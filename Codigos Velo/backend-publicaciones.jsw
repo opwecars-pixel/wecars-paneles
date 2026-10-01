@@ -1,0 +1,27 @@
+// backend/publicaciones.jsw
+// Stub temporal — funciones exportadas para que el panel cargue.
+// Implementación completa pendiente (Fase 5 - Meta Graph API).
+
+export async function obtenerVehiculos() {
+  return [];
+}
+
+export async function obtenerCuentasAutorizadas() {
+  return [];
+}
+
+export async function guardarBorrador(datos) {
+  return { ok: false, pendiente: true, mensaje: 'Módulo de publicaciones no activado aún.' };
+}
+
+export async function publicarEnMeta(publicacionId) {
+  return { ok: false, pendiente: true, mensaje: 'Módulo de publicaciones no activado aún.' };
+}
+
+export async function obtenerHistorial(filtros) {
+  return [];
+}
+
+export async function generarTexto(carro, plataforma) {
+  return '';
+}

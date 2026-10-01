@@ -1,0 +1,13 @@
+﻿_id,clienteId,ventaId,concepto,monto,tipo,fecha,metodo,referencia
+p001,cl001,v001,Enganche Ford Lobo Raptor — toma RAM 2019 + efectivo,480000,ingreso,2026-07-12,transferencia+toma,TRF2026-001
+p002,cl001,v001,Diferencia enganche Lobo Raptor — transferencia,200000,ingreso,2026-07-12,transferencia,TRF2026-002
+p003,cl003,v002,Enganche Kia Sportage 2018 — toma March + efectivo,116000,ingreso,2026-07-15,transferencia+toma,TRF2026-003
+p004,cl005,v003,Liquidación Nissan Altima 2018 — contado,190000,ingreso,2026-07-08,transferencia,TRF2026-004
+p005,cl007,v004,Liquidación Mazda 3 2019 — contado,210000,ingreso,2026-07-05,efectivo,EFT2026-001
+p006,cl009,v005,Liquidación Peugeot Partner 2017 — contado empresa,165000,ingreso,2026-07-02,cheque,CHQ2026-001
+p007,,,Publicidad Facebook + Instagram — Julio,22000,egreso,2026-07-14,tarjeta,FB2026-JUL
+p008,,,Detailing y preparación de unidades — Julio,9500,egreso,2026-07-10,efectivo,DET2026-003
+p009,,,Renta local agencia — Julio 2026,28000,egreso,2026-07-18,transferencia,RENTA2026-JUL
+p010,,,Comisiones vendedores — Julio,51000,egreso,2026-07-17,transferencia,COM2026-JUL
+p011,,,Adquisición Kia Sportage 2023 (nuevo inventario),418000,egreso,2026-06-25,transferencia,COMP2026-001
+p012,,,Adquisición Ford Lobo Lariat 2021,622000,egreso,2026-06-28,transferencia,COMP2026-002

@@ -1,0 +1,192 @@
+// backend/backend-apartados.jsw
+// Gestión del sistema de apartados de vehículos.
+// REGLA: suppressAuth: true en TODA operación wixData.
+// REGLA: identidad y rol SIEMPRE del backend, nunca del frontend.
+
+import wixData from 'wix-data';
+import wixUsersBackend from 'wix-users-backend';
+import { obtenerPerfil } from 'backend/permisos.jsw';
+import { registrarActividad } from 'backend/actividades.jsw';
+
+const SA = { suppressAuth: true };
+
+async function _requireAdmin() {
+  const email = await wixUsersBackend.currentUser.getEmail();
+  if (!email) throw new Error('No autenticado');
+  const perfil = await obtenerPerfil(email);
+  const rolesPermitidos = ['Administración', 'Gerencia'];
+  if (!perfil || !rolesPermitidos.includes(perfil.rol)) throw new Error('Sin permiso para crear apartados');
+  return { email, ...perfil };
+}
+
+// Finanzas puede cerrar apartados (baja por cancelación o venta) pero no crearlos.
+async function _requireAdminOFinanzas() {
+  const email = await wixUsersBackend.currentUser.getEmail();
+  if (!email) throw new Error('No autenticado');
+  const perfil = await obtenerPerfil(email);
+  const rolesPermitidos = ['Administración', 'Gerencia', 'Finanzas'];
+  if (!perfil || !rolesPermitidos.includes(perfil.rol)) throw new Error('Sin permiso');
+  return { email, ...perfil };
+}
+
+function _generarFolio() {
+  const ts = Date.now().toString().slice(-6);
+  return 'APT-' + ts;
+}
+
+function _addDias(fecha, n) {
+  const d = new Date(fecha);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+
+// Crea un registro de apartado y marca el vehículo como 'Apartado' en Cars.
+// Llamado desde pagina-administracion.js con handler 'wecars-apartado-crear'.
+export async function crearApartado(datos) {
+  const admin = await _requireAdmin();
+
+  const {
+    clienteId, clienteNombre, clienteTelefono,
+    vehiculoId, vehiculoNombre,
+    marca, modelo, anio, version, noSerie, transmision, color,
+    precioAcordado, montoEnganche,
+    vigenciaDias = 15,
+    formaPago = '',
+    notas = '',
+  } = datos;
+
+  if (!marca && !modelo) throw new Error('Falta información del vehículo');
+  if (!montoEnganche || montoEnganche <= 0) throw new Error('El monto de apartado debe ser mayor a 0');
+
+  const folio    = _generarFolio();
+  const fechaHoy = new Date();
+  const fechaVig = _addDias(fechaHoy, vigenciaDias);
+
+  // Si viene del inventario: verificar que el auto existe y actualizar estatus
+  let carro = null;
+  if (vehiculoId) {
+    carro = await wixData.get('Cars', vehiculoId, SA);
+    if (!carro) throw new Error('Vehículo no encontrado en inventario');
+    if (['Apartado','Vendido','vendido'].includes(carro.estatusVenta)) {
+      throw new Error('El vehículo ya está ' + carro.estatusVenta);
+    }
+    await wixData.update('Cars', { _id: vehiculoId, estatusVenta: 'Apartado' }, SA);
+  }
+
+  // Insertar en colección Apartados
+  const apartado = {
+    folioApartado:   folio,
+    clienteId:       clienteId       || '',
+    clienteNombre:   clienteNombre   || '',
+    clienteTelefono: clienteTelefono || '',
+    vehiculoId,
+    vehiculoNombre:  vehiculoNombre  || '',
+    marca:           marca           || '',
+    modelo:          modelo          || '',
+    anio:            String(anio     || ''),
+    version:         version         || '',
+    noSerie:         noSerie         || 'NA',
+    transmision:     transmision     || '',
+    color:           color           || '',
+    precioAcordado:  Number(precioAcordado  || 0),
+    montoEnganche:   Number(montoEnganche),
+    fechaApartado:   fechaHoy,
+    fechaVigencia:   fechaVig,
+    formaPago:       formaPago,
+    estatusApartado: 'activo',
+    vendedorNombre:  admin.nombre    || '',
+    registradoPor:   admin.email,
+    notas,
+  };
+
+  const inserted = await wixData.insert('Apartados', apartado, SA);
+
+  // Registrar actividad para historial de Gerencia
+  const vehiculoLabel = [marca, modelo, String(anio||'')].filter(Boolean).join(' ');
+  registrarActividad({
+    tipo:           'apartado',
+    clienteId:      clienteId || '',
+    entidadTipo:    'apartado',
+    entidadId:      inserted._id,
+    vendedorEmail:  admin.email,
+    vendedorNombre: admin.nombre || '',
+    eventKey:       'apartado:' + inserted._id,
+    metadata: {
+      folio:          folio,
+      clienteNombre:  clienteNombre || '',
+      vehiculoNombre: vehiculoLabel,
+      montoEnganche:  montoEnganche,
+      formaPago:      formaPago || '',
+    },
+  }).catch(() => {});
+
+  // Devolver el registro completo + carro actualizado para la UI
+  const carroActualizado = carro ? Object.assign({}, carro, { estatusVenta: 'Apartado' }) : null;
+
+  return {
+    ok: true,
+    folio,
+    apartadoId:  inserted._id,
+    adminNombre: admin.nombre || 'weCars Bajío',
+    carro:       carroActualizado,
+    datos:       inserted,
+  };
+}
+
+// Cierra un apartado (vendido o cancelado) y actualiza el estatus del vehículo.
+export async function cerrarApartado(apartadoId, tipoCierre, motivo) {
+  const admin = await _requireAdminOFinanzas();
+
+  if (!apartadoId) throw new Error('Falta apartadoId');
+  const tiposValidos = ['vendido', 'cancelado'];
+  if (!tiposValidos.includes(tipoCierre)) throw new Error('tipoCierre inválido');
+
+  const apartado = await wixData.get('Apartados', apartadoId, SA);
+  if (!apartado) throw new Error('Apartado no encontrado');
+  if (apartado.estatusApartado !== 'activo') throw new Error('El apartado ya está cerrado');
+
+  // Actualizar el apartado
+  await wixData.update('Apartados', {
+    _id:             apartadoId,
+    estatusApartado: tipoCierre,          // 'vendido' | 'cancelado'
+    motivoCierre:    motivo || '',
+    fechaCierre:     new Date(),
+    cerradoPor:      admin.email,
+    cerradoPorNombre: admin.nombre || '',
+  }, SA);
+
+  // Actualizar estatus del vehículo en Cars (si aplica)
+  if (apartado.vehiculoId) {
+    const estatusCarro = tipoCierre === 'vendido' ? 'Vendido' : 'Disponible';
+    await wixData.update('Cars', { _id: apartado.vehiculoId, estatusVenta: estatusCarro }, SA);
+  }
+
+  // Registrar actividad
+  registrarActividad({
+    tipo:           'apartado_cierre',
+    clienteId:      apartado.clienteId    || '',
+    entidadTipo:    'apartado',
+    entidadId:      apartadoId,
+    vendedorEmail:  admin.email,
+    vendedorNombre: admin.nombre          || '',
+    eventKey:       'apartado_cierre:' + apartadoId,
+    metadata: {
+      folio:         apartado.folioApartado || '',
+      clienteNombre: apartado.clienteNombre || '',
+      tipoCierre,
+      motivo:        motivo || '',
+    },
+  }).catch(() => {});
+
+  return { ok: true, estatusNuevo: tipoCierre, apartadoId, vehiculoId: apartado.vehiculoId || null };
+}
+
+// Lista apartados activos (para el panel Admin si se quiere una vista futura).
+export async function listarApartados(filtros = {}) {
+  await _requireAdmin(); // Gerencia y Administración tienen acceso
+  let q = wixData.query('Apartados').eq('estatusApartado', 'activo').descending('fechaApartado');
+  if (filtros.vehiculoId) q = q.eq('vehiculoId', filtros.vehiculoId);
+  if (filtros.clienteId)  q = q.eq('clienteId',  filtros.clienteId);
+  const r = await q.find(SA);
+  return r.items;
+}

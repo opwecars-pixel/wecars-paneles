@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¡Gracias! · weCars Bajío</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@800;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root {
+  /* ── DS v2 Brand ────────────────────────────────────── */
+  --lime:        #56a900;  --lime-dark:  #3d7a00;
+  --lime-bg:     rgba(86,169,0,.10);  --lime-light: #ebf7dc;
+  /* ── DS v2 Neutrals ─────────────────────────────────── */
+  --bg:          #f4f6f5;  --surface:   #ffffff;
+  --dark:        #0d1a0d;  --dark-2:    #1a2e1a;
+  --ink:         #0d1a0d;  --ink-2:     #2c3d2c;
+  --muted:       #6b7e6b;  --muted-2:   #9aaa9a;
+  --line:        #e2eae2;
+  /* ── DS v2 Semantic ─────────────────────────────────── */
+  --err:         #dc2626;  --err-bg:    rgba(220,38,38,.10);
+  --warn:        #d97706;  --warn-bg:   rgba(217,119,6,.10);
+  --ok:          #56a900;  --ok-bg:     rgba(86,169,0,.10);
+  --info:        #2563eb;  --info-bg:   rgba(37,99,235,.10);
+  /* ── DS v2 Elevation ────────────────────────────────── */
+  --sh-1: 0 1px 2px rgba(0,0,0,.05),0 1px 3px rgba(0,0,0,.04);
+  --sh-2: 0 2px 8px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);
+  --sh-3: 0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);
+  --sh-modal: 0 24px 64px rgba(0,0,0,.18),0 8px 24px rgba(0,0,0,.10);
+  /* ── DS v2 Radius ───────────────────────────────────── */
+  --r-xs: 4px;  --r-sm: 8px;  --r-md: 12px;  --r-lg: 18px;
+  /* ── DS v2 Spacing ──────────────────────────────────── */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px;
+  --sp-6:24px; --sp-8:32px; --sp-10:40px; --sp-12:48px; --sp-16:64px;
+  /* ── DS v2 Type scale ───────────────────────────────── */
+  --t-xs:.6875rem; --t-sm:.8125rem; --t-base:.875rem; --t-md:1rem;
+  --t-lg:1.125rem; --t-xl:1.375rem; --t-2xl:1.75rem;
+  /* ── DS v2 Motion ───────────────────────────────────── */
+  --ease:cubic-bezier(.2,0,0,1); --t-fast:100ms; --t-base-d:180ms; --t-slow:300ms;
+  /* ── Legacy aliases — DO NOT REMOVE ────────────────── */
+  --verde:      var(--lime);    --verde-dark: var(--lime-dark);
+  --negro:      var(--ink);     --paper:      var(--bg);
+  --white:      var(--surface); --shadow-sm:  var(--sh-1);
+  --shadow:     var(--sh-2);    --shadow-lg:  var(--sh-3);
+  --radius-sm:  var(--r-sm);   --radius:     var(--r-md);
+  --radius-md:  var(--r-md);   --radius-lg:  var(--r-lg);
+  --gris:       var(--bg);     --gris-borde: var(--line);
+  --ink-2:      #2c3d2c;       --ink-3:      var(--ink-2);
+  --radio:      var(--r-md);   --sombra:     var(--sh-3);
+  --borde:      var(--line);   --texto:      var(--muted);  --max: 1280px;
+}
+
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);padding:var(--sp-8) var(--sp-4) 60px}
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+    html,body{scrollbar-width:none;-ms-overflow-style:none}
+  .shell{max-width:860px;margin:0 auto}
+
+  /* ── Hero gracias ─────────────────────────────────── */
+  .conf-hero{text-align:center;padding:var(--sp-10) var(--sp-5) var(--sp-8);background:var(--surface);border-radius:var(--r-md);box-shadow:var(--sh-2);margin-bottom:var(--sp-6)}
+  .conf-check{width:64px;height:64px;border-radius:50%;background:var(--lime-bg);color:var(--lime-dark);display:inline-flex;align-items:center;justify-content:center;font-size:1.75rem;margin-bottom:var(--sp-4)}
+  .conf-titulo{font-family:'Manrope',sans-serif;font-size:var(--t-2xl);font-weight:800;color:var(--ink);margin-bottom:var(--sp-2)}
+  .conf-sub{font-size:var(--t-md);color:var(--muted);max-width:480px;margin:0 auto var(--sp-5)}
+  .conf-badges{display:flex;flex-wrap:wrap;gap:var(--sp-2);justify-content:center}
+  .conf-badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--t-sm);font-weight:700;background:var(--lime-bg);color:var(--ink-2);padding:5px 12px;border-radius:var(--r-xs)}
+  .conf-badge i{color:var(--lime-dark);font-size:var(--t-base)}
+
+  /* ── CTA asesor ───────────────────────────────────── */
+  .conf-cta{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);background:var(--dark);color:#fff;border-radius:var(--r-md);padding:var(--sp-5) var(--sp-6);margin-bottom:var(--sp-6)}
+  .conf-cta-text h3{font-family:'Manrope',sans-serif;font-size:var(--t-md);font-weight:800;margin-bottom:var(--sp-1)}
+  .conf-cta-text p{font-size:var(--t-sm);opacity:.7}
+  .conf-cta-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;background:var(--lime);color:var(--ink);font-weight:700;font-size:var(--t-sm);padding:10px 18px;border-radius:var(--r-sm);text-decoration:none;white-space:nowrap;transition:background var(--t-fast) var(--ease)}
+  .conf-cta-btn:hover{background:var(--lime-dark);color:#fff}
+  .conf-cta-btn:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+
+  /* ── Autos similares ──────────────────────────────── */
+  .conf-section-title{font-family:'Manrope',sans-serif;font-size:var(--t-md);font-weight:800;margin-bottom:var(--sp-4);display:flex;align-items:center;gap:var(--sp-2)}
+  .conf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-4);margin-bottom:var(--sp-6)}
+  .conf-card{background:var(--surface);border-radius:var(--r-md);box-shadow:var(--sh-1);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow var(--t-base-d) var(--ease)}
+  .conf-card:hover{box-shadow:var(--sh-3)}
+  .conf-card-img{width:100%;aspect-ratio:16/10;object-fit:cover;background:var(--line);display:block}
+  .conf-card-img-placeholder{width:100%;aspect-ratio:16/10;background:var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:2rem}
+  .conf-card-body{padding:var(--sp-4);flex:1;display:flex;flex-direction:column}
+  .conf-card-title{font-weight:700;font-size:var(--t-base);margin-bottom:var(--sp-1);line-height:1.3}
+  .conf-card-meta{font-size:var(--t-xs);color:var(--muted);margin-bottom:var(--sp-3)}
+  .conf-card-precio{font-family:'Manrope',sans-serif;font-size:var(--t-lg);font-weight:800;color:var(--ink);margin-bottom:var(--sp-3)}
+  .conf-card-fin{font-size:var(--t-xs);background:var(--info-bg);color:var(--info);padding:3px 9px;border-radius:var(--r-xs);display:inline-block;margin-bottom:var(--sp-3);font-weight:700}
+  .conf-card-btn{margin-top:auto;display:block;text-align:center;background:var(--lime);color:var(--ink);font-weight:700;font-size:var(--t-sm);padding:9px 14px;border-radius:var(--r-sm);text-decoration:none;transition:background var(--t-fast) var(--ease)}
+  .conf-card-btn:hover{background:var(--lime-dark);color:#fff}
+  .conf-card-btn:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+
+  /* ── Empty state ──────────────────────────────────── */
+  .conf-empty{text-align:center;padding:var(--sp-8);color:var(--muted);font-size:var(--t-base);background:var(--surface);border-radius:var(--r-md)}
+
+  /* ── Pasos siguientes ─────────────────────────────── */
+  .conf-pasos{background:var(--surface);border-radius:var(--r-md);box-shadow:var(--sh-2);padding:var(--sp-6)}
+  .conf-paso{display:flex;align-items:flex-start;gap:var(--sp-4);padding:var(--sp-3) 0;border-bottom:1px solid var(--line)}
+  .conf-paso:last-child{border-bottom:none}
+  .conf-paso-num{width:32px;height:32px;border-radius:50%;background:var(--lime-bg);color:var(--lime-dark);font-weight:800;font-size:var(--t-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .conf-paso-text h4{font-size:var(--t-base);font-weight:700;margin-bottom:2px}
+  .conf-paso-text p{font-size:var(--t-sm);color:var(--muted)}
+
+  /* ── Motion ───────────────────────────────────────── */
+  @media(prefers-reduced-motion:reduce){
+    .conf-cta-btn,.conf-card,.conf-card-btn{transition:none}
+  }
+
+  /* ── Responsive ───────────────────────────────────── */
+  @media(max-width:640px){
+    .conf-grid{grid-template-columns:1fr}
+    .conf-cta{flex-direction:column;text-align:center}
+    .conf-titulo{font-size:var(--t-xl)}
+    .conf-cta-btn{width:100%;justify-content:center;padding:14px 20px;font-size:var(--t-base)}
+    .conf-card-btn{padding:12px 14px;font-size:var(--t-base);min-height:44px;display:flex;align-items:center;justify-content:center}
+  }
+  @media(max-width:480px){
+    body{padding:var(--sp-4) 10px 40px}
+    .conf-hero{padding:var(--sp-6) var(--sp-4) var(--sp-5)}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Hero -->
+  <div class="conf-hero">
+    <div class="conf-check"><i class="ti ti-circle-check"></i></div>
+    <h1 class="conf-titulo" id="conf-titulo">¡Gracias! Tu mensaje fue recibido</h1>
+    <p class="conf-sub" id="conf-sub">Uno de nuestros asesores se comunicará contigo en menos de 30 minutos.</p>
+    <div class="conf-badges">
+      <span class="conf-badge"><i class="ti ti-clock"></i> Respuesta en &lt;30 min</span>
+      <span class="conf-badge"><i class="ti ti-shield-check"></i> Sin compromisos</span>
+      <span class="conf-badge"><i class="ti ti-star"></i> Atención personalizada</span>
+    </div>
+  </div>
+
+  <!-- CTA WhatsApp -->
+  <div class="conf-cta">
+    <div class="conf-cta-text">
+      <h3>¿Quieres respuesta inmediata?</h3>
+      <p>Escríbenos por WhatsApp y un asesor te atiende ahora mismo.</p>
+    </div>
+    <a class="conf-cta-btn" id="conf-wa-btn" href="https://wa.me/524778350020?text=Hola%2C%20acabo%20de%20llenar%20el%20formulario%20y%20me%20interesa%20obtener%20más%20información." target="_blank" rel="noopener">
+      <i class="ti ti-brand-whatsapp"></i> Abrir WhatsApp
+    </a>
+  </div>
+
+  <!-- Autos similares -->
+  <div class="conf-section-title"><i class="ti ti-car" style="color:var(--lime-dark)"></i> Autos que podrían interesarte</div>
+  <div class="conf-grid" id="conf-grid">
+    <div class="conf-empty" style="grid-column:1/-1">Cargando opciones para ti...</div>
+  </div>
+
+  <!-- Pasos siguientes -->
+  <div class="conf-pasos">
+    <div class="conf-section-title" style="margin-bottom:4px"><i class="ti ti-list-check" style="color:var(--lime-dark)"></i> ¿Qué sigue?</div>
+    <div class="conf-paso"><div class="conf-paso-num">1</div><div class="conf-paso-text"><h4>Revisamos tu solicitud</h4><p>Nuestro equipo recibió tu mensaje y lo está procesando ahora mismo.</p></div></div>
+    <div class="conf-paso"><div class="conf-paso-num">2</div><div class="conf-paso-text"><h4>Un asesor te contacta</h4><p>Te llamamos o escribimos en menos de 30 minutos en horario de oficina.</p></div></div>
+    <div class="conf-paso"><div class="conf-paso-num">3</div><div class="conf-paso-text"><h4>Agendamos una cita</h4><p>Conoce el auto en persona, sin presión y con toda la información.</p></div></div>
+  </div>
+
+</div>
+
+<script>
+  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+  function M(n){return n?'$'+Math.round(n).toLocaleString('es-MX'):'—'}
+  function calcMen(p,meses,tasa){const r=tasa/12;return Math.round(p*r/(1-Math.pow(1+r,-meses)))}
+
+  window.addEventListener('message', ev => {
+    let d = ev.data;
+    if (typeof d === 'string') { try { d = JSON.parse(d); } catch(e) { return; } }
+    if (!d || d.type !== 'wecars-confirmacion') return;
+
+    // Personalizar hero
+    if (d.nombre) {
+      document.getElementById('conf-titulo').textContent = `¡Gracias, ${d.nombre.split(' ')[0]}! Tu mensaje fue recibido`;
+    }
+    if (d.interes) {
+      document.getElementById('conf-sub').textContent = `Encontramos algunas opciones de ${d.interes} que podrían interesarte. Un asesor te contactará en menos de 30 minutos.`;
+    }
+
+    // WhatsApp con contexto del lead
+    const waText = encodeURIComponent(`Hola, acabo de llenar el formulario${d.interes ? ' y me interesa un ' + d.interes : ''}. ¿Pueden darme más información?`);
+    document.getElementById('conf-wa-btn').href = `https://wa.me/524778350020?text=${waText}`;
+
+    // Renderizar autos similares
+    const grid = document.getElementById('conf-grid');
+    if (!d.autos || !d.autos.length) {
+      grid.innerHTML = '<div class="conf-empty" style="grid-column:1/-1">Visita nuestro inventario para ver todas las opciones disponibles.<br><br><a href="/inventario" style="color:var(--lime-dark);font-weight:700">Ver inventario →</a></div>';
+      return;
+    }
+    grid.innerHTML = d.autos.map(a => {
+      const men48 = a.precio ? calcMen(a.precio, 48, 0.18) : null;
+      const imgEl = a.imagen
+        ? `<img class="conf-card-img" src="${esc(a.imagen)}" alt="${esc(a.title)}" loading="lazy">`
+        : `<div class="conf-card-img-placeholder"><i class="ti ti-car"></i></div>`;
+      const metaParts = [a.year, a.transmision, a.kilometros ? Math.round(a.kilometros/1000)+'k km' : ''].filter(Boolean);
+      return `
+      <div class="conf-card">
+        ${imgEl}
+        <div class="conf-card-body">
+          <div class="conf-card-title">${esc(a.title || a.brand)}</div>
+          <div class="conf-card-meta">${metaParts.map(esc).join(' · ')}</div>
+          <div class="conf-card-precio">${M(a.precio)}</div>
+          ${men48 ? `<div class="conf-card-fin">~$${men48.toLocaleString('es-MX')}/mes a 48m</div>` : ''}
+          <a class="conf-card-btn" href="/auto/${esc(a.slug)}" target="_top">Ver detalles →</a>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Notificar altura al padre
+    setTimeout(() => {
+      const h = document.body.scrollHeight;
+      window.parent.postMessage({ type: 'wecars-resize', height: h }, '*');
+    }, 200);
+  });
+
+  // Auto-resize robusto
+  (function(){var t,retries=0;function send(){var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight,document.body.offsetHeight);window.parent.postMessage({type:'wecars-resize',height:h},'*');}function rh(){clearTimeout(t);t=setTimeout(function(){requestAnimationFrame(send);},150);}function hookImgs(){document.querySelectorAll('img').forEach(function(img){if(!img.dataset.wcResize){img.dataset.wcResize='1';img.addEventListener('load',rh);img.addEventListener('error',rh);}});}window.addEventListener('load',function(){rh();var iv=setInterval(function(){rh();hookImgs();if(++retries>=12)clearInterval(iv);},400);});window.addEventListener('resize',rh);new MutationObserver(function(){rh();hookImgs();}).observe(document.body,{childList:true,subtree:true,attributes:false,characterData:false});hookImgs();rh();})();
+</script>
+<style>
+.vta-aside{display:flex;align-items:center;gap:20px;padding:20px 24px;background:var(--white,#fff);border:1px solid var(--line,#d8e2e5);border-left:4px solid var(--lime,#56a900);border-radius:0 12px 12px 0;flex-wrap:wrap;margin:40px 0}
+.vta-aside-icon{font-size:1.5rem;flex-shrink:0;line-height:1}
+.vta-aside-body{flex:1;min-width:180px}
+.vta-aside-body strong{display:block;font-size:.9rem;font-weight:700;color:var(--ink,#0f1a0f);margin-bottom:3px}
+.vta-aside-body p{font-size:.8rem;color:var(--muted,#6d7a83);line-height:1.55;margin:0}
+.vta-aside-link{white-space:nowrap;font-size:.82rem;font-weight:700;color:#fff;background:var(--lime,#56a900);text-decoration:none;padding:9px 18px;border-radius:99px;flex-shrink:0;transition:background .15s}
+.vta-aside-link:hover{background:var(--lime-dark,#3d7a00)}
+@media(max-width:520px){.vta-aside{flex-direction:column;align-items:flex-start;gap:12px}.vta-aside-link{align-self:flex-start}}
+@media(prefers-color-scheme:dark){.vta-aside{background:var(--white,#1C2416);border-color:var(--line,#2e3d24)}.vta-aside-body strong{color:var(--ink,#e8f0e0)}}
+@media(max-width:640px){body{touch-action:pan-y;overscroll-behavior-y:contain}input,select,textarea,button{touch-action:manipulation}}
+</style>
+<div class="vta-aside">
+  <div class="vta-aside-icon">&#128269;</div>
+  <div class="vta-aside-body">
+    <strong>Antes de firmar, verifica que los papeles del auto sean los correctos.</strong>
+    <p>Un crédito sobre un auto con factura clonada o baja ilegal puede traerte problemas legales. Revisamos consecutivos, propietario y documentos &mdash; valida primero, firma después. Desde $189&nbsp;+&nbsp;IVA.</p>
+  </div>
+  <a class="vta-aside-link" href="https://www.wecarsbajio.com/verifica-tu-auto" onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:'https://www.wecarsbajio.com/verifica-tu-auto'},'*')">Verifica tu Auto &rarr;</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+﻿_id,vendedorId,vendedor,clienteId,ventaId,autoVendido,montoVenta,pct,monto,estatus,fechaVenta,fechaPago
+com001,3e027843-3e39-44c9-8e33-adc48b5ec45d,Brandon Eduardo Zuñiga,cl001,v001,Ford Lobo Raptor 2022,1000000,1.5,15000,pagada,2026-07-12,2026-07-15
+com002,7cc6241e-e93a-4704-8da3-bea04ffecd51,weCars Bajío,cl003,v002,Kia Sportage 2018,220000,1.5,3300,pagada,2026-07-15,2026-07-17
+com003,3e027843-3e39-44c9-8e33-adc48b5ec45d,Brandon Eduardo Zuñiga,cl005,v003,Nissan Altima 2018,190000,1.5,2850,pagada,2026-07-08,2026-07-11
+com004,7cc6241e-e93a-4704-8da3-bea04ffecd51,weCars Bajío,cl007,v004,Mazda 3 2019,210000,1.5,3150,pagada,2026-07-05,2026-07-08
+com005,3e027843-3e39-44c9-8e33-adc48b5ec45d,Brandon Eduardo Zuñiga,cl009,v005,Peugeot Partner 2017,165000,1.5,2475,pendiente,2026-07-02,

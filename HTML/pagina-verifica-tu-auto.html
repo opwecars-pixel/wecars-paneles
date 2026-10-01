@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verifica tu Auto · weCars Bajío</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ── Tokens (mismo sistema que inicio y consignas) ───────────────── */
+:root {
+  --lime:        #56a900;
+  --lime-dark:   #3d7a00;
+  --lime-bg:     rgba(86,169,0,.10);
+  --lime-border: rgba(86,169,0,.28);
+  --ink:         #0f1a0f;
+  --ink-2:       #1a2e1a;
+  --paper:       #F5F7F5;
+  --white:       #ffffff;
+  --muted:       #6d7a83;
+  --line:        #d8e2e5;
+  --c-red:       #e24b4a;  --c-red-bg:   rgba(226,75,74,.10);
+  --c-amber:     #d97706;  --c-amber-bg: rgba(217,119,6,.10);
+  --c-blue:      #2a78d6;  --c-blue-bg:  rgba(42,120,214,.10);
+  --c-green:     #16a34a;  --c-green-bg: rgba(22,163,74,.10);
+  --shadow-sm:   0 2px 8px rgba(12,27,35,.08);
+  --shadow:      0 8px 24px rgba(12,27,35,.10);
+  --shadow-lg:   0 18px 48px rgba(12,27,35,.12);
+  --radius:      12px;
+  --radius-md:   16px;
+  --radius-lg:   22px;
+  --wa:          #25d366;
+  --wa-dark:     #1da851;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #111a0e; --ink: #e8f0e0; --ink-2: #c8d8c0;
+    --line:  #2e3d24; --muted: #7a9e68; --white: #1C2416;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,.25);
+    --shadow:    0 8px 24px rgba(0,0,0,.28);
+    --shadow-lg: 0 18px 48px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111a0e; --ink: #e8f0e0; --ink-2: #c8d8c0;
+  --line:  #2e3d24; --muted: #7a9e68; --white: #1C2416;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.25);
+  --shadow:    0 8px 24px rgba(0,0,0,.28);
+  --shadow-lg: 0 18px 48px rgba(0,0,0,.35);
+}
+:root[data-theme="light"] {
+  --paper: #F5F7F5; --ink: #0f1a0f; --ink-2: #1a2e1a;
+  --line:  #E4EAE4; --muted: #5a7060; --white: #ffffff;
+}
+
+/* ── Reset ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; max-width: 100%; }
+img, svg, video { max-width: 100%; height: auto; }
+html { width: 100%; overflow-x: clip; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  font-family: "DM Sans", Arial, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  width: 100%; max-width: 100%;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+    html,body{scrollbar-width:none;-ms-overflow-style:none}
+
+/* ── Contenedor central ──────────────────────────────────────────── */
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 clamp(18px, 5vw, 28px);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════════════════════════ */
+.hero {
+  background: linear-gradient(160deg, #071206 0%, #142e07 55%, #071206 100%);
+  padding: clamp(40px, 8vw, 60px) 0 clamp(36px, 7vw, 52px);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 65% 55% at 80% 15%, rgba(86,169,0,.20) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 40% 50% at 5% 85%, rgba(42,120,214,.10) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-inner {
+  position: relative; z-index: 1;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(150,217,78,.30);
+  color: #96d94e;
+  background: rgba(86,169,0,.09);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: .68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  margin-bottom: 20px;
+}
+.hero-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #96d94e;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 4px rgba(150,217,78,.18);
+}
+.hero h1 {
+  font-family: "Manrope", sans-serif;
+  font-weight: 900;
+  font-size: clamp(1.75rem, 6vw, 2.6rem);
+  color: #fff;
+  line-height: 1.12;
+  letter-spacing: -.03em;
+  margin-bottom: 14px;
+  text-wrap: balance;
+}
+.hero h1 em {
+  color: #96d94e;
+  font-style: normal;
+}
+.hero-sub {
+  font-size: clamp(.88rem, 2.2vw, .98rem);
+  color: rgba(255,255,255,.55);
+  line-height: 1.72;
+  max-width: 520px;
+  margin-bottom: 32px;
+}
+.hero-stats {
+  display: flex;
+  gap: clamp(20px, 5vw, 36px);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.hero-stat-num {
+  font-family: "Manrope", sans-serif;
+  font-weight: 900;
+  font-size: clamp(1.3rem, 4vw, 1.6rem);
+  color: #fff;
+  line-height: 1;
+}
+.hero-stat-num em {
+  color: #96d94e;
+  font-style: normal;
+}
+.hero-stat-label {
+  font-size: .68rem;
+  color: rgba(255,255,255,.38);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.hero-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255,255,255,.12);
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SECTION HELPERS
+══════════════════════════════════════════════════════════════════ */
+.section {
+  padding: clamp(32px, 7vw, 48px) 0 0;
+}
+.section-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--lime-dark);
+  margin-bottom: 10px;
+}
+.section-eyebrow::before {
+  content: '';
+  width: 20px; height: 2.5px;
+  background: var(--lime);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.section-title {
+  font-family: "Manrope", sans-serif;
+  font-weight: 900;
+  font-size: clamp(1.18rem, 4vw, 1.45rem);
+  letter-spacing: -.025em;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 20px;
+  text-wrap: balance;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CHECKS GRID
+══════════════════════════════════════════════════════════════════ */
+.checks-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.check-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .18s;
+}
+.check-card:hover { box-shadow: var(--shadow); }
+.check-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.check-title {
+  font-weight: 700;
+  font-size: .86rem;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.check-desc {
+  font-size: .75rem;
+  color: var(--muted);
+  line-height: 1.6;
+  flex: 1;
+}
+.check-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: 3px 9px;
+  border-radius: 99px;
+  margin-top: auto;
+  width: fit-content;
+}
+.check-tag.critical  { background: var(--c-red-bg);   color: var(--c-red); }
+.check-tag.important { background: var(--c-amber-bg); color: var(--c-amber); }
+.check-tag.plus      { background: var(--c-blue-bg);  color: var(--c-blue); }
+
+.check-card-wide {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 14px;
+}
+.check-card-wide .check-tag {
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RESULTADO — lista de items
+══════════════════════════════════════════════════════════════════ */
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.result-item {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.result-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 4px;
+  border-radius: 2px 0 0 2px;
+}
+.result-item.green::before  { background: var(--c-green); }
+.result-item.red::before    { background: var(--c-red); }
+.result-item.blue::before   { background: var(--c-blue); }
+.result-item.amber::before  { background: var(--c-amber); }
+.result-item-title {
+  font-weight: 700;
+  font-size: .88rem;
+  color: var(--ink);
+  margin-bottom: 5px;
+}
+.result-item-desc {
+  font-size: .76rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.verdict-card {
+  background: var(--ink-2);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.verdict-title {
+  font-weight: 800;
+  font-size: .94rem;
+  color: #fff;
+  margin-bottom: 4px;
+  letter-spacing: -.01em;
+}
+.verdict-sub {
+  font-size: .75rem;
+  color: rgba(255,255,255,.42);
+  line-height: 1.6;
+}
+.verdict-badges {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.vbadge {
+  font-size: .7rem;
+  font-weight: 800;
+  border-radius: 7px;
+  padding: 5px 11px;
+  letter-spacing: .02em;
+}
+.vbadge-ok    { background: rgba(22,163,74,.22);  color: #4ade80; }
+.vbadge-obs   { background: rgba(217,119,6,.22);  color: #fbbf24; }
+.vbadge-no    { background: rgba(226,75,74,.22);  color: #f87171; }
+
+/* ══════════════════════════════════════════════════════════════════
+   STEPS
+══════════════════════════════════════════════════════════════════ */
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 14px 0;
+  position: relative;
+}
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 17px; top: 48px; bottom: 0;
+  width: 1.5px;
+  background: var(--line);
+}
+.step-num {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--ink-2);
+  color: #96d94e;
+  font-family: "Manrope", sans-serif;
+  font-weight: 900;
+  font-size: .9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 1;
+  position: relative;
+}
+.step-body h4 {
+  font-weight: 700;
+  font-size: .9rem;
+  color: var(--ink);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+.step-body p {
+  font-size: .78rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PRECIO
+══════════════════════════════════════════════════════════════════ */
+.price-band {
+  background: var(--ink-2);
+  border-radius: var(--radius-lg);
+  padding: clamp(20px, 5vw, 28px) clamp(20px, 5vw, 28px);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: clamp(32px, 7vw, 48px);
+}
+.price-big {
+  font-family: "Manrope", sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.2rem, 8vw, 2.9rem);
+  color: #96d94e;
+  line-height: 1;
+  flex-shrink: 0;
+  letter-spacing: -.04em;
+}
+.price-big small {
+  font-size: .95rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.40);
+  margin-left: 3px;
+}
+.price-info {
+  flex: 1;
+  min-width: 160px;
+}
+.price-info strong {
+  display: block;
+  color: #fff;
+  font-size: .92rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.price-info span {
+  font-size: .76rem;
+  color: rgba(255,255,255,.42);
+  line-height: 1.6;
+}
+.price-chips {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.price-chip {
+  background: rgba(86,169,0,.14);
+  border: 1px solid rgba(86,169,0,.28);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: .64rem;
+  font-weight: 700;
+  color: #96d94e;
+}
+
+.price-extra-note {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  background: rgba(86,169,0,.07);
+  border: 1px solid rgba(86,169,0,.22);
+  border-radius: 8px;
+  font-size: .75rem;
+  color: var(--muted);
+  line-height: 1.5;
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+}
+.price-extra-note .ti { flex-shrink:0; font-size:.9rem; margin-top:.05em; color: var(--lime); }
+
+/* ══════════════════════════════════════════════════════════════════
+   FORMULARIO
+══════════════════════════════════════════════════════════════════ */
+.form-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(20px, 5vw, 28px);
+  margin-top: clamp(28px, 6vw, 40px);
+  box-shadow: var(--shadow);
+}
+.form-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 6px;
+}
+.form-head-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--c-green-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.form-head-title {
+  font-family: "Manrope", sans-serif;
+  font-weight: 900;
+  font-size: 1rem;
+  color: var(--ink);
+  letter-spacing: -.02em;
+  line-height: 1.2;
+}
+.form-head-sub {
+  font-size: .76rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.form-sub {
+  font-size: .8rem;
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 12px 0 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.form-sub strong { color: var(--ink); }
+
+/* ── Campos ──────────────────────────────────────────────────────── */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+.campo label {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.req-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--c-red);
+  flex-shrink: 0;
+}
+.opt-tag {
+  font-size: .62rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  font-size: .88rem;
+  font-family: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  transition: border-color .15s, box-shadow .15s;
+  outline: none;
+  -webkit-appearance: none;
+}
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  border-color: var(--lime-dark);
+  box-shadow: 0 0 0 3px var(--lime-bg);
+  background: var(--white);
+}
+.campo input::placeholder,
+.campo textarea::placeholder { color: var(--muted); opacity: .6; }
+.campo-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.campo-row .campo { margin-bottom: 0; }
+.campo-help {
+  font-size: .7rem;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+/* ── Botón WhatsApp ──────────────────────────────────────────────── */
+.btn-wa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--wa);
+  color: #fff;
+  font-family: "Manrope", sans-serif;
+  font-weight: 900;
+  font-size: 1rem;
+  padding: 16px 24px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: background .18s, transform .12s, box-shadow .18s;
+  text-decoration: none;
+  letter-spacing: -.01em;
+  box-shadow: 0 4px 20px rgba(37,211,102,.30);
+}
+.btn-wa:hover {
+  background: var(--wa-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(37,211,102,.40);
+}
+.btn-wa svg { width: 22px; height: 22px; flex-shrink: 0; fill: #fff; }
+.btn-wa-hint {
+  text-align: center;
+  font-size: .72rem;
+  color: var(--muted);
+  margin-top: 10px;
+  line-height: 1.55;
+}
+
+/* ── Error / Status ──────────────────────────────────────────────── */
+.status-box {
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: .82rem;
+  line-height: 1.5;
+  display: none;
+  margin-top: 12px;
+}
+.status-box.ok      { background: var(--c-green-bg); color: var(--c-green); border: 1px solid rgba(22,163,74,.25); }
+.status-box.err     { background: var(--c-red-bg);   color: var(--c-red);   border: 1px solid rgba(226,75,74,.20); }
+.status-box.loading { background: var(--c-amber-bg); color: var(--c-amber); border: 1px solid rgba(217,119,6,.20); }
+
+/* ══════════════════════════════════════════════════════════════════
+   DOCUMENTOS
+══════════════════════════════════════════════════════════════════ */
+.docs-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(18px, 4vw, 24px);
+  margin-top: clamp(20px, 5vw, 28px);
+  box-shadow: var(--shadow-sm);
+}
+.docs-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.docs-head-icon { font-size: 20px; flex-shrink: 0; }
+.docs-head-title {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  font-size: .94rem;
+  color: var(--ink);
+}
+.docs-head-sub {
+  font-size: .74rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.doc-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 11px 13px;
+}
+.doc-icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.doc-name { font-size: .83rem; font-weight: 700; color: var(--ink); line-height: 1.25; }
+.doc-hint { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+.doc-badge {
+  margin-left: auto;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: .62rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  letter-spacing: .02em;
+}
+.doc-badge.req { background: var(--c-red-bg);   color: var(--c-red); }
+.doc-badge.rec { background: var(--c-amber-bg); color: var(--c-amber); }
+.doc-badge.opt { background: var(--c-blue-bg);  color: var(--c-blue); }
+
+/* ══════════════════════════════════════════════════════════════════
+   REGISTRO ALTERNATIVO
+══════════════════════════════════════════════════════════════════ */
+.divider-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: clamp(20px, 5vw, 28px);
+  color: var(--muted);
+  font-size: .74rem;
+}
+.divider-or::before,
+.divider-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.registro-wrap {
+  margin-top: 16px;
+}
+.registro-hint {
+  font-size: .78rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+  line-height: 1.65;
+}
+.btn-registro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--lime-bg);
+  color: var(--lime-dark);
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  font-size: .9rem;
+  padding: 13px 20px;
+  border-radius: 11px;
+  border: 1.5px solid var(--lime-border);
+  cursor: pointer;
+  width: 100%;
+  transition: background .18s;
+}
+.btn-registro:hover { background: rgba(86,169,0,.18); }
+.btn-registro:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ══════════════════════════════════════════════════════════════════
+   NOTA PRIVACIDAD
+══════════════════════════════════════════════════════════════════ */
+.privacy-note {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--c-blue-bg);
+  border: 1px solid rgba(42,120,214,.15);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-top: clamp(20px, 5vw, 28px);
+  margin-bottom: clamp(40px, 8vw, 60px);
+}
+.privacy-icon {
+  font-size: 17px;
+  flex-shrink: 0;
+  color: var(--c-blue);
+  margin-top: 1px;
+}
+.privacy-note p {
+  font-size: .76rem;
+  color: var(--ink);
+  line-height: 1.65;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MINI-BADGES en cards expandidas
+══════════════════════════════════════════════════════════════════ */
+.mini-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.mini-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: .67rem;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 3px 9px;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RESPONSIVE — Auditoría móvil
+══════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .checks-grid { grid-template-columns: 1fr; }
+  .check-card-wide { flex-direction: column; }
+  .check-card-wide .check-tag { margin-top: 4px; }
+  .campo-row { grid-template-columns: 1fr; }
+  .hero-divider { display: none; }
+  .hero-stats { gap: 18px; }
+  .price-band { flex-direction: column; gap: 14px; }
+  .verdict-badges { justify-content: flex-start; }
+}
+
+@media (max-width: 400px) {
+  .hero h1 { font-size: 1.55rem; }
+  .hero-badge { font-size: .6rem; }
+  .price-big { font-size: 2rem; }
+  .btn-wa { font-size: .92rem; padding: 14px 18px; }
+  .section-title { font-size: 1.1rem; }
+  .verdict-badges { flex-direction: column; gap: 6px; }
+  .vbadge { text-align: center; }
+}
+
+/* ── Touch: feedback táctil en móvil ─────────────────────────────── */
+@media (hover: none) {
+  .btn-wa:active { background: var(--wa-dark); transform: scale(.98); }
+  .btn-registro:active { background: rgba(86,169,0,.20); }
+  .check-card:active { box-shadow: var(--shadow); }
+}
+
+/* ── Scroll horizontal en tablas ─────────────────────────────────── */
+.overflow-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ── Focus visible ───────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2.5px solid var(--lime);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+@media(max-width:640px){.btn-wa,.btn-registro{min-height:44px}}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="container hero-inner">
+    <div class="hero-badge">Servicio de verificaci&oacute;n documental</div>
+    <h1>&iquest;C&oacute;mo sabes que la factura<br>no es <em>falsa o clonada?</em></h1>
+    <p class="hero-sub">Revisamos que los consecutivos tengan continuidad, que la baja sea legal y que el propietario coincida con los documentos. Si algo no cuadra, te avisamos antes de que el dinero cambie de manos.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num"><em>48</em>&thinsp;h</div>
+        <div class="hero-stat-label">Tiempo de respuesta</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">$<em>189</em></div>
+        <div class="hero-stat-label">+ IVA por verificaci&oacute;n</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num"><em>100</em>%</div>
+        <div class="hero-stat-label">Reporte por escrito</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     QUÉ REVISAMOS
+════════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="container">
+    <div class="section-eyebrow">Lo que revisamos</div>
+    <div class="section-title">&iquest;Qu&eacute; incluye la verificaci&oacute;n?</div>
+    <div class="checks-grid">
+
+      <div class="check-card">
+        <div class="check-icon" style="background:var(--c-red-bg);color:var(--c-red)">📄</div>
+        <div class="check-title">Validez de la factura</div>
+        <div class="check-desc">Verificamos que la factura sea original, no clonada ni alterada.</div>
+        <span class="check-tag critical">Cr&iacute;tico</span>
+      </div>
+
+      <div class="check-card">
+        <div class="check-icon" style="background:var(--c-amber-bg);color:var(--c-amber)">📋</div>
+        <div class="check-title">Consecutivos con continuidad</div>
+        <div class="check-desc">Revisamos que el historial de transmisiones no tenga saltos ni propietarios faltantes.</div>
+        <span class="check-tag important">Importante</span>
+      </div>
+
+      <div class="check-card">
+        <div class="check-icon" style="background:var(--c-blue-bg);color:var(--c-blue)">👤</div>
+        <div class="check-title">Baja legal del due&ntilde;o anterior</div>
+        <div class="check-desc">Confirmamos que el propietario anterior haya dado de baja el veh&iacute;culo correctamente.</div>
+        <span class="check-tag important">Importante</span>
+      </div>
+
+      <div class="check-card">
+        <div class="check-icon" style="background:var(--c-green-bg);color:var(--c-green)">🔒</div>
+        <div class="check-title">Propietario y datos coinciden</div>
+        <div class="check-desc">Cruzamos que el INE, la factura y la tarjeta de circulaci&oacute;n sean del mismo due&ntilde;o.</div>
+        <span class="check-tag plus">Adicional</span>
+      </div>
+
+      <div class="check-card check-card-wide">
+        <div class="check-icon" style="background:var(--c-red-bg);color:var(--c-red);font-size:12px;font-weight:900;letter-spacing:-.03em;flex-shrink:0">REP</div>
+        <div style="flex:1;min-width:0">
+          <div class="check-title">Consulta REPUVE y recomendaci&oacute;n de fiscal&iacute;a</div>
+          <div class="check-desc" style="margin:6px 0 10px">Consultamos el <strong>Registro P&uacute;blico Vehicular (REPUVE)</strong> a nivel nacional para verificar que el n&uacute;mero de serie no tenga reporte de robo activo. Si el veh&iacute;culo <strong>no es originario de Guanajuato</strong>, te indicamos si conviene presentarlo ante fiscal&iacute;a del estado de origen para obtener constancia de no reporte.</div>
+          <div class="mini-badges">
+            <span class="mini-badge" style="background:var(--c-red-bg);color:var(--c-red)">REPUVE nacional</span>
+            <span class="mini-badge" style="background:var(--c-amber-bg);color:var(--c-amber)">Recomendaci&oacute;n fiscal&iacute;a</span>
+            <span class="mini-badge" style="background:var(--c-blue-bg);color:var(--c-blue)">SESNSP</span>
+          </div>
+        </div>
+        <span class="check-tag critical">Cr&iacute;tico</span>
+      </div>
+
+      <div class="check-card check-card-wide">
+        <div class="check-icon" style="background:var(--c-amber-bg);color:var(--c-amber);font-size:12px;font-weight:900;flex-shrink:0">ADO</div>
+        <div style="flex:1;min-width:0">
+          <div class="check-title">Adeudos y estado legal del veh&iacute;culo</div>
+          <div class="check-desc" style="margin:6px 0 10px">Verificamos que el veh&iacute;culo no tenga <strong>tenencia sin pagar</strong>, <strong>infracciones pendientes</strong> o alg&uacute;n tipo de <strong>embargo o gravamen legal</strong> que pueda transferirse al nuevo propietario al momento de la compra.</div>
+          <div class="mini-badges">
+            <span class="mini-badge" style="background:var(--c-amber-bg);color:var(--c-amber)">Tenencia</span>
+            <span class="mini-badge" style="background:var(--c-amber-bg);color:var(--c-amber)">Infracciones</span>
+            <span class="mini-badge" style="background:var(--c-red-bg);color:var(--c-red)">Gravamen legal</span>
+          </div>
+        </div>
+        <span class="check-tag important">Importante</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     QUÉ RECIBES
+════════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="container">
+    <div class="section-eyebrow">El resultado</div>
+    <div class="section-title">&iquest;Qu&eacute; recibes al final?</div>
+    <div class="result-list">
+
+      <div class="result-item green">
+        <div class="result-item-title">Dictamen documental por escrito</div>
+        <div class="result-item-desc">Un documento que indica si la factura es v&aacute;lida, si los consecutivos tienen continuidad y si la baja fue realizada conforme a derecho. Redactado para que lo entiendas sin necesidad de ser experto legal.</div>
+      </div>
+
+      <div class="result-item red">
+        <div class="result-item-title">Resultado de consulta REPUVE</div>
+        <div class="result-item-desc">Te informamos si el n&uacute;mero de serie del veh&iacute;culo aparece con reporte de robo en el registro nacional. Si el auto no es de Guanajuato, te indicamos si debes presentarlo ante la fiscal&iacute;a del estado de origen y por qu&eacute; &mdash; con una recomendaci&oacute;n clara sobre si procede o no.</div>
+      </div>
+
+      <div class="result-item blue">
+        <div class="result-item-title">Recomendaciones mec&aacute;nicas previas a la compra</div>
+        <div class="result-item-desc">Seg&uacute;n el tipo de veh&iacute;culo, a&ntilde;o y uso declarado, te sugerimos qu&eacute; puntos revisar con un mec&aacute;nico antes de cerrar el trato: frenos, motor, caja, suspensi&oacute;n, sistema el&eacute;ctrico y carrocer&iacute;a. Son orientaciones, no una revisi&oacute;n mec&aacute;nica.</div>
+      </div>
+
+      <div class="verdict-card">
+        <div>
+          <div class="verdict-title">Veredicto final</div>
+          <div class="verdict-sub">Un dictamen concreto sobre si la operaci&oacute;n es recomendable.</div>
+        </div>
+        <div class="verdict-badges">
+          <span class="vbadge vbadge-ok">APROBADO</span>
+          <span class="vbadge vbadge-obs">CON OBSERVACIONES</span>
+          <span class="vbadge vbadge-no">NO RECOMENDADO</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     CÓMO FUNCIONA
+════════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="container">
+    <div class="section-eyebrow">El proceso</div>
+    <div class="section-title">&iquest;C&oacute;mo funciona?</div>
+    <div class="steps-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Llenas el formulario y nos mandas los documentos</h4>
+          <p>Con tus datos del veh&iacute;culo y las fotos o PDF de la factura e INE. Todo por WhatsApp.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Nosotros revisamos cada documento</h4>
+          <p>Validamos consecutivos, baja legal, propietario y autenticidad de la factura. En menos de 48&nbsp;h h&aacute;biles.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Recibes el reporte por escrito</h4>
+          <p>Te enviamos un dictamen claro: qu&eacute; est&aacute; bien, qu&eacute; falta y si el auto es seguro comprar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     PRECIO
+════════════════════════════════════════════════════════════════ -->
+<div class="container">
+  <div class="price-band">
+    <div class="price-big">$189 <small>+ IVA</small></div>
+    <div class="price-info">
+      <strong>Un pago &uacute;nico por verificaci&oacute;n completa</strong>
+      <span>Incluye revisi&oacute;n de factura, consecutivos, baja legal y propietario. Reporte por escrito en WhatsApp y correo.</span>
+      <div class="price-chips">
+        <span class="price-chip">Reporte en 48 h</span>
+        <span class="price-chip">Sin cita</span>
+        <span class="price-chip">100% en l&iacute;nea</span>
+      </div>
+    </div>
+  </div>
+  <p class="price-extra-note"><i class="ti ti-info-circle"></i> Si el proceso requiere consultas ante REPUVE u otros organismos con costo, o la obtenci&oacute;n de documentos adicionales (ej. duplicado de factura, constancias fiscales), ese gasto corre por cuenta del comprador y se le notifica antes de proceder.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     FORMULARIO — WhatsApp
+════════════════════════════════════════════════════════════════ -->
+<div class="container">
+  <div class="form-card">
+    <div class="form-head">
+      <div class="form-head-icon">📱</div>
+      <div>
+        <div class="form-head-title">Solicitar verificaci&oacute;n por WhatsApp</div>
+        <div class="form-head-sub">La forma m&aacute;s r&aacute;pida &mdash; recomendada</div>
+      </div>
+    </div>
+    <p class="form-sub">Llena los datos del auto, haz clic en el bot&oacute;n y se abrir&aacute; WhatsApp con tu solicitud lista. <strong>En el mismo chat manda las fotos o PDF</strong> de la factura e INE.</p>
+
+    <div class="campo">
+      <label>Tu nombre <span class="req-dot"></span></label>
+      <input type="text" id="wa-nombre" placeholder="Ej. Juan P&eacute;rez" autocomplete="name">
+    </div>
+
+    <div class="campo-row">
+      <div class="campo">
+        <label>Tu WhatsApp <span class="req-dot"></span></label>
+        <input type="tel" id="wa-tel" placeholder="477 123 4567" autocomplete="tel" inputmode="tel">
+      </div>
+      <div class="campo">
+        <label>Tu correo <span class="opt-tag">opc.</span></label>
+        <input type="email" id="wa-email" placeholder="correo@ejemplo.com" autocomplete="email" inputmode="email">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label>Veh&iacute;culo a verificar <span class="req-dot"></span></label>
+      <input type="text" id="wa-auto" placeholder="Ej. Honda CR-V 2020 Blanco">
+      <span class="campo-help">Marca, modelo, a&ntilde;o y color</span>
+    </div>
+
+    <div class="campo-row">
+      <div class="campo">
+        <label>N&uacute;mero de serie / VIN <span class="opt-tag">opc.</span></label>
+        <input type="text" id="wa-vin" placeholder="17 caracteres" maxlength="17" autocomplete="off" style="letter-spacing:.04em">
+        <span class="campo-help">En factura o tablero</span>
+      </div>
+      <div class="campo">
+        <label>Placas <span class="opt-tag">opc.</span></label>
+        <input type="text" id="wa-placas" placeholder="Ej. ABC-123-A" autocomplete="off" style="text-transform:uppercase">
+      </div>
+    </div>
+
+    <div id="wa-error" class="status-box err" style="margin-bottom:12px"></div>
+
+    <a id="btn-wa" href="#" target="_blank" rel="noopener" class="btn-wa" onclick="return abrirWhatsApp()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.532 5.845L0 24l6.335-1.61A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.373l-.36-.214-3.732.949.983-3.612-.236-.374A9.818 9.818 0 1112 21.818z"/></svg>
+      Abrir WhatsApp y enviar solicitud
+    </a>
+    <p class="btn-wa-hint">Se abrir&aacute; WhatsApp con tu informaci&oacute;n lista. <strong>Despu&eacute;s manda las fotos de los documentos en el mismo chat.</strong></p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     DOCUMENTOS
+════════════════════════════════════════════════════════════════ -->
+<div class="container">
+  <div class="docs-card">
+    <div class="docs-head">
+      <div class="docs-head-icon">📎</div>
+      <div>
+        <div class="docs-head-title">Documentos que necesitamos</div>
+        <div class="docs-head-sub">M&aacute;ndalos como fotos o PDF en el chat de WhatsApp</div>
+      </div>
+    </div>
+    <div class="doc-list">
+      <div class="doc-item">
+        <div class="doc-icon" style="background:var(--c-red-bg);color:var(--c-red)">📄</div>
+        <div>
+          <div class="doc-name">Factura del veh&iacute;culo</div>
+          <div class="doc-hint">Foto o PDF completa &mdash; anverso y reverso</div>
+        </div>
+        <span class="doc-badge req">Obligatorio</span>
+      </div>
+      <div class="doc-item">
+        <div class="doc-icon" style="background:var(--c-blue-bg);color:var(--c-blue)">👤</div>
+        <div>
+          <div class="doc-name">INE del &uacute;ltimo propietario</div>
+          <div class="doc-hint">Identificaci&oacute;n oficial vigente, ambos lados</div>
+        </div>
+        <span class="doc-badge req">Obligatorio</span>
+      </div>
+      <div class="doc-item">
+        <div class="doc-icon" style="background:var(--c-green-bg);color:var(--c-green)">📋</div>
+        <div>
+          <div class="doc-name">Tarjeta de circulaci&oacute;n</div>
+          <div class="doc-hint">Vigente o la m&aacute;s reciente que tengan</div>
+        </div>
+        <span class="doc-badge rec">Recomendado</span>
+      </div>
+      <div class="doc-item">
+        <div class="doc-icon" style="background:var(--c-amber-bg);color:var(--c-amber)">📄</div>
+        <div>
+          <div class="doc-name">Comprobante de tenencia</div>
+          <div class="doc-hint">Del a&ntilde;o en curso o pago m&aacute;s reciente</div>
+        </div>
+        <span class="doc-badge opt">Opcional</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     OPCIÓN B — Registrar sin documentos
+════════════════════════════════════════════════════════════════ -->
+<div class="container">
+  <div class="divider-or">o si prefieres registrar tu solicitud primero</div>
+  <div class="registro-wrap">
+    <p class="registro-hint">Guardamos tu solicitud y te contactamos nosotros. Los documentos los mandas despu&eacute;s cuando te marquemos.</p>
+    <button class="btn-registro" id="btn-registro" onclick="registrarSolicitud()">
+      ✓&nbsp; Registrar solicitud sin documentos
+    </button>
+    <div id="registro-status" class="status-box"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     PRIVACIDAD
+════════════════════════════════════════════════════════════════ -->
+<div class="container">
+  <div class="privacy-note">
+    <span class="privacy-icon">🔒</span>
+    <p><strong>Privacidad:</strong> Tu informaci&oacute;n y documentos se usan &uacute;nicamente para realizar la verificaci&oacute;n solicitada. No compartimos datos con terceros. El dictamen final llega solo a ti por WhatsApp o correo electr&oacute;nico.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     SCRIPTS — lógica idéntica preservada
+════════════════════════════════════════════════════════════════ -->
+<script>
+const WA_NUM = '524778350020';
+
+function gv(id){ return (document.getElementById(id)||{}).value||''; }
+
+function abrirWhatsApp() {
+  var nombre = gv('wa-nombre').trim();
+  var tel    = gv('wa-tel').trim();
+  var auto   = gv('wa-auto').trim();
+  var errEl  = document.getElementById('wa-error');
+
+  if (!nombre) { mostrarError('Por favor escribe tu nombre.'); return false; }
+  if (!tel)    { mostrarError('Por favor escribe tu número de WhatsApp.'); return false; }
+  if (!auto)   { mostrarError('Por favor describe el vehículo que quieres verificar.'); return false; }
+  if (errEl)   { errEl.style.display='none'; }
+
+  var vin    = gv('wa-vin').trim();
+  var placas = gv('wa-placas').trim();
+  var email  = gv('wa-email').trim();
+
+  var msg = '✅ *Solicitud Verifica tu Auto — weCars Bajío*\n\n'
+    + '👤 *Nombre:* ' + nombre + '\n'
+    + '📱 *Tel / WhatsApp:* ' + tel + '\n'
+    + (email ? '📧 *Correo:* ' + email + '\n' : '')
+    + '\n🚗 *Vehículo:* ' + auto + '\n'
+    + (vin    ? '🔢 *VIN / Serie:* ' + vin + '\n'    : '')
+    + (placas ? '📍 *Placas:* ' + placas + '\n'     : '')
+    + '\n💰 *Servicio:* $189 + IVA por verificación completa\n'
+    + '\n¡Adjunto los documentos del vehículo para la verificación:\n'
+    + '• Factura original (obligatorio)\n'
+    + '• INE del último dueño (obligatorio)\n'
+    + '• Tarjeta de circulación (recomendado)\n'
+    + '• Tenencia (si la tengo)\n';
+
+  var url = 'https://wa.me/' + WA_NUM + '?text=' + encodeURIComponent(msg);
+  document.getElementById('btn-wa').href = url;
+
+  window.parent.postMessage({
+    type:            'wecars-vta-nuevo',
+    clienteNombre:   nombre,
+    clienteTelefono: tel,
+    clienteEmail:    email,
+    autoDescripcion: auto,
+    vin:             vin,
+    placas:          placas,
+    status:          'Pendiente',
+    precioPagado:    189,
+    metodo:          'whatsapp'
+  }, '*');
+
+  return true;
+}
+
+function mostrarError(msg) {
+  var el = document.getElementById('wa-error');
+  if (!el) return;
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function registrarSolicitud() {
+  var nombre = gv('wa-nombre').trim();
+  var tel    = gv('wa-tel').trim();
+  var auto   = gv('wa-auto').trim();
+  var errEl  = document.getElementById('wa-error');
+
+  if (!nombre) { mostrarError('Por favor escribe tu nombre.'); return; }
+  if (!tel)    { mostrarError('Por favor escribe tu número de WhatsApp.'); return; }
+  if (errEl)   { errEl.style.display='none'; }
+
+  var btn = document.getElementById('btn-registro');
+  var st  = document.getElementById('registro-status');
+  if (btn) btn.disabled = true;
+  if (st)  { st.className='status-box loading'; st.textContent='⏳ Registrando solicitud…'; st.style.display='block'; }
+
+  window.parent.postMessage({
+    type:            'wecars-vta-nuevo',
+    clienteNombre:   nombre,
+    clienteTelefono: tel,
+    clienteEmail:    gv('wa-email').trim(),
+    autoDescripcion: auto,
+    vin:             gv('wa-vin').trim(),
+    placas:          gv('wa-placas').trim(),
+    status:          'Pendiente',
+    precioPagado:    189,
+    metodo:          'formulario'
+  }, '*');
+
+  setTimeout(function(){
+    if (btn && btn.disabled) {
+      if (st) { st.className='status-box ok'; st.textContent='✅ Solicitud registrada. Te contactaremos pronto por WhatsApp.'; }
+    }
+  }, 10000);
+}
+
+window.addEventListener('message', function(ev) {
+  var d = ev.data;
+  if (!d || !d.type) return;
+  if (d.type === 'wecars-vta-nuevo-ok') {
+    var btn = document.getElementById('btn-registro');
+    var st  = document.getElementById('registro-status');
+    if (btn) { btn.disabled=false; btn.textContent='✓ Solicitud registrada'; }
+    if (st)  { st.className='status-box ok'; st.textContent='✅ ¡Solicitud registrada! Te contactamos en menos de 24 h para pedirte los documentos por WhatsApp.'; st.style.display='block'; }
+  }
+  if (d.type === 'wecars-vta-nuevo-error') {
+    var btn = document.getElementById('btn-registro');
+    var st  = document.getElementById('registro-status');
+    if (btn) btn.disabled=false;
+    if (st)  { st.className='status-box err'; st.textContent='❌ Error al registrar: '+(d.error||'intenta de nuevo.'); st.style.display='block'; }
+  }
+});
+</script>
+
+<script>(function(){var t,retries=0;function send(){var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight,document.body.offsetHeight);window.parent.postMessage({type:'wecars-resize',height:h},'*');}function rh(){clearTimeout(t);t=setTimeout(function(){requestAnimationFrame(send);},150);}function hookImgs(){document.querySelectorAll('img').forEach(function(img){if(!img.dataset.wcResize){img.dataset.wcResize='1';img.addEventListener('load',rh);img.addEventListener('error',rh);}});}window.addEventListener('load',function(){rh();var iv=setInterval(function(){rh();hookImgs();if(++retries>=12)clearInterval(iv);},400);});window.addEventListener('resize',rh);new MutationObserver(function(){rh();hookImgs();}).observe(document.body,{childList:true,subtree:true,attributes:false,characterData:false});hookImgs();rh();})();</script>
+</body>
+</html>

@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reseñas y Testimonios · weCars Bajío</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {  width: 100%; overflow-x: hidden; }
+    body {
+      font-family: "DM Sans", Arial, sans-serif; max-width: 1920px; margin: 0 auto; overflow-x: hidden;
+      background: #fff; color: var(--ink); line-height: 1.6;
+    }
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+    html,body{scrollbar-width:none;-ms-overflow-style:none}
+    :root {
+  /* ── Brand ─────────────────────────────────────────── */
+  --lime:          #56a900;
+  --lime-dark:     #3d7a00;
+  --lime-bg:       rgba(86,169,0,.10);
+  /* ── Neutrals ──────────────────────────────────────── */
+  --ink:           #0f1a0f;
+  --ink-2:         #1a2e1a;
+  --paper:         #F5F7F5;
+  --white:         #ffffff;
+  --muted:         #6d7a83;
+  --line:          #d8e2e5;
+  /* ── Semantic ──────────────────────────────────────── */
+  --c-red:         #e24b4a;   --c-red-bg:    rgba(226,75,74,.10);
+  --c-amber:       #d97706;   --c-amber-bg:  rgba(217,119,6,.10);
+  --c-blue:        #2a78d6;   --c-blue-bg:   rgba(42,120,214,.10);
+  --c-green:       #16a34a;   --c-green-bg:  rgba(22,163,74,.10);
+  --c-purple:      #9333ea;   --c-purple-bg: rgba(147,51,234,.10);
+  --amarillo:      #f59e0b;
+  --violet:        #4338c8;
+  --violet-2:      #5c55e5;
+  /* ── Elevation ─────────────────────────────────────── */
+  --shadow-sm:     0 2px 8px  rgba(12,27,35,.08);
+  --shadow:        0 8px 24px rgba(12,27,35,.10);
+  --shadow-lg:     0 18px 48px rgba(12,27,35,.12);
+  /* ── Radius ────────────────────────────────────────── */
+  --radius-sm:     8px;
+  --radius:        12px;
+  --radius-md:     16px;
+  --radius-lg:     22px;
+  --radius-pill:   999px;
+  /* ── Aliases backward-compat (no tocar) ────────────── */
+  --verde:         var(--lime);
+  --verde-dark:    var(--lime-dark);
+  --negro:         var(--ink);
+  --ink-3:         var(--ink-2);
+  --gris:          var(--paper);
+  --gris-borde:    var(--line);
+  --radio:         var(--radius-md);
+  --sombra:        var(--shadow-lg);
+  --borde:         var(--line);
+  --texto:         var(--muted);
+  --max:           1280px;
+}
+/* ── Dark mode ──────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #111a0e; --ink: #e8f0e0; --ink-2: #c8d8c0;
+    --line: #2e3d24; --muted: #7a9e68; --white: #1C2416;
+    --gris: #111a0e; --gris-borde: #2e3d24; --negro: #e8f0e0;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,.25);
+    --shadow: 0 8px 24px rgba(0,0,0,.28);
+    --shadow-lg: 0 18px 48px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111a0e; --ink: #e8f0e0; --ink-2: #c8d8c0;
+  --line: #2e3d24; --muted: #7a9e68; --white: #1C2416;
+  --gris: #111a0e; --gris-borde: #2e3d24; --negro: #e8f0e0;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.25);
+  --shadow: 0 8px 24px rgba(0,0,0,.28);
+  --shadow-lg: 0 18px 48px rgba(0,0,0,.35);
+}
+:root[data-theme="light"] {
+  --paper: #F5F7F5; --ink: #0f1a0f; --ink-2: #1a2e1a;
+  --line: #E4EAE4; --muted: #5a7060; --white: #ffffff;
+  --gris: #F5F7F5; --gris-borde: #d8e2e5; --negro: #0b1014;
+}
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 80px 0; }
+    .etiqueta {
+      display: inline-block; background: rgba(112,207,5,.12); color: var(--verde-dark);
+      font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 20px; margin-bottom: 18px;
+    }
+    .etiqueta-dark {
+      display: inline-block; background: rgba(112,207,5,.15); color: var(--verde);
+      font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 20px; margin-bottom: 18px;
+    }
+    .sec-titulo { font-size: clamp(26px,4vw,42px); font-weight: 900; line-height: 1.15; letter-spacing: -.5px; margin-bottom: 14px; }
+    .sec-sub { font-size: 15px; color: var(--muted); max-width: 580px; line-height: 1.75; margin-bottom: 48px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 24px; border-radius: 10px; font-size: 14px; font-weight: 700;
+      text-decoration: none; transition: all .18s; white-space: nowrap; cursor: pointer; border: none;
+    }
+    .btn-verde { background: var(--verde); color: #fff; }
+    .btn-verde:hover { background: var(--verde-dark); }
+    .btn-negro { background: var(--negro); color: #fff; }
+    .btn-negro:hover { background: #333; }
+    .btn-wa { background: #25D366; color: #fff; }
+    .btn-wa:hover { background: #1ebe5d; }
+    .btn-outline-blanco { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.3); }
+    .btn-outline-blanco:hover { border-color: #fff; background: rgba(255,255,255,.07); }
+
+    /* Estrellas */
+    .estrellas { display: flex; gap: 2px; }
+    .estrella { color: var(--amarillo); font-size: 14px; }
+    .estrellas.sm .estrella { font-size: 11px; }
+    .estrellas.lg .estrella { font-size: 20px; }
+
+    /* ══ HERO ════════════════════════════════════════════ */
+    #hero { background: var(--negro); padding: 88px 0 72px; position: relative; overflow: hidden; }
+    #hero::before {
+      content: ""; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 75% 40%, rgba(112,207,5,.12) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1.1fr 1fr;
+      gap: 60px; align-items: center; position: relative; z-index: 1;
+    }
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(112,207,5,.15); border: 1px solid rgba(112,207,5,.3);
+      color: var(--verde); font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase;
+      padding: 5px 13px; border-radius: 20px; margin-bottom: 20px;
+    }
+    #hero h1 { font-size: clamp(34px,5vw,58px); font-weight: 900; color: #fff; line-height: 1.07; letter-spacing: -1.2px; margin-bottom: 18px; }
+    #hero h1 span { color: var(--verde); }
+    #hero p { font-size: 16px; color: rgba(255,255,255,.6); line-height: 1.75; margin-bottom: 32px; max-width: 460px; }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* Rating grande en hero */
+    .hero-rating {
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px; padding: 28px;
+    }
+    .hr-top {
+      display: flex; align-items: center; gap: 18px; margin-bottom: 24px;
+      padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .hr-numero { font-size: 56px; font-weight: 900; color: #fff; line-height: 1; }
+    .hr-detalle { flex: 1; }
+    .hr-estrellas { display: flex; gap: 3px; margin-bottom: 6px; }
+    .hr-estrella { color: var(--amarillo); font-size: 18px; }
+    .hr-base { font-size: 12px; color: rgba(255,255,255,.5); }
+    .hr-barras { display: flex; flex-direction: column; gap: 6px; }
+    .hr-barra { display: flex; align-items: center; gap: 8px; }
+    .hr-barra-label { font-size: 11px; color: rgba(255,255,255,.5); width: 10px; text-align: right; flex-shrink: 0; }
+    .hr-barra-track { flex: 1; height: 6px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
+    .hr-barra-fill { height: 100%; border-radius: 3px; background: var(--amarillo); }
+    .hr-barra-pct { font-size: 10px; color: rgba(255,255,255,.4); width: 28px; text-align: right; flex-shrink: 0; }
+    .hr-google {
+      display: flex; align-items: center; gap: 10px; margin-top: 18px;
+      background: rgba(255,255,255,.05); border-radius: 10px; padding: 10px 14px;
+    }
+    .hr-google-logo { width: 20px; height: 20px; flex-shrink: 0; }
+    .hr-google-txt { font-size: 12px; color: rgba(255,255,255,.6); }
+    .hr-google-txt strong { color: #fff; }
+
+    /* ══ STATS ═══════════════════════════════════════════ */
+    #stats { background: var(--verde); padding: 48px 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; }
+    .stat-item { text-align: center; padding: 20px 16px; border-right: 1px solid rgba(255,255,255,.2); }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-size: clamp(30px,4vw,48px); font-weight: 900; color: #fff; line-height: 1; letter-spacing: -1px; }
+    .stat-num span { font-size: .65em; }
+    .stat-label { font-size: 12px; color: rgba(255,255,255,.8); font-weight: 600; margin-top: 6px; }
+
+    /* ══ CASOS DE ÉXITO ══════════════════════════════════ */
+    #casos { background: var(--gris); }
+    .casos-header { text-align: center; margin-bottom: 48px; }
+    .casos-header .sec-sub { margin: 0 auto; text-align: center; }
+    .casos-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .caso-card {
+      background: #fff; border-radius: 16px; border: 1.5px solid var(--gris-borde);
+      overflow: hidden; transition: box-shadow .2s, border-color .2s;
+    }
+    .caso-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.09); border-color: var(--verde); }
+    .caso-header {
+      background: var(--negro); padding: 20px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .caso-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900; color: #fff; flex-shrink: 0;
+    }
+    .caso-nombre strong { font-size: 14px; color: #fff; display: block; }
+    .caso-nombre span { font-size: 11px; color: rgba(255,255,255,.5); }
+    .caso-auto {
+      background: rgba(112,207,5,.15); color: var(--verde);
+      font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px;
+      display: inline-block; margin-top: 5px; letter-spacing: .3px;
+    }
+    .caso-body { padding: 20px; }
+    .caso-quote {
+      font-size: 13px; color: #444; line-height: 1.75; margin-bottom: 16px;
+      font-style: italic;
+    }
+    .caso-quote::before { content: "\201C"; color: var(--verde); font-size: 22px; font-style: normal; line-height: 0; vertical-align: -8px; margin-right: 2px; }
+    .caso-quote::after  { content: "\201D"; color: var(--verde); font-size: 22px; font-style: normal; line-height: 0; vertical-align: -8px; margin-left: 2px; }
+    .caso-footer { display: flex; align-items: center; justify-content: space-between; }
+    .caso-dato { font-size: 11px; }
+    .caso-dato strong { display: block; font-size: 13px; color: var(--negro); }
+    .caso-dato span { color: var(--muted); }
+    .caso-badge {
+      background: rgba(112,207,5,.1); border: 1px solid rgba(112,207,5,.25);
+      color: var(--verde-dark); border-radius: 8px; padding: 6px 10px;
+      font-size: 10px; font-weight: 800; text-align: center;
+    }
+    .caso-badge span { display: block; font-size: 14px; font-weight: 900; color: var(--verde); }
+
+    /* ══ RESEÑAS GOOGLE ══════════════════════════════════ */
+    #resenas { background: #fff; }
+    .resenas-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 24px; margin-bottom: 40px; flex-wrap: wrap;
+    }
+    .resenas-header-left h2 { margin-bottom: 8px; }
+    .google-badge {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--gris); border-radius: 12px; padding: 14px 18px;
+      border: 1.5px solid var(--gris-borde); flex-shrink: 0;
+    }
+    .google-badge-score { font-size: 32px; font-weight: 900; color: var(--negro); line-height: 1; }
+    .google-badge-right .estrellas { margin-bottom: 4px; }
+    .google-badge-right p { font-size: 11px; color: var(--muted); }
+    .google-badge-right strong { font-size: 12px; color: var(--negro); }
+
+    /* Filtros */
+    .resenas-filtros { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+    .filtro-btn {
+      padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: 700;
+      border: 1.5px solid var(--gris-borde); background: #fff; color: var(--muted);
+      cursor: pointer; transition: all .18s;
+    }
+    .filtro-btn:hover, .filtro-btn.activo { background: var(--negro); color: #fff; border-color: var(--negro); }
+    .filtro-btn.activo-verde { background: var(--verde); color: #fff; border-color: var(--verde); }
+
+    /* Grid reseñas */
+    .resenas-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .resena-card {
+      background: var(--gris); border-radius: 14px; padding: 20px;
+      border: 1.5px solid var(--gris-borde); transition: box-shadow .2s;
+    }
+    .resena-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+    .resena-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .resena-user { display: flex; align-items: center; gap: 10px; }
+    .resena-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0;
+    }
+    .resena-nombre strong { font-size: 13px; display: block; }
+    .resena-nombre span { font-size: 11px; color: var(--muted); }
+    .google-icon { width: 18px; height: 18px; flex-shrink: 0; }
+    .resena-estrellas { margin-bottom: 8px; }
+    .resena-texto { font-size: 13px; color: #444; line-height: 1.7; }
+    .resena-tag {
+      display: inline-block; margin-top: 10px;
+      background: rgba(112,207,5,.1); color: var(--verde-dark);
+      font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; letter-spacing: .3px;
+    }
+    .resena-fecha { font-size: 10px; color: #bbb; margin-top: 8px; }
+
+    /* CTA Google */
+    .google-cta-box {
+      margin-top: 32px; background: var(--gris); border-radius: 14px; padding: 24px 28px;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+      border: 1.5px solid var(--gris-borde);
+    }
+    .gcta-left { display: flex; align-items: center; gap: 16px; }
+    .gcta-ico { width: 48px; height: 48px; border-radius: 12px; background: #fff; border: 1.5px solid var(--gris-borde); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .gcta-ico svg { width: 24px; height: 24px; }
+    .gcta-txt strong { font-size: 14px; display: block; margin-bottom: 2px; }
+    .gcta-txt p { font-size: 12px; color: var(--muted); }
+
+    /* ══ DEJAR RESEÑA ════════════════════════════════════ */
+    #dejar-resena { background: var(--negro); }
+    .dr-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+    .dr-texto h2 { color: #fff; margin-bottom: 14px; }
+    .dr-texto p { font-size: 15px; color: rgba(255,255,255,.6); line-height: 1.75; margin-bottom: 28px; }
+    .dr-opciones { display: flex; flex-direction: column; gap: 12px; }
+    .dr-opcion {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px; padding: 16px; text-decoration: none;
+      transition: background .18s, border-color .18s;
+    }
+    .dr-opcion:hover { background: rgba(112,207,5,.1); border-color: rgba(112,207,5,.3); }
+    .dr-opcion-ico { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .dr-opcion-ico svg { width: 18px; height: 18px; }
+    .dr-opcion-txt strong { font-size: 13px; color: #fff; display: block; margin-bottom: 2px; }
+    .dr-opcion-txt span { font-size: 11px; color: rgba(255,255,255,.5); }
+    .dr-opcion-arrow { margin-left: auto; color: rgba(255,255,255,.3); font-size: 18px; }
+
+    /* Formulario de reseña */
+    .dr-form { background: #fff; border-radius: 18px; overflow: hidden; }
+    .dr-form-head { background: rgba(255,255,255,.06); border-bottom: 1px solid rgba(255,255,255,.08); padding: 20px 24px; }
+    .dr-form-head h3 { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 3px; }
+    .dr-form-head p { font-size: 11px; color: rgba(255,255,255,.5); }
+    .dr-form-body { padding: 22px 24px; background: #fff; }
+    .campo { margin-bottom: 14px; }
+    .campo label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: .4px; display: block; margin-bottom: 5px; }
+    .campo input, .campo select, .campo textarea {
+      width: 100%; height: 42px; border-radius: 9px; border: 1.5px solid var(--gris-borde);
+      padding: 0 13px; font-size: 13px; color: var(--negro); background: #fff;
+      outline: none; transition: border-color .18s, box-shadow .18s; font-family: inherit; appearance: none;
+    }
+    .campo textarea { height: 90px; padding: 11px 13px; resize: none; }
+    .campo select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+    }
+    .campo input:focus, .campo select:focus, .campo textarea:focus {
+      border-color: var(--verde); box-shadow: 0 0 0 3px rgba(112,207,5,.1);
+    }
+    .campo-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Rating stars interactivo */
+    .rating-stars { display: flex; gap: 6px; margin-top: 6px; }
+    .rating-star {
+      font-size: 28px; cursor: pointer; color: #ddd;
+      transition: color .15s, transform .1s; user-select: none;
+    }
+    .rating-star:hover, .rating-star.activo { color: var(--amarillo); transform: scale(1.15); }
+
+    .dr-form-foot { padding: 14px 24px; border-top: 1px solid var(--gris-borde); background: #fafafa; }
+    .envio-btn {
+      width: 100%; padding: 13px; border-radius: 10px; border: none;
+      background: var(--verde); color: #fff; font-size: 14px; font-weight: 800;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px;
+      transition: background .18s;
+    }
+    .envio-btn:hover { background: var(--verde-dark); }
+    .envio-btn svg { width: 16px; height: 16px; }
+    .privacidad { font-size: 10px; color: #ccc; text-align: center; margin-top: 8px; }
+
+    /* Éxito */
+    #dr-exito { display: none; padding: 40px 24px; background: #fff; text-align: center; }
+    .exito-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--verde); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+    .exito-ico svg { width: 22px; height: 22px; color: #fff; }
+    #dr-exito h4 { font-size: 18px; font-weight: 900; margin-bottom: 8px; }
+    #dr-exito p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 22px; }
+    .exito-wa { display: flex; align-items: center; gap: 8px; justify-content: center; background: #25D366; color: #fff; text-decoration: none; padding: 12px 22px; border-radius: 10px; font-size: 13px; font-weight: 700; transition: background .18s; }
+    .exito-wa:hover { background: #1ebe5d; }
+
+    /* ══ CTA FINAL ═══════════════════════════════════════ */
+    #cta-final { background: var(--gris); padding: 80px 0; }
+    .cta-inner {
+      background: var(--negro); border-radius: 24px; padding: 56px 48px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+    }
+    .cta-texto h2 { font-size: clamp(24px,3.5vw,38px); font-weight: 900; color: #fff; letter-spacing: -.5px; margin-bottom: 12px; }
+    .cta-texto h2 span { color: var(--verde); }
+    .cta-texto p { font-size: 14px; color: rgba(255,255,255,.55); line-height: 1.75; }
+    .cta-acciones { display: flex; flex-direction: column; gap: 12px; }
+    .cta-acc {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px; padding: 16px 18px; text-decoration: none;
+      transition: background .18s, border-color .18s;
+    }
+    .cta-acc:hover { background: rgba(112,207,5,.1); border-color: rgba(112,207,5,.25); }
+    .cta-acc-ico { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cta-acc-ico svg { width: 17px; height: 17px; }
+    .cta-acc-txt strong { font-size: 13px; color: #fff; display: block; }
+    .cta-acc-txt span { font-size: 11px; color: rgba(255,255,255,.45); }
+    .cta-acc-flecha { margin-left: auto; color: rgba(255,255,255,.3); font-size: 18px; }
+
+    /* ══ RESPONSIVE ══════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .hero-inner, .dr-inner, .cta-inner { grid-template-columns: 1fr; gap: 36px; }
+      .casos-grid, .resenas-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .stat-item:nth-child(2) { border-right: none; }
+      .resenas-header { flex-direction: column; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 56px 0; }
+      .campo-fila { grid-template-columns: 1fr; }
+    }
+  
+        /* Mobile drawer — v2 */
+    .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:198;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+    .mob-drawer{position:fixed;top:0;right:0;bottom:0;width:80vw;max-width:300px;background:#0b0b0b;z-index:199;transform:translateX(110%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-16px 0 60px rgba(0,0,0,.65)}
+    .mob-drawer.open{transform:translateX(0)}
+    .mob-overlay.open{display:block}
+    .mob-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
+    .mob-drawer-head img{height:26px;width:auto;opacity:.9}
+    .mob-close{background:rgba(255,255,255,.07);border:0;color:#777;width:30px;height:30px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,color .15s}
+    .mob-close:hover{background:rgba(255,255,255,.12);color:#fff}
+    .mob-close svg{width:14px;height:14px;display:block}
+    .mob-nav-links{display:flex;flex-direction:column;padding:8px 10px;flex:1;overflow-y:auto;gap:1px}
+    .mob-nav-links a{display:flex;align-items:center;gap:10px;padding:11px 12px;color:#bbb;text-decoration:none;font-size:.88rem;font-weight:600;font-family:'DM Sans',sans-serif;border-radius:10px;transition:background .14s,color .14s}
+    .mob-nav-links a:hover{background:rgba(255,255,255,.05);color:#eee}
+    .mob-nav-links a.active{background:rgba(112,207,5,.1);color:#70cf05}
+    .mob-nav-links a.mob-sec{font-size:.82rem;font-weight:500;color:#555;padding:9px 12px}
+    .mob-nav-links a.mob-sec:hover{background:rgba(255,255,255,.04);color:#888}
+    .mob-nav-links a.mob-sec.active{background:rgba(112,207,5,.08);color:#70cf05}
+    .mob-nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.6}
+    .mob-nav-links a.active .mob-nav-icon{opacity:1}
+    .mob-nav-links .mob-divider{height:1px;background:rgba(255,255,255,.05);margin:5px 0}
+    .mob-cta{padding:12px 12px 18px;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;gap:7px}
+    .mob-cta-wa{display:flex;align-items:center;justify-content:center;gap:8px;background:#25d366;border-radius:12px;padding:13px;text-decoration:none;width:100%;font-weight:700;font-size:.88rem;color:#fff;font-family:'DM Sans',sans-serif;transition:background .18s}
+    .mob-cta-wa:hover{background:#1fc05e}
+    .mob-cta-wa svg{width:17px;height:17px;fill:#fff;flex-shrink:0}
+    .mob-cta-info{display:flex;align-items:center;justify-content:center;gap:8px;padding:2px 0}
+    .mob-cta-info a{color:#444;font-size:.76rem;text-decoration:none;font-family:'DM Sans',sans-serif}
+    .mob-cta-info a:hover{color:#777}
+    .mob-cta-info .sep{color:#2a2a2a;font-size:.65rem}
+    .menu-toggle{display:none;background:none;border:0;color:white;padding:9px;cursor:pointer;z-index:201;position:relative}
+    .menu-toggle svg{width:26px;height:26px}
+
+  
+    /* ── FLOATING WA ── */
+    .wa-float{position:fixed;right:18px;bottom:18px;z-index:199;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#25D366;color:#fff;box-shadow:0 8px 24px rgba(1,41,18,.35);transition:transform .2s ease;text-decoration:none}
+    .wa-float:hover,.wa-float:active{transform:scale(1.1)}
+    .wa-float svg{width:26px;height:26px;fill:#fff}
+    /* ── E.1 polish: accessibility ────────────────────── */
+    button:focus-visible,a.btn:focus-visible,a[class*="btn"]:focus-visible,.btn:focus-visible,.wc-btn:focus-visible,.envio-btn:focus-visible,.faq-q:focus-visible,.mob-close:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+    @media(max-width:640px){.btn,.envio-btn,.btn-verde,.btn-negro,.btn-wa,.wc-btn.primary{min-height:44px}}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV COMPARTIDA ══════════════════════════════════════ -->
+<style>
+  .shell{width:min(1320px,calc(100% - 42px));margin:0 auto}
+  .wc-announcement{color:#cbd8de;background:#091015;border-bottom:1px solid rgba(255,255,255,.07);font-size:.78rem}
+  .wc-announcement .shell{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0}
+  .wc-announcement strong{color:#fff}
+  .wc-announcement a{color:#c5fb91;font-weight:800}
+  .wc-announcement .bar{width:1px;height:12px;background:rgba(255,255,255,.24)}
+  .wc-header{position:sticky;top:0;z-index:50;background:rgba(11,16,20,.94);backdrop-filter:blur(15px);border-bottom:1px solid rgba(255,255,255,.08)}
+  .wc-nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .wc-brand img{width:148px;height:auto;display:block}
+  .wc-links{display:flex;align-items:center;gap:22px;color:#dae4e8;font-size:.86rem;font-weight:700;list-style:none;padding:0;margin:0}
+  .wc-links a{position:relative;padding:6px 0;text-decoration:none;color:inherit}
+  .wc-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:2px;background:#70cf05;transition:.2s ease}
+  .wc-links a:hover::after,.wc-links a.active::after{width:100%}
+  .wc-links a.active{color:#fff}
+  .wc-actions{display:flex;align-items:center;gap:10px}
+  .wc-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;font-size:.82rem;font-weight:800;text-decoration:none;font-family:inherit}
+  .wc-btn.ghost{color:#eef5f7;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06)}
+  .wc-btn.primary{color:#081102;background:#70cf05}
+  .wc-btn.primary:hover{background:#94ed38}
+  .wc-dropdown{position:relative}
+  .wc-drop-btn{background:none;border:none;color:#dae4e8;font-size:.86rem;font-weight:700;cursor:pointer;padding:6px 0;display:flex;align-items:center;gap:5px;font-family:inherit;transition:color .2s}
+  .wc-drop-btn:hover{color:#fff}
+  .wc-drop-btn.active{color:#fff;position:relative}
+  .wc-drop-btn.active::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:2px;background:#70cf05}
+  .wc-caret{font-size:.65rem;transition:transform .2s;display:inline-block}
+  .wc-dropdown.open .wc-caret{transform:rotate(180deg)}
+  .wc-drop-menu{display:none;position:absolute;top:calc(100% + 10px);right:0;min-width:170px;background:#162128;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:6px;list-style:none;box-shadow:0 12px 32px rgba(0,0,0,.35);z-index:99}
+  .wc-dropdown.open .wc-drop-menu{display:block}
+  .wc-drop-menu li{list-style:none}
+  .wc-drop-menu a{display:block;padding:10px 14px;border-radius:8px;color:#c8d6db;text-decoration:none;font-size:.84rem;font-weight:600;transition:.15s}
+  .wc-drop-menu a:hover,.wc-drop-menu a.active{background:rgba(112,207,5,.12);color:#70cf05}
+  .wc-footer{padding:28px 0;background:#091015;color:#9eafb8;font-size:.76rem}
+  .wc-foot{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .wc-footer-rich{background:#0d1117;border-top:1px solid rgba(255,255,255,.07);padding:56px 0 0;color:#9eafb8}
+  .wc-foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .wc-foot-brand img{width:140px;margin-bottom:16px;display:block}
+  .wc-foot-brand p{font-size:.84rem;line-height:1.65;color:#8090a0;max-width:220px;margin-bottom:20px}
+  .wc-socials{display:flex;gap:8px}
+  .wc-socials a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.08);color:#c0cdd5;font-size:.72rem;font-weight:800;text-decoration:none;transition:.15s}
+  .wc-socials a:hover{background:rgba(112,207,5,.15);color:#70cf05}
+  .wc-foot-col h4{color:#fff;font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px}
+  .wc-foot-col ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+  .wc-foot-col ul a,.wc-foot-col p a{color:#8090a0;text-decoration:none;font-size:.85rem;font-weight:500;transition:.15s}
+  .wc-foot-col ul a:hover,.wc-foot-col p a:hover{color:#c5fb91}
+  .wc-foot-col p{color:#8090a0;font-size:.84rem;line-height:1.7;margin-bottom:12px}
+  .wc-foot-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;color:#566570;font-size:.74rem}
+  .wc-foot-bottom a{color:#566570;text-decoration:none}
+  .wc-foot-bottom a:hover{color:#8090a0}
+  .wc-inv-cta{background:#162128;border-top:1px solid rgba(255,255,255,.06);padding:28px 0}
+  .wc-inv-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .wc-inv-inner h3{color:#fff;font-size:1.05rem;font-weight:800;margin:0}
+  .wc-inv-inner p{color:#8090a0;font-size:.84rem;margin:4px 0 0}
+  .wc-inv-btn{display:inline-flex;align-items:center;gap:8px;background:#70cf05;color:#081102;font-weight:800;font-size:.88rem;padding:12px 22px;border-radius:8px;text-decoration:none;white-space:nowrap;transition:.15s;font-family:inherit}
+  .wc-inv-btn:hover{background:#94ed38}
+  .wc-foot img{width:136px}
+  .wc-foot a{color:#d5e4e8;text-decoration:none}
+  .wc-foot a:hover{color:#c5fb91}
+  @media(max-width:1000px){.wc-announcement{display:none}.wc-links{display:none}.wc-btn.ghost{display:none}.wc-foot{flex-direction:column;align-items:flex-start}.wc-foot-grid{grid-template-columns:1fr}.wc-foot-bottom{flex-direction:column;align-items:flex-start;gap:8px}.wc-menu-btn{display:flex!important}.menu-toggle{display:block!important}}
+  @media(max-width:1000px){
+    .wc-header{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(11,16,20,.97);transform:translateZ(0)}
+    .mob-overlay{backdrop-filter:none;-webkit-backdrop-filter:none}
+  }
+  @media(max-width:480px){.wc-announcement .bar,.wc-announcement a{display:none}}
+</style>
+<div class="wc-announcement">
+  <div class="shell">
+    <strong>Atención personalizada en León, Gto.</strong>
+    <span class="bar"></span>
+    <span>Compra, vende o financia tu próximo auto con weCars Bajío.</span>
+    <a href="https://www.wecarsbajio.com/" target="_top">Ir al inicio →</a>
+  </div>
+</div>
+<header class="wc-header">
+  <div class="shell wc-nav">
+    <a class="wc-brand" href="https://www.wecarsbajio.com/" target="_top">
+      <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="weCars Bajío">
+    </a>
+    <ul class="wc-links">
+      <li><a href="https://www.wecarsbajio.com/" target="_top">Inicio</a></li>
+      <li><a href="https://www.wecarsbajio.com/inventario" target="_top">Inventario</a></li>
+      <li><a href="https://www.wecarsbajio.com/credito" target="_top">Crédito</a></li>
+      <li><a href="https://www.wecarsbajio.com/consigna" target="_top">Consigna</a></li>
+      <li><a href="https://www.wecarsbajio.com/nosotros" target="_top">Nosotros</a></li>
+      <li class="wc-dropdown">
+        <button class="wc-drop-btn active" type="button">Más <span class="wc-caret">▾</span></button>
+        <ul class="wc-drop-menu">
+          <li><a href="https://www.wecarsbajio.com/contacto" target="_top">Contacto</a></li>
+          <li><a href="https://www.wecarsbajio.com/testimonios" target="_top" class="active">Testimonios</a></li>
+          <li><a href="https://www.wecarsbajio.com/garantias" target="_top">Garantías</a></li>
+        </ul>
+      </li>
+    </ul>
+    <div class="wc-actions">
+      <a class="wc-btn primary" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_top">Hablar con asesor</a>
+    
+      <button class="menu-toggle" type="button" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile drawer nav -->
+<div class="mob-overlay" id="mobOverlay"></div>
+<nav class="mob-drawer" id="mobDrawer" aria-label="Menú móvil">
+  <div class="mob-drawer-head">
+    <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="WeCars Bajío" />
+    <button class="mob-close" id="mobClose" aria-label="Cerrar menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="mob-nav-links">
+    <a href="https://www.wecarsbajio.com/" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </a>
+    <a href="https://www.wecarsbajio.com/inventario" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Inventario
+    </a>
+    <a href="https://www.wecarsbajio.com/credito" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Crédito
+    </a>
+    <a href="https://www.wecarsbajio.com/consigna" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Consigna tu auto
+    </a>
+    <div class="mob-divider"></div>
+    <a href="https://www.wecarsbajio.com/nosotros" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Nosotros
+    </a>
+    <a href="https://www.wecarsbajio.com/testimonios" target="_top" class="mob-sec active">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Testimonios
+    </a>
+    <a href="https://www.wecarsbajio.com/garantias" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Garantías
+    </a>
+    <a href="https://www.wecarsbajio.com/contacto" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Contacto
+    </a>
+  </div>
+  <div class="mob-cta">
+    <a class="mob-cta-wa" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_top">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.852L0 24l6.335-1.508A11.933 11.933 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.366l-.36-.213-3.72.976.993-3.628-.234-.373A9.818 9.818 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
+      Hablar con un asesor
+    </a>
+    <div class="mob-cta-info">
+      <a href="tel:+524778350020">477 835 0020</a>
+      <span class="sep">·</span>
+      <a href="https://instagram.com/wecars.bajio" target="_top">@wecars.bajio</a>
+    </div>
+  </div>
+</nav>
+<script>
+(function () {
+  function aplicarNavConfig(config) {
+    if (!config) return;
+    const mapa = {};
+    (config.navLinks || []).concat(config.navMas || []).forEach((item) => { mapa[item.key] = item; });
+    const rutaAClave = {
+      '/': 'inicio', '': 'inicio',
+      '/inventario': 'inventario', '/credito': 'credito', '/consigna': 'consigna', '/nosotros': 'nosotros',
+      '/contacto': 'contacto', '/testimonios': 'testimonios', '/garantias': 'garantias',
+    };
+    document.querySelectorAll('.wc-links a').forEach((a) => {
+      try {
+        const u = new URL(a.href);
+        const clave = rutaAClave[u.pathname];
+        if (clave && mapa[clave]) a.href = mapa[clave].url;
+      } catch (e) {}
+    });
+  }
+  function aplicarWhatsAppConfig(config) {
+    if (!config || !config.whatsappNumber) return;
+    document.querySelectorAll('a[href*="524778350020"]').forEach((a) => {
+      a.href = a.href.replace(/524778350020/g, config.whatsappNumber);
+    });
+  }
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'wecars-siteconfig') {
+      aplicarNavConfig(e.data.config);
+      aplicarWhatsAppConfig(e.data.config);
+    }
+  });
+})();
+
+(function(){
+  document.querySelectorAll('.wc-drop-btn').forEach(function(btn){
+    btn.addEventListener('click',function(e){e.stopPropagation();this.closest('.wc-dropdown').classList.toggle('open');});
+  });
+  document.addEventListener('click',function(){document.querySelectorAll('.wc-dropdown').forEach(function(d){d.classList.remove('open');});});
+})();
+</script>
+
+<!-- ══ HERO ══════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-pill">
+          <svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#5DC442"/></svg>
+          +500 familias con su auto
+        </div>
+        <h1>Lo dicen nuestros<br>clientes, no<br><span>nosotros.</span></h1>
+        <p>Más de 500 familias en León ya compraron, vendieron o financiaron su auto con weCars Bajío. Aquí están sus historias — sin editar, sin filtros.</p>
+        <div class="hero-btns" style="margin-bottom:24px;">
+          <a href="#resenas" class="btn btn-verde">Ver todas las reseñas</a>
+          <a href="#dejar-resena" class="btn btn-outline-blanco">Dejar mi reseña</a>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="display:flex;gap:2px;">
+              <span style="color:#f59e0b;font-size:14px;">★★★★★</span>
+            </div>
+            <span style="font-size:13px;color:rgba(255,255,255,.6);">4.8 en Google</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--verde);"></div>
+            <span style="font-size:13px;color:rgba(255,255,255,.6);">95% recomienda weCars</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rating widget -->
+      <div class="hero-rating">
+        <div class="hr-top">
+          <div class="hr-numero">4.8</div>
+          <div class="hr-detalle">
+            <div class="hr-estrellas">
+              <span class="hr-estrella">★</span><span class="hr-estrella">★</span>
+              <span class="hr-estrella">★</span><span class="hr-estrella">★</span>
+              <span class="hr-estrella" style="color:#f59e0b80;">★</span>
+            </div>
+            <div style="font-size:13px;color:rgba(255,255,255,.7);font-weight:700;margin-bottom:2px;">Calificación general</div>
+            <div class="hr-base">Basado en +120 reseñas verificadas</div>
+          </div>
+        </div>
+        <div class="hr-barras">
+          <div class="hr-barra">
+            <div class="hr-barra-label" style="color:rgba(255,255,255,.5);font-size:11px;">5★</div>
+            <div class="hr-barra-track"><div class="hr-barra-fill" style="width:78%;"></div></div>
+            <div class="hr-barra-pct" style="color:rgba(255,255,255,.4);font-size:10px;">78%</div>
+          </div>
+          <div class="hr-barra">
+            <div class="hr-barra-label" style="color:rgba(255,255,255,.5);font-size:11px;">4★</div>
+            <div class="hr-barra-track"><div class="hr-barra-fill" style="width:17%;"></div></div>
+            <div class="hr-barra-pct" style="color:rgba(255,255,255,.4);font-size:10px;">17%</div>
+          </div>
+          <div class="hr-barra">
+            <div class="hr-barra-label" style="color:rgba(255,255,255,.5);font-size:11px;">3★</div>
+            <div class="hr-barra-track"><div class="hr-barra-fill" style="width:3%;background:#ccc;"></div></div>
+            <div class="hr-barra-pct" style="color:rgba(255,255,255,.4);font-size:10px;">3%</div>
+          </div>
+          <div class="hr-barra">
+            <div class="hr-barra-label" style="color:rgba(255,255,255,.5);font-size:11px;">2★</div>
+            <div class="hr-barra-track"><div class="hr-barra-fill" style="width:1%;background:#ccc;"></div></div>
+            <div class="hr-barra-pct" style="color:rgba(255,255,255,.4);font-size:10px;">1%</div>
+          </div>
+          <div class="hr-barra">
+            <div class="hr-barra-label" style="color:rgba(255,255,255,.5);font-size:11px;">1★</div>
+            <div class="hr-barra-track"><div class="hr-barra-fill" style="width:1%;background:#ccc;"></div></div>
+            <div class="hr-barra-pct" style="color:rgba(255,255,255,.4);font-size:10px;">1%</div>
+          </div>
+        </div>
+        <div class="hr-google">
+          <svg class="hr-google-logo" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          <div class="hr-google-txt"><strong>Google Reviews</strong> · Reseñas verificadas por Google</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS ══════════════════════════════════════════════ -->
+<div id="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-num">4.8<span>/5</span></div>
+        <div class="stat-label">Calificación en Google</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">+120<span></span></div>
+        <div class="stat-label">Reseñas verificadas</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">95<span>%</span></div>
+        <div class="stat-label">Recomiendan weCars</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">+500<span></span></div>
+        <div class="stat-label">Clientes satisfechos</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CASOS DE ÉXITO ═════════════════════════════════════ -->
+<section id="casos">
+  <div class="container">
+    <div class="casos-header">
+      <span class="etiqueta">Historias reales</span>
+      <h2 class="sec-titulo">Clientes que ya tienen<br>su auto con nosotros</h2>
+      <p class="sec-sub">Historias reales de personas que compraron, vendieron o financiaron su auto con weCars Bajío en León.</p>
+    </div>
+    <div class="casos-grid">
+
+      <div class="caso-card">
+        <div class="caso-header">
+          <div class="caso-avatar" style="background:#2563EB;">JM</div>
+          <div>
+            <div class="caso-nombre">
+              <strong>Juan Manuel R.</strong>
+              <span>León, Gto. · Compra con crédito</span>
+            </div>
+            <span class="caso-auto">Nissan Sentra 2020</span>
+          </div>
+        </div>
+        <div class="caso-body">
+          <div class="estrellas" style="margin-bottom:10px;"><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span></div>
+          <p class="caso-quote">Tenía buró con problemas por un crédito anterior y pensé que no podría comprar mi auto. Me contactaron, me explicaron la opción con KUNA Capital y en 4 días ya tenía las llaves del Sentra. Sin compromiso y sin burocracia.</p>
+          <div class="caso-footer">
+            <div class="caso-dato">
+              <strong>Crédito aprobado</strong>
+              <span>Historial con detalles · KUNA Capital</span>
+            </div>
+            <div class="caso-badge">
+              <span>4 días</span>
+              proceso completo
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="caso-card">
+        <div class="caso-header">
+          <div class="caso-avatar" style="background:#7c3aed;">LA</div>
+          <div>
+            <div class="caso-nombre">
+              <strong>Laura A.</strong>
+              <span>León, Gto. · Consigna</span>
+            </div>
+            <span class="caso-auto">Honda CR-V 2018 · Vendido</span>
+          </div>
+        </div>
+        <div class="caso-body">
+          <div class="estrellas" style="margin-bottom:10px;"><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span></div>
+          <p class="caso-quote">Intenté vender mi CR-V sola por Facebook y fue un desastre. Llevé el carro con weCars, firmamos el contrato y en 18 días ya me habían pagado. Recibí exactamente lo que acordamos, sin sorpresas.</p>
+          <div class="caso-footer">
+            <div class="caso-dato">
+              <strong>$285,000 recibidos</strong>
+              <span>Consigna · Solo 8% de comisión</span>
+            </div>
+            <div class="caso-badge">
+              <span>18 días</span>
+              para vender
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="caso-card">
+        <div class="caso-header">
+          <div class="caso-avatar" style="background:#059669;">CR</div>
+          <div>
+            <div class="caso-nombre">
+              <strong>Carlos y Rosa M.</strong>
+              <span>León, Gto. · Primera compra</span>
+            </div>
+            <span class="caso-auto">Volkswagen Jetta 2019</span>
+          </div>
+        </div>
+        <div class="caso-body">
+          <div class="estrellas" style="margin-bottom:10px;"><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span></div>
+          <p class="caso-quote">Era nuestro primer auto y estábamos muy nerviosos. El asesor nos explicó todo paso a paso, comparó tres opciones de crédito y nos ayudó a elegir la que más nos convenía. Nunca sentimos presión de compra.</p>
+          <div class="caso-footer">
+            <div class="caso-dato">
+              <strong>Primer auto</strong>
+              <span>Scotiabank · 48 meses</span>
+            </div>
+            <div class="caso-badge">
+              <span>72h</span>
+              aprobación
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ RESEÑAS GOOGLE ═════════════════════════════════════ -->
+<section id="resenas">
+  <div class="container">
+    <div class="resenas-header">
+      <div class="resenas-header-left">
+        <span class="etiqueta">Reseñas verificadas</span>
+        <h2 class="sec-titulo">Lo que dicen en Google</h2>
+        <p style="font-size:14px;color:var(--muted);max-width:440px;">Reseñas reales publicadas en Google Maps por clientes que vivieron el proceso con nosotros.</p>
+      </div>
+      <div class="google-badge">
+        <div class="google-badge-score">4.8</div>
+        <div class="google-badge-right">
+          <div class="estrellas"><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span><span class="estrella">★</span><span class="estrella" style="color:#f59e0b80;">★</span></div>
+          <strong>+120 reseñas en Google</strong>
+          <p>weCars Bajío · León, Gto.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="resenas-filtros">
+      <button class="filtro-btn activo" onclick="filtrar(this,'todos')">Todas</button>
+      <button class="filtro-btn" onclick="filtrar(this,'compra')">Compra de auto</button>
+      <button class="filtro-btn" onclick="filtrar(this,'credito')">Crédito</button>
+      <button class="filtro-btn" onclick="filtrar(this,'consigna')">Consigna</button>
+      <button class="filtro-btn activo-verde" onclick="filtrar(this,'5')">★★★★★ Solo 5 estrellas</button>
+    </div>
+
+    <div class="resenas-grid" id="resenas-container">
+
+      <div class="resena-card" data-cat="credito">
+        <div class="resena-top">
+          <div class="resena-user">
+            <div class="resena-avatar" style="background:#c41230;">MG</div>
+            <div class="resena-nombre"><strong>Miguel G.</strong><span>hace 2 semanas</span></div>
+          </div>
+          <svg class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.45 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        </div>
+        <div class="resena-estrellas"><span class="estrella">★★★★★</span></div>
+        <p class="resena-texto">Excelente servicio. Fui con buró bajo y me dijeron que tenían una opción para mí. En menos de una semana ya estaba manejando mi Toyota. El asesor fue muy claro con todo el proceso.</p>
+        <span class="resena-tag">Crédito con buró</span>
+        <div class="resena-fecha">Reseña verificada · Google Maps</div>
+      </div>
+
+      <div class="resena-card" data-cat="compra">
+        <div class="resena-top">
+          <div class="resena-user">
+            <div class="resena-avatar" style="background:#7c3aed;">VS</div>
+            <div class="resena-nombre"><strong>Valeria S.</strong><span>hace 1 mes</span></div>
+          </div>
+          <svg class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.45 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        </div>
+        <div class="resena-estrellas"><span class="estrella">★★★★★</span></div>
+        <p class="resena-texto">Compré mi primer auto aquí y la experiencia fue increíble. Sin presión, sin letras chicas. El Mazda 3 que compré estaba en perfectas condiciones y el asesor fue muy honesto sobre el historial del vehículo.</p>
+        <span class="resena-tag">Primera compra</span>
+        <div class="resena-fecha">Reseña verificada · Google Maps</div>
+      </div>
+
+      <div class="resena-card" data-cat="consigna">
+        <div class="resena-top">
+          <div class="resena-user">
+            <div class="resena-avatar" style="background:#059669;">RP</div>
+            <div class="resena-nombre"><strong>Roberto P.</strong><span>hace 3 semanas</span></div>
+          </div>
+          <svg class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.45 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        </div>
+        <div class="resena-estrellas"><span class="estrella">★★★★★</span></div>
+        <p class="resena-texto">Dejé mi Kia Sportage en consigna y lo vendieron en 22 días. Me pagaron puntual y todo quedó como se acordó en el contrato. Recomendable 100% para quien quiera vender rápido y sin drama.</p>
+        <span class="resena-tag">Consigna</span>
+        <div class="resena-fecha">Reseña verificada · Google Maps</div>
+      </div>
+
+      <div class="resena-card" data-cat="credito">
+        <div class="resena-top">
+          <div class="resena-user">
+            <div class="resena-avatar" style="background:#ea580c;">AH</div>
+            <div class="resena-nombre"><strong>Ana H.</strong><span>hace 5 semanas</span></div>
+          </div>
+          <svg class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.45 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        </div>
+        <div class="resena-estrellas"><span class="estrella">★★★★★</span></div>
+        <p class="resena-texto">Me dijeron en otro lugar que no me podían dar crédito. Vine a weCars y en 2 días me aprobaron con Banorte. El proceso fue muy transparente, me explicaron la tasa, el CAT y las mensualidades antes de firmar nada.</p>
+        <span class="resena-tag">Crédito aprobado</span>
+        <div class="resena-fecha">Reseña verificada · Google Maps</div>
+      </div>
+
+      <div class="resena-card" data-cat="compra">
+        <div class="resena-top">
+          <div class="resena-user">
+            <div class="resena-avatar" style="background:#0891b2;">FL</div>
+            <div class="resena-nombre"><strong>Fernando L.</strong><span>hace 2 meses</span></div>
+          </div>
+          <svg class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.45 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        </div>
+        <div class="resena-estrellas"><span class="estrella">★★★★★</span></div>
+        <p class="resena-texto">Compré una pickup RAM 1500. El asesor me mandó el expediente mecánico completo antes de que fuera al piso. Llegué, hice la prueba de manejo y cerré ese mismo día. Así debe ser comprar un auto.</p>
+        <span class="resena-tag">Compra de contado</span>
+        <div class="resena-fecha">Reseña verificada · Google Maps</div>
+      </div>
+
+      <div class="resena-card" data-cat="consigna">
+        <div class="resena-top">
+          <div class="resena-user">
+            <div class="resena-avatar" style="background:#be185d;">PM</div>
+            <div class="resena-nombre"><strong>Patricia M.</strong><span>hace 6 semanas</span></div>
+          </div>
+          <svg class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.45 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        </div>
+        <div class="resena-estrellas"><span class="estrella">★★★★★</span></div>
+        <p class="resena-texto">Tenía mi Focus en consigna con otra agencia por 2 meses y nada. Lo traje a weCars y en 25 días vendido. Me avisaron en tiempo real cómo iba el proceso. Excelente comunicación.</p>
+        <span class="resena-tag">Consigna exitosa</span>
+        <div class="resena-fecha">Reseña verificada · Google Maps</div>
+      </div>
+
+    </div>
+
+    <!-- CTA para dejar reseña en Google -->
+    <div class="google-cta-box">
+      <div class="gcta-left">
+        <div class="gcta-ico">
+          <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.45 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        </div>
+        <div class="gcta-txt">
+          <strong>¿Ya compraste con nosotros? Comparte tu experiencia en Google</strong>
+          <p>Tus reseñas ayudan a otras familias a tomar la mejor decisión. Solo tarda 2 minutos.</p>
+        </div>
+      </div>
+      <a href="https://search.google.com/local/writereview?placeid=weCars+Bajio+Leon+Guanajuato" target="_blank" class="btn btn-negro">
+        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#fff"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#fff"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#fff"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.45 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#fff"/></svg>
+        Dejar reseña en Google
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DEJAR RESEÑA ═══════════════════════════════════════ -->
+<section id="dejar-resena">
+  <div class="container">
+    <div class="dr-inner">
+      <div class="dr-texto">
+        <span class="etiqueta-dark">Tu opinión importa</span>
+        <h2 class="sec-titulo" style="color:#fff;">¿Ya viviste la<br>experiencia weCars?</h2>
+        <p>Cuéntanos cómo fue. Tu reseña ayuda a cientos de familias en León a tomar una mejor decisión. Y si tuviste algún problema, también queremos saberlo para mejorar.</p>
+        <div class="dr-opciones">
+          <a href="https://search.google.com/local/writereview?placeid=weCars+Bajio+Leon+Guanajuato" target="_blank" class="dr-opcion">
+            <div class="dr-opcion-ico" style="background:rgba(255,255,255,.1);">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.45 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            </div>
+            <div class="dr-opcion-txt">
+              <strong>Reseñar en Google Maps</strong>
+              <span>Queda publicada y verificada · Tarda 2 minutos</span>
+            </div>
+            <div class="dr-opcion-arrow">›</div>
+          </a>
+          <div class="dr-opcion" style="cursor:default;">
+            <div class="dr-opcion-ico" style="background:rgba(112,207,5,.2);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="dr-opcion-txt">
+              <strong>Formulario en esta página</strong>
+              <span>La recibimos directamente · Sin cuenta de Google</span>
+            </div>
+            <div class="dr-opcion-arrow">›</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario -->
+      <div class="dr-form">
+        <div class="dr-form-head">
+          <h3>Comparte tu experiencia</h3>
+          <p>La recibimos directamente en weCars Bajío</p>
+        </div>
+        <div id="dr-form-content">
+          <div class="dr-form-body">
+            <div class="campo">
+              <label>¿Cómo calificarías tu experiencia? *</label>
+              <div class="rating-stars" id="rating-stars">
+                <span class="rating-star" data-val="1" onclick="setRating(1)">★</span>
+                <span class="rating-star" data-val="2" onclick="setRating(2)">★</span>
+                <span class="rating-star" data-val="3" onclick="setRating(3)">★</span>
+                <span class="rating-star" data-val="4" onclick="setRating(4)">★</span>
+                <span class="rating-star" data-val="5" onclick="setRating(5)">★</span>
+              </div>
+              <input type="hidden" id="rating-val" value="0">
+            </div>
+            <div class="campo-fila">
+              <div class="campo"><label>Tu nombre *</label><input type="text" id="r-nombre" placeholder="Juan García"></div>
+              <div class="campo"><label>¿Qué compraste / hiciste?</label>
+                <select id="r-tipo">
+                  <option value="">— Selecciona —</option>
+                  <option>Compré un auto</option>
+                  <option>Solicité un crédito</option>
+                  <option>Consigné mi auto</option>
+                  <option>Solo visité</option>
+                </select>
+              </div>
+            </div>
+            <div class="campo">
+              <label>¿Qué auto involucró tu experiencia? (opcional)</label>
+              <input type="text" id="r-auto" placeholder="Nissan Sentra 2020, Honda CRV 2019…">
+            </div>
+            <div class="campo">
+              <label>Tu reseña *</label>
+              <textarea id="r-texto" placeholder="Cuéntanos cómo fue tu experiencia. ¿Qué te pareció el proceso, el asesor, el precio? Tu opinión honesta ayuda a otras familias a decidir." style="height:110px;"></textarea>
+            </div>
+            <div class="campo">
+              <label>¿Lo recomendarías?</label>
+              <select id="r-recomienda">
+                <option>Sí, definitivamente</option>
+                <option>Sí, con algunas reservas</option>
+                <option>No lo recomendaría</option>
+              </select>
+            </div>
+          </div>
+          <div class="dr-form-foot">
+            <button class="envio-btn" onclick="enviarResena()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Publicar mi reseña
+            </button>
+            <div class="privacidad">Al enviar, tu reseña puede publicarse en este sitio y compartirse con el equipo weCars.</div>
+          </div>
+        </div>
+        <div id="dr-exito">
+          <div class="exito-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h4>¡Gracias por tu reseña!</h4>
+          <p>La recibimos. Si quieres que quede también en Google Maps para ayudar a más personas, da clic abajo. Solo toma 2 minutos.</p>
+          <a href="https://search.google.com/local/writereview?placeid=weCars+Bajio+Leon+Guanajuato" target="_blank" class="exito-wa" style="margin:0 24px 20px;">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#fff"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#fff"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#fff"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.45 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#fff"/></svg>
+            También reseñar en Google
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA FINAL ══════════════════════════════════════════ -->
+<section id="cta-final">
+  <div class="container">
+    <div class="cta-inner">
+      <div class="cta-texto">
+        <h2>Tú podrías ser<br>el siguiente en<br><span>compartir tu historia.</span></h2>
+        <p>Únete a las más de 500 familias en León que ya encontraron su auto ideal, aprobaron su crédito o vendieron su carro con weCars Bajío. Sin complicaciones, sin sorpresas.</p>
+      </div>
+      <div class="cta-acciones">
+        <a href="https://wa.me/524778350020?text=Hola,%20quiero%20ver%20el%20inventario%20de%20autos%20disponibles" target="_blank" class="cta-acc">
+          <div class="cta-acc-ico" style="background:#25D366;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <div class="cta-acc-txt">
+            <strong>Ver inventario de autos</strong>
+            <span>Encuentra el tuyo y agenda prueba de manejo</span>
+          </div>
+          <div class="cta-acc-flecha">›</div>
+        </a>
+        <a href="https://wa.me/524778350020?text=Hola,%20quiero%20simular%20un%20crédito%20automotriz" target="_blank" class="cta-acc">
+          <div class="cta-acc-ico" style="background:#2563EB;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="cta-acc-txt">
+            <strong>Simular mi crédito</strong>
+            <span>6 bancos disponibles · Respuesta en 72h</span>
+          </div>
+          <div class="cta-acc-flecha">›</div>
+        </a>
+        <a href="https://wa.me/524778350020?text=Hola,%20quiero%20consignar%20mi%20auto%20con%20weCars%20Bajío" target="_blank" class="cta-acc">
+          <div class="cta-acc-ico" style="background:var(--verde);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="cta-acc-txt">
+            <strong>Consignar mi auto</strong>
+            <span>Solo 8% · Tu auto asegurado · Contrato firmado</span>
+          </div>
+          <div class="cta-acc-flecha">›</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  const WA = "524778350020";
+  let ratingActual = 0;
+
+  /* ── Filtros de reseñas ── */
+  window.filtrar = function(btn, cat) {
+    document.querySelectorAll(".filtro-btn").forEach(b => { b.classList.remove("activo"); b.classList.remove("activo-verde"); });
+    btn.classList.add(cat === "5" ? "activo-verde" : "activo");
+    document.querySelectorAll(".resena-card").forEach(c => {
+      if (cat === "todos" || cat === "5") { c.style.display = "block"; }
+      else { c.style.display = c.dataset.cat === cat ? "block" : "none"; }
+    });
+  };
+
+  /* ── Rating stars ── */
+  window.setRating = function(val) {
+    ratingActual = val;
+    document.getElementById("rating-val").value = val;
+    document.querySelectorAll(".rating-star").forEach(s => {
+      s.classList.toggle("activo", parseInt(s.dataset.val) <= val);
+    });
+  };
+  document.querySelectorAll(".rating-star").forEach(s => {
+    s.addEventListener("mouseover", () => {
+      const v = parseInt(s.dataset.val);
+      document.querySelectorAll(".rating-star").forEach(x => {
+        x.style.color = parseInt(x.dataset.val) <= v ? "#f59e0b" : "#ddd";
+      });
+    });
+    s.addEventListener("mouseleave", () => {
+      document.querySelectorAll(".rating-star").forEach(x => {
+        x.style.color = parseInt(x.dataset.val) <= ratingActual ? "#f59e0b" : "#ddd";
+      });
+    });
+  });
+
+  /* ── Enviar reseña ── */
+  window.enviarResena = function() {
+    const nombre = document.getElementById("r-nombre").value.trim();
+    const tipo   = document.getElementById("r-tipo").value;
+    const auto   = document.getElementById("r-auto").value.trim();
+    const texto  = document.getElementById("r-texto").value.trim();
+    const rec    = document.getElementById("r-recomienda").value;
+    const rating = ratingActual;
+    if (!nombre || !texto || !rating) { alert("Por favor llena tu nombre, calificación y reseña."); return; }
+    const estrellas = "★".repeat(rating) + "☆".repeat(5 - rating);
+    const msg = `⭐ *Nueva reseña en weCars Bajío*\n\n*Cliente:* ${nombre}\n*Calificación:* ${estrellas} (${rating}/5)\n${tipo ? `*Tipo:* ${tipo}\n` : ""}${auto ? `*Auto:* ${auto}\n` : ""}*¿Recomienda?* ${rec}\n\n*Reseña:*\n${texto}`;
+    // Guardar en Wix CMS colección "Testimonios"
+    window.parent.postMessage({
+      type:   'wecars-testimonio',
+      pagina: 'Testimonios',
+      data:   { nombre, tipo, auto, texto, recomienda: rec, calificacion: rating }
+    }, '*');
+
+    window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, "_blank");
+    document.getElementById("dr-form-content").style.display = "none";
+    document.getElementById("dr-exito").style.display = "block";
+  };
+
+  /* ── FAQ ── */
+  document.querySelectorAll(".faq-q").forEach(btn => btn.addEventListener("click", function() {
+    const item = this.closest(".faq-item");
+    const open = item.classList.contains("open");
+    document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
+    if (!open) item.classList.add("open");
+  }));
+})();
+</script>
+
+<div class="wc-inv-cta">
+  <div class="shell wc-inv-inner">
+    <div>
+      <h3 style="color:#fff;margin:0 0 4px;font-size:1.15rem">¿Listo para encontrar tu auto?</h3>
+      <p style="margin:0;color:#9eafb8;font-size:.88rem">Más de 50 unidades disponibles. Filtra por precio, año y tipo.</p>
+    </div>
+    <a class="wc-inv-btn" href="https://www.wecarsbajio.com/inventario" target="_top">Ver inventario completo →</a>
+  </div>
+</div>
+<footer class="wc-footer-rich">
+  <div class="shell">
+    <div class="wc-foot-grid">
+      <div class="wc-foot-brand">
+        <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="weCars Bajío">
+        <p>Compra, venta, consignación y opciones de financiamiento para autos seminuevos en León, Gto.</p>
+        <div class="wc-socials">
+          <a href="https://instagram.com/wecars.bajio" target="_top" title="Instagram">ig</a>
+          <a href="#" target="_top" title="Facebook">f</a>
+          <a href="#" target="_top" title="TikTok">tt</a>
+        </div>
+      </div>
+      <div class="wc-foot-col">
+        <h4>Explora</h4>
+        <ul>
+          <li><a href="https://www.wecarsbajio.com/inventario" target="_top">Inventario</a></li>
+          <li><a href="https://www.wecarsbajio.com/credito" target="_top">Crédito</a></li>
+          <li><a href="https://www.wecarsbajio.com/consigna" target="_top">Consigna tu auto</a></li>
+          <li><a href="https://www.wecarsbajio.com/garantias" target="_top">Garantías</a></li>
+          <li><a href="https://www.wecarsbajio.com/nosotros" target="_top">Nosotros</a></li>
+          <li><a href="https://www.wecarsbajio.com/testimonios" target="_top">Testimonios</a></li>
+        </ul>
+      </div>
+      <div class="wc-foot-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="tel:+524778350020" target="_top">477 835 0020</a></li>
+          <li><a href="https://instagram.com/wecars.bajio" target="_top">@wecars.bajio</a></li>
+          <li><a href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa." target="_top">Solicitar asesoría</a></li>
+          <li><a href="mailto:op.wecars@gmail.com" target="_top">op.wecars@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="wc-foot-col">
+        <h4>Visítanos</h4>
+        <p style="font-size:.84rem;line-height:1.7;margin-bottom:16px">Blvrd. Vicente Valtierra 7065<br>Terracota, Hacienda San Ángel<br>León, Guanajuato</p>
+        <p style="font-size:.84rem;line-height:1.7;margin:0">Lun–Vie 9:00–18:30<br>Sáb 11:00–14:00</p>
+      </div>
+    </div>
+    <div class="wc-foot-bottom">
+      <span>© 2026 WeCars Bajío. Todos los derechos reservados.</span>
+      <span><a href="#" target="_top">Aviso de privacidad</a> · <a href="#" target="_top">Términos y condiciones</a></span>
+    </div>
+  </div>
+</footer>
+  
+<style>
+.vta-aside{display:flex;align-items:center;gap:20px;padding:20px 24px;background:var(--white,#fff);border:1px solid var(--line,#d8e2e5);border-left:4px solid var(--lime,#56a900);border-radius:0 12px 12px 0;flex-wrap:wrap;margin:40px 0}
+.vta-aside-icon{font-size:1.5rem;flex-shrink:0;line-height:1}
+.vta-aside-body{flex:1;min-width:180px}
+.vta-aside-body strong{display:block;font-size:.9rem;font-weight:700;color:var(--ink,#0f1a0f);margin-bottom:3px}
+.vta-aside-body p{font-size:.8rem;color:var(--muted,#6d7a83);line-height:1.55;margin:0}
+.vta-aside-link{white-space:nowrap;font-size:.82rem;font-weight:700;color:#fff;background:var(--lime,#56a900);text-decoration:none;padding:9px 18px;border-radius:99px;flex-shrink:0;transition:background .15s}
+.vta-aside-link:hover{background:var(--lime-dark,#3d7a00)}
+@media(max-width:520px){.vta-aside{flex-direction:column;align-items:flex-start;gap:12px}.vta-aside-link{align-self:flex-start}}
+@media(prefers-color-scheme:dark){.vta-aside{background:var(--white,#1C2416);border-color:var(--line,#2e3d24)}.vta-aside-body strong{color:var(--ink,#e8f0e0)}}
+
+/* ── MOBILE: scroll trap fix + pequeños ajustes ── */
+@media(max-width:640px){
+  body{touch-action:pan-y;overscroll-behavior-y:contain}
+  /* Elementos con scroll horizontal propio: no bloquear */
+  .mob-filter-bar,.wc-subtoggle,.overflow-x-scroll,[class*="scroll-x"]{touch-action:pan-x}
+  /* Campos de formulario: fáciles de tocar */
+  input,select,textarea,button{touch-action:manipulation}
+  /* Padding lateral consistente en mobile */
+  .shell{padding-left:16px!important;padding-right:16px!important}
+}
+</style>
+<div class="vta-aside">
+  <div class="vta-aside-icon">&#128269;</div>
+  <div class="vta-aside-body">
+    <strong>¿Cómo sabes que la factura no es falsa? ¿Los papeles del auto están en orden?</strong>
+    <p>Muchas ventas traen facturas con consecutivos rotos, bajas ilegales o propietarios que no coinciden. Nosotros lo detectamos antes de que el dinero cambie de manos &mdash; desde $189&nbsp;+&nbsp;IVA.</p>
+  </div>
+  <a class="vta-aside-link" href="https://www.wecarsbajio.com/verifica-tu-auto" onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:'https://www.wecarsbajio.com/verifica-tu-auto'},'*')">Verifica tu Auto &rarr;</a>
+</div>
+  <p class="vta-strip-text"><strong>Verifica tu Auto</strong> &mdash; Revisamos factura, INE, tenencia y m&aacute;s antes de que compres. Reporte en 48&nbsp;h desde $189&nbsp;+&nbsp;IVA.</p>
+  <a class="vta-strip-link" href="https://www.wecarsbajio.com/verifica-tu-auto" onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:'https://www.wecarsbajio.com/verifica-tu-auto'},'*')">Saber m&aacute;s &rarr;</a>
+</div>
+<script>(function(){var t,retries=0;function send(){var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight,document.body.offsetHeight);window.parent.postMessage({type:"wecars-resize",height:h},"*");}function rh(){clearTimeout(t);t=setTimeout(function(){requestAnimationFrame(send);},150);}function hookImgs(){document.querySelectorAll("img").forEach(function(img){if(!img.dataset.wcResize){img.dataset.wcResize="1";img.addEventListener("load",rh);img.addEventListener("error",rh);}});}window.addEventListener("load",function(){rh();var iv=setInterval(function(){rh();hookImgs();if(++retries>=12)clearInterval(iv);},400);});window.addEventListener("resize",rh);new MutationObserver(function(){rh();hookImgs();}).observe(document.body,{childList:true,subtree:true,attributes:false,characterData:false});hookImgs();rh();})();
+
+    // Menú móvil — drawer lateral
+    (function(){
+      var btn=document.querySelector('.menu-toggle');
+      var drawer=document.getElementById('mobDrawer');
+      var overlay=document.getElementById('mobOverlay');
+      var close=document.getElementById('mobClose');
+      function openMenu(){drawer.classList.add('open');overlay.classList.add('open');}
+      function closeMenu(){drawer.classList.remove('open');overlay.classList.remove('open');}
+      if(btn) btn.addEventListener('click',openMenu);
+      if(close) close.addEventListener('click',closeMenu);
+      if(overlay) overlay.addEventListener('click',closeMenu);
+      document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMenu();});
+    })();</script>
+
+<a class="wa-float" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+</body>
+</html>

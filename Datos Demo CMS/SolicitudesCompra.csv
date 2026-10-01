@@ -1,0 +1,7 @@
+﻿_id,vendedorId,vendedor,clienteId,marca,modelo,año,version,colorPreferido,presupuestoMax,estatus,fechaSolicitud,notas
+sc001,3e027843-3e39-44c9-8e33-adc48b5ec45d,Brandon Eduardo Zuñiga,cl002,VW,Jetta,2019,Comfortline,cualquiera,215000,encontrado,2026-07-16,Cliente entrega Jetta en toma al cerrar compra del Sportage 2023. Valuado $215k.
+sc002,7cc6241e-e93a-4704-8da3-bea04ffecd51,weCars Bajío,cl008,Toyota,Hilux,2020,Base,cualquiera,380000,buscando,2026-07-17,Ofrece Hilux 2020 como toma para la Lobo Lariat 2021. Revisando papeles.
+sc003,3e027843-3e39-44c9-8e33-adc48b5ec45d,Brandon Eduardo Zuñiga,cl012,Ford,Focus,2019,SE,cualquiera,95000,buscando,2026-07-15,Focus 2019 para toma en compra de Camry 2022. Pendiente valuación física.
+sc004,7cc6241e-e93a-4704-8da3-bea04ffecd51,weCars Bajío,cl020,Ram,1500,2018,Big Horn,cualquiera,320000,buscando,2026-07-13,Empresario ofrece Ram 2018 en toma para Frontier 2023. Alta probabilidad.
+sc005,3e027843-3e39-44c9-8e33-adc48b5ec45d,Brandon Eduardo Zuñiga,cl024,Chevrolet,Aveo,2020,LT,cualquiera,88000,encontrado,2026-07-14,"Aveo 2020 aceptado como parte de pago. Valuado $88k, diferencia de $362k en Equinox."
+sc006,7cc6241e-e93a-4704-8da3-bea04ffecd51,weCars Bajío,cl028,Mercedes-Benz,GLA,2015,200,cualquiera,540000,buscando,2026-07-18,Profesionista ofrece GLA 2015 para bajar precio del BMW Serie 3. Pendiente valuación.

@@ -1,0 +1,2292 @@
+
+<!DOCTYPE html>
+<!--
+  WECARS BAJÍO · INICIO COMPLETO
+  Este HTML se pega completo en un elemento "Embed HTML" de Wix.
+  Recibe el inventario real desde Velo mediante:
+  { type: 'wecars-inventory', items: [...] }
+
+  Requisito en Wix:
+  - El elemento HTML debe tener el ID: htmlCatalogo
+  - El código Velo de src/pages/inicio.oe6tw.js debe usar:
+    const COLLECTION_ID = 'Cars';
+-->
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Prototipo de rediseño para WeCars Bajío: compra, venta, consignación y financiamiento de autos seminuevos." />
+  <title>WeCars Bajío | Autos seminuevos con respaldo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+  /* ── Brand ─────────────────────────────────────────── */
+  --lime:          #56a900;
+  --lime-dark:     #3d7a00;
+  --lime-bg:       rgba(86,169,0,.10);
+  /* ── Neutrals ──────────────────────────────────────── */
+  --ink:           #0f1a0f;
+  --ink-2:         #1a2e1a;
+  --paper:         #F5F7F5;
+  --white:         #ffffff;
+  --muted:         #6d7a83;
+  --line:          #d8e2e5;
+  /* ── Semantic ──────────────────────────────────────── */
+  --c-red:         #e24b4a;   --c-red-bg:    rgba(226,75,74,.10);
+  --c-amber:       #d97706;   --c-amber-bg:  rgba(217,119,6,.10);
+  --c-blue:        #2a78d6;   --c-blue-bg:   rgba(42,120,214,.10);
+  --c-green:       #16a34a;   --c-green-bg:  rgba(22,163,74,.10);
+  --c-purple:      #9333ea;   --c-purple-bg: rgba(147,51,234,.10);
+  --amarillo:      #f59e0b;
+  --violet:        #4338c8;
+  --violet-2:      #5c55e5;
+  /* ── Elevation ─────────────────────────────────────── */
+  --shadow-sm:     0 2px 8px  rgba(12,27,35,.08);
+  --shadow:        0 8px 24px rgba(12,27,35,.10);
+  --shadow-lg:     0 18px 48px rgba(12,27,35,.12);
+  /* ── Radius ────────────────────────────────────────── */
+  --radius-sm:     8px;
+  --radius:        12px;
+  --radius-md:     16px;
+  --radius-lg:     22px;
+  --radius-pill:   999px;
+  /* ── Aliases backward-compat (no tocar) ────────────── */
+  --verde:         var(--lime);
+  --verde-dark:    var(--lime-dark);
+  --negro:         var(--ink);
+  --ink-3:         var(--ink-2);
+  --gris:          var(--paper);
+  --gris-borde:    var(--line);
+  --radio:         var(--radius-md);
+  --sombra:        var(--shadow-lg);
+  --borde:         var(--line);
+  --texto:         var(--muted);
+  --max:           1280px;
+}
+/* ── Dark mode ──────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #111a0e; --ink: #e8f0e0; --ink-2: #c8d8c0;
+    --line: #2e3d24; --muted: #7a9e68; --white: #1C2416;
+    --gris: #111a0e; --gris-borde: #2e3d24; --negro: #e8f0e0;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,.25);
+    --shadow: 0 8px 24px rgba(0,0,0,.28);
+    --shadow-lg: 0 18px 48px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111a0e; --ink: #e8f0e0; --ink-2: #c8d8c0;
+  --line: #2e3d24; --muted: #7a9e68; --white: #1C2416;
+  --gris: #111a0e; --gris-borde: #2e3d24; --negro: #e8f0e0;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.25);
+  --shadow: 0 8px 24px rgba(0,0,0,.28);
+  --shadow-lg: 0 18px 48px rgba(0,0,0,.35);
+}
+:root[data-theme="light"] {
+  --paper: #F5F7F5; --ink: #0f1a0f; --ink-2: #1a2e1a;
+  --line: #E4EAE4; --muted: #5a7060; --white: #ffffff;
+  --gris: #F5F7F5; --gris-borde: #d8e2e5; --negro: #0b1014;
+}
+
+    *{box-sizing:border-box;max-width:100%}
+    img,svg,video{max-width:100%;height:auto}
+    /* Full-width: asegura que el HTML ocupe 1920px o el ancho completo del iframe */
+    html{width:100%;min-width:320px;overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+    body{width:100%;max-width:100%;overflow-x:clip;position:relative}
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+    html,body{scrollbar-width:none;-ms-overflow-style:none}
+
+
+    body{
+      margin:0;
+      background:var(--paper);
+      color:var(--ink);
+      font-family:"DM Sans",Arial,sans-serif;
+      line-height:1.5;
+    }
+
+    button, input, select{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+
+    .shell{width:min(var(--max),calc(100% - 40px));margin:0 auto}
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border:1px solid rgba(103,199,0,.30);
+      border-radius:999px;color:#d8ffb0;background:rgba(103,199,0,.10);
+      font-size:.76rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    }
+    .eyebrow.light{color:#4c9700;background:#effbdd;border-color:#cbeea8}
+    .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 5px rgba(103,199,0,.13)}
+    .section-title{
+      margin:14px 0 0;font-family:"Manrope",Arial,sans-serif;
+      font-size:clamp(2rem,4.3vw,3.55rem);line-height:1.08;letter-spacing:-.055em;
+    }
+    .section-copy{margin:18px 0 0;max-width:630px;color:var(--muted);font-size:1.04rem}
+    .section-top{display:flex;align-items:end;justify-content:space-between;gap:28px}
+    .section-top .section-copy{margin-bottom:2px}
+
+    /* Header */
+    .announcement{
+      background:#0b1014;color:#d9e4ea;font-size:.84rem;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .announcement .shell{display:flex;align-items:center;justify-content:center;gap:10px;padding:9px 0}
+    .announcement strong{color:white}
+    .announcement .divider{height:13px;width:1px;background:rgba(255,255,255,.22)}
+    .announcement a{color:#bff082;font-weight:700}
+
+    .wc-header{
+      position:sticky;top:0;z-index:50;background:rgba(11,16,20,.94);
+      backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .wc-nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .wc-brand{display:flex;align-items:center;flex:0 0 auto}
+    .wc-brand img{width:164px;height:auto;display:block}
+    .wc-links{display:flex;align-items:center;gap:27px;color:#dce5ea;font-size:.92rem;font-weight:600;list-style:none}
+    .wc-links a{position:relative;padding:8px 0;text-decoration:none;color:inherit}
+    .wc-links a::after{
+      content:"";position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--lime);
+      transition:width .23s ease;
+    }
+    .wc-links a:hover::after,.wc-links a.active::after{width:100%}
+    .wc-links a.active{color:#fff}
+    .wc-actions{display:flex;align-items:center;gap:11px}
+    .wc-btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:9px;border:0;
+      font-weight:700;transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
+      padding:10px 16px;border-radius:999px;font-size:.86rem;text-decoration:none;font-family:inherit;
+    }
+    .wc-btn.primary{color:#071100;background:var(--lime)}
+    .wc-btn.primary:hover{background:#8dea2e;box-shadow:0 10px 28px rgba(103,199,0,.25);transform:translateY(-1px)}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:9px;border:0;
+      font-weight:700;transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
+    }
+    .menu-toggle{display:none;background:none;border:0;color:white;padding:9px;cursor:pointer;z-index:201;position:relative}
+    .menu-toggle svg{width:26px;height:26px;transition:opacity .2s}
+        /* Mobile drawer — v2 */
+    .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:198;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+    .mob-drawer{position:fixed;top:0;right:0;bottom:0;width:80vw;max-width:300px;background:#0b0b0b;z-index:199;transform:translateX(110%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-16px 0 60px rgba(0,0,0,.65)}
+    .mob-drawer.open{transform:translateX(0)}
+    .mob-overlay.open{display:block}
+    .mob-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
+    .mob-drawer-head img{height:26px;width:auto;opacity:.9}
+    .mob-close{background:rgba(255,255,255,.07);border:0;color:#777;width:30px;height:30px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,color .15s}
+    .mob-close:hover{background:rgba(255,255,255,.12);color:#fff}
+    .mob-close svg{width:14px;height:14px;display:block}
+    .mob-nav-links{display:flex;flex-direction:column;padding:8px 10px;flex:1;overflow-y:auto;gap:1px}
+    .mob-nav-links a{display:flex;align-items:center;gap:10px;padding:11px 12px;color:#bbb;text-decoration:none;font-size:.88rem;font-weight:600;font-family:'DM Sans',sans-serif;border-radius:10px;transition:background .14s,color .14s}
+    .mob-nav-links a:hover{background:rgba(255,255,255,.05);color:#eee}
+    .mob-nav-links a.active{background:rgba(112,207,5,.1);color:#70cf05}
+    .mob-nav-links a.mob-sec{font-size:.82rem;font-weight:500;color:#555;padding:9px 12px}
+    .mob-nav-links a.mob-sec:hover{background:rgba(255,255,255,.04);color:#888}
+    .mob-nav-links a.mob-sec.active{background:rgba(112,207,5,.08);color:#70cf05}
+    .mob-nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.6}
+    .mob-nav-links a.active .mob-nav-icon{opacity:1}
+    .mob-nav-links .mob-divider{height:1px;background:rgba(255,255,255,.05);margin:5px 0}
+    .mob-cta{padding:12px 12px 18px;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;gap:7px}
+    .mob-cta-wa{display:flex;align-items:center;justify-content:center;gap:8px;background:#25d366;border-radius:12px;padding:13px;text-decoration:none;width:100%;font-weight:700;font-size:.88rem;color:#fff;font-family:'DM Sans',sans-serif;transition:background .18s}
+    .mob-cta-wa:hover{background:#1fc05e}
+    .mob-cta-wa svg{width:17px;height:17px;fill:#fff;flex-shrink:0}
+    .mob-cta-info{display:flex;align-items:center;justify-content:center;gap:8px;padding:2px 0}
+    .mob-cta-info a{color:#444;font-size:.76rem;text-decoration:none;font-family:'DM Sans',sans-serif}
+    .mob-cta-info a:hover{color:#777}
+    .mob-cta-info .sep{color:#2a2a2a;font-size:.65rem}
+    .mob-cta .btn{width:100%;text-align:center;border-radius:12px;font-size:.97rem;padding:14px}
+
+    /* Nav dropdown (Más ▾) */
+    .wc-dropdown{position:relative}
+    .wc-drop-btn{
+      display:inline-flex;align-items:center;gap:5px;padding:8px 0;
+      background:none;border:0;color:#dce5ea;font-size:.92rem;font-weight:600;cursor:pointer;
+      position:relative;font-family:inherit;
+    }
+    .wc-drop-btn::after{
+      content:"";position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--lime);
+      transition:width .23s ease;
+    }
+    .wc-drop-btn:hover::after{width:100%}
+    .wc-drop-menu{
+      display:none;position:absolute;top:calc(100% + 10px);right:0;min-width:180px;
+      background:#162128;border-radius:12px;border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 18px 40px rgba(0,0,0,.35);overflow:hidden;z-index:99;list-style:none;padding:6px;
+    }
+    .wc-dropdown.open .wc-drop-menu{display:block}
+    .wc-drop-menu a{
+      display:block;padding:11px 16px;color:#c8d5dc;font-size:.87rem;font-weight:600;
+      transition:background .15s,color .15s;border-radius:8px;
+    }
+    .wc-drop-menu a:hover{background:rgba(103,199,0,.12);color:#70cf05}
+
+    /* Hero */
+    .hero{
+      overflow:hidden;position:relative;color:white;background:var(--ink);
+      min-height:760px;display:flex;align-items:stretch;
+    }
+    .hero::before{
+      content:"";position:absolute;inset:0;
+      background:
+        linear-gradient(90deg,rgba(7,10,12,.97) 0%,rgba(7,10,12,.91) 31%,rgba(7,10,12,.44) 68%,rgba(7,10,12,.30) 100%),
+        linear-gradient(0deg,rgba(7,10,12,.66) 0%,transparent 46%),
+        url("https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2100&q=88") center/cover;
+      transform:scale(1.02);
+    }
+    .hero::after{
+      content:"";position:absolute;width:680px;height:680px;right:-270px;bottom:-300px;border-radius:50%;
+      background:radial-gradient(circle,rgba(67,56,200,.40) 0%,rgba(67,56,200,0) 70%);
+    }
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr;gap:0;align-items:center;padding:88px 0 80px}
+    .hero-copy{max-width:720px}
+    .hero-copy h1{
+      margin:17px 0 0;max-width:710px;font-family:"Manrope",Arial,sans-serif;
+      font-size:clamp(3rem,6vw,5.35rem);line-height:.98;letter-spacing:-.072em;
+    }
+    .hero-copy h1 span{color:#b7f779}
+    .hero-copy p{max-width:620px;margin:23px 0 0;color:#ced9df;font-size:clamp(1rem,1.6vw,1.16rem)}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+    .btn{padding:14px 20px;border-radius:12px;font-size:.95rem}
+    .btn.primary{background:var(--lime);color:#081203;box-shadow:0 13px 32px rgba(103,199,0,.18)}
+    .btn.primary:hover{background:#8fea2a;transform:translateY(-2px)}
+    .btn.dark{background:white;color:#0b1014}
+    .btn.dark:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+    .btn.outline{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:white}
+    .btn.outline:hover{background:rgba(255,255,255,.12)}
+    .hero-proof{display:flex;flex-wrap:wrap;gap:16px 22px;margin-top:32px;color:#c3d0d7;font-size:.88rem;font-weight:600}
+    .hero-proof span{display:flex;align-items:center;gap:8px}
+    .check{width:19px;height:19px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(103,199,0,.16);color:#a9f365;font-size:.75rem}
+
+    .finder{
+      position:relative;background:rgba(255,255,255,.98);color:var(--ink);padding:25px;border-radius:25px;
+      box-shadow:0 26px 65px rgba(0,0,0,.30);border:1px solid rgba(255,255,255,.65);
+    }
+    .finder::before{
+      content:"";position:absolute;inset:-1px;border-radius:25px;padding:1px;
+      background:linear-gradient(140deg,rgba(103,199,0,.8),rgba(67,56,200,.6),transparent 55%);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+    }
+    .finder-top{display:flex;align-items:start;justify-content:space-between;gap:14px}
+    .finder .small-label{margin:0;color:var(--violet);font-weight:800;font-size:.77rem;letter-spacing:.09em;text-transform:uppercase}
+    .finder h2{margin:6px 0 0;font-family:"Manrope";font-size:1.5rem;line-height:1.16;letter-spacing:-.04em}
+    .finder-icon{width:43px;height:43px;display:grid;place-items:center;border-radius:13px;background:#f0fbe5;color:var(--lime-dark)}
+    .finder form{display:grid;gap:12px;margin-top:23px}
+    .field{display:grid;gap:6px}
+    .field label{font-size:.78rem;color:#53616d;font-weight:700}
+    .field select,.field input{
+      width:100%;height:48px;border:1px solid #dce3e6;border-radius:10px;background:white;padding:0 12px;color:#18232b;outline:none;
+    }
+    .field select:focus,.field input:focus{border-color:var(--violet);box-shadow:0 0 0 4px rgba(67,56,200,.10)}
+    .finder-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .finder .btn{margin-top:4px;width:100%;background:var(--ink);color:white}
+    .finder .btn:hover{background:var(--violet);transform:translateY(-1px)}
+    .finder-note{margin:15px 0 0;color:#6b7780;font-size:.76rem;text-align:center}
+    .finder-note b{color:#28343c}
+
+    /* Franja de captura — nombre + celular "a la entrada" (en el flujo normal, no un pop-up) */
+    .entry-capture{background:var(--ink);color:white;padding:34px 0 82px;position:relative;z-index:1}
+    .entry-capture-inner{display:flex;align-items:center;justify-content:space-between;gap:26px;flex-wrap:wrap}
+    .entry-capture-copy{max-width:480px}
+    .entry-capture-kicker{margin:0;color:#b7f779;font-weight:800;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+    .entry-capture-copy h3{margin:8px 0 0;font-family:"Manrope",Arial,sans-serif;font-size:1.3rem;line-height:1.3;letter-spacing:-.02em;color:white;font-weight:800}
+    .entry-capture-form{display:flex;gap:10px;flex-wrap:wrap;flex:1;min-width:290px;max-width:580px}
+    .entry-capture-form input{flex:1;min-width:130px;height:48px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);padding:0 14px;color:white;outline:none;font-family:inherit;font-size:.9rem}
+    .entry-capture-form input::placeholder{color:#9fb0b8}
+    .entry-capture-form input:focus{border-color:var(--lime)}
+    .entry-capture-form .btn{white-space:nowrap;padding:0 20px;height:48px}
+    @media(max-width:1000px){.announcement{display:none}.entry-capture-inner{flex-direction:column;align-items:stretch}.entry-capture-form{max-width:none;flex-direction:column}.entry-capture-form input,.entry-capture-form .btn{width:100%}}
+
+    /* Trust bar */
+    .trust-wrap{position:relative;z-index:2;margin-top:-39px}
+    .trust{
+      display:grid;grid-template-columns:repeat(4,1fr);background:white;box-shadow:var(--shadow);
+      border-radius:18px;overflow:hidden;border:1px solid rgba(20,30,35,.07);
+    }
+    .trust-item{display:flex;align-items:center;gap:13px;padding:20px 22px;border-right:1px solid #e5e9eb}
+    .trust-item:last-child{border-right:0}
+    .trust-icon{width:41px;height:41px;display:grid;place-items:center;flex:0 0 auto;border-radius:12px;background:#eefbdd;color:#59ad00}
+    .trust b{display:block;font-size:.89rem}
+    .trust small{display:block;margin-top:2px;color:#74808a;font-size:.76rem;line-height:1.25}
+
+    /* Sections */
+    section{padding:110px 0}
+    .paths{padding-bottom:70px}
+    .path-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:39px}
+    .path-card{
+      min-height:305px;position:relative;overflow:hidden;padding:27px;border-radius:var(--radius-md);color:white;
+      background:var(--ink-2);isolation:isolate;
+    }
+    .path-card::before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,11,13,.93),rgba(8,11,13,.13) 80%);z-index:-1}
+    .path-card::after{content:"";position:absolute;inset:0;z-index:-2;transition:transform .4s ease}
+    .path-card.buy::after{background:url("https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1000&q=84") center/cover}
+    .path-card.finance::after{background:url("https://images.unsplash.com/photo-1461632830798-3adb3034e4c8?auto=format&fit=crop&w=1000&q=84") center/cover}
+    .path-card.sell::after{background:url("https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=1000&q=84") center/cover}
+    .path-card:hover::after{transform:scale(1.06)}
+    .path-number{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);font-weight:800;font-size:.83rem}
+    .path-card h3{margin:91px 0 0;font-family:"Manrope";font-size:1.66rem;line-height:1.08;letter-spacing:-.04em}
+    .path-card p{margin:10px 0 0;max-width:300px;color:#d7e0e5;font-size:.92rem}
+    .path-card a{display:inline-flex;align-items:center;gap:8px;margin-top:19px;color:#b8f779;font-weight:800;font-size:.89rem}
+    .path-card a span{font-size:1.15rem;transition:transform .2s ease}
+    .path-card a:hover span{transform:translateX(4px)}
+
+    /* Razones / objeciones */
+    .reasons{padding:70px 0;background:var(--paper)}
+    .reasons-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px}
+    .reasons-card{background:white;border:1px solid var(--line);border-radius:16px;padding:22px;transition:transform .2s ease,box-shadow .2s ease}
+    .reasons-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+    .reasons-icon{width:38px;height:38px;border-radius:10px;background:#eefbdd;color:var(--lime-dark);display:grid;place-items:center;margin-bottom:14px;font-size:1.05rem}
+    .reasons-card h3{font-family:"Manrope";font-size:1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
+    .reasons-card p{color:var(--muted);font-size:.83rem;line-height:1.55}
+
+    /* Compra en 4 pasos */
+    .steps{padding:70px 0}
+    .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px;counter-reset:step}
+    .step-card{position:relative;padding:26px 22px;border-radius:16px;background:var(--ink-2);color:white}
+    .step-card:not(:last-child)::after{content:"→";position:absolute;top:26px;right:-22px;color:var(--lime);font-size:1.2rem;font-weight:900;z-index:1}
+    .step-number{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--lime);color:#081102;font-family:"Manrope";font-weight:900;font-size:.85rem;margin-bottom:16px}
+    .step-card h3{font-family:"Manrope";font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
+    .step-card p{color:#c3cdd2;font-size:.83rem;line-height:1.55}
+    @media(max-width:1000px){
+      .reasons-grid{grid-template-columns:1fr 1fr}
+      .steps-grid{grid-template-columns:1fr 1fr;gap:20px 16px}
+      .step-card:not(:last-child)::after{display:none}
+    }
+
+    /* Inventory */
+    .inventory{background:#eaf0f2;padding:105px 0}
+    .inventory-controls{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:34px}
+    .filter-pills{display:flex;gap:9px;flex-wrap:wrap}
+    .filter-pill{
+      border:1px solid #d1dade;background:white;border-radius:999px;padding:9px 14px;color:#44515b;font-size:.84rem;font-weight:700;
+    }
+    .filter-pill.active,.filter-pill:hover{color:white;background:var(--ink);border-color:var(--ink)}
+    .inventory-note{color:#72808a;font-size:.84rem}
+    .vehicle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:19px;margin-top:24px}
+    .vehicle-card{overflow:hidden;border-radius:17px;background:white;border:1px solid #dde5e8;box-shadow:0 10px 28px rgba(16,29,38,.07);transition:transform .24s ease,box-shadow .24s ease}
+    .vehicle-card:hover{transform:translateY(-5px);box-shadow:0 20px 36px rgba(16,29,38,.13)}
+    .vehicle-image{position:relative;aspect-ratio:1.45;overflow:hidden;background:#dbe4e6}
+    .vehicle-image img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+    .vehicle-card:hover .vehicle-image img{transform:scale(1.05)}
+    .vehicle-tag{position:absolute;top:13px;left:13px;background:rgba(255,255,255,.92);backdrop-filter:blur(7px);padding:6px 9px;border-radius:8px;font-size:.68rem;font-weight:800}
+    .heart{position:absolute;top:11px;right:11px;width:35px;height:35px;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(255,255,255,.92);font-size:1rem}
+    .vehicle-content{padding:18px 18px 19px}
+    .vehicle-meta{display:flex;gap:9px;flex-wrap:wrap;color:#6a7680;font-size:.77rem;font-weight:600}
+    .vehicle-meta span+span::before{content:"•";margin-right:9px;color:#98a4ab}
+    .vehicle-card h3{margin:8px 0 0;font-family:"Manrope";font-size:1.16rem;letter-spacing:-.03em}
+    .price-line{display:flex;align-items:end;justify-content:space-between;gap:10px;margin-top:15px}
+    .price-line b{font-size:1.17rem;letter-spacing:-.02em}
+    .price-line small{display:block;color:#7b8791;font-size:.69rem;text-align:right}
+    .price-line strong{display:block;color:var(--violet);font-size:.9rem}
+    .vehicle-cta{display:flex;align-items:center;justify-content:space-between;margin-top:17px;padding-top:14px;border-top:1px solid #e9edef}
+    .vehicle-cta button{border:0;background:none;color:var(--violet);font-size:.85rem;font-weight:800;padding:0}
+    .vehicle-cta a{font-size:.8rem;font-weight:700;color:#3f4c55}
+    .inventory-bottom{text-align:center;margin-top:30px}
+    .inventory-bottom .btn{background:var(--ink);color:white}
+    .inventory-bottom .btn:hover{background:var(--violet)}
+
+
+    /* Catálogo integrado: conectado con Wix CMS mediante Velo */
+    .market-inventory{background:#eaf0f2;padding:104px 0}
+    .market-toolbar{
+      display:flex;align-items:center;justify-content:space-between;gap:18px;
+      margin-top:32px;padding:14px 16px;border:1px solid #d7e1e5;border-radius:16px;background:white;
+    }
+    .market-source{display:flex;align-items:center;gap:10px;color:#55626c;font-size:.82rem}
+    .market-source-mark{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#eefbdd;color:#5da800;font-size:.95rem;font-weight:900}
+    .market-source b{display:block;color:#213039;font-size:.85rem}
+    .market-source span{display:block;margin-top:1px;font-size:.73rem}
+    .market-open{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;padding:10px 13px;background:#11181d;color:white;font-size:.82rem;font-weight:800}
+    .market-open:hover{background:var(--lime-dark,#56a900)}
+    .market-layout{display:grid;grid-template-columns:265px minmax(0,1fr);gap:21px;margin-top:21px}
+    .market-filters{
+      align-self:start;position:sticky;top:98px;padding:20px;border-radius:17px;background:white;border:1px solid #dbe4e7;
+    }
+    .market-filter-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:16px;border-bottom:1px solid #e8edef}
+    .market-filter-header h3{margin:0;font-family:"Manrope";font-size:1.02rem;letter-spacing:-.03em}
+    .market-reset{border:0;background:none;padding:0;color:var(--lime-dark,#56a900);font-size:.78rem;font-weight:800}
+    .market-filter-group{padding:16px 0;border-bottom:1px solid #e8edef}
+    .market-filter-group:last-of-type{border-bottom:0}
+    .market-filter-group label.title{display:block;margin-bottom:9px;color:#35434c;font-size:.78rem;font-weight:800}
+    .market-search{position:relative}
+    .market-search input{
+      width:100%;height:43px;border:1px solid #d9e1e4;border-radius:10px;background:#fbfcfc;padding:0 11px 0 35px;color:#26323a;outline:none;font-size:.83rem;
+    }
+    .market-search input:focus,.market-select:focus{border-color:var(--lime);box-shadow:0 0 0 4px rgba(112,207,5,.12)}
+    .market-search span{position:absolute;left:11px;top:12px;color:#76848d;font-size:.89rem}
+    .market-select{width:100%;height:42px;border:1px solid #d9e1e4;border-radius:10px;background:#fbfcfc;padding:0 9px;color:#39464e;outline:none;font-size:.82rem}
+    .market-chip-grid{display:flex;gap:7px;flex-wrap:wrap}
+    .market-chip{border:1px solid #dbe3e6;border-radius:999px;padding:7px 9px;background:white;color:#5a6872;font-size:.73rem;font-weight:700}
+    .market-chip.active,.market-chip:hover{background:#11181d;border-color:#11181d;color:white}
+    .market-check{display:flex;align-items:center;gap:8px;margin:9px 0 0;color:#56646e;font-size:.79rem;font-weight:600}
+    .market-check input{accent-color:var(--lime-dark,#56a900)}
+    .market-filters .market-apply{width:100%;margin-top:16px;padding:12px;border:0;border-radius:10px;background:var(--lime);color:#081203;font-size:.84rem;font-weight:900}
+    .market-filters .market-apply:hover{background:#8eeb2c}
+    .market-results-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:1px 0 15px}
+    .market-results-count b{display:block;font-size:.91rem}
+    .market-results-count span{display:block;margin-top:2px;color:#73808a;font-size:.76rem}
+    .market-view-actions{display:flex;align-items:center;gap:9px}
+    .market-sort{height:38px;border:1px solid #d6e0e4;border-radius:9px;padding:0 9px;background:white;color:#4d5b64;font-size:.78rem;outline:0}
+    .market-view{display:grid;place-items:center;width:38px;height:38px;border:1px solid #d6e0e4;border-radius:9px;background:white;color:#33414a;font-weight:900}
+    .market-view.active{background:#11181d;color:white;border-color:#11181d}
+    .market-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .market-grid.list-mode{grid-template-columns:1fr}
+    .market-card{position:relative;overflow:hidden;border-radius:16px;background:white;border:1px solid #dbe4e7;box-shadow:0 8px 22px rgba(15,28,36,.06);transition:transform .2s ease,box-shadow .2s ease}
+    .market-card:hover{transform:translateY(-4px);box-shadow:0 19px 34px rgba(15,28,36,.14)}
+    .market-card-image{position:relative;aspect-ratio:1.47;overflow:hidden;background:#dfe7e9}
+    .market-card-image img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+    .market-card:hover .market-card-image img{transform:scale(1.045)}
+    .market-badges{position:absolute;left:11px;right:11px;top:11px;display:flex;justify-content:space-between;gap:8px}
+    .market-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:20px;background:var(--lime);backdrop-filter:blur(6px);color:#081102;font-size:.64rem;font-weight:900;letter-spacing:.02em;text-transform:uppercase}
+    .market-badge.demo{background:rgba(255,249,223,.95);color:#78600a}
+    .market-heart{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:50%;background:rgba(255,255,255,.94);font-size:.97rem;color:#2b3941}
+    .market-heart.fav{color:#e53e3e}
+    .market-photo-nav{position:absolute;top:50%;z-index:3;display:grid;place-items:center;width:31px;height:31px;border:0;border-radius:50%;background:rgba(255,255,255,.93);color:#17242b;font-size:1.28rem;transform:translateY(-50%);box-shadow:0 5px 14px rgba(0,0,0,.16)}
+    .market-photo-nav:hover{background:#fff;transform:translateY(-50%) scale(1.06)}
+    .market-photo-nav.prev{left:10px}
+    .market-photo-nav.next{right:10px}
+    .market-photo-count{position:absolute;left:11px;bottom:11px;display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border-radius:8px;background:rgba(10,16,20,.77);backdrop-filter:blur(6px);color:#fff;font-size:.66rem;font-weight:900}
+    .market-card-body{padding:15px}
+    .market-card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;color:#68767f;font-size:.71rem;font-weight:700}
+    .market-card-meta span+span:before{content:"•";padding-right:6px;color:#a0acb2}
+    .market-card h3{margin:7px 0 0;font-family:"Manrope";font-size:1.02rem;line-height:1.2;letter-spacing:-.035em}
+    .market-location{display:flex;align-items:center;gap:4px;margin-top:7px;color:#7a8891;font-size:.72rem;font-weight:600}
+    .market-price-row{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:13px;padding-top:12px;border-top:1px solid #edf0f1}
+    .market-price{font-family:"Manrope";font-size:1.08rem;letter-spacing:-.04em;color:var(--lime-dark,#56a900)}
+    .market-payment{color:#59666f;font-size:.67rem;text-align:right;line-height:1.2}
+    .market-payment b{display:block;margin-top:2px;color:#11181d;font-size:.79rem}
+    .market-card-actions{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;margin-top:14px}
+    .market-detail{display:flex;align-items:center;justify-content:center;border:0;background:#11181d;border-radius:9px;padding:10px;color:white;font-size:.77rem;font-weight:800;text-decoration:none;text-align:center;cursor:pointer}
+    .market-detail:hover{background:var(--lime-dark,#56a900)}
+    .market-interest{color:#4d5c65;font-size:.74rem;font-weight:800;text-decoration:none;white-space:nowrap}
+    .market-interest:hover{color:var(--lime-dark,#56a900)}
+    .market-empty{grid-column:1/-1;padding:45px 22px;text-align:center;border:1px dashed #bdcbd1;border-radius:16px;background:rgba(255,255,255,.65);color:#64717a}
+    .market-empty b{display:block;font-family:"Manrope";font-size:1.15rem;color:#27343b}
+    .market-empty p{margin:8px 0 0;font-size:.85rem}
+    .market-notify{margin:22px auto 0;display:flex;flex-direction:column;align-items:center;gap:10px;max-width:440px}
+    .market-notify p{margin:0;font-size:.82rem;color:#4d5b63;font-weight:600}
+    .market-notify-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%}
+    .market-notify-row input{flex:1;min-width:140px;height:44px;border:1px solid #d8e0e4;border-radius:10px;padding:0 12px;outline:0;background:#fbfcfc;color:#243039;font-family:inherit;font-size:.85rem}
+    .market-notify-row input:focus{border-color:var(--lime);box-shadow:0 0 0 4px rgba(112,207,5,.12)}
+    .market-notify button{border:none;border-radius:10px;padding:0 20px;height:44px;background:var(--lime);color:#071100;font-weight:800;font-size:.82rem;cursor:pointer;transition:.15s;white-space:nowrap;font-family:inherit}
+    .market-notify button:hover{background:#8dea2e}
+    .market-notify button:disabled{opacity:.65;cursor:default}
+    .market-load{display:flex;flex-direction:column;align-items:center;gap:11px;margin-top:25px}
+    .market-load .btn{background:white;color:#1d2931;border:1px solid #cbd7dc}
+    .market-load .btn:hover{background:#11181d;color:white;border-color:#11181d}
+    .market-legal{margin:0;color:#77858e;font-size:.69rem;text-align:center;max-width:720px;line-height:1.45}
+    .market-card.list-card{display:grid;grid-template-columns:230px 1fr}
+    .market-grid.list-mode .market-card-image{aspect-ratio:auto;min-height:190px}
+    .market-grid.list-mode .market-card-body{padding:20px}
+    .market-grid.list-mode .market-card h3{font-size:1.23rem}
+    .market-grid.list-mode .market-card-actions{max-width:400px}
+    @media (max-width:1000px){
+      .market-grid{grid-template-columns:1fr}
+      .market-layout{grid-template-columns:1fr}
+      .market-filters{position:static}
+      .market-filters form{display:grid;grid-template-columns:1fr;gap:0}
+      .market-filter-header{grid-column:1/-1}
+      .market-filter-group{border-bottom:1px solid #e8edef}
+      .market-filters .market-apply{grid-column:1/-1}
+      .market-inventory{padding:74px 0}
+      .market-toolbar{align-items:flex-start;flex-direction:column}
+      .market-open{width:100%}
+      .market-results-top{align-items:flex-start;flex-direction:column}
+      .market-view-actions{width:100%}
+      .market-sort{flex:1}
+      .market-card.list-card{display:block}
+      .market-grid.list-mode .market-card-image{min-height:auto;aspect-ratio:1.47}
+    }
+
+    /* Perfil de compra segura */
+    .security.purchase-profile{
+      overflow:hidden;position:relative;background:#090d10;color:white;padding:112px 0;
+    }
+    .security.purchase-profile::before{
+      content:"";position:absolute;inset:0;
+      background:
+        radial-gradient(circle at 92% 15%,rgba(103,199,0,.22),transparent 20%),
+        radial-gradient(circle at 74% 78%,rgba(67,56,200,.32),transparent 28%);
+      pointer-events:none;
+    }
+    .purchase-profile .security-grid{
+      position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+      gap:62px;align-items:center;
+    }
+    .purchase-profile .section-copy{color:#b9c7cf}
+    .profile-benefits{display:grid;gap:13px;margin-top:31px}
+    .profile-benefit{display:flex;align-items:flex-start;gap:13px}
+    .profile-benefit-icon{
+      display:grid;place-items:center;flex:0 0 auto;width:35px;height:35px;border-radius:10px;
+      background:rgba(103,199,0,.13);color:#b6f96e;font-size:.83rem;font-weight:900;
+    }
+    .profile-benefit h4{margin:2px 0 0;font-size:.95rem}
+    .profile-benefit p{margin:4px 0 0;color:#b3c1c9;font-size:.85rem}
+    .profile-note{
+      display:flex;align-items:center;gap:9px;margin-top:27px;color:#d4e0e5;font-size:.79rem;font-weight:700;
+    }
+    .profile-note i{
+      display:grid;place-items:center;width:22px;height:22px;border-radius:50%;
+      background:rgba(103,199,0,.16);color:#bdf77b;font-style:normal;font-size:.72rem;
+    }
+
+    .profile-wizard{
+      position:relative;overflow:hidden;padding:24px;border-radius:23px;background:#fff;color:var(--ink);
+      border:1px solid rgba(255,255,255,.66);box-shadow:0 25px 65px rgba(0,0,0,.30);
+    }
+    .profile-wizard::before{
+      content:"";position:absolute;top:0;left:0;right:0;height:4px;
+      background:linear-gradient(90deg,var(--lime),var(--violet));
+    }
+    .profile-wizard-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .profile-kicker{margin:0;color:var(--violet);font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .profile-step-label{color:#65727b;font-size:.75rem;font-weight:800}
+    .profile-progress{height:7px;margin-top:14px;border-radius:999px;background:#e8edef;overflow:hidden}
+    .profile-progress span{display:block;width:25%;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--lime),#93ea36);transition:width .28s ease}
+    .profile-form{margin-top:22px}
+    .profile-question{margin:0;font-family:"Manrope";font-size:1.43rem;line-height:1.15;letter-spacing:-.045em}
+    .profile-helper{margin:7px 0 0;color:#74818a;font-size:.82rem}
+    .wizard-step{display:none;animation:profileFade .2s ease}
+    .wizard-step.active{display:block}
+    @keyframes profileFade{from{opacity:.2;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+    .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:19px}
+    .choice-grid.three{grid-template-columns:repeat(3,1fr)}
+    .profile-choice{
+      min-height:72px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;
+      padding:12px;border:1px solid #dbe3e6;border-radius:13px;background:#fff;color:#35424a;text-align:left;
+      transition:border-color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease;
+    }
+    .profile-choice:hover{transform:translateY(-1px);border-color:#acbac0}
+    .profile-choice.active{
+      border-color:var(--violet);background:#f4f3ff;color:#3027a4;box-shadow:0 0 0 3px rgba(67,56,200,.10);
+    }
+    .profile-choice strong{font-size:.83rem;line-height:1.16}
+    .profile-choice span{color:#74818a;font-size:.70rem;line-height:1.22}
+    .profile-choice.active span{color:#5f58bd}
+    .choice-icon{font-size:1.12rem}
+    .profile-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:19px}
+    .profile-split h4{margin:0;color:#48565f;font-size:.78rem}
+    .profile-split .choice-grid{margin-top:9px}
+    .profile-split .profile-choice{min-height:57px}
+    .profile-split .profile-choice span{display:none}
+    .profile-error{min-height:18px;margin:11px 0 0;color:#bc2542;font-size:.75rem;font-weight:700}
+    .profile-controls{display:flex;align-items:center;justify-content:space-between;gap:11px;margin-top:10px}
+    .profile-back{border:0;background:none;padding:10px 0;color:#60707a;font-size:.82rem;font-weight:900}
+    .profile-back.hidden{visibility:hidden}
+    .profile-next{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:12px 15px;
+      background:var(--ink);color:#fff;font-size:.82rem;font-weight:900;
+    }
+    .profile-next:hover{background:var(--violet)}
+    .profile-result{display:none;margin-top:22px;animation:profileFade .24s ease}
+    .profile-result.visible{display:block}
+    .result-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 9px;border-radius:999px;background:#effbdd;color:#4c9200;font-size:.71rem;font-weight:900}
+    .result-title{margin:12px 0 0;font-family:"Manrope";font-size:1.52rem;line-height:1.12;letter-spacing:-.045em}
+    .result-copy{margin:9px 0 0;color:#66737c;font-size:.87rem}
+    .result-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}
+    .result-tag{padding:7px 9px;border-radius:999px;background:#f0f4f5;color:#4d5a63;font-size:.72rem;font-weight:800}
+    .result-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:19px}
+    .result-actions a,.result-actions button{
+      display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:10px;padding:12px;text-align:center;
+      font-size:.78rem;font-weight:900;
+    }
+    .result-primary{border:0;background:var(--lime);color:#081203}
+    .result-primary:hover{background:#91ea2e}
+    .result-secondary{border:1px solid #d6e0e3;background:#fff;color:#3b4951}
+    .result-secondary:hover{border-color:var(--violet);color:var(--violet)}
+    .personality-invite{
+      display:flex;align-items:flex-start;gap:10px;margin-top:13px;padding:12px;border-radius:12px;
+      background:#f5f4ff;border:1px solid #dfdcff;color:#363068;
+    }
+    .personality-invite b{display:block;font-size:.76rem}
+    .personality-invite p{margin:3px 0 0;color:#66619a;font-size:.71rem;line-height:1.35}
+    .personality-invite .spark{font-size:1.05rem}
+    .profile-restart{display:block;margin:14px auto 0;border:0;background:none;color:#6d7880;font-size:.76rem;font-weight:800}
+
+    @media (max-width:1000px){
+      .purchase-profile .security-grid{grid-template-columns:1fr;gap:37px}
+      .profile-wizard{max-width:590px;padding:20px;border-radius:18px}
+      .security.purchase-profile{padding:74px 0}
+      .choice-grid,.choice-grid.three{grid-template-columns:1fr 1fr}
+      .profile-split{grid-template-columns:1fr;gap:14px}
+      .result-actions{grid-template-columns:1fr}
+    }
+
+
+    /* Lead area */
+    .lead{padding:96px 0}
+    .lead-box{display:grid;grid-template-columns:1.05fr .95fr;overflow:hidden;border-radius:27px;background:white;box-shadow:var(--shadow)}
+    .lead-content{padding:52px}
+    .lead-content h2{margin:15px 0 0;font-family:"Manrope";font-size:clamp(2.2rem,3.7vw,3.35rem);line-height:1.05;letter-spacing:-.055em}
+    .lead-content p{margin:17px 0 0;color:var(--muted);max-width:500px}
+    .lead-form{display:grid;gap:12px;margin-top:26px}
+    .lead-form .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .lead-form input,.lead-form select{
+      height:49px;width:100%;border:1px solid #d8e0e4;border-radius:10px;padding:0 12px;outline:0;background:#fbfcfc;color:#243039;
+    }
+    .lead-form input:focus,.lead-form select:focus{border-color:var(--violet);box-shadow:0 0 0 4px rgba(67,56,200,.10)}
+    .lead-form .btn{margin-top:4px;background:var(--lime);color:#071100}
+    .lead-form .btn:hover{background:#8dea2e;transform:translateY(-1px)}
+    .consent{margin:1px 0 0;color:#7a8790;font-size:.71rem;line-height:1.35}
+    .lead-visual{
+      min-height:470px;position:relative;padding:34px;color:white;background:
+      linear-gradient(0deg,rgba(10,13,16,.72),rgba(10,13,16,.12)),
+      url("https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1150&q=84") center/cover;
+    }
+    .lead-quote{position:absolute;left:34px;right:34px;bottom:34px;padding:20px;border-radius:16px;background:rgba(8,12,15,.74);backdrop-filter:blur(11px);border:1px solid rgba(255,255,255,.16)}
+    .lead-quote b{display:block;font-family:"Manrope";font-size:1.18rem;line-height:1.2}
+    .lead-quote span{display:block;margin-top:8px;color:#ced8de;font-size:.84rem}
+    .lead-seal{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.13);backdrop-filter:blur(8px);font-size:.76rem;font-weight:700}
+
+    /* Footer */
+    footer{background:#090d10;color:#d5e0e5;padding:58px 0 25px}
+    .footer-grid{display:grid;grid-template-columns:1.18fr .9fr .9fr .9fr;gap:34px}
+    .footer-brand img{width:178px}
+    .footer-brand p{margin:17px 0 0;max-width:300px;color:#9eafb9;font-size:.87rem}
+    .footer-social{display:flex;gap:9px;margin-top:18px}
+    .footer-staff-btn{display:inline-flex;align-items:center;gap:7px;margin-top:18px;padding:9px 14px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#c8d5dc;font-size:.79rem;font-weight:700;text-decoration:none;transition:.15s}
+    .footer-staff-btn:hover{background:rgba(112,207,5,.14);border-color:rgba(112,207,5,.4);color:#b7f779}
+    .social{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.08);color:white;font-size:.83rem;font-weight:800}
+    .social:hover{background:var(--violet)}
+    .footer-col h4{margin:0;color:white;font-size:.88rem}
+    .footer-col a,.footer-col p{display:block;margin:11px 0 0;color:#aebdc5;font-size:.84rem}
+    .footer-col a:hover{color:#b7f779}
+    .footer-bottom{display:flex;justify-content:space-between;gap:15px;margin-top:44px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);color:#82939e;font-size:.76rem}
+    .footer-bottom a:hover{color:white}
+
+    /* Modal */
+    .modal{position:fixed;display:none;place-items:center;inset:0;z-index:100;padding:20px;background:rgba(3,6,8,.70);backdrop-filter:blur(6px)}
+    .modal.open{display:grid}
+    .modal-card{position:relative;width:min(510px,100%);padding:29px;border-radius:22px;background:white;box-shadow:0 30px 80px rgba(0,0,0,.34)}
+    .modal-close{position:absolute;right:15px;top:15px;width:34px;height:34px;border:0;border-radius:50%;background:#edf2f3;font-size:1.1rem}
+    .modal-card .modal-kicker{margin:0;color:var(--violet);font-size:.77rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .modal-card h3{margin:7px 40px 0 0;font-family:"Manrope";font-size:1.65rem;line-height:1.12;letter-spacing:-.04em}
+    .modal-card p{margin:12px 0 0;color:#64727b;font-size:.91rem}
+    .modal-points{display:grid;gap:10px;margin:20px 0}
+    .modal-points div{display:flex;align-items:center;gap:9px;color:#34414a;font-size:.87rem}
+    .modal-points span{display:grid;place-items:center;width:23px;height:23px;border-radius:50%;background:#effbdd;color:#5da900;font-weight:900;font-size:.75rem}
+    .modal-card .btn{width:100%;background:var(--ink);color:white}
+    .modal-card .btn:hover{background:var(--violet)}
+
+    /* Floating button */
+    .whatsapp{
+      position:fixed;right:22px;bottom:22px;z-index:39;display:flex;align-items:center;gap:9px;
+      padding:13px 16px;border-radius:999px;background:#25D366;color:#061c10;font-weight:800;font-size:.87rem;
+      box-shadow:0 14px 35px rgba(1,41,18,.26);transition:transform .2s ease;
+    }
+    .whatsapp:hover{transform:translateY(-3px)}
+    .whatsapp .wa-icon{width:20px;height:20px;display:grid;place-items:center;border-radius:50%;background:#0a9d46;color:white;font-size:.72rem}
+
+    .hidden{display:none!important}
+
+    @media (max-width:980px){
+      .wc-links{display:none}
+      .menu-toggle{display:block}
+      .hero-grid{grid-template-columns:1fr;gap:39px;padding:70px 0 76px}
+      .hero{min-height:auto}
+      .hero-copy h1{max-width:720px}
+      .finder{max-width:540px}
+      .trust{grid-template-columns:1fr 1fr}
+      .trust-item:nth-child(2){border-right:0}
+      .trust-item:nth-child(-n+2){border-bottom:1px solid #e5e9eb}
+      .path-grid,.vehicle-grid{grid-template-columns:repeat(2,1fr)}
+      .security-grid{grid-template-columns:1fr;gap:38px}
+      .lead-box{grid-template-columns:1fr}
+      .lead-visual{min-height:310px;order:-1}
+      .footer-grid{grid-template-columns:1.3fr 1fr 1fr}
+      .footer-brand{grid-column:1/-1}
+    }
+
+    @media (max-width:1000px){
+      .shell{width:min(var(--max),calc(100% - 28px))}
+      .wc-nav{height:67px}
+      .wc-brand img{width:135px}
+      .hero-grid{padding:56px 0 62px}
+      .hero-copy h1{font-size:3.18rem}
+      .hero-actions{display:grid;grid-template-columns:1fr}
+      .hero-actions .btn{width:100%}
+      .hero-proof{display:grid;grid-template-columns:1fr 1fr;gap:11px;font-size:.8rem}
+      .finder{padding:20px;border-radius:20px}
+      .finder-row{grid-template-columns:1fr}
+      .trust-wrap{margin-top:-23px}
+      .trust{grid-template-columns:1fr}
+      .trust-item{border-right:0!important;border-bottom:1px solid #e5e9eb!important;padding:16px}
+      .trust-item:last-child{border-bottom:0!important}
+      section{padding:74px 0}
+      .section-top{display:block}
+      .section-title{font-size:2.38rem}
+      .path-grid,.vehicle-grid{grid-template-columns:1fr}
+      .inventory{padding:74px 0}
+      .inventory-controls{align-items:flex-start;flex-direction:column;gap:14px}
+      .filter-pills{overflow:auto;flex-wrap:nowrap;width:100%;padding-bottom:3px}
+      .filter-pill{white-space:nowrap}
+      .lead{padding:68px 0}
+      .lead-content{padding:31px 22px}
+      .lead-form .form-row{grid-template-columns:1fr}
+      .lead-visual{min-height:290px;padding:20px}
+      .lead-quote{left:20px;right:20px;bottom:20px}
+      .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
+      .footer-brand{grid-column:1/-1}
+      .footer-bottom{display:block;line-height:1.8}
+      .whatsapp{right:13px;bottom:13px;padding:12px 14px}
+    }
+
+    /* ── Mobile performance ── */
+    @media (max-width:1000px){
+      /* Quitar backdrop-filter — causa GPU stall en scroll */
+      .wc-header{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(11,16,20,.97);transform:translateZ(0)}
+      .lead-quote{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(8,12,15,.88)}
+      .lead-seal{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(255,255,255,.16)}
+      .modal{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(3,6,8,.88)}
+      .mob-overlay{backdrop-filter:none;-webkit-backdrop-filter:none}
+      /* Quitar gradiente decorativo del hero */
+      .hero::after{display:none}
+      /* Sección oscura: fondo sólido en vez de radial-gradients */
+      .purchase-profile{background:#090d10}
+      /* Path cards: desactivar zoom de imagen en hover y transición */
+      .path-card::after{transition:none}
+      .path-card:hover::after{transform:none}
+      /* Quitar hover transforms en tarjetas — no existen en touch */
+      .reasons-card,.vehicle-card,.market-card{transition:none}
+      .reasons-card:hover,.vehicle-card:hover,.market-card:hover{transform:none;box-shadow:none}
+      /* Secciones: menos padding en mobile */
+      section{padding:56px 0}
+      .paths{padding-bottom:40px}
+      .inventory,.lead{padding:56px 0}
+    }
+    /* ── E.1 polish: accessibility ────────────────────── */
+    button:focus-visible,a.btn:focus-visible,a[class*="btn"]:focus-visible,.btn:focus-visible,.wc-btn:focus-visible,.faq-q:focus-visible,.mob-close:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+    @media(max-width:640px){.btn,.btn.primary,.btn.dark,.wc-btn.primary{min-height:44px}}
+
+  </style>
+</head>
+
+<body>
+  <div class="announcement">
+    <div class="shell">
+      <strong>Atención personalizada en León, Gto.</strong>
+      <span class="divider"></span>
+      <span>Compra, vende o consigna con acompañamiento de principio a fin.</span>
+      <a href="#contacto">Hablar con un asesor →</a>
+    </div>
+  </div>
+
+  <header class="wc-header">
+    <div class="shell wc-nav">
+      <a class="wc-brand" href="https://www.wecarsbajio.com/" target="_top" aria-label="WeCars Bajío, inicio">
+        <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="WeCars Bajío" />
+      </a>
+
+      <ul class="wc-links" aria-label="Navegación principal">
+        <li><a href="https://www.wecarsbajio.com/" target="_top" class="active">Inicio</a></li>
+        <li><a href="https://www.wecarsbajio.com/inventario" target="_top">Inventario</a></li>
+        <li><a href="https://www.wecarsbajio.com/credito" target="_top">Crédito</a></li>
+        <li><a href="https://www.wecarsbajio.com/consigna" target="_top">Consigna</a></li>
+        <li><a href="https://www.wecarsbajio.com/nosotros" target="_top">Nosotros</a></li>
+        <li class="wc-dropdown">
+          <button class="wc-drop-btn" type="button">Más <span>▾</span></button>
+          <div class="wc-drop-menu">
+            <a href="https://www.wecarsbajio.com/contacto" target="_top">Contacto</a>
+            <a href="https://www.wecarsbajio.com/testimonios" target="_top">Testimonios</a>
+            <a href="https://www.wecarsbajio.com/garantias" target="_top">Garantías</a>
+          </div>
+        </li>
+      </ul>
+
+      <div class="wc-actions">
+        <a class="wc-btn primary" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_top">Hablar con asesor</a>
+        <button class="menu-toggle" type="button" aria-label="Abrir menú">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18M3 12h18M3 18h18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile drawer nav -->
+<div class="mob-overlay" id="mobOverlay"></div>
+<nav class="mob-drawer" id="mobDrawer" aria-label="Menú móvil">
+  <div class="mob-drawer-head">
+    <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="WeCars Bajío" />
+    <button class="mob-close" id="mobClose" aria-label="Cerrar menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="mob-nav-links">
+    <a href="https://www.wecarsbajio.com/" target="_top" class="active">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </a>
+    <a href="https://www.wecarsbajio.com/inventario" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Inventario
+    </a>
+    <a href="https://www.wecarsbajio.com/credito" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Crédito
+    </a>
+    <a href="https://www.wecarsbajio.com/consigna" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Consigna tu auto
+    </a>
+    <div class="mob-divider"></div>
+    <a href="https://www.wecarsbajio.com/nosotros" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Nosotros
+    </a>
+    <a href="https://www.wecarsbajio.com/testimonios" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Testimonios
+    </a>
+    <a href="https://www.wecarsbajio.com/garantias" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Garantías
+    </a>
+    <a href="https://www.wecarsbajio.com/contacto" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Contacto
+    </a>
+  </div>
+  <div class="mob-cta">
+    <a class="mob-cta-wa" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_top">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.852L0 24l6.335-1.508A11.933 11.933 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.366l-.36-.213-3.72.976.993-3.628-.234-.373A9.818 9.818 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
+      Hablar con un asesor
+    </a>
+    <div class="mob-cta-info">
+      <a href="tel:+524778350020">477 835 0020</a>
+      <span class="sep">·</span>
+      <a href="https://instagram.com/wecars.bajio" target="_top">@wecars.bajio</a>
+    </div>
+  </div>
+</nav>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span> Inventario actualizado todos los días</div>
+          <h1>Encuentra tu próximo auto <span>sin perder semanas buscando.</span></h1>
+          <p>Crédito para la mayoría de perfiles, tomamos tu auto a cuenta y todo el proceso es simple y transparente, de principio a fin.</p>
+
+          <div class="hero-actions">
+            <a class="btn primary" href="https://www.wecarsbajio.com/inventario" target="_top">Ver inventario <span>→</span></a>
+            <a class="btn outline" href="https://www.wecarsbajio.com/credito" target="_top">Cotizar crédito</a>
+          </div>
+
+          <div class="hero-proof">
+            <span><i class="check">✓</i> Sin compromiso ni letras chiquitas</span>
+            <span><i class="check">✓</i> Crédito o contado</span>
+            <span><i class="check">✓</i> Atención local en León</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="entry-capture">
+      <div class="shell entry-capture-inner">
+        <div class="entry-capture-copy">
+          <p class="entry-capture-kicker">¿Buscas tu próximo auto?</p>
+          <h3>Déjanos tu nombre y celular — un asesor te ayuda a encontrar la mejor opción, sin compromiso.</h3>
+        </div>
+        <form id="entryCaptureForm" class="entry-capture-form">
+          <input type="text" name="name" placeholder="Tu nombre" required>
+          <input type="tel" name="phone" placeholder="Tu celular" required>
+          <button class="btn primary" type="submit">Quiero que me ayuden <span>→</span></button>
+        </form>
+      </div>
+    </section>
+
+    <div class="trust-wrap">
+      <div class="shell">
+        <div class="trust" aria-label="Diferenciadores de WeCars">
+          <div class="trust-item">
+            <div class="trust-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7z"/><path d="m8.7 12 2.1 2.1 4.5-4.5"/></svg>
+            </div>
+            <div><b>Compra más clara</b><small>Información y proceso explicados contigo.</small></div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h2"/></svg>
+            </div>
+            <div><b>Crédito a tu medida</b><small>Opciones para crédito o pago de contado.</small></div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+            </div>
+            <div><b>Ahorra tiempo</b><small>Te acercamos opciones según tus necesidades.</small></div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-3.7 8-11A8 8 0 0 0 4 11c0 7.3 8 11 8 11z"/><circle cx="12" cy="11" r="2.5"/></svg>
+            </div>
+            <div><b>Atención en León</b><small>Acompañamiento local para una decisión segura.</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="paths">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow light"><span class="dot"></span> Una marca, tres caminos</div>
+            <h2 class="section-title">El auto es importante.<br>El proceso también.</h2>
+          </div>
+          <p class="section-copy">Compramos con respaldo, vendemos con transparencia y financiamos con opciones reales — todo desde León, Gto.</p>
+        </div>
+
+        <div class="path-grid">
+          <article class="path-card buy">
+            <span class="path-number">01</span>
+            <h3>Encuentra tu próximo auto</h3>
+            <p>Explora inventario, compara opciones y da el siguiente paso con un asesor.</p>
+            <a href="https://www.wecarsbajio.com/inventario" target="_top">Ver unidades <span>→</span></a>
+          </article>
+
+          <article class="path-card finance" id="financiamiento">
+            <span class="path-number">02</span>
+            <h3>Cotiza sin complicarte</h3>
+            <p>Descubre una mensualidad estimada antes de iniciar tu solicitud de crédito. Revisa si calificas · respuesta rápida · sin compromiso.</p>
+            <a href="https://www.wecarsbajio.com/credito" target="_top">Abrir cotizador <span>→</span></a>
+          </article>
+
+          <article class="path-card sell" id="vende">
+            <span class="path-number">03</span>
+            <h3>Vende o consigna tu auto</h3>
+            <p>Registra tu vehículo y recibe una alternativa de colocación según tu caso.</p>
+            <a href="https://www.wecarsbajio.com/consigna" target="_top">Quiero vender <span>→</span></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="reasons">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow light"><span class="dot"></span> Antes de decidir</div>
+            <h2 class="section-title">¿Por qué comprar aquí<br>y no por tu cuenta?</h2>
+          </div>
+          <p class="section-copy">Comprar con un particular o por redes sociales puede parecer más barato, hasta que algo sale mal. Esto es lo que cambia con weCars.</p>
+        </div>
+        <div class="reasons-grid">
+          <div class="reasons-card">
+            <div class="reasons-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+            </div>
+            <h3>Sin sorpresas mecánicas</h3>
+            <p>Cada auto pasa una revisión de más de 150 puntos antes de publicarse. Comprando por tu cuenta, compras a ciegas.</p>
+          </div>
+          <div class="reasons-card">
+            <div class="reasons-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+            <h3>Financiamiento real</h3>
+            <p>Cotizamos tu crédito directamente con nosotros, con respuesta rápida y sin compromiso — no dependes de que el vendedor "conozca a alguien".</p>
+          </div>
+          <div class="reasons-card">
+            <div class="reasons-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3>Garantía después de comprar</h3>
+            <p>Si algo no era como te dijeron, lo resolvemos. Un particular o una publicación en redes desaparece en cuanto recibe tu pago.</p>
+          </div>
+          <div class="reasons-card">
+            <div class="reasons-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <h3>Historial y papeles en regla</h3>
+            <p>Revisamos reportes y tenencia antes de vender. Evitas el riesgo de un auto con adeudos o problemas legales ocultos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="steps">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow light"><span class="dot"></span> El proceso</div>
+            <h2 class="section-title">Comprar tu auto,<br>en 4 pasos simples.</h2>
+          </div>
+          <p class="section-copy">Así de directo es el camino desde que ves un auto hasta que te lo llevas.</p>
+        </div>
+        <div class="steps-grid">
+          <div class="step-card">
+            <span class="step-number">1</span>
+            <h3>Encuentra tu vehículo</h3>
+            <p>Filtra por precio, tipo o marca en el inventario.</p>
+          </div>
+          <div class="step-card">
+            <span class="step-number">2</span>
+            <h3>Cotiza tu crédito</h3>
+            <p>Simula tu mensualidad, sin compromiso ni letras chiquitas.</p>
+          </div>
+          <div class="step-card">
+            <span class="step-number">3</span>
+            <h3>Envía tus documentos</h3>
+            <p>Un asesor te guía paso a paso, sin trámites confusos.</p>
+          </div>
+          <div class="step-card">
+            <span class="step-number">4</span>
+            <h3>Estrena</h3>
+            <p>Recibe tu auto revisado y listo para rodar.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+<style>
+.vta-promo-wrap{padding:0 0 48px}
+.vta-promo{background:var(--ink-2,#1a2e1a);border-radius:18px;display:flex;align-items:center;justify-content:space-between;gap:32px;padding:36px 40px;flex-wrap:wrap}
+.vta-promo-left{flex:1;min-width:220px}
+.vta-promo-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--lime,#56a900);margin-bottom:14px}
+.vta-promo-eyebrow::before{content:'';display:block;width:6px;height:6px;border-radius:50%;background:var(--lime,#56a900);flex-shrink:0}
+.vta-promo h3{font-family:'Manrope',sans-serif;font-weight:900;font-size:clamp(1.1rem,2vw,1.35rem);color:#fff;letter-spacing:-.02em;line-height:1.3;margin:0 0 10px}
+.vta-promo p{font-size:.84rem;color:rgba(255,255,255,.5);line-height:1.6;margin:0}
+.vta-promo-right{display:flex;flex-direction:column;align-items:flex-end;gap:14px;flex-shrink:0}
+.vta-promo-price{font-family:'Manrope',sans-serif;font-weight:900;font-size:2rem;color:var(--lime,#56a900);line-height:1}
+.vta-promo-price span{font-size:.72rem;font-weight:600;color:rgba(255,255,255,.4);display:block;margin-top:2px;text-align:right}
+.vta-promo-btn{background:var(--lime,#56a900);color:#fff;font-family:'Manrope',sans-serif;font-weight:800;font-size:.85rem;padding:11px 22px;border-radius:99px;text-decoration:none;white-space:nowrap;transition:background .15s,transform .12s}
+.vta-promo-btn:hover{background:var(--lime-dark,#3d7a00);transform:translateY(-1px)}
+@media(max-width:600px){.vta-promo{padding:26px 22px}.vta-promo-right{align-items:flex-start;flex-direction:row;flex-wrap:wrap;gap:10px}.vta-promo-price{font-size:1.6rem}}
+</style>
+    <div class="vta-promo-wrap">
+      <div class="shell">
+        <div class="vta-promo">
+          <div class="vta-promo-left">
+            <div class="vta-promo-eyebrow">Servicio adicional</div>
+            <h3>¿Cómo sabes que la factura<br>no es falsa o clonada?</h3>
+            <p>Muchas ventas traen facturas con consecutivos rotos, bajas ilegales o propietarios que no coinciden. Un papel mal firmado puede costarte el auto &mdash; nosotros lo detectamos antes de que firmes.</p>
+          </div>
+          <div class="vta-promo-right">
+            <div class="vta-promo-price">$189 <span>+ IVA · por verificación</span></div>
+            <a class="vta-promo-btn" href="https://www.wecarsbajio.com/verifica-tu-auto" onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:'https://www.wecarsbajio.com/verifica-tu-auto'},'*')">Ver el servicio &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="market-inventory" id="inventario">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow light"><span class="dot"></span> Catálogo de unidades</div>
+            <h2 class="section-title">Explora el inventario<br>sin salir de WeCars.</h2>
+          </div>
+          <p class="section-copy">Una interfaz con filtros y tarjetas propias de WeCars. Las unidades se cargan desde tu colección Cars mediante Velo y se actualizan cuando cambias tu CMS.</p>
+        </div>
+
+        <div class="market-toolbar">
+          <div class="market-source">
+            <div class="market-source-mark">↗</div>
+            <div>
+              <b>Inventario WeCars Bajío</b>
+              <span>Unidades cargadas directamente desde la colección Cars de tu CMS.</span>
+            </div>
+          </div>
+          <a class="market-open" href="#contacto">¿No encuentras lo que buscas? <span>→</span></a>
+        </div>
+
+        <div class="market-layout">
+          <aside class="market-filters" aria-label="Filtros de inventario">
+            <form id="marketFilters">
+              <div class="market-filter-header">
+                <h3>Filtra tu búsqueda</h3>
+                <button class="market-reset" type="button" id="marketReset">Limpiar</button>
+              </div>
+
+              <div class="market-filter-group">
+                <label class="title" for="marketSearch">¿Qué vehículo buscas?</label>
+                <div class="market-search">
+                  <span>⌕</span>
+                  <input id="marketSearch" type="search" placeholder="Marca, modelo o versión" autocomplete="off">
+                </div>
+              </div>
+
+              <div class="market-filter-group">
+                <label class="title">Tipo de vehículo</label>
+                <div class="market-chip-grid" id="vehicleTypes">
+                  <button class="market-chip active" type="button" data-type="all">Todos</button>
+                  <button class="market-chip" type="button" data-type="suv">SUV</button>
+                  <button class="market-chip" type="button" data-type="sedan">Sedán</button>
+                  <button class="market-chip" type="button" data-type="pickup">Pickup</button>
+                  <button class="market-chip" type="button" data-type="premium">Premium</button>
+                </div>
+              </div>
+
+              <div class="market-filter-group">
+                <label class="title" for="marketPrice">Rango de precio</label>
+                <select class="market-select" id="marketPrice">
+                  <option value="all">Cualquier precio</option>
+                  <option value="0-250">Hasta $250,000</option>
+                  <option value="250-500">$250,000 – $500,000</option>
+                  <option value="500-1000">$500,000 – $1,000,000</option>
+                  <option value="1000-999999">Más de $1,000,000</option>
+                </select>
+              </div>
+
+              <div class="market-filter-group">
+                <label class="title" for="marketYear">Año</label>
+                <select class="market-select" id="marketYear">
+                  <option value="all">Cualquier año</option>
+                  <option value="2024">2024 o más reciente</option>
+                  <option value="2022">2022 o más reciente</option>
+                  <option value="2020">2020 o más reciente</option>
+                </select>
+              </div>
+
+              <div class="market-filter-group">
+                <label class="title">Preferencias</label>
+                <label class="market-check"><input id="marketAutomatic" type="checkbox"> Automática</label>
+                <label class="market-check"><input id="marketCredit" type="checkbox"> Quiero cotizar crédito</label>
+              </div>
+
+              <button class="market-apply" type="submit">Ver vehículos</button>
+            </form>
+          </aside>
+
+          <div>
+            <div class="market-results-top">
+              <div class="market-results-count">
+                <b id="marketCount">Cargando inventario…</b>
+                <span id="marketSubcount">Filtros aplicados a las unidades mostradas.</span>
+              </div>
+              <div class="market-view-actions">
+                <select class="market-sort" id="marketSort" aria-label="Ordenar inventario">
+                  <option value="featured">Ordenar: Recomendados</option>
+                  <option value="low">Precio: menor a mayor</option>
+                  <option value="high">Precio: mayor a menor</option>
+                  <option value="new">Año: más reciente</option>
+                </select>
+                <button class="market-view active" type="button" id="marketGridBtn" title="Vista de cuadrícula" aria-label="Vista de cuadrícula">▦</button>
+                <button class="market-view" type="button" id="marketListBtn" title="Vista de lista" aria-label="Vista de lista">☷</button>
+              </div>
+            </div>
+
+            <div class="market-grid" id="marketGrid" aria-live="polite"></div>
+
+            <div class="market-load">
+              <button type="button" class="btn" id="marketMore">Cargar más unidades</button>
+              <p class="market-legal">El catálogo cargará fotos, precio, kilometraje y disponibilidad desde tu colección Cars. Si un auto no tiene foto, aparecerá una imagen de respaldo hasta que agregues su galería en el CMS.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="security purchase-profile" id="proceso">
+      <div class="shell security-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Compra segura, desde tu estilo</div>
+          <h2 class="section-title">No te ofrecemos "cualquier auto".<br>Primero entendemos qué va contigo.</h2>
+          <p class="section-copy">Responde cuatro preguntas rápidas para perfilar el tipo de vehículo, equipamiento y forma de compra que mejor encajan con tu día a día.</p>
+
+          <div class="profile-benefits">
+            <div class="profile-benefit">
+              <div class="profile-benefit-icon">01</div>
+              <div><h4>Recomendaciones más relevantes</h4><p>Prioriza opciones alineadas con tu uso real, no solo con una marca o un precio.</p></div>
+            </div>
+            <div class="profile-benefit">
+              <div class="profile-benefit-icon">02</div>
+              <div><h4>Sin datos sensibles al inicio</h4><p>Primero te conocemos como comprador; los documentos se solicitan únicamente cuando decidas avanzar.</p></div>
+            </div>
+            <div class="profile-benefit">
+              <div class="profile-benefit-icon">03</div>
+              <div><h4>Una conversación mejor preparada</h4><p>Tu asesor recibe un resumen claro para proponerte unidades con mayor sentido para ti.</p></div>
+            </div>
+          </div>
+
+          <div class="profile-note"><i>✓</i> Toma menos de un minuto y puedes cambiar tus respuestas cuando quieras.</div>
+        </div>
+
+        <div class="profile-wizard" id="buyerProfile">
+          <div class="profile-wizard-head">
+            <p class="profile-kicker">Tu perfil de búsqueda</p>
+            <span class="profile-step-label" id="profileStepLabel">Pregunta 1 de 4</span>
+          </div>
+          <div class="profile-progress" aria-hidden="true"><span id="profileProgress"></span></div>
+
+          <form class="profile-form" id="buyerProfileForm">
+            <section class="wizard-step active" data-step="1">
+              <h3 class="profile-question">¿Para qué vas a usar más tu próximo auto?</h3>
+              <p class="profile-helper">Elige la situación que más se parezca a tu día a día.</p>
+              <div class="choice-grid">
+                <button class="profile-choice" type="button" data-group="use" data-value="ciudad">
+                  <span class="choice-icon">◉</span><strong>Ciudad y trayectos diarios</strong><span>Comodidad, consumo y practicidad.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="use" data-value="familia">
+                  <span class="choice-icon">◫</span><strong>Familia y actividades</strong><span>Espacio, seguridad y versatilidad.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="use" data-value="trabajo">
+                  <span class="choice-icon">▣</span><strong>Trabajo o negocio</strong><span>Carga, resistencia y presencia.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="use" data-value="viajes">
+                  <span class="choice-icon">↗</span><strong>Viajes y escapadas</strong><span>Confort, espacio y desempeño.</span>
+                </button>
+              </div>
+            </section>
+
+            <section class="wizard-step" data-step="2">
+              <h3 class="profile-question">¿Qué no puede faltar?</h3>
+              <p class="profile-helper">Elige hasta dos prioridades. Así afinamos mejor la búsqueda.</p>
+              <div class="choice-grid three">
+                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="ahorro">
+                  <span class="choice-icon">⌁</span><strong>Ahorro de combustible</strong><span>Menor gasto en uso diario.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="seguridad">
+                  <span class="choice-icon">✓</span><strong>Seguridad</strong><span>Asistencias y protección.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="espacio">
+                  <span class="choice-icon">↔</span><strong>Espacio</strong><span>Pasajeros, cajuela o carga.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="tecnologia">
+                  <span class="choice-icon">◈</span><strong>Tecnología</strong><span>Pantalla, conectividad y confort.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="desempeno">
+                  <span class="choice-icon">↯</span><strong>Desempeño</strong><span>Respuesta y sensación de manejo.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="estilo">
+                  <span class="choice-icon">✦</span><strong>Diseño y presencia</strong><span>Que refleje tu estilo.</span>
+                </button>
+              </div>
+            </section>
+
+            <section class="wizard-step" data-step="3">
+              <h3 class="profile-question">Hablemos de tu punto de partida.</h3>
+              <p class="profile-helper">No es una solicitud de crédito. Solo nos ayuda a no mostrarte opciones fuera de contexto.</p>
+
+              <div class="profile-split">
+                <div>
+                  <h4>Presupuesto aproximado</h4>
+                  <div class="choice-grid">
+                    <button class="profile-choice" type="button" data-group="budget" data-value="hasta350"><strong>Hasta $350 mil</strong><span>Opciones accesibles.</span></button>
+                    <button class="profile-choice" type="button" data-group="budget" data-value="350a550"><strong>$350 a $550 mil</strong><span>Rango medio.</span></button>
+                    <button class="profile-choice" type="button" data-group="budget" data-value="mas550"><strong>Más de $550 mil</strong><span>Premium o reciente.</span></button>
+                    <button class="profile-choice" type="button" data-group="budget" data-value="comparando"><strong>Aún comparo</strong><span>Quiero explorar.</span></button>
+                  </div>
+                </div>
+                <div>
+                  <h4>Forma de compra</h4>
+                  <div class="choice-grid">
+                    <button class="profile-choice" type="button" data-group="payment" data-value="credito"><strong>Crédito</strong><span>Quiero mensualidad.</span></button>
+                    <button class="profile-choice" type="button" data-group="payment" data-value="contado"><strong>Contado</strong><span>Compra directa.</span></button>
+                    <button class="profile-choice" type="button" data-group="payment" data-value="autoCuenta"><strong>Auto a cuenta</strong><span>Quiero tomar el mío.</span></button>
+                    <button class="profile-choice" type="button" data-group="payment" data-value="evaluando"><strong>Estoy evaluando</strong><span>Necesito orientación.</span></button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="wizard-step" data-step="4">
+              <h3 class="profile-question">Al elegir, ¿qué estilo te representa más?</h3>
+              <p class="profile-helper">No es una etiqueta: es una pista extra para recomendarte mejor.</p>
+              <div class="choice-grid">
+                <button class="profile-choice" type="button" data-group="style" data-value="practico">
+                  <span class="choice-icon">◌</span><strong>Práctico y eficiente</strong><span>Quiero que todo sea fácil y funcional.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="style" data-value="protector">
+                  <span class="choice-icon">◍</span><strong>Cuido a los míos</strong><span>Busco tranquilidad y espacio.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="style" data-value="explorador">
+                  <span class="choice-icon">△</span><strong>Siempre listo para salir</strong><span>Me gusta moverme, viajar y descubrir.</span>
+                </button>
+                <button class="profile-choice" type="button" data-group="style" data-value="entusiasta">
+                  <span class="choice-icon">✦</span><strong>Me importa cómo se siente</strong><span>Diseño, potencia y carácter.</span>
+                </button>
+              </div>
+            </section>
+
+            <p class="profile-error" id="profileError" role="alert"></p>
+            <div class="profile-controls">
+              <button class="profile-back hidden" id="profileBack" type="button">← Anterior</button>
+              <button class="profile-next" id="profileNext" type="button">Continuar <span>→</span></button>
+            </div>
+          </form>
+
+          <div class="profile-result" id="profileResult">
+            <span class="result-badge">✓ Perfil inicial listo</span>
+            <h3 class="result-title" id="profileResultTitle">Tu búsqueda toma forma.</h3>
+            <p class="result-copy" id="profileResultCopy"></p>
+            <div class="result-tags" id="profileResultTags"></div>
+
+            <div class="result-actions">
+              <a class="result-primary" href="https://www.wecarsbajio.com/inventario" target="_top">Ver opciones de inventario →</a>
+              <a class="result-secondary" id="profileAdvisor" href="#" target="_top">Enviar mi perfil a un asesor</a>
+            </div>
+
+            <div class="personality-invite">
+              <span class="spark">✦</span>
+              <div>
+                <b>¿Te interesaría validar tu personalidad para conocer qué auto encaja mejor contigo?</b>
+                <p>Completa una evaluación breve y recibe una perspectiva adicional sobre el estilo de vehículo que más se alinea contigo.</p>
+              </div>
+            </div>
+            <a class="result-secondary" href="http://www.wecarsbajio.com/vc" target="_top" style="margin-top:10px;width:100%;">Quiero validar mi personalidad →</a>
+
+            <button class="profile-restart" type="button" id="profileRestart">Cambiar mis respuestas</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lead" id="contacto">
+      <div class="shell">
+        <div class="lead-box">
+          <div class="lead-content">
+            <div class="eyebrow light"><span class="dot"></span> Empieza hoy</div>
+            <h2>¿Compras, vendes o buscas financiamiento?</h2>
+            <p>Déjanos tus datos básicos y un asesor podrá guiarte con el siguiente paso adecuado. No es necesario pedir documentos desde el primer contacto.</p>
+
+            <form class="lead-form" id="leadForm">
+              <div class="form-row">
+                <input type="text" name="name" placeholder="Tu nombre" required aria-label="Tu nombre" />
+                <input type="tel" name="phone" placeholder="Tu teléfono" required aria-label="Tu teléfono" />
+              </div>
+              <select name="interest" required aria-label="Interés">
+                <option value="">¿Qué necesitas?</option>
+                <option>Quiero comprar un auto</option>
+                <option>Quiero cotizar crédito</option>
+                <option>Quiero vender o consignar mi auto</option>
+                <option>Quiero conocer una unidad</option>
+              </select>
+              <button class="btn" type="submit">Solicitar asesoría <span>→</span></button>
+              <p class="consent">Al enviar, acepta ser contactado por WeCars Bajío. Conecta este formulario a Wix Forms, CRM o WhatsApp Business antes de publicarlo.</p>
+            </form>
+          </div>
+
+          <div class="lead-visual">
+            <span class="lead-seal">✓ Atención personalizada</span>
+            <div class="lead-quote">
+              <b>Un diseño que guía a cada prospecto hacia la acción correcta.</b>
+              <span>Compra · Financiamiento · Consignación</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="WeCars Bajío" />
+          <p>Compra, venta, consignación y opciones de financiamiento para autos seminuevos.</p>
+          <div class="footer-social" aria-label="Redes sociales">
+            <a class="social" href="https://instagram.com/wecars.bajio" target="_top" aria-label="Instagram">ig</a>
+            <a class="social" href="#" target="_top" aria-label="Facebook">f</a>
+            <a class="social" href="#" target="_top" aria-label="TikTok">tt</a>
+          </div>
+          <a class="footer-staff-btn" href="https://www.wecarsbajio.com/entrar" target="_top">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            Ingresar · Acceso para asesores
+          </a>
+        </div>
+        <div class="footer-col">
+          <h4>Explora</h4>
+          <a href="https://www.wecarsbajio.com/" target="_top" class="active">Inicio</a>
+        <a href="https://www.wecarsbajio.com/inventario" target="_top">Inventario</a>
+          <a href="#proceso" data-scroll-target="proceso">Compra segura</a>
+          <a href="https://www.wecarsbajio.com/credito" target="_top">Cotizador</a>
+          <a href="https://www.wecarsbajio.com/consigna" target="_top">Consigna tu auto</a>
+          <a href="https://www.wecarsbajio.com/garantias" target="_top">Garantías</a>
+          <a href="https://www.wecarsbajio.com/nosotros" target="_top">Nosotros</a>
+          <a href="https://www.wecarsbajio.com/testimonios" target="_top">Testimonios</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contacto</h4>
+          <a href="tel:+524778350020">477 835 0020</a>
+          <a href="https://www.instagram.com/wecars.bajio/" target="_top">@wecars.bajio</a>
+          <a href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa." target="_top">Solicitar asesoría</a>
+          <a href="mailto:op.wecars@gmail.com" target="_top">op.wecars@gmail.com</a>
+        </div>
+        <div class="footer-col">
+          <h4>Visítanos</h4>
+          <p>Blvrd. Vicente Valtierra 7065<br>Terracota, Hacienda San Ángel<br>León, Guanajuato</p>
+          <p>Lun–Vie 9:00–18:30<br>Sáb 11:00–14:00</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 WeCars Bajío. Todos los derechos reservados.</span>
+        <span><a href="#">Aviso de privacidad</a> · <a href="#">Términos y condiciones</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <a class="whatsapp" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20recibir%20asesor%C3%ADa%20para%20comprar%20o%20vender%20un%20auto." target="_blank" rel="noopener">
+    <span class="wa-icon">✆</span> WhatsApp
+  </a>
+
+  <div class="modal" id="vehicleModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+      <p class="modal-kicker">Vista de detalle</p>
+      <h3 id="modalTitle">Unidad de ejemplo</h3>
+      <p>Los datos de esta unidad se cargan desde tu colección Cars. Puedes enlazar este botón a una página dinámica individual de Wix.</p>
+      <div class="modal-points">
+        <div><span>✓</span> Galería con fotos reales de la unidad</div>
+        <div><span>✓</span> Ficha técnica, precio y mensualidad estimada</div>
+        <div><span>✓</span> Botón para cita, prueba de manejo o WhatsApp</div>
+      </div>
+      <a class="btn" href="#contacto" id="modalLead">Solicitar información</a>
+    </div>
+  </div>
+
+  <script>
+    // Recibe de Velo el número de WhatsApp y los links del menú (un solo
+    // lugar para editarlos, en vez de tocar cada página por separado).
+    // Compara la ruta actual de cada link del menú contra un mapa fijo de
+    // rutas conocidas, así no hay que agregar atributos nuevos al HTML.
+    (function () {
+      function aplicarNavConfig(config) {
+        if (!config) return;
+        const mapa = {};
+        (config.navLinks || []).concat(config.navMas || []).forEach((item) => { mapa[item.key] = item; });
+        const rutaAClave = {
+          '/': 'inicio', '': 'inicio',
+          '/inventario': 'inventario', '/credito': 'credito', '/consigna': 'consigna', '/nosotros': 'nosotros',
+          '/contacto': 'contacto', '/testimonios': 'testimonios', '/garantias': 'garantias',
+        };
+        document.querySelectorAll('.wc-links a').forEach((a) => {
+          try {
+            const u = new URL(a.href);
+            const clave = rutaAClave[u.pathname];
+            if (clave && mapa[clave]) a.href = mapa[clave].url;
+          } catch (e) {}
+        });
+      }
+      function aplicarWhatsAppConfig(config) {
+        if (!config || !config.whatsappNumber) return;
+        document.querySelectorAll('a[href*="524778350020"]').forEach((a) => {
+          a.href = a.href.replace(/524778350020/g, config.whatsappNumber);
+        });
+      }
+      window.addEventListener('message', (e) => {
+        if (e.data && e.data.type === 'wecars-siteconfig') {
+          aplicarNavConfig(e.data.config);
+          aplicarWhatsAppConfig(e.data.config);
+        }
+      });
+    })();
+
+    // Detecta el canal de origen de la visita (Facebook, Instagram, TikTok,
+    // Google, Marketplace, Referido o Sitio web) a partir de parámetros UTM,
+    // los clic-IDs que Meta/Google/TikTok agregan a sus anuncios, o el
+    // referrer del navegador. Se guarda en localStorage para conservar el
+    // origen real de la primera visita aunque el visitante navegue por más
+    // páginas del sitio antes de dejar sus datos (atribución de primer toque).
+    function detectarOrigenVisita() {
+      try {
+        const KEY = 'wc_origen_v1';
+        const guardado = localStorage.getItem(KEY);
+        if (guardado) return guardado;
+
+        const params = new URLSearchParams(window.location.search);
+        const src = (params.get('utm_source') || '').toLowerCase();
+        const ref = (document.referrer || '').toLowerCase();
+        let origen = '';
+
+        if (src.includes('facebook') || src === 'fb') origen = 'Facebook';
+        else if (src.includes('instagram')) origen = 'Instagram';
+        else if (src.includes('tiktok')) origen = 'TikTok';
+        else if (src.includes('google')) origen = 'Google';
+        else if (params.get('gclid')) origen = 'Google';
+        else if (params.get('ttclid')) origen = 'TikTok';
+        else if (params.get('fbclid')) origen = 'Facebook';
+        else if (ref.includes('marketplace.facebook.com')) origen = 'Marketplace';
+        else if (ref.includes('instagram.com')) origen = 'Instagram';
+        else if (ref.includes('facebook.com') || ref.includes('fb.com')) origen = 'Facebook';
+        else if (ref.includes('tiktok.com')) origen = 'TikTok';
+        else if (ref.includes('google.')) origen = 'Google';
+        else if (ref && ref.indexOf('wecarsbajio.com') === -1) origen = 'Otro';
+        else origen = 'Sitio web';
+
+        try { localStorage.setItem(KEY, origen); } catch (e) {}
+        return origen;
+      } catch (e) {
+        return 'Sitio web';
+      }
+    }
+
+    // Navegación interna del HTML iframe.
+    // Los enlaces con data-scroll-target desplazan al bloque correspondiente.
+    document.querySelectorAll('[data-scroll-target]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const targetId = link.dataset.scrollTarget;
+        const target = document.getElementById(targetId);
+
+        if (!target) {
+          return;
+        }
+
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+
+        // Aviso opcional al código Velo de la página, para que también pueda
+        // desplazar el lienzo principal de Wix cuando el iframe sea muy alto.
+        window.parent.postMessage({
+          type: 'wecars-scroll-to',
+          target: targetId,
+          y: target.offsetTop
+        }, '*');
+      });
+    });
+
+    // Menú móvil — drawer lateral
+    (function(){
+      const btn     = document.querySelector('.menu-toggle');
+      const drawer  = document.getElementById('mobDrawer');
+      const overlay = document.getElementById('mobOverlay');
+      const close   = document.getElementById('mobClose');
+      function openMenu(){
+        drawer.classList.add('open');
+        overlay.classList.add('open');
+      }
+      function closeMenu(){
+        drawer.classList.remove('open');
+        overlay.classList.remove('open');
+      }
+      btn?.addEventListener('click', openMenu);
+      close?.addEventListener('click', closeMenu);
+      overlay?.addEventListener('click', closeMenu);
+      document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeMenu(); });
+    })();
+
+    // Dropdown "Más ▾" en la navegación principal
+    (function () {
+      document.querySelectorAll('.wc-dropdown').forEach(function (dropdown) {
+        dropdown.querySelector('.wc-drop-btn').addEventListener('click', function (e) {
+          e.stopPropagation();
+          dropdown.classList.toggle('open');
+        });
+      });
+      document.addEventListener('click', function () {
+        document.querySelectorAll('.wc-dropdown').forEach(function (d) {
+          d.classList.remove('open');
+        });
+      });
+    })();
+
+    // Catálogo integrado con Wix CMS.
+    // Recibe los vehículos desde Velo mediante postMessage().
+    // No se muestran autos de ejemplo: el catálogo espera la colección técnica Cars.
+    const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=84';
+    let inventoryData = [];
+    let inventoryOrigin = 'pending';
+
+    const marketGrid = document.getElementById('marketGrid');
+    const marketCount = document.getElementById('marketCount');
+    const marketSubcount = document.getElementById('marketSubcount');
+    const marketSearch = document.getElementById('marketSearch');
+    const marketPrice = document.getElementById('marketPrice');
+    const marketYear = document.getElementById('marketYear');
+    const marketAutomatic = document.getElementById('marketAutomatic');
+    const marketCredit = document.getElementById('marketCredit');
+    const marketSort = document.getElementById('marketSort');
+    const marketMore = document.getElementById('marketMore');
+    let selectedType = 'all';
+    let visibleLimit = 6;
+    const FAV_KEY = 'wecars_favorites';
+    function loadFavorites() {
+      try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); }
+      catch (e) { return new Set(); }
+    }
+    function saveFavorites(favs) {
+      try { localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(favs))); } catch (e) {}
+    }
+    let favorites = loadFavorites();
+
+    const money = value => new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      maximumFractionDigits: 0
+    }).format(Number(value) || 0);
+
+    const TASA = 14.9;
+    function calcMens(price, engPct, plazo) {
+      const eng = price * (engPct / 100);
+      const monto = price - eng;
+      const tm = TASA / 100 / 12;
+      return tm ? monto * (tm * Math.pow(1 + tm, plazo)) / (Math.pow(1 + tm, plazo) - 1) : monto / plazo;
+    }
+
+    function sanitizeText(value, fallback = '') {
+      return String(value ?? fallback)
+        .replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    }
+
+    function toNumber(value) {
+      const parsed = Number(String(value ?? '').replace(/[$,\s]/g, ''));
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function obtenerImagenesAuto(item) {
+      const candidatos = [];
+      function agregar(valor) {
+        if (Array.isArray(valor)) { valor.forEach(agregar); return; }
+        if (valor && typeof valor === 'object') { agregar(valor.src || valor.image || valor.url || ''); return; }
+        const url = String(valor ?? '').trim();
+        if (url) candidatos.push(url);
+      }
+      agregar(item.images);
+      agregar(item.gallery);
+      agregar(item.image || item.imagen);
+      const unicas = [...new Set(candidatos)];
+      return unicas.length ? unicas : [FALLBACK_IMAGE];
+    }
+
+    function normalizeAuto(item, index) {
+      const rawType = String(item.type || item.tipo || 'all').toLowerCase();
+      const price = toNumber(item.price || item.precio || 0);
+      const priceCredito = toNumber(item.priceCredito) || price;
+      const images = obtenerImagenesAuto(item);
+
+      return {
+        id: String(item.id || item._id || `auto-${index}`),
+        title: String(item.title || item.nombre || 'Auto disponible').trim(),
+        brand: String(item.brand || item.marca || '').trim(),
+        type: rawType,
+        year: toNumber(item.year || item.ano || item.año || 0),
+        km: toNumber(item.km || item.kilometraje || 0),
+        transmission: String(item.transmission || item.transmision || 'Consultar').trim(),
+        price: price,
+        monthly: toNumber(item.monthly || item.mensualidad) || (priceCredito ? calcMens(priceCredito, 20, 36) : 0),
+        city: String(item.city || item.ciudad || 'León, Gto.').trim(),
+        fuel: String(item.fuel || '').trim(),
+        image: images[0],
+        images: images,
+        sourceUrl: String(item.sourceUrl || item.url || item.link || '').trim()
+      };
+    }
+
+    function filteredInventory() {
+      const search = marketSearch.value.trim().toLowerCase();
+      const priceRange = marketPrice.value === 'all' ? null : marketPrice.value.split('-').map(Number);
+      const min = priceRange ? priceRange[0] * 1000 : 0;
+      const max = priceRange ? priceRange[1] * 1000 : Infinity;
+      const minYear = marketYear.value === 'all' ? 0 : Number(marketYear.value);
+
+      let result = inventoryData.filter(item => {
+        const searchable = `${item.title} ${item.brand} ${item.type}`.toLowerCase();
+        const matchesText = !search || searchable.includes(search);
+        const matchesType = selectedType === 'all' || item.type === selectedType;
+        const matchesPrice = item.price >= min && item.price <= max;
+        const matchesYear = item.year >= minYear;
+        const matchesTransmission = !marketAutomatic.checked || item.transmission === 'Automática';
+        return matchesText && matchesType && matchesPrice && matchesYear && matchesTransmission;
+      });
+
+      result.sort((a, b) => {
+        if (marketSort.value === 'low') return a.price - b.price;
+        if (marketSort.value === 'high') return b.price - a.price;
+        if (marketSort.value === 'new') return b.year - a.year;
+        return String(a.id).localeCompare(String(b.id));
+      });
+
+      return result;
+    }
+
+    // Describe qué estaba buscando la persona cuando el catálogo no tuvo
+    // resultados, para que el asesor sepa qué auto avisarle cuando llegue.
+    function describeActiveFilters() {
+      const parts = [];
+      const search = marketSearch.value.trim();
+      if (search) parts.push(`"${search}"`);
+      if (selectedType !== 'all') parts.push(selectedType);
+      if (marketPrice.value !== 'all') {
+        const [min, max] = marketPrice.value.split('-');
+        parts.push(`$${min}k-$${max}k`);
+      }
+      if (marketYear.value !== 'all') parts.push(`desde ${marketYear.value}`);
+      if (marketAutomatic.checked) parts.push('automático');
+      return parts.length ? parts.join(' · ') : 'Sin filtros específicos';
+    }
+
+    function renderInventory() {
+      // Mientras Velo no haya contestado, no mostramos unidades falsas.
+      if (inventoryOrigin === 'pending') {
+        marketCount.textContent = 'Conectando con tu inventario…';
+        marketSubcount.textContent = 'Esperando los autos de la colección Cars.';
+        marketMore.style.display = 'none';
+        marketGrid.innerHTML = `
+          <div class="market-empty">
+            <b>Conectando con el inventario de WeCars</b>
+            <p>El catálogo está listo. Esperando que Velo reciba los registros de la colección Cars.</p>
+          </div>`;
+        return;
+      }
+
+      const allMatches = filteredInventory();
+      const shown = allMatches.slice(0, visibleLimit);
+
+      marketCount.textContent = `${allMatches.length} ${allMatches.length === 1 ? 'unidad encontrada' : 'unidades encontradas'}`;
+      marketSubcount.textContent = 'Inventario actualizado desde la colección Cars.';
+      marketMore.style.display = allMatches.length > visibleLimit ? 'inline-flex' : 'none';
+
+      if (!shown.length) {
+        marketGrid.innerHTML = `
+          <div class="market-empty">
+            <b>No hay coincidencias con estos filtros.</b>
+            <p>Prueba ampliar el rango de precio o elimina alguno de los filtros.</p>
+            <form class="market-notify" id="marketNotifyForm">
+              <p>¿No encontraste lo que buscabas? Te avisamos en cuanto llegue.</p>
+              <div class="market-notify-row">
+                <input type="text" name="name" placeholder="Tu nombre" required>
+                <input type="tel" name="phone" placeholder="WhatsApp" required>
+              </div>
+              <button type="submit">Avísame cuando llegue →</button>
+            </form>
+          </div>`;
+        return;
+      }
+
+      marketGrid.innerHTML = shown.map(item => {
+        const isFavorite = favorites.has(item.id);
+        const title = sanitizeText(item.title);
+        const detailUrl = `https://www.wecarsbajio.com/detalle?carId=${encodeURIComponent(item.id)}`;
+        const photoTotal = item.images.length;
+
+        return `
+          <article class="market-card" data-id="${sanitizeText(item.id)}" data-photo-index="0">
+            <div class="market-card-image">
+              <a href="${detailUrl}" target="_top" style="display:block;height:100%;">
+                <img class="market-card-photo" data-card-image src="${sanitizeText(item.image, FALLBACK_IMAGE)}" alt="${title}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" style="pointer-events:none;">
+              </a>
+              <div class="market-badges">
+                <span class="market-badge">Disponible</span>
+                <button class="market-heart ${isFavorite ? 'fav' : ''}" type="button" data-favorite="${sanitizeText(item.id)}" aria-label="Guardar ${title}">${isFavorite ? '♥' : '♡'}</button>
+              </div>
+              ${photoTotal > 1 ? `
+                <button class="market-photo-nav prev" type="button" data-card-direction="-1" aria-label="Foto anterior de ${title}">‹</button>
+                <button class="market-photo-nav next" type="button" data-card-direction="1" aria-label="Foto siguiente de ${title}">›</button>
+                <span class="market-photo-count" data-card-counter>1 / ${photoTotal}</span>
+              ` : ''}
+            </div>
+            <div class="market-card-body">
+              <div class="market-card-meta"><span>${item.year || 'Año N/D'}</span><span>${sanitizeText(item.transmission)}</span><span>${item.km ? item.km.toLocaleString('es-MX') + ' km' : 'Km N/D'}</span>${item.fuel ? `<span>${sanitizeText(item.fuel)}</span>` : ''}</div>
+              <h3>${title}</h3>
+              <div class="market-location">⌖ ${sanitizeText(item.city)}</div>
+              <div class="market-price-row">
+                <b class="market-price">${item.price ? money(item.price) : 'Consultar precio'}</b>
+                <span class="market-payment">${item.monthly ? `Desde<b>${money(item.monthly)} / mes*</b>` : '<b>Solicita cotización</b>'}</span>
+              </div>
+              <div class="market-card-actions">
+                <a class="market-detail" href="${detailUrl}" target="_top">Ver detalle</a>
+                <a class="market-interest" href="https://wa.me/524778350020?text=${encodeURIComponent('Hola, me interesa el ' + item.title + (item.price ? ' ($' + item.price.toLocaleString('es-MX') + ')' : '') + '. ¿Está disponible?')}" target="_blank" rel="noreferrer">Me interesa →</a>
+              </div>
+            </div>
+          </article>`;
+      }).join('');
+    }
+
+    document.getElementById('marketFilters').addEventListener('submit', event => {
+      event.preventDefault();
+      visibleLimit = 6;
+      renderInventory();
+    });
+
+    document.getElementById('vehicleTypes').addEventListener('click', event => {
+      const button = event.target.closest('[data-type]');
+      if (!button) return;
+      selectedType = button.dataset.type;
+      document.querySelectorAll('[data-type]').forEach(item => item.classList.toggle('active', item === button));
+      visibleLimit = 6;
+      renderInventory();
+    });
+
+    [marketSearch, marketPrice, marketYear, marketAutomatic, marketCredit, marketSort].forEach(element => {
+      element.addEventListener(element === marketSearch ? 'input' : 'change', () => {
+        visibleLimit = 6;
+        renderInventory();
+      });
+    });
+
+    document.getElementById('marketReset').addEventListener('click', () => {
+      marketSearch.value = '';
+      marketPrice.value = 'all';
+      marketYear.value = 'all';
+      marketAutomatic.checked = false;
+      marketCredit.checked = false;
+      marketSort.value = 'featured';
+      selectedType = 'all';
+      document.querySelectorAll('[data-type]').forEach(item => item.classList.toggle('active', item.dataset.type === 'all'));
+      visibleLimit = 6;
+      renderInventory();
+    });
+
+    marketMore.addEventListener('click', () => {
+      visibleLimit += 6;
+      renderInventory();
+    });
+
+    document.getElementById('marketGridBtn').addEventListener('click', () => {
+      marketGrid.classList.remove('list-mode');
+      document.getElementById('marketGridBtn').classList.add('active');
+      document.getElementById('marketListBtn').classList.remove('active');
+    });
+
+    document.getElementById('marketListBtn').addEventListener('click', () => {
+      marketGrid.classList.add('list-mode');
+      document.getElementById('marketListBtn').classList.add('active');
+      document.getElementById('marketGridBtn').classList.remove('active');
+    });
+
+    function cambiarFotoEnTarjeta(card, direction) {
+      const item = inventoryData.find(vehicle => String(vehicle.id) === String(card.dataset.id));
+      if (!item || !Array.isArray(item.images) || item.images.length <= 1) return;
+
+      const total = item.images.length;
+      const current = Number(card.dataset.photoIndex || 0);
+      const next = (current + Number(direction) + total) % total;
+      card.dataset.photoIndex = String(next);
+
+      const image = card.querySelector('[data-card-image]');
+      const counter = card.querySelector('[data-card-counter]');
+      if (image) { image.src = item.images[next]; image.alt = `Foto ${next + 1} de ${item.title}`; }
+      if (counter) counter.textContent = `${next + 1} / ${total}`;
+    }
+
+    marketGrid.addEventListener('click', event => {
+      const photoButton = event.target.closest('[data-card-direction]');
+      if (photoButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        const card = photoButton.closest('[data-id]');
+        if (card) cambiarFotoEnTarjeta(card, photoButton.dataset.cardDirection);
+        return;
+      }
+
+      const favorite = event.target.closest('[data-favorite]');
+      if (favorite) {
+        const id = String(favorite.dataset.favorite);
+        favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+        saveFavorites(favorites);
+        renderInventory();
+        return;
+      }
+
+      const vehicleButton = event.target.closest('[data-vehicle]');
+      if (vehicleButton) {
+        const item = inventoryData.find(vehicle => String(vehicle.id) === String(vehicleButton.dataset.vehicle));
+        if (!item) return;
+        document.getElementById('modalTitle').textContent = item.title;
+        document.querySelector('#vehicleModal .modal-kicker').textContent = `${item.year || 'Año N/D'} · ${item.transmission} · ${item.km ? item.km.toLocaleString('es-MX') + ' km' : 'Km N/D'}`;
+        document.querySelector('#vehicleModal .modal-card p:not(.modal-kicker)').textContent =
+          `Ficha de ${item.title}. Un asesor puede confirmar disponibilidad, crédito o prueba de manejo.`;
+        const modalLead = document.getElementById('modalLead');
+        modalLead.href = `https://www.wecarsbajio.com/detalle?carId=${encodeURIComponent(item.id)}`;
+        modalLead.target = '_top';
+        modalLead.textContent = 'Ver ficha completa del vehículo';
+        document.getElementById('vehicleModal').classList.add('open');
+      }
+    });
+
+    // Formulario "avísame cuando llegue" dentro del estado vacío del catálogo.
+    marketGrid.addEventListener('submit', event => {
+      const form = event.target.closest('#marketNotifyForm');
+      if (!form) return;
+      event.preventDefault();
+      const nombre = form.querySelector('[name="name"]').value.trim();
+      const telefono = form.querySelector('[name="phone"]').value.trim();
+      if (!nombre || !telefono) return;
+      window.parent.postMessage({
+        type:   'wecars-lead',
+        pagina: 'Inicio - Sin resultados',
+        data:   { nombre, telefono, interes: describeActiveFilters(), origen: detectarOrigenVisita() }
+      }, '*');
+      const btn = form.querySelector('button[type="submit"]');
+      btn.textContent = '¡Listo! Te avisamos en cuanto llegue.';
+      btn.disabled = true;
+      form.querySelectorAll('input').forEach(input => { input.disabled = true; });
+    });
+
+    // Wix envía: { type: 'wecars-inventory', items: [...] }
+    // Wix recomienda usar window.onmessage dentro del HTML Component.
+    // También acepta JSON por si el mensaje llegara serializado.
+    window.onmessage = function(event) {
+      let data = event.data;
+
+      if (typeof data === 'string') {
+        try {
+          data = JSON.parse(data);
+        } catch (error) {
+          return;
+        }
+      }
+
+      if (!data || data.type !== 'wecars-inventory' || !Array.isArray(data.items)) {
+        return;
+      }
+
+      inventoryData = data.items.map(normalizeAuto).filter(item => item.title);
+      inventoryOrigin = 'wix';
+      visibleLimit = 6;
+      favorites = loadFavorites();
+      renderInventory();
+
+      // Confirmación para diagnosticar en la consola Velo.
+      window.parent.postMessage({
+        type: 'wecars-inventory-received',
+        count: inventoryData.length
+      }, '*');
+    };
+
+    renderInventory();
+
+    // Wix puede cargar el HTML antes de que Velo active onMessage().
+    // Por eso el componente avisa varias veces que está listo.
+    let readyAttempts = 0;
+    const readyTimer = setInterval(() => {
+      window.parent.postMessage({ type: 'wecars-catalog-ready' }, '*');
+      readyAttempts += 1;
+
+      if (inventoryOrigin === 'wix' || readyAttempts >= 20) {
+        clearInterval(readyTimer);
+      }
+    }, 500);
+
+    window.parent.postMessage({ type: 'wecars-catalog-ready' }, '*');
+
+    // Modal de detalle de unidad
+    const modal = document.getElementById('vehicleModal');
+    const modalTitle = document.getElementById('modalTitle');
+    modal.querySelector('.modal-close').addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', event => {
+      if (event.target === modal) modal.classList.remove('open');
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') modal.classList.remove('open');
+    });
+
+    // Captura de nombre + celular "a la entrada" — franja fija en el flujo
+    // normal de la página (NO es un pop-up), para evitar el problema de los
+    // elementos position:fixed/absolute dentro del iframe de Wix (Velo lo
+    // estira a todo el alto del contenido, así que un modal flotante puede
+    // terminar posicionado fuera de la pantalla real del visitante).
+    (function () {
+      const entryForm = document.getElementById('entryCaptureForm');
+      if (!entryForm) return;
+
+      entryForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const nombre = entryForm.querySelector('[name="name"]').value.trim();
+        const telefono = entryForm.querySelector('[name="phone"]').value.trim();
+        if (!nombre || !telefono) return;
+
+        window.parent.postMessage({
+          type: 'wecars-lead',
+          pagina: 'Inicio - Franja de entrada',
+          data: { nombre, telefono, interes: 'Franja de entrada', origen: detectarOrigenVisita() }
+        }, '*');
+
+        entryForm.querySelectorAll('input, button').forEach(el => el.disabled = true);
+        entryForm.innerHTML = '<p style="text-align:center;font-weight:800;color:white;padding:8px 0;">¡Gracias! Un asesor te contactará pronto.</p>';
+      });
+    })();
+
+
+    // Perfil rápido del comprador: guía de 4 preguntas.
+    const buyerProfileForm = document.getElementById('buyerProfileForm');
+
+    if (buyerProfileForm) {
+      const profileState = {
+        use: '',
+        priorities: [],
+        budget: '',
+        payment: '',
+        style: ''
+      };
+
+      let profileStep = 1;
+      const profileSteps = [...buyerProfileForm.querySelectorAll('.wizard-step')];
+      const profileNext = document.getElementById('profileNext');
+      const profileBack = document.getElementById('profileBack');
+      const profileError = document.getElementById('profileError');
+      const profileProgress = document.getElementById('profileProgress');
+      const profileStepLabel = document.getElementById('profileStepLabel');
+      const profileResult = document.getElementById('profileResult');
+      const profileAdvisor = document.getElementById('profileAdvisor');
+
+      const readable = {
+        use: {
+          ciudad: 'ciudad y trayectos diarios',
+          familia: 'familia y actividades',
+          trabajo: 'trabajo o negocio',
+          viajes: 'viajes y escapadas'
+        },
+        priorities: {
+          ahorro: 'ahorro de combustible',
+          seguridad: 'seguridad',
+          espacio: 'espacio',
+          tecnologia: 'tecnología',
+          desempeno: 'desempeño',
+          estilo: 'diseño y presencia'
+        },
+        budget: {
+          hasta350: 'hasta $350 mil',
+          '350a550': '$350 a $550 mil',
+          mas550: 'más de $550 mil',
+          comparando: 'aún comparando'
+        },
+        payment: {
+          credito: 'crédito',
+          contado: 'contado',
+          autoCuenta: 'auto a cuenta',
+          evaluando: 'forma de compra por definir'
+        },
+        style: {
+          practico: 'práctico y eficiente',
+          protector: 'protector y orientado a la familia',
+          explorador: 'explorador',
+          entusiasta: 'entusiasta del manejo y diseño'
+        }
+      };
+
+      function updateProfileUI() {
+        profileSteps.forEach(step => {
+          step.classList.toggle('active', Number(step.dataset.step) === profileStep);
+        });
+
+        profileStepLabel.textContent = `Pregunta ${profileStep} de 4`;
+        profileProgress.style.width = `${profileStep * 25}%`;
+        profileBack.classList.toggle('hidden', profileStep === 1);
+        profileNext.innerHTML = profileStep === 4 ? 'Ver mi perfil <span>✓</span>' : 'Continuar <span>→</span>';
+        profileError.textContent = '';
+      }
+
+      function profileStepIsValid() {
+        if (profileStep === 1) return Boolean(profileState.use);
+        if (profileStep === 2) return profileState.priorities.length > 0;
+        if (profileStep === 3) return Boolean(profileState.budget && profileState.payment);
+        if (profileStep === 4) return Boolean(profileState.style);
+        return true;
+      }
+
+      function profileErrorMessage() {
+        if (profileStep === 1) return 'Elige el uso principal que tendrá tu auto.';
+        if (profileStep === 2) return 'Elige al menos una prioridad para continuar.';
+        if (profileStep === 3) return 'Elige un presupuesto aproximado y una forma de compra.';
+        if (profileStep === 4) return 'Elige el estilo que más se parece a ti.';
+        return '';
+      }
+
+      function showProfileResult() {
+        buyerProfileForm.style.display = 'none';
+        document.querySelector('.profile-wizard-head').style.display = 'none';
+        document.querySelector('.profile-progress').style.display = 'none';
+
+        const recommendations = {
+          ciudad: 'Te conviene comenzar por sedanes compactos, hatchbacks o crossovers eficientes que hagan simples tus trayectos diarios.',
+          familia: 'Tu perfil apunta a SUVs y crossovers con buen espacio, seguridad y comodidad para acompañar cada plan.',
+          trabajo: 'Vale la pena comparar pickups, SUVs robustas o unidades con espacio y capacidad para el ritmo de tu negocio.',
+          viajes: 'Busca SUVs o crossovers cómodos, estables y con espacio suficiente para recorrer más kilómetros con tranquilidad.'
+        };
+
+        const styleAdd = {
+          practico: ' Priorizaremos funcionalidad, consumo y costo de uso.',
+          protector: ' Pondremos especial atención en seguridad, confort y espacio.',
+          explorador: ' Consideraremos versatilidad, altura y capacidad para salir de la rutina.',
+          entusiasta: ' También te mostraremos opciones con diseño, equipamiento y sensación de manejo.'
+        };
+
+        document.getElementById('profileResultTitle').textContent =
+          'Tu búsqueda ya tiene una dirección.';
+        document.getElementById('profileResultCopy').textContent =
+          `${recommendations[profileState.use]}${styleAdd[profileState.style]}`;
+
+        const tags = [
+          readable.use[profileState.use],
+          ...profileState.priorities.map(item => readable.priorities[item]),
+          readable.budget[profileState.budget],
+          readable.payment[profileState.payment]
+        ].filter(Boolean);
+
+        document.getElementById('profileResultTags').innerHTML =
+          tags.map(tag => `<span class="result-tag">${tag}</span>`).join('');
+
+        const message = [
+          'Hola, completé mi perfil de búsqueda en WeCars.',
+          `Uso principal: ${readable.use[profileState.use]}.`,
+          `Prioridades: ${profileState.priorities.map(item => readable.priorities[item]).join(', ')}.`,
+          `Presupuesto: ${readable.budget[profileState.budget]}.`,
+          `Compra: ${readable.payment[profileState.payment]}.`,
+          `Estilo: ${readable.style[profileState.style]}.`,
+          'Me gustaría recibir recomendaciones de vehículos.'
+        ].join(' ');
+
+        profileAdvisor.href = `https://wa.me/524778350020?text=${encodeURIComponent(message)}`;
+        profileResult.classList.add('visible');
+      }
+
+      buyerProfileForm.addEventListener('click', event => {
+        const choice = event.target.closest('.profile-choice');
+        if (!choice) return;
+
+        const group = choice.dataset.group;
+        const value = choice.dataset.value;
+        const isMultiple = choice.dataset.multiple === 'true';
+
+        if (isMultiple) {
+          const current = profileState[group];
+          const index = current.indexOf(value);
+
+          if (index > -1) {
+            current.splice(index, 1);
+            choice.classList.remove('active');
+          } else if (current.length < 2) {
+            current.push(value);
+            choice.classList.add('active');
+          } else {
+            profileError.textContent = 'Elige máximo dos prioridades para mantener tu perfil claro.';
+          }
+
+          return;
+        }
+
+        profileState[group] = value;
+        buyerProfileForm.querySelectorAll(`.profile-choice[data-group="${group}"]`).forEach(button => {
+          button.classList.toggle('active', button === choice);
+        });
+        profileError.textContent = '';
+      });
+
+      profileNext.addEventListener('click', () => {
+        if (!profileStepIsValid()) {
+          profileError.textContent = profileErrorMessage();
+          return;
+        }
+
+        if (profileStep === 4) {
+          showProfileResult();
+          return;
+        }
+
+        profileStep += 1;
+        updateProfileUI();
+      });
+
+      profileBack.addEventListener('click', () => {
+        if (profileStep > 1) {
+          profileStep -= 1;
+          updateProfileUI();
+        }
+      });
+
+      document.getElementById('profileRestart').addEventListener('click', () => {
+        profileState.use = '';
+        profileState.priorities = [];
+        profileState.budget = '';
+        profileState.payment = '';
+        profileState.style = '';
+        profileStep = 1;
+
+        buyerProfileForm.querySelectorAll('.profile-choice').forEach(button => button.classList.remove('active'));
+        profileResult.classList.remove('visible');
+        buyerProfileForm.style.display = '';
+        document.querySelector('.profile-wizard-head').style.display = '';
+        document.querySelector('.profile-progress').style.display = '';
+        updateProfileUI();
+      });
+
+      updateProfileUI();
+    }
+
+
+    // Este formulario no envía datos: deja el punto de integración listo para Wix Forms, CRM o Make.
+    var _leadFormEnviando = false;
+    document.getElementById('leadForm').addEventListener('submit', event => {
+      event.preventDefault();
+      if (_leadFormEnviando) return;
+      const form = event.currentTarget;
+      const nombre   = form.querySelector('[name="name"]').value.trim();
+      const telefono = form.querySelector('[name="phone"]').value.trim();
+      const interes  = form.querySelector('[name="interest"]').value;
+      if (!nombre || !telefono || !interes) return;
+      _leadFormEnviando = true;
+      const btn = form.querySelector('button[type="submit"]');
+      const textoOriginal = btn.textContent;
+      btn.textContent = '¡Listo! Un asesor te contactará pronto.';
+      btn.disabled = true;
+      window.parent.postMessage({
+        type:   'wecars-lead',
+        pagina: 'Inicio',
+        data:   { nombre, telefono, interes, origen: detectarOrigenVisita() }
+      }, '*');
+      form.reset();
+      // El botón permanece deshabilitado: la acción ya se registró, no hay razón
+      // para re-enviar en la misma sesión sin recargar la página.
+    });
+
+    // Buscador rápido del hero: manda al Inventario ya con esos filtros
+    // aplicados (mismos valores que usan los chips/select de esa página).
+    document.getElementById('finderForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const tipo = document.getElementById('brand').value;
+      const precio = document.getElementById('budget').value;
+      const params = new URLSearchParams();
+      if (tipo && tipo !== 'all') params.set('tipo', tipo);
+      if (precio && precio !== 'all') params.set('precio', precio);
+      const qs = params.toString();
+      window.top.location.href = 'https://www.wecarsbajio.com/inventario' + (qs ? '?' + qs : '');
+    });
+  </script>
+  
+<!-- Verifica tu Auto — tira discreta -->
+<style>
+.vta-strip{display:flex;align-items:center;gap:14px;padding:13px 24px;background:var(--paper,#F5F7F5);border-top:1px solid var(--line,#d8e2e5);border-bottom:1px solid var(--line,#d8e2e5);font-family:'DM Sans',sans-serif;flex-wrap:wrap}
+.vta-strip-dot{width:7px;height:7px;border-radius:50%;background:#56a900;flex-shrink:0;margin-top:1px}
+.vta-strip-text{flex:1;font-size:.82rem;color:var(--muted,#6d7a83);line-height:1.4;min-width:180px;margin:0}
+.vta-strip-text strong{color:var(--ink,#0f1a0f);font-weight:600}
+.vta-strip-link{white-space:nowrap;font-size:.8rem;font-weight:700;color:#56a900;text-decoration:none;padding:5px 14px;border:1.5px solid rgba(86,169,0,.3);border-radius:99px;transition:background .15s,border-color .15s}
+.vta-strip-link:hover{background:rgba(86,169,0,.08);border-color:rgba(86,169,0,.55)}
+@media(max-width:480px){.vta-strip{gap:10px;padding:12px 16px}.vta-strip-text{font-size:.78rem}}
+@media(prefers-color-scheme:dark){.vta-strip{background:var(--white,#1C2416);border-color:var(--line,#2e3d24)}.vta-strip-text strong{color:var(--ink,#e8f0e0)}}
+
+/* ── MOBILE: scroll trap fix + pequeños ajustes ── */
+@media(max-width:640px){
+  body{touch-action:pan-y;overscroll-behavior-y:contain}
+  /* Elementos con scroll horizontal propio: no bloquear */
+  .mob-filter-bar,.wc-subtoggle,.overflow-x-scroll,[class*="scroll-x"]{touch-action:pan-x}
+  /* Campos de formulario: fáciles de tocar */
+  input,select,textarea,button{touch-action:manipulation}
+  /* Padding lateral consistente en mobile */
+  .shell{padding-left:16px!important;padding-right:16px!important}
+}
+</style>
+<div class="vta-strip">
+  <div class="vta-strip-dot"></div>
+  <p class="vta-strip-text"><strong>Verifica tu Auto</strong> &mdash; Revisamos factura, INE, tenencia y m&aacute;s antes de que compres. Reporte en 48&nbsp;h desde $189&nbsp;+&nbsp;IVA.</p>
+  <a class="vta-strip-link" href="https://www.wecarsbajio.com/verifica-tu-auto" onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:'https://www.wecarsbajio.com/verifica-tu-auto'},'*')">Saber m&aacute;s &rarr;</a>
+</div>
+<script>(function(){var t,retries=0;function send(){var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight,document.body.offsetHeight);window.parent.postMessage({type:"wecars-resize",height:h},"*");}function rh(){clearTimeout(t);t=setTimeout(function(){requestAnimationFrame(send);},150);}function hookImgs(){document.querySelectorAll("img").forEach(function(img){if(!img.dataset.wcResize){img.dataset.wcResize="1";img.addEventListener("load",rh);img.addEventListener("error",rh);}});}window.addEventListener("load",function(){rh();var iv=setInterval(function(){rh();hookImgs();if(++retries>=12)clearInterval(iv);},400);});window.addEventListener("resize",rh);new MutationObserver(function(){rh();hookImgs();}).observe(document.body,{childList:true,subtree:true,attributes:false,characterData:false});hookImgs();rh();})();</script>
+
+<!-- ── BLOQUE MÓVIL: touch targets + fonts + grid fixes ── -->
+<style id="ini-mobile-ux">
+@media(max-width:820px){
+  /* Touch targets */
+  .heart,.mob-close,.market-heart,.market-photo-nav{min-width:44px!important;min-height:44px!important}
+  .filter-pill{min-height:44px!important;display:inline-flex;align-items:center}
+  /* Texto mínimo legible */
+  .market-badge,.market-photo-count,.market-payment,.market-card-meta,.price-line small{font-size:.8rem!important}
+  .eyebrow,.trust small{font-size:.8rem!important}
+  /* Vehicle CTA button: dar padding táctil */
+  .vehicle-cta button{padding:10px 16px!important;min-height:44px!important}
+}
+</style>
+</body>
+</html>

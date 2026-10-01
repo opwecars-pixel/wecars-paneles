@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Garantías — weCars Bajío</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+  /* ── Brand ─────────────────────────────────────────── */
+  --lime:          #56a900;
+  --lime-dark:     #3d7a00;
+  --lime-bg:       rgba(86,169,0,.10);
+  /* ── Neutrals ──────────────────────────────────────── */
+  --ink:           #0f1a0f;
+  --ink-2:         #1a2e1a;
+  --paper:         #F5F7F5;
+  --white:         #ffffff;
+  --muted:         #6d7a83;
+  --line:          #d8e2e5;
+  /* ── Semantic ──────────────────────────────────────── */
+  --c-red:         #e24b4a;   --c-red-bg:    rgba(226,75,74,.10);
+  --c-amber:       #d97706;   --c-amber-bg:  rgba(217,119,6,.10);
+  --c-blue:        #2a78d6;   --c-blue-bg:   rgba(42,120,214,.10);
+  --c-green:       #16a34a;   --c-green-bg:  rgba(22,163,74,.10);
+  --c-purple:      #9333ea;   --c-purple-bg: rgba(147,51,234,.10);
+  --amarillo:      #f59e0b;
+  --violet:        #4338c8;
+  --violet-2:      #5c55e5;
+  /* ── Elevation ─────────────────────────────────────── */
+  --shadow-sm:     0 2px 8px  rgba(12,27,35,.08);
+  --shadow:        0 8px 24px rgba(12,27,35,.10);
+  --shadow-lg:     0 18px 48px rgba(12,27,35,.12);
+  /* ── Radius ────────────────────────────────────────── */
+  --radius-sm:     8px;
+  --radius:        12px;
+  --radius-md:     16px;
+  --radius-lg:     22px;
+  --radius-pill:   999px;
+  /* ── Aliases backward-compat (no tocar) ────────────── */
+  --verde:         var(--lime);
+  --verde-dark:    var(--lime-dark);
+  --negro:         var(--ink);
+  --ink-3:         var(--ink-2);
+  --gris:          var(--paper);
+  --gris-borde:    var(--line);
+  --radio:         var(--radius-md);
+  --sombra:        var(--shadow-lg);
+  --borde:         var(--line);
+  --texto:         var(--muted);
+  --max:           1280px;
+}
+/* ── Dark mode ──────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #111a0e; --ink: #e8f0e0; --ink-2: #c8d8c0;
+    --line: #2e3d24; --muted: #7a9e68; --white: #1C2416;
+    --gris: #111a0e; --gris-borde: #2e3d24; --negro: #e8f0e0;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,.25);
+    --shadow: 0 8px 24px rgba(0,0,0,.28);
+    --shadow-lg: 0 18px 48px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111a0e; --ink: #e8f0e0; --ink-2: #c8d8c0;
+  --line: #2e3d24; --muted: #7a9e68; --white: #1C2416;
+  --gris: #111a0e; --gris-borde: #2e3d24; --negro: #e8f0e0;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.25);
+  --shadow: 0 8px 24px rgba(0,0,0,.28);
+  --shadow-lg: 0 18px 48px rgba(0,0,0,.35);
+}
+:root[data-theme="light"] {
+  --paper: #F5F7F5; --ink: #0f1a0f; --ink-2: #1a2e1a;
+  --line: #E4EAE4; --muted: #5a7060; --white: #ffffff;
+  --gris: #F5F7F5; --gris-borde: #d8e2e5; --negro: #0b1014;
+}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {  width: 100%; overflow-x: clip; }
+  body { font-family: "DM Sans", Arial, sans-serif; color: var(--ink); }
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+    html,body{scrollbar-width:none;-ms-overflow-style:none}
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--negro);
+    padding: 80px 24px 70px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 40%, rgba(112,207,5,.14) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(112,207,5,.12);
+    border: 1px solid rgba(112,207,5,.3);
+    color: var(--verde);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 99px;
+    margin-bottom: 20px;
+  }
+  .hero-badge span { width: 7px; height: 7px; background: var(--verde); border-radius: 50%; }
+  .hero h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 18px; }
+  .hero h1 em { color: var(--verde); font-style: normal; }
+  .hero p { color: rgba(255,255,255,.7); font-size: 1.05rem; line-height: 1.7; margin-bottom: 28px; }
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-green {
+    background: var(--verde); color: #fff; font-weight: 700;
+    padding: 14px 28px; border-radius: 8px; text-decoration: none;
+    font-size: .95rem; transition: background .2s;
+  }
+  .btn-green:hover { background: var(--verde-dark); }
+  .btn-outline {
+    background: transparent; color: #fff; font-weight: 700;
+    padding: 14px 28px; border-radius: 8px; text-decoration: none;
+    font-size: .95rem; border: 2px solid rgba(255,255,255,.25);
+    transition: border-color .2s;
+  }
+  .btn-outline:hover { border-color: rgba(255,255,255,.6); }
+
+  /* Hero right — shield card */
+  .shield-card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 20px;
+    padding: 36px 32px;
+    text-align: center;
+  }
+  .shield-icon {
+    width: 80px; height: 80px; margin: 0 auto 16px;
+    background: rgba(112,207,5,.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .shield-icon svg { width: 44px; height: 44px; }
+  .shield-card h3 { color: #fff; font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+  .shield-card p { color: rgba(255,255,255,.6); font-size: .9rem; line-height: 1.6; margin-bottom: 24px; }
+  .shield-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .shield-stat { background: rgba(255,255,255,.06); border-radius: 10px; padding: 14px 10px; }
+  .shield-stat .num { color: var(--verde); font-size: 1.5rem; font-weight: 900; }
+  .shield-stat .lbl { color: rgba(255,255,255,.55); font-size: .72rem; margin-top: 2px; }
+  .edega-badge {
+    margin-top: 20px;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(112,207,5,.1); border: 1px solid rgba(112,207,5,.25);
+    border-radius: 8px; padding: 8px 14px;
+    color: var(--verde); font-size: .8rem; font-weight: 600;
+  }
+
+  /* ─── URGENCIA BANNER ─── */
+  .urgencia {
+    background: var(--verde);
+    padding: 18px 24px;
+    text-align: center;
+  }
+  .urgencia-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;
+  }
+  .urgencia p { color: #fff; font-size: 1rem; font-weight: 700; }
+  .urgencia a {
+    background: #fff; color: var(--verde); font-size: .85rem; font-weight: 800;
+    padding: 8px 20px; border-radius: 6px; text-decoration: none; white-space: nowrap;
+    transition: opacity .2s;
+  }
+  .urgencia a:hover { opacity: .9; }
+
+  /* ─── SECCIÓN GENÉRICA ─── */
+  section { padding: 80px 24px; }
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+  .section-tag {
+    display: inline-block;
+    background: rgba(112,207,5,.12); border: 1px solid rgba(112,207,5,.25);
+    color: var(--verde); font-size: .7rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 99px; margin-bottom: 14px;
+  }
+  .section-header { text-align: center; margin-bottom: 52px; }
+  .section-header h2 { font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 900; line-height: 1.15; }
+  .section-header p { color: var(--texto); font-size: 1rem; margin-top: 12px; line-height: 1.7; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+  /* ─── WECARS GARANTIZA ─── */
+  .wecars-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+  .wecars-card {
+    background: #fff; border: 1px solid var(--borde);
+    border-radius: 14px; padding: 28px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .wecars-icon {
+    width: 48px; height: 48px;
+    background: rgba(112,207,5,.1);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .wecars-icon svg { width: 26px; height: 26px; }
+  .wecars-card h4 { font-size: 1rem; font-weight: 800; }
+  .wecars-card p { color: var(--texto); font-size: .88rem; line-height: 1.65; }
+
+  /* ─── VENDER EDEGA ─── */
+  .vender-edega { background: var(--negro); }
+  .edega-hero-label {
+    display: inline-block; background: var(--verde); color: #fff;
+    font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 6px; margin-bottom: 16px;
+  }
+  .edega-intro-grid {
+    display: grid; grid-template-columns: 1fr 1.1fr; gap: 60px; align-items: center;
+  }
+  .edega-intro-left h2 { font-size: clamp(1.7rem, 3.5vw, 2.6rem); font-weight: 900; color: #fff; line-height: 1.15; margin-bottom: 16px; }
+  .edega-intro-left h2 em { color: var(--verde); font-style: normal; }
+  .edega-intro-left p { color: rgba(255,255,255,.65); font-size: 1rem; line-height: 1.75; margin-bottom: 28px; }
+  .edega-puntos { display: flex; flex-direction: column; gap: 14px; margin-bottom: 30px; }
+  .edega-punto { display: flex; align-items: flex-start; gap: 12px; }
+  .check-circle {
+    width: 26px; height: 26px; flex-shrink: 0;
+    background: var(--verde); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .check-circle svg { width: 14px; height: 14px; }
+  .edega-punto span { color: rgba(255,255,255,.8); font-size: .95rem; line-height: 1.5; }
+  .edega-punto span strong { color: #fff; }
+  .disclaimer-box {
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+    border-left: 3px solid var(--verde);
+    border-radius: 8px; padding: 14px 16px;
+    color: rgba(255,255,255,.45); font-size: .78rem; line-height: 1.6;
+    margin-top: 8px;
+  }
+
+  /* Edega right card */
+  .edega-right-card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .edega-card-header {
+    background: var(--verde);
+    padding: 24px 28px;
+    text-align: center;
+  }
+  .edega-card-header p { color: rgba(255,255,255,.85); font-size: .85rem; margin-top: 4px; }
+  .edega-card-header h3 { color: #fff; font-size: 1.4rem; font-weight: 900; }
+  .edega-card-body { padding: 24px 28px; }
+  .edega-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.07);
+  }
+  .edega-item:last-child { border-bottom: none; }
+  .edega-item svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--verde); }
+  .edega-item span { color: rgba(255,255,255,.8); font-size: .9rem; }
+  .edega-item span strong { color: #fff; }
+  .edega-cta-card {
+    background: rgba(112,207,5,.12); border-top: 1px solid rgba(112,207,5,.2);
+    padding: 20px 28px; text-align: center;
+  }
+  .btn-wa {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--verde); color: #fff; font-weight: 800;
+    padding: 14px 28px; border-radius: 8px; text-decoration: none;
+    font-size: .95rem; transition: background .2s; width: 100%; justify-content: center;
+  }
+  .btn-wa:hover { background: var(--verde-dark); }
+  .btn-wa svg { width: 20px; height: 20px; }
+
+  /* ─── QUÉ CUBRE ─── */
+  .cobertura-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+  .cobertura-card {
+    background: #fff; border: 1px solid var(--borde);
+    border-radius: 14px; padding: 26px 22px;
+  }
+  .cobertura-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .cob-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .cob-icon svg { width: 24px; height: 24px; }
+  .cob-icon.motor { background: rgba(112,207,5,.12); }
+  .cob-icon.trans { background: rgba(59,130,246,.1); }
+  .cob-icon.elec { background: rgba(245,158,11,.1); }
+  .cob-icon.ac { background: rgba(139,92,246,.1); }
+  .cob-icon.llantas { background: rgba(239,68,68,.1); }
+  .cobertura-card h4 { font-size: .95rem; font-weight: 800; }
+  .cobertura-card ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .cobertura-card ul li { display: flex; align-items: flex-start; gap: 8px; color: var(--texto); font-size: .85rem; line-height: 1.5; }
+  .cobertura-card ul li::before { content: ''; width: 6px; height: 6px; background: var(--verde); border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  .edega-disclaimer-section { text-align: center; margin-top: 36px; }
+  .edega-disclaimer-section p { color: #999; font-size: .8rem; line-height: 1.6; max-width: 700px; margin: 0 auto; }
+
+  /* ─── CÓMO FUNCIONA ─── */
+  .proceso-dark { background: var(--negro); }
+  .pasos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
+  .paso {
+    text-align: center; padding: 32px 20px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    position: relative;
+  }
+  .paso-num {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--verde); color: #fff;
+    font-size: 1.1rem; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .paso h4 { color: #fff; font-size: .95rem; font-weight: 800; margin-bottom: 8px; }
+  .paso p { color: rgba(255,255,255,.55); font-size: .85rem; line-height: 1.6; }
+  .paso-tiempo {
+    margin-top: 14px; display: inline-block;
+    background: rgba(112,207,5,.12); border: 1px solid rgba(112,207,5,.2);
+    color: var(--verde); font-size: .75rem; font-weight: 700;
+    padding: 4px 12px; border-radius: 99px;
+  }
+
+  /* ─── COMPARATIVA ─── */
+  .comparativa-table {
+    width: 100%; border-collapse: collapse;
+    border-radius: 14px; overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,.07);
+  }
+  .comparativa-table th { padding: 18px 20px; font-size: .9rem; text-align: center; }
+  .comparativa-table th:first-child { text-align: left; }
+  .comparativa-table th.sin { background: #f0f0f0; color: #888; }
+  .comparativa-table th.con { background: var(--verde); color: #fff; }
+  .comparativa-table th.feature { background: var(--negro); color: #fff; }
+  .comparativa-table td { padding: 14px 20px; font-size: .88rem; border-bottom: 1px solid #f0f0f0; text-align: center; }
+  .comparativa-table td:first-child { text-align: left; font-weight: 600; color: var(--negro); }
+  .comparativa-table tr:last-child td { border-bottom: none; }
+  .comparativa-table tr:nth-child(even) td { background: #fafafa; }
+  .tick { color: var(--verde); font-size: 1.1rem; font-weight: 900; }
+  .cross { color: #ccc; font-size: 1.1rem; }
+  .comparativa-cta { text-align: center; margin-top: 36px; }
+  .comparativa-cta p { color: var(--texto); font-size: .9rem; margin-bottom: 16px; }
+
+  /* ─── PROTECCIÓN LLANTAS ─── */
+  .llantas-dark { background: var(--negro); }
+  .llantas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .llantas-left h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 900; color: #fff; margin-bottom: 14px; }
+  .llantas-left h2 em { color: var(--verde); font-style: normal; }
+  .llantas-left p { color: rgba(255,255,255,.65); font-size: .95rem; line-height: 1.75; margin-bottom: 28px; }
+  .llantas-items { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+  .llanta-item {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    padding: 14px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .llanta-item svg { width: 20px; height: 20px; color: var(--verde); flex-shrink: 0; }
+  .llanta-item span { color: rgba(255,255,255,.8); font-size: .85rem; font-weight: 600; }
+  .llantas-disclaimer { color: rgba(255,255,255,.35); font-size: .78rem; line-height: 1.6; }
+  .llantas-right-visual {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+  }
+  .llanta-big-icon { width: 100px; height: 100px; margin: 0 auto 20px; }
+  .llantas-right-visual h4 { color: #fff; font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
+  .llantas-right-visual p { color: rgba(255,255,255,.55); font-size: .88rem; line-height: 1.65; margin-bottom: 24px; }
+
+  /* ─── FAQ ─── */
+  .faq-list { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  .faq-item { border: 1px solid var(--borde); border-radius: 12px; overflow: hidden; }
+  .faq-q {
+    width: 100%; text-align: left; padding: 18px 20px;
+    background: #fff; font-size: .95rem; font-weight: 700;
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    border: none; color: var(--negro);
+  }
+  .faq-q svg { transition: transform .25s; flex-shrink: 0; }
+  .faq-item.open .faq-q svg { transform: rotate(45deg); }
+  .faq-a { display: none; padding: 0 20px 18px; color: var(--texto); font-size: .9rem; line-height: 1.7; }
+  .faq-item.open .faq-a { display: block; }
+
+  /* ─── CTA FINAL ─── */
+  .cta-final { background: var(--negro); text-align: center; }
+  .cta-final h2 { font-size: clamp(1.7rem, 3.5vw, 2.5rem); font-weight: 900; color: #fff; margin-bottom: 14px; line-height: 1.2; }
+  .cta-final h2 em { color: var(--verde); font-style: normal; }
+  .cta-final p { color: rgba(255,255,255,.6); font-size: 1rem; margin-bottom: 36px; max-width: 540px; margin-left: auto; margin-right: auto; }
+  .cta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; max-width: 780px; margin: 0 auto; }
+  .cta-card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 14px; padding: 26px 20px; text-align: center;
+    text-decoration: none; transition: border-color .2s, background .2s;
+  }
+  .cta-card:hover { border-color: var(--verde); background: rgba(112,207,5,.07); }
+  .cta-card-icon { width: 44px; height: 44px; background: rgba(112,207,5,.12); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+  .cta-card-icon svg { width: 24px; height: 24px; }
+  .cta-card h4 { color: #fff; font-size: .95rem; font-weight: 800; margin-bottom: 6px; }
+  .cta-card p { color: rgba(255,255,255,.5); font-size: .82rem; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 36px; }
+    .edega-intro-grid { grid-template-columns: 1fr; gap: 36px; }
+    .llantas-grid { grid-template-columns: 1fr; gap: 36px; }
+    .llantas-items { grid-template-columns: 1fr; }
+    .hero-btns { flex-direction: column; }
+    .btn-green, .btn-outline { text-align: center; }
+    .urgencia-inner { flex-direction: column; gap: 10px; }
+  }
+
+        /* Mobile drawer — v2 */
+    .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:198;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+    .mob-drawer{position:fixed;top:0;right:0;bottom:0;width:80vw;max-width:300px;background:#0b0b0b;z-index:199;transform:translateX(110%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-16px 0 60px rgba(0,0,0,.65)}
+    .mob-drawer.open{transform:translateX(0)}
+    .mob-overlay.open{display:block}
+    .mob-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
+    .mob-drawer-head img{height:26px;width:auto;opacity:.9}
+    .mob-close{background:rgba(255,255,255,.07);border:0;color:#777;width:30px;height:30px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,color .15s}
+    .mob-close:hover{background:rgba(255,255,255,.12);color:#fff}
+    .mob-close svg{width:14px;height:14px;display:block}
+    .mob-nav-links{display:flex;flex-direction:column;padding:8px 10px;flex:1;overflow-y:auto;gap:1px}
+    .mob-nav-links a{display:flex;align-items:center;gap:10px;padding:11px 12px;color:#bbb;text-decoration:none;font-size:.88rem;font-weight:600;font-family:'DM Sans',sans-serif;border-radius:10px;transition:background .14s,color .14s}
+    .mob-nav-links a:hover{background:rgba(255,255,255,.05);color:#eee}
+    .mob-nav-links a.active{background:rgba(112,207,5,.1);color:#70cf05}
+    .mob-nav-links a.mob-sec{font-size:.82rem;font-weight:500;color:#555;padding:9px 12px}
+    .mob-nav-links a.mob-sec:hover{background:rgba(255,255,255,.04);color:#888}
+    .mob-nav-links a.mob-sec.active{background:rgba(112,207,5,.08);color:#70cf05}
+    .mob-nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.6}
+    .mob-nav-links a.active .mob-nav-icon{opacity:1}
+    .mob-nav-links .mob-divider{height:1px;background:rgba(255,255,255,.05);margin:5px 0}
+    .mob-cta{padding:12px 12px 18px;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;gap:7px}
+    .mob-cta-wa{display:flex;align-items:center;justify-content:center;gap:8px;background:#25d366;border-radius:12px;padding:13px;text-decoration:none;width:100%;font-weight:700;font-size:.88rem;color:#fff;font-family:'DM Sans',sans-serif;transition:background .18s}
+    .mob-cta-wa:hover{background:#1fc05e}
+    .mob-cta-wa svg{width:17px;height:17px;fill:#fff;flex-shrink:0}
+    .mob-cta-info{display:flex;align-items:center;justify-content:center;gap:8px;padding:2px 0}
+    .mob-cta-info a{color:#444;font-size:.76rem;text-decoration:none;font-family:'DM Sans',sans-serif}
+    .mob-cta-info a:hover{color:#777}
+    .mob-cta-info .sep{color:#2a2a2a;font-size:.65rem}
+    .menu-toggle{display:none;background:none;border:0;color:white;padding:9px;cursor:pointer;z-index:201;position:relative}
+    .menu-toggle svg{width:26px;height:26px}
+
+  
+    /* ── FLOATING WA ── */
+    .wa-float{position:fixed;right:18px;bottom:18px;z-index:199;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#25D366;color:#fff;box-shadow:0 8px 24px rgba(1,41,18,.35);transition:transform .2s ease;text-decoration:none}
+    .wa-float:hover,.wa-float:active{transform:scale(1.1)}
+    .wa-float svg{width:26px;height:26px;fill:#fff}
+    /* ── E.1 polish: accessibility ────────────────────── */
+    button:focus-visible,a.btn:focus-visible,a[class*="btn"]:focus-visible,.btn-green:focus-visible,.btn-outline:focus-visible,.btn-wa:focus-visible,.faq-q:focus-visible,.wc-btn:focus-visible,.mob-close:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+    @media(max-width:640px){.btn-green,.btn-outline,.btn-wa,.wc-btn.primary{min-height:44px}}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV COMPARTIDA ══════════════════════════════════════ -->
+<style>
+  .shell{width:min(1320px,calc(100% - 42px));margin:0 auto}
+  .wc-announcement{color:#cbd8de;background:#091015;border-bottom:1px solid rgba(255,255,255,.07);font-size:.78rem}
+  .wc-announcement .shell{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0}
+  .wc-announcement strong{color:#fff}
+  .wc-announcement a{color:#c5fb91;font-weight:800}
+  .wc-announcement .bar{width:1px;height:12px;background:rgba(255,255,255,.24)}
+  .wc-header{position:sticky;top:0;z-index:50;background:rgba(11,16,20,.94);backdrop-filter:blur(15px);border-bottom:1px solid rgba(255,255,255,.08)}
+  .wc-nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .wc-brand img{width:148px;height:auto;display:block}
+  .wc-links{display:flex;align-items:center;gap:22px;color:#dae4e8;font-size:.86rem;font-weight:700;list-style:none;padding:0;margin:0}
+  .wc-links a{position:relative;padding:6px 0;text-decoration:none;color:inherit}
+  .wc-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:2px;background:#70cf05;transition:.2s ease}
+  .wc-links a:hover::after,.wc-links a.active::after{width:100%}
+  .wc-links a.active{color:#fff}
+  .wc-actions{display:flex;align-items:center;gap:10px}
+  .wc-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;font-size:.82rem;font-weight:800;text-decoration:none;font-family:inherit}
+  .wc-btn.ghost{color:#eef5f7;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06)}
+  .wc-btn.primary{color:#081102;background:#70cf05}
+  .wc-btn.primary:hover{background:#94ed38}
+  .wc-dropdown{position:relative}
+  .wc-drop-btn{background:none;border:none;color:#dae4e8;font-size:.86rem;font-weight:700;cursor:pointer;padding:6px 0;display:flex;align-items:center;gap:5px;font-family:inherit;transition:color .2s}
+  .wc-drop-btn:hover{color:#fff}
+  .wc-drop-btn.active{color:#fff;position:relative}
+  .wc-drop-btn.active::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:2px;background:#70cf05}
+  .wc-caret{font-size:.65rem;transition:transform .2s;display:inline-block}
+  .wc-dropdown.open .wc-caret{transform:rotate(180deg)}
+  .wc-drop-menu{display:none;position:absolute;top:calc(100% + 10px);right:0;min-width:170px;background:#162128;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:6px;list-style:none;box-shadow:0 12px 32px rgba(0,0,0,.35);z-index:99}
+  .wc-dropdown.open .wc-drop-menu{display:block}
+  .wc-drop-menu li{list-style:none}
+  .wc-drop-menu a{display:block;padding:10px 14px;border-radius:8px;color:#c8d6db;text-decoration:none;font-size:.84rem;font-weight:600;transition:.15s}
+  .wc-drop-menu a:hover,.wc-drop-menu a.active{background:rgba(112,207,5,.12);color:#70cf05}
+  .wc-footer{padding:28px 0;background:#091015;color:#9eafb8;font-size:.76rem}
+  .wc-foot{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .wc-footer-rich{background:#0d1117;border-top:1px solid rgba(255,255,255,.07);padding:56px 0 0;color:#9eafb8}
+  .wc-foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .wc-foot-brand img{width:140px;margin-bottom:16px;display:block}
+  .wc-foot-brand p{font-size:.84rem;line-height:1.65;color:#8090a0;max-width:220px;margin-bottom:20px}
+  .wc-socials{display:flex;gap:8px}
+  .wc-socials a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.08);color:#c0cdd5;font-size:.72rem;font-weight:800;text-decoration:none;transition:.15s}
+  .wc-socials a:hover{background:rgba(112,207,5,.15);color:#70cf05}
+  .wc-foot-col h4{color:#fff;font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px}
+  .wc-foot-col ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+  .wc-foot-col ul a,.wc-foot-col p a{color:#8090a0;text-decoration:none;font-size:.85rem;font-weight:500;transition:.15s}
+  .wc-foot-col ul a:hover,.wc-foot-col p a:hover{color:#c5fb91}
+  .wc-foot-col p{color:#8090a0;font-size:.84rem;line-height:1.7;margin-bottom:12px}
+  .wc-foot-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;color:#566570;font-size:.74rem}
+  .wc-foot-bottom a{color:#566570;text-decoration:none}
+  .wc-foot-bottom a:hover{color:#8090a0}
+  .wc-inv-cta{background:#162128;border-top:1px solid rgba(255,255,255,.06);padding:28px 0}
+  .wc-inv-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .wc-inv-inner h3{color:#fff;font-size:1.05rem;font-weight:800;margin:0}
+  .wc-inv-inner p{color:#8090a0;font-size:.84rem;margin:4px 0 0}
+  .wc-inv-btn{display:inline-flex;align-items:center;gap:8px;background:#70cf05;color:#081102;font-weight:800;font-size:.88rem;padding:12px 22px;border-radius:8px;text-decoration:none;white-space:nowrap;transition:.15s;font-family:inherit}
+  .wc-inv-btn:hover{background:#94ed38}
+  .wc-foot img{width:136px}
+  .wc-foot a{color:#d5e4e8;text-decoration:none}
+  .wc-foot a:hover{color:#c5fb91}
+  @media(max-width:1000px){.wc-announcement{display:none}.wc-links{display:none}.wc-btn.ghost{display:none}.wc-foot{flex-direction:column;align-items:flex-start}.wc-foot-grid{grid-template-columns:1fr}.wc-foot-bottom{flex-direction:column;align-items:flex-start;gap:8px}.wc-menu-btn{display:flex!important}.menu-toggle{display:block!important}}
+  @media(max-width:1000px){
+    .wc-header{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(11,16,20,.97);transform:translateZ(0)}
+    .mob-overlay{backdrop-filter:none;-webkit-backdrop-filter:none}
+  }
+  @media(max-width:480px){.wc-announcement .bar,.wc-announcement a{display:none}}
+</style>
+<div class="wc-announcement">
+  <div class="shell">
+    <strong>Atención personalizada en León, Gto.</strong>
+    <span class="bar"></span>
+    <span>Compra, vende o financia tu próximo auto con weCars Bajío.</span>
+    <a href="https://www.wecarsbajio.com/" target="_top">Ir al inicio →</a>
+  </div>
+</div>
+<header class="wc-header">
+  <div class="shell wc-nav">
+    <a class="wc-brand" href="https://www.wecarsbajio.com/" target="_top">
+      <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="weCars Bajío">
+    </a>
+    <ul class="wc-links">
+      <li><a href="https://www.wecarsbajio.com/" target="_top">Inicio</a></li>
+      <li><a href="https://www.wecarsbajio.com/inventario" target="_top">Inventario</a></li>
+      <li><a href="https://www.wecarsbajio.com/credito" target="_top">Crédito</a></li>
+      <li><a href="https://www.wecarsbajio.com/consigna" target="_top">Consigna</a></li>
+      <li><a href="https://www.wecarsbajio.com/nosotros" target="_top">Nosotros</a></li>
+      <li class="wc-dropdown">
+        <button class="wc-drop-btn active" type="button">Más <span class="wc-caret">▾</span></button>
+        <ul class="wc-drop-menu">
+          <li><a href="https://www.wecarsbajio.com/contacto" target="_top">Contacto</a></li>
+          <li><a href="https://www.wecarsbajio.com/testimonios" target="_top">Testimonios</a></li>
+          <li><a href="https://www.wecarsbajio.com/garantias" target="_top" class="active">Garantías</a></li>
+        </ul>
+      </li>
+    </ul>
+    <div class="wc-actions">
+      <a class="wc-btn primary" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_top">Hablar con asesor</a>
+    
+      <button class="menu-toggle" type="button" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile drawer nav -->
+<div class="mob-overlay" id="mobOverlay"></div>
+<nav class="mob-drawer" id="mobDrawer" aria-label="Menú móvil">
+  <div class="mob-drawer-head">
+    <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="WeCars Bajío" />
+    <button class="mob-close" id="mobClose" aria-label="Cerrar menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="mob-nav-links">
+    <a href="https://www.wecarsbajio.com/" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </a>
+    <a href="https://www.wecarsbajio.com/inventario" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Inventario
+    </a>
+    <a href="https://www.wecarsbajio.com/credito" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Crédito
+    </a>
+    <a href="https://www.wecarsbajio.com/consigna" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Consigna tu auto
+    </a>
+    <div class="mob-divider"></div>
+    <a href="https://www.wecarsbajio.com/nosotros" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Nosotros
+    </a>
+    <a href="https://www.wecarsbajio.com/testimonios" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Testimonios
+    </a>
+    <a href="https://www.wecarsbajio.com/garantias" target="_top" class="mob-sec active">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Garantías
+    </a>
+    <a href="https://www.wecarsbajio.com/contacto" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Contacto
+    </a>
+  </div>
+  <div class="mob-cta">
+    <a class="mob-cta-wa" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_top">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.852L0 24l6.335-1.508A11.933 11.933 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.366l-.36-.213-3.72.976.993-3.628-.234-.373A9.818 9.818 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
+      Hablar con un asesor
+    </a>
+    <div class="mob-cta-info">
+      <a href="tel:+524778350020">477 835 0020</a>
+      <span class="sep">·</span>
+      <a href="https://instagram.com/wecars.bajio" target="_top">@wecars.bajio</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══════════════════════════════════════════════════ -->
+<div class="hero" role="banner">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge" aria-label="Distintivo weCars Garantiza">
+        <span aria-hidden="true"></span>
+        weCars Garantiza
+      </div>
+      <h1>Cada auto pasa por<br><em>un proceso de revisión</em><br>antes de llegar a ti</h1>
+      <p>En weCars Bajío no vendemos autos al azar. Cada vehículo en nuestro inventario ha sido inspeccionado, verificado y documentado. Sabes qué compras antes de comprarlo.</p>
+      <div class="hero-btns">
+        <a class="btn-green"
+           href="https://www.wecarsbajio.com/inventario"
+           onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:this.href},'*')"
+           id="hero-cta-inventario">
+          Ver autos disponibles
+        </a>
+        <a class="btn-outline"
+           href="https://wa.me/524778350020?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20las%20garant%C3%ADas%20de%20weCars%20Baj%C3%ADo."
+           target="_blank" rel="noopener"
+           id="hero-cta-whatsapp"
+           aria-label="Hablar con un asesor por WhatsApp">
+          Hablar con un asesor
+        </a>
+      </div>
+    </div>
+
+    <div class="shield-card" role="complementary" aria-label="Resumen del respaldo weCars">
+      <div class="shield-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#70cf05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <h3>Respaldo weCars</h3>
+      <p>Proceso de verificación en cada vehículo antes de ponerse a la venta. Transparencia en historial, documentación y estado mecánico.</p>
+      <div class="shield-stats" aria-label="Aspectos del proceso de revisión">
+        <div class="shield-stat">
+          <div class="num" aria-hidden="true">✓</div>
+          <div class="lbl">Revisión mecánica</div>
+        </div>
+        <div class="shield-stat">
+          <div class="num" aria-hidden="true">✓</div>
+          <div class="lbl">Historial verificado</div>
+        </div>
+        <div class="shield-stat">
+          <div class="num" aria-hidden="true">✓</div>
+          <div class="lbl">Documentación</div>
+        </div>
+        <div class="shield-stat">
+          <div class="num" aria-hidden="true">✓</div>
+          <div class="lbl">Respaldo post-venta</div>
+        </div>
+      </div>
+      <div class="edega-badge" aria-label="Certificado por el equipo weCars">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        Certificado por equipo weCars
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ QUÉ INCLUYE CADA AUTO (ESCUDOS) ══════════════════════ -->
+<section aria-labelledby="escudos-heading">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Lo que incluye cada auto</span>
+      <h2 id="escudos-heading">El proceso detrás de cada vehículo</h2>
+      <p>Antes de que un auto aparezca en nuestro inventario, pasa por una serie de revisiones realizadas por nuestro equipo.</p>
+    </div>
+    <div class="wecars-grid" role="list">
+
+      <div class="wecars-card" role="listitem">
+        <div class="wecars-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#70cf05" stroke-width="2" stroke-linecap="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h4>Verificación mecánica</h4>
+        <p>Revisión de más de 150 puntos por técnicos certificados antes de la venta. Motor, frenos, suspensión y sistemas principales.</p>
+      </div>
+
+      <div class="wecars-card" role="listitem">
+        <div class="wecars-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#70cf05" stroke-width="2" stroke-linecap="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <h4>Historial verificado</h4>
+        <p>Revisamos el historial de reportes y tenencia del vehículo. Sabes el historial del auto antes de tomar una decisión.</p>
+      </div>
+
+      <div class="wecars-card" role="listitem">
+        <div class="wecars-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#70cf05" stroke-width="2" stroke-linecap="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h8M8 16h5"/>
+          </svg>
+        </div>
+        <h4>Documentación en regla</h4>
+        <p>Verificamos que facturas, tenencia y trámites administrativos estén completos y en orden antes de la entrega.</p>
+      </div>
+
+      <div class="wecars-card" role="listitem">
+        <div class="wecars-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#70cf05" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <h4>Revisión de carrocería</h4>
+        <p>Inspeccionamos golpes, reparaciones previas y estado de pintura para que sepas exactamente en qué condición visual está el auto.</p>
+      </div>
+
+      <div class="wecars-card" role="listitem">
+        <div class="wecars-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#70cf05" stroke-width="2" stroke-linecap="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h4>Respaldo durante la compra</h4>
+        <p>Nuestro equipo acompaña el proceso de compra y resuelve dudas sobre el vehículo antes de que el dinero cambie de manos.</p>
+      </div>
+
+      <div class="wecars-card" role="listitem">
+        <div class="wecars-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#70cf05" stroke-width="2" stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h4>Garantía de satisfacción</h4>
+        <p>Si en los primeros días encuentras algo que no te dijeron, lo resolvemos. Comprometidos con que la experiencia sea positiva.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ URGENCIA / CTA ════════════════════════════════════════ -->
+<div class="urgencia" role="complementary" aria-label="Invitación a revisar el inventario">
+  <div class="urgencia-inner">
+    <p>Todos los autos en nuestro inventario pasan por nuestro proceso de revisión antes de publicarse.</p>
+    <a href="https://www.wecarsbajio.com/inventario"
+       onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:this.href},'*')"
+       id="urgencia-cta-inventario"
+       aria-label="Ver inventario disponible">
+      Ver inventario →
+    </a>
+  </div>
+</div>
+
+<!-- ══ COBERTURA ═════════════════════════════════════════════ -->
+<section aria-labelledby="cobertura-heading">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Qué revisamos</span>
+      <h2 id="cobertura-heading">Lo que validamos en cada vehículo</h2>
+      <p>Estas son las áreas que nuestro equipo inspecciona y documenta antes de que el auto se ponga a la venta.</p>
+    </div>
+    <div class="cobertura-grid" role="list">
+
+      <div class="cobertura-card" role="listitem">
+        <div class="cobertura-card-header">
+          <div class="cob-icon motor" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#70cf05" stroke-width="2" stroke-linecap="round">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              <line x1="12" y1="12" x2="12" y2="16"/>
+              <line x1="10" y1="14" x2="14" y2="14"/>
+            </svg>
+          </div>
+          <h4>Motor y mecánica</h4>
+        </div>
+        <ul>
+          <li>Estado general del motor</li>
+          <li>Sistema de frenos</li>
+          <li>Suspensión y dirección</li>
+          <li>Fluidos y niveles</li>
+        </ul>
+      </div>
+
+      <div class="cobertura-card" role="listitem">
+        <div class="cobertura-card-header">
+          <div class="cob-icon trans" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+            </svg>
+          </div>
+          <h4>Transmisión</h4>
+        </div>
+        <ul>
+          <li>Cambio de velocidades</li>
+          <li>Embrague (si aplica)</li>
+          <li>Caja automática o manual</li>
+          <li>Funcionamiento de marcha</li>
+        </ul>
+      </div>
+
+      <div class="cobertura-card" role="listitem">
+        <div class="cobertura-card-header">
+          <div class="cob-icon elec" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round">
+              <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </div>
+          <h4>Sistema eléctrico</h4>
+        </div>
+        <ul>
+          <li>Batería y carga</li>
+          <li>Luces interiores y exteriores</li>
+          <li>Climatización</li>
+          <li>Sistemas de asistencia</li>
+        </ul>
+      </div>
+
+      <div class="cobertura-card" role="listitem">
+        <div class="cobertura-card-header">
+          <div class="cob-icon ac" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round">
+              <path d="M8 3v4l-2 2 2 2v4M16 3v4l2 2-2 2v4M12 2v20M3 12h18"/>
+            </svg>
+          </div>
+          <h4>Documentación</h4>
+        </div>
+        <ul>
+          <li>Factura original</li>
+          <li>Tenencia al corriente</li>
+          <li>Historial de reportes</li>
+          <li>Datos del propietario</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="edega-disclaimer-section">
+      <p>Las condiciones específicas de cualquier garantía aplicable dependen de los términos correspondientes al vehículo y la operación. Nuestro equipo puede orientarte sobre los detalles antes de la compra.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CÓMO FUNCIONA (PROCESO) ══════════════════════════════ -->
+<section class="proceso-dark" aria-labelledby="proceso-heading">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Cómo funciona</span>
+      <h2 id="proceso-heading" style="color:#fff;">El proceso de compra en weCars</h2>
+      <p style="color:rgba(255,255,255,.65);">Desde que encuentras un auto hasta que lo manejas a casa, cada paso está acompañado por nuestro equipo.</p>
+    </div>
+    <div class="pasos-grid" role="list">
+
+      <div class="paso" role="listitem">
+        <div class="paso-num" aria-label="Paso 1">01</div>
+        <h4>Selección</h4>
+        <p>Exploras el inventario disponible con información real: fotos, especificaciones y precio sin sorpresas.</p>
+        <span class="paso-tiempo">Tu ritmo</span>
+      </div>
+
+      <div class="paso" role="listitem">
+        <div class="paso-num" aria-label="Paso 2">02</div>
+        <h4>Revisión del vehículo</h4>
+        <p>Cuando encuentras un auto de tu interés, nuestro equipo te orienta sobre su estado documentado y resuelve tus preguntas.</p>
+        <span class="paso-tiempo">Con asesoría</span>
+      </div>
+
+      <div class="paso" role="listitem">
+        <div class="paso-num" aria-label="Paso 3">03</div>
+        <h4>Validación y trámites</h4>
+        <p>Verificamos documentación, revisamos que todo esté en orden y acompañamos el proceso administrativo de la compra.</p>
+        <span class="paso-tiempo">Equipo weCars</span>
+      </div>
+
+      <div class="paso" role="listitem">
+        <div class="paso-num" aria-label="Paso 4">04</div>
+        <h4>Entrega</h4>
+        <p>Recibes el vehículo revisado y documentado. Si en los primeros días surge algo que no se te comunicó, lo atendemos.</p>
+        <span class="paso-tiempo">Respaldo post-venta</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  function aplicarNavConfig(config){
+    if(!config) return;
+    var mapa={};
+    (config.navLinks||[]).concat(config.navMas||[]).forEach(function(item){mapa[item.key]=item;});
+    var rutaAClave={'/':"inicio",'':"inicio",'/inventario':"inventario",'/credito':"credito",'/consigna':"consigna",'/nosotros':"nosotros",'/contacto':"contacto",'/testimonios':"testimonios",'/garantias':"garantias"};
+    document.querySelectorAll('.wc-links a').forEach(function(a){try{var u=new URL(a.href);var c=rutaAClave[u.pathname];if(c&&mapa[c])a.href=mapa[c].url;}catch(e){}});
+  }
+  function aplicarWhatsAppConfig(config){
+    if(!config||!config.whatsappNumber) return;
+    document.querySelectorAll('a[href*="524778350020"]').forEach(function(a){a.href=a.href.replace(/524778350020/g,config.whatsappNumber);});
+  }
+  window.addEventListener('message',function(e){
+    if(e.data&&e.data.type==='wecars-siteconfig'){aplicarNavConfig(e.data.config);aplicarWhatsAppConfig(e.data.config);}
+  });
+
+  document.querySelectorAll('.wc-drop-btn').forEach(function(btn){
+    btn.addEventListener('click',function(e){e.stopPropagation();this.closest('.wc-dropdown').classList.toggle('open');});
+  });
+  document.addEventListener('click',function(){document.querySelectorAll('.wc-dropdown').forEach(function(d){d.classList.remove('open');});});
+
+  (function(){
+    var btn=document.querySelector('.menu-toggle');
+    var drawer=document.getElementById('mobDrawer');
+    var overlay=document.getElementById('mobOverlay');
+    var close=document.getElementById('mobClose');
+    function openMenu(){drawer.classList.add('open');overlay.classList.add('open');}
+    function closeMenu(){drawer.classList.remove('open');overlay.classList.remove('open');}
+    if(btn) btn.addEventListener('click',openMenu);
+    if(close) close.addEventListener('click',closeMenu);
+    if(overlay) overlay.addEventListener('click',closeMenu);
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMenu();});
+  })();
+
+  (function(){var t,retries=0;function send(){var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight,document.body.offsetHeight);window.parent.postMessage({type:"wecars-resize",height:h},"*");}function rh(){clearTimeout(t);t=setTimeout(function(){requestAnimationFrame(send);},150);}function hookImgs(){document.querySelectorAll("img").forEach(function(img){if(!img.dataset.wcResize){img.dataset.wcResize="1";img.addEventListener("load",rh);img.addEventListener("error",rh);}});}window.addEventListener("load",function(){rh();var iv=setInterval(function(){rh();hookImgs();if(++retries>=12)clearInterval(iv);},400);});window.addEventListener("resize",rh);new MutationObserver(function(){rh();hookImgs();}).observe(document.body,{childList:true,subtree:true,attributes:false,characterData:false});hookImgs();rh();})();
+})();
+</script>
+<script id="gar-cta-nav">
+/* Actualiza hrefs de CTAs de página cuando llega wecars-siteconfig */
+(function(){
+  var rutaAClave={'/inventario':'inventario','/credito':'credito','/consigna':'consigna','/nosotros':'nosotros','/contacto':'contacto','/garantias':'garantias'};
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='wecars-siteconfig') return;
+    var config=e.data.config; if(!config) return;
+    var mapa={};
+    (config.navLinks||[]).concat(config.navMas||[]).forEach(function(item){mapa[item.key]=item;});
+    document.querySelectorAll('a[onclick*="wecars-navegar"]').forEach(function(a){
+      try{var u=new URL(a.href);var c=rutaAClave[u.pathname];if(c&&mapa[c])a.href=mapa[c].url;}catch(ex){}
+    });
+  });
+})();
+</script>
+
+<style>
+.vta-aside{display:flex;align-items:center;gap:20px;padding:20px 24px;background:var(--white,#fff);border:1px solid var(--line,#d8e2e5);border-left:4px solid var(--lime,#56a900);border-radius:0 12px 12px 0;flex-wrap:wrap;margin:40px 0}
+.vta-aside-icon{font-size:1.5rem;flex-shrink:0;line-height:1}
+.vta-aside-body{flex:1;min-width:180px}
+.vta-aside-body strong{display:block;font-size:.9rem;font-weight:700;color:var(--ink,#0f1a0f);margin-bottom:3px}
+.vta-aside-body p{font-size:.8rem;color:var(--muted,#6d7a83);line-height:1.55;margin:0}
+.vta-aside-link{white-space:nowrap;font-size:.82rem;font-weight:700;color:#fff;background:var(--lime,#56a900);text-decoration:none;padding:9px 18px;border-radius:99px;flex-shrink:0;transition:background .15s}
+.vta-aside-link:hover{background:var(--lime-dark,#3d7a00)}
+@media(max-width:520px){.vta-aside{flex-direction:column;align-items:flex-start;gap:12px}.vta-aside-link{align-self:flex-start}}
+@media(prefers-color-scheme:dark){.vta-aside{background:var(--white,#1C2416);border-color:var(--line,#2e3d24)}.vta-aside-body strong{color:var(--ink,#e8f0e0)}}
+@media(max-width:640px){
+  body{touch-action:pan-y;overscroll-behavior-y:contain}
+  input,select,textarea,button{touch-action:manipulation}
+  .shell{padding-left:16px!important;padding-right:16px!important}
+}
+</style>
+<div class="vta-aside">
+  <div class="vta-aside-icon">&#128269;</div>
+  <div class="vta-aside-body">
+    <strong>¿Cómo sabes que la factura no es falsa? ¿Los papeles del auto están en orden?</strong>
+    <p>Muchas ventas traen facturas con consecutivos rotos, bajas ilegales o propietarios que no coinciden. Nosotros lo detectamos antes de que el dinero cambie de manos &mdash; desde $189&nbsp;+&nbsp;IVA.</p>
+  </div>
+  <a class="vta-aside-link" href="https://www.wecarsbajio.com/verifica-tu-auto" onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:'https://www.wecarsbajio.com/verifica-tu-auto'},'*')">Verifica tu Auto &rarr;</a>
+</div>
+
+<a class="wa-float" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+<!-- ── BLOQUE MÓVIL: padding + tabla comparativa + touch targets ── -->
+<style id="gar-mobile-ux">
+/* Tabla comparativa: scroll horizontal en móvil */
+.comparativa-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:820px){
+  /* Reducir padding de secciones */
+  section{padding:44px 20px!important}
+  .hero{padding:48px 20px 40px!important}
+  /* Touch targets */
+  .mob-close{min-width:44px!important;min-height:44px!important}
+  .urgencia a{min-height:44px!important;display:inline-flex;align-items:center}
+  /* Texto mínimo */
+  .shield-stat .lbl,.section-tag,.disclaimer-box{font-size:.8rem!important}
+  /* Tabla: reducir padding de celdas en móvil */
+  .comparativa-table th,.comparativa-table td{padding:10px 12px!important;font-size:.82rem!important}
+}
+</style>
+<script id="gar-table-wrap">
+(function(){
+  var table = document.querySelector('.comparativa-table');
+  if(table && table.parentElement && !table.parentElement.classList.contains('comparativa-wrap')){
+    var wrap = document.createElement('div');
+    wrap.className = 'comparativa-wrap';
+    table.parentNode.insertBefore(wrap, table);
+    wrap.appendChild(table);
+  }
+})();
+</script>
+</body>
+</html>

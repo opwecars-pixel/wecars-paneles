@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar · weCars Bajío</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Manrope:wght@700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════════
+   DS v2 TOKENS — WECARS MASTER DESIGN SYSTEM
+   D.1 pagina-entrar — ARCHIVO REFERENCIA ERP
+   ══════════════════════════════════════════ */
+:root {
+  /* Brand */
+  --lime:       #56a900;
+  --lime-dark:  #3d7a00;
+  --lime-bg:    rgba(86,169,0,.10);
+  --lime-light: #ebf7dc;
+
+  /* Surfaces */
+  --bg:         #f4f6f5;
+  --surface:    #ffffff;
+  --surface-2:  #f8faf9;
+  --dark:       #0d1a0d;
+  --dark-2:     #1a2e1a;
+  --dark-3:     #243524;
+
+  /* Ink */
+  --ink:        #0d1a0d;
+  --ink-2:      #2c3d2c;
+  --muted:      #6b7e6b;
+  --muted-2:    #9aaa9a;
+  --line:       #e2eae2;
+  --line-2:     #cdd8cd;
+
+  /* Semantic */
+  --err:  #dc2626;   --err-bg:  rgba(220,38,38,.10);
+  --warn: #d97706;   --warn-bg: rgba(217,119,6,.10);
+  --ok:   #56a900;   --ok-bg:   rgba(86,169,0,.10);
+  --info: #2563eb;   --info-bg: rgba(37,99,235,.10);
+
+  /* Shadows */
+  --sh-1:     0 1px 2px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.04);
+  --sh-2:     0 2px 8px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+  --sh-3:     0 8px 32px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+  --sh-modal: 0 24px 64px rgba(0,0,0,.18), 0 8px 24px rgba(0,0,0,.10);
+
+  /* Radius */
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+
+  /* Spacing — grid 4px */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* Type scale — 8 niveles */
+  --t-xs:   0.6875rem;  /* 11px */
+  --t-sm:   0.8125rem;  /* 13px */
+  --t-base: 0.875rem;   /* 14px */
+  --t-md:   1rem;       /* 16px */
+  --t-lg:   1.125rem;   /* 18px */
+  --t-xl:   1.375rem;   /* 22px */
+  --t-2xl:  1.75rem;    /* 28px */
+
+  /* Motion */
+  --ease:     cubic-bezier(.2,0,0,1);
+  --t-fast:   100ms;
+  --t-base-d: 180ms;
+  --t-slow:   300ms;
+
+  /* ── Aliases legacy — NO ELIMINAR
+     Estos tokens mantienen compatibilidad con referencias
+     existentes en otros archivos del ecosistema.  ───── */
+  --verde:       var(--lime);
+  --verde-dark:  var(--lime-dark);
+  --negro:       var(--ink);
+  --ink-3:       var(--ink-2);
+  --gris:        var(--bg);
+  --gris-borde:  var(--line);
+  --radio:       var(--r-md);
+  --sombra:      var(--sh-modal);
+  --borde:       var(--line);
+  --texto:       var(--muted);
+  --max:         1280px;
+  --paper:       var(--bg);
+  --white:       var(--surface);
+  --shadow-sm:   var(--sh-1);
+  --shadow:      var(--sh-2);
+  --shadow-lg:   var(--sh-3);
+  --radius-sm:   var(--r-sm);
+  --radius:      var(--r-md);
+  --radius-md:   var(--r-md);
+  --radius-lg:   var(--r-lg);
+  --radius-pill: 999px;
+  --c-red:    #dc2626; --c-red-bg:    rgba(220,38,38,.10);
+  --c-amber:  #d97706; --c-amber-bg:  rgba(217,119,6,.10);
+  --c-blue:   #2563eb; --c-blue-bg:   rgba(37,99,235,.10);
+  --c-green:  #16a34a; --c-green-bg:  rgba(22,163,74,.10);
+  --c-purple: #9333ea; --c-purple-bg: rgba(147,51,234,.10);
+  --amarillo: #f59e0b;
+  --violet:   #4338c8;
+  --violet-2: #5c55e5;
+}
+
+/* ── Dark mode ─────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:       #111a11;
+    --surface:  #182018;
+    --line:     #2a3a2a;
+    --line-2:   #344534;
+    --ink:      #edf4ed;
+    --ink-2:    #c8d8c8;
+    --muted:    #8a9e8a;
+    --muted-2:  #607060;
+    --paper:    #111a11; --white: #182018; --gris: #111a11;
+    --gris-borde: #2a3a2a; --negro: #edf4ed;
+    --sh-1:     0 1px 2px rgba(0,0,0,.2);
+    --sh-2:     0 2px 8px rgba(0,0,0,.25);
+    --sh-3:     0 8px 32px rgba(0,0,0,.35);
+    --shadow-sm:var(--sh-1); --shadow:var(--sh-2); --shadow-lg:var(--sh-3);
+  }
+}
+:root[data-theme="dark"] {
+  --bg:       #111a11;
+  --surface:  #182018;
+  --line:     #2a3a2a;
+  --line-2:   #344534;
+  --ink:      #edf4ed;
+  --ink-2:    #c8d8c8;
+  --muted:    #8a9e8a;
+  --muted-2:  #607060;
+  --paper:    #111a11; --white: #182018; --gris: #111a11;
+  --gris-borde: #2a3a2a; --negro: #edf4ed;
+  --sh-1:     0 1px 2px rgba(0,0,0,.2);
+  --sh-2:     0 2px 8px rgba(0,0,0,.25);
+  --sh-3:     0 8px 32px rgba(0,0,0,.35);
+  --shadow-sm:var(--sh-1); --shadow:var(--sh-2); --shadow-lg:var(--sh-3);
+}
+:root[data-theme="light"] {
+  --bg:       #f4f6f5;
+  --surface:  #ffffff;
+  --line:     #e2eae2;
+  --line-2:   #cdd8cd;
+  --ink:      #0d1a0d;
+  --ink-2:    #2c3d2c;
+  --muted:    #6b7e6b;
+  --muted-2:  #9aaa9a;
+  --paper:    #f4f6f5; --white: #ffffff; --gris: #f4f6f5;
+  --gris-borde: #e2eae2; --negro: #0d1a0d;
+}
+
+/* ══ RESET ════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow-x: hidden; }
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+    html,body{scrollbar-width:none;-ms-overflow-style:none}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-8) var(--sp-4);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ══ CARD ═════════════════════════════════════════════════ */
+.en-wrap {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-3);
+  overflow: hidden;
+}
+
+/* ══ BRAND HEADER ═════════════════════════════════════════ */
+.en-brand {
+  background: var(--dark);
+  padding: var(--sp-8) var(--sp-8) var(--sp-6);
+  text-align: center;
+  position: relative;
+}
+/* Línea sutil de acento en el borde inferior */
+.en-brand::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: var(--sp-8); right: var(--sp-8);
+  height: 1px;
+  background: rgba(86,169,0,.2);
+}
+.en-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  background: var(--lime);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #081102;
+  font-weight: 900;
+  font-family: 'Manrope', sans-serif;
+  font-size: var(--t-sm);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--sp-4);
+}
+.en-brand-name {
+  font-family: 'Manrope', sans-serif;
+  font-size: var(--t-xl);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  line-height: 1.05;
+  margin-bottom: var(--sp-1);
+}
+.en-brand-name em {
+  font-style: normal;
+  color: var(--lime);
+}
+.en-brand-sub {
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.3);
+}
+
+/* ══ CONTENT BODY ═════════════════════════════════════════ */
+.en-body {
+  padding: var(--sp-8);
+  text-align: center;
+}
+
+/* ══ ESTADO: VERIFICANDO ══════════════════════════════════ */
+.en-spin {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--line);
+  border-top-color: var(--lime);
+  border-radius: 50%;
+  margin: 0 auto var(--sp-5);
+  animation: en-spin .75s linear infinite;
+}
+@keyframes en-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .en-spin { animation: none; opacity: 0.6; }
+}
+
+/* ══ TÍTULOS Y DESCRIPCIONES DE ESTADO ════════════════════ */
+.en-state-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: var(--t-lg);
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: var(--sp-2);
+}
+.en-state-desc {
+  font-size: var(--t-sm);
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ══ ICONO DE ESTADO ══════════════════════════════════════ */
+.en-icon {
+  display: block;
+  font-size: 26px;
+  margin-bottom: var(--sp-4);
+}
+.en-icon-lock { color: var(--muted-2); }
+.en-icon-grid { color: var(--lime); }
+
+/* ══ ESTADO: SELECTOR DE PANELES ═════════════════════════ */
+.en-paneles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-6);
+  text-align: left;
+}
+
+/* Botón de panel — clase que reemplaza todos los inline styles */
+.en-panel-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  min-height: 52px;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-family: 'DM Sans', Arial, sans-serif;
+  font-size: var(--t-base);
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background   var(--t-fast) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.en-panel-btn:hover {
+  border-color: var(--lime);
+  background: var(--lime-bg);
+}
+.en-panel-btn:active {
+  background: var(--lime-light);
+  border-color: var(--lime-dark);
+}
+.en-panel-btn:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+.en-panel-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-xs);
+  background: var(--lime-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 15px;
+  color: var(--lime-dark);
+  transition: background var(--t-fast) var(--ease);
+}
+.en-panel-btn:hover .en-panel-icon {
+  background: rgba(86,169,0,.18);
+}
+.en-panel-label { flex: 1; line-height: 1.2; }
+.en-panel-arrow {
+  font-size: 14px;
+  color: var(--muted-2);
+  flex-shrink: 0;
+  transition: color var(--t-fast) var(--ease),
+              transform var(--t-fast) var(--ease);
+}
+.en-panel-btn:hover .en-panel-arrow {
+  color: var(--lime);
+  transform: translateX(2px);
+}
+
+/* ══ ESTADO: SIN ACCESO ═══════════════════════════════════ */
+.en-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-6);
+  background: var(--ink);
+  color: #fff;
+  text-decoration: none;
+  padding: 0 var(--sp-5);
+  height: 38px;
+  border-radius: var(--r-sm);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  font-family: 'DM Sans', Arial, sans-serif;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.en-contact:hover  { background: var(--ink-2); }
+.en-contact:active { background: var(--dark); }
+.en-contact:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+
+/* ══ RESPONSIVE — MOBILE ══════════════════════════════════ */
+@media (max-width: 480px) {
+  body {
+    padding: var(--sp-4) var(--sp-3);
+    align-items: flex-start;
+    padding-top: var(--sp-10);
+  }
+  .en-wrap {
+    max-width: 100%;
+    border-radius: var(--r-md);
+  }
+  .en-brand {
+    padding: var(--sp-6) var(--sp-6) var(--sp-5);
+  }
+  .en-body {
+    padding: var(--sp-6);
+  }
+  .en-contact {
+    height: 44px;
+    width: 100%;
+    justify-content: center;
+  }
+  /* iOS: evitar zoom en inputs futuros */
+  input, select, textarea { font-size: 16px !important; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="en-wrap">
+
+  <!-- BRAND HEADER — siempre visible, todas las pantallas -->
+  <div class="en-brand">
+    <div class="en-mark">wC</div>
+    <div class="en-brand-name">we<em>Cars</em> Bajío</div>
+    <div class="en-brand-sub">Panel de operaciones</div>
+  </div>
+
+  <div class="en-body">
+
+    <!-- STATE: Verificando acceso -->
+    <div id="en-verificando">
+      <div class="en-spin"></div>
+      <div class="en-state-title">Verificando tu acceso</div>
+      <div class="en-state-desc">Te llevamos a tu panel en un momento.</div>
+    </div>
+
+    <!-- STATE: Selector de paneles (usuario con acceso múltiple) -->
+    <div id="en-selector" style="display:none">
+      <i class="ti ti-layout-grid en-icon en-icon-grid"></i>
+      <div class="en-state-title" id="en-selector-nombre">Hola</div>
+      <div class="en-state-desc">¿A cuál panel quieres entrar?</div>
+      <div id="en-selector-paneles" class="en-paneles"></div>
+    </div>
+
+    <!-- STATE: Sin acceso / sin panel asignado -->
+    <div id="en-sinacceso" style="display:none">
+      <i class="ti ti-lock en-icon en-icon-lock"></i>
+      <div class="en-state-title" id="en-sinacceso-titulo">Tu cuenta no tiene un panel asignado</div>
+      <div class="en-state-desc" id="en-sinacceso-detalle">Contacta a tu gerente para que te asigne un rol en el sistema.</div>
+      <span class="en-contact">
+        <i class="ti ti-mail"></i> Contactar gerente
+      </span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  window.addEventListener('message', (event) => {
+    const data = event.data;
+    if (!data || !data.type) return;
+
+    if (data.type === 'wecars-redirigir') {
+      // Velo ya decidió a dónde ir y lo hace directamente con wixLocation.to(),
+      // este mensaje es solo por si algún día se prefiere redirigir desde
+      // el propio HTML en vez de desde Velo.
+    }
+
+    if (data.type === 'wecars-sin-panel') {
+      document.getElementById('en-verificando').style.display = 'none';
+      document.getElementById('en-sinacceso').style.display = '';
+      if (data.rol) {
+        document.getElementById('en-sinacceso-titulo').textContent = `Tu rol "${data.rol}" todavía no tiene un panel disponible`;
+        document.getElementById('en-sinacceso-detalle').textContent = 'Este panel está en construcción — contacta a tu gerente.';
+      }
+    }
+
+    if (data.type === 'wecars-selector-paneles') {
+      document.getElementById('en-verificando').style.display = 'none';
+      document.getElementById('en-selector').style.display = '';
+      document.getElementById('en-selector-nombre').textContent = '¡Hola, ' + (data.nombre || '') + '!';
+      const ICONOS = {
+        vendedor:       'ti-user',
+        gerencia:       'ti-chart-bar',
+        administracion: 'ti-settings',
+        finanzas:       'ti-coin',
+      };
+      const contenedor = document.getElementById('en-selector-paneles');
+      contenedor.innerHTML = (data.paneles || []).map(p => `
+        <button onclick="irPanel('${p.url}')" type="button" class="en-panel-btn">
+          <span class="en-panel-icon"><i class="ti ${ICONOS[p.rol] || 'ti-layout-grid'}"></i></span>
+          <span class="en-panel-label">Panel de ${p.label}</span>
+          <i class="ti ti-arrow-right en-panel-arrow"></i>
+        </button>`).join('');
+    }
+  });
+
+  function irPanel(url) {
+    window.parent.postMessage({ type: 'wecars-ir-panel', url: url }, '*');
+  }
+
+  // Auto-resize dentro del iframe de Wix
+  (function(){var t,retries=0;function send(){var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight,document.body.offsetHeight);window.parent.postMessage({type:"wecars-resize",height:h},"*");}function rh(){clearTimeout(t);t=setTimeout(function(){requestAnimationFrame(send);},150);}function hookImgs(){document.querySelectorAll("img").forEach(function(img){if(!img.dataset.wcResize){img.dataset.wcResize="1";img.addEventListener("load",rh);img.addEventListener("error",rh);}});}window.addEventListener("load",function(){rh();var iv=setInterval(function(){rh();hookImgs();if(++retries>=12)clearInterval(iv);},400);});window.addEventListener("resize",rh);new MutationObserver(function(){rh();hookImgs();}).observe(document.body,{childList:true,subtree:true,attributes:false,characterData:false});hookImgs();rh();})();;
+
+  // ── MODO DEMO ──────────────────────────────────────────
+  if (window.self === window.top) {
+    setTimeout(() => {
+      document.getElementById('en-verificando').style.display = 'none';
+      document.getElementById('en-sinacceso').style.display = '';
+      document.getElementById('en-sinacceso-titulo').textContent = 'Modo demo — aquí Velo redirigiría según tu rol';
+      document.getElementById('en-sinacceso-detalle').textContent = 'Esto solo se ve así cuando abres el archivo directo, fuera de Wix.';
+    }, 900);
+  }
+</script>
+
+</body>
+</html>

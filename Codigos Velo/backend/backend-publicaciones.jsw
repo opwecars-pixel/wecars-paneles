@@ -1,0 +1,534 @@
+// ───────────────────────────────────────────────────────────────────
+//  ARCHIVO DE BACKEND NUEVO: backend/publicaciones.jsw
+//
+//  En Wix Studio, panel Velo (izquierda): carpeta "Backend"
+//  Clic derecho → "New .jsw file" → nombre: publicaciones.jsw
+//
+//  COLECCIONES NECESARIAS (crear en Wix CMS antes de usar este archivo):
+//
+//  ① CuentasSociales  —  permisos: Solo Admin del sitio
+//     _id              Text (auto)
+//     propietarioEmail Text   — email FK → Usuarios
+//     tipo             Text   — 'personal' | 'corporativa'
+//     plataforma       Text   — 'instagram' | 'facebook'
+//     paginaId         Text   — Facebook Page ID o Instagram Business Account ID
+//     paginaNombre     Text   — nombre visible de la cuenta
+//     instagramActorId Text   — Instagram User ID (cuando plataforma='instagram')
+//     estado           Text   — 'activa' | 'desconectada' | 'error'
+//     vendedoresAutorizados  Text  — JSON: ["email1","email2"] (cuentas corporativas)
+//     secretKey        Text   — nombre de clave en Wix Secrets, ej. "fb_token_pg_123"
+//     fechaConexion    Date
+//     ultimoError      Text
+//  Índice: propietarioEmail (ascendente)
+//
+//  ② Publicaciones  —  permisos: Solo Admin del sitio
+//     _id              Text (auto)
+//     carroId          Text   — FK → Cars._id
+//     carroSlug        Text   — "Toyota Corolla 2022" (denormalizado)
+//     vendedorEmail    Text   — FK → Usuarios.email
+//     cuentaSocialId   Text   — FK → CuentasSociales._id
+//     plataforma       Text   — 'instagram' | 'facebook'
+//     texto            Text
+//     fotoUrls         Text   — JSON: array de URLs static.wixstatic.com
+//     estado           Text   — 'borrador' | 'publicada' | 'error'
+//     fechaCreacion    Date
+//     fechaPublicacion Date
+//     externalPostId   Text   — ID devuelto por Meta Graph API
+//     errorMensaje     Text
+//  Índices: vendedorEmail, carroId, estado, fechaPublicacion
+//
+//  SECRETS MANAGER (configurar en Wix antes de usar publicarEnMeta):
+//     META_APP_ID      — App ID de tu Facebook Developer App
+//     META_APP_SECRET  — App Secret de tu Facebook Developer App
+//     fb_token_{pageId} — Long-lived Page Access Token (uno por cuenta conectada)
+//
+//  PREREQUISITOS DE META (manual, fuera del código):
+//   1. Crear Facebook App en developers.facebook.com
+//   2. Permisos: pages_manage_posts, instagram_basic, instagram_content_publish
+//   3. Cuentas de Instagram deben ser Business o Creator conectadas a una Facebook Page
+//   4. URL de redirect OAuth: https://[dominio-wix]/_functions/meta_oauth_callback
+// ───────────────────────────────────────────────────────────────────
+
+import wixData from 'wix-data';
+import wixUsersBackend from 'wix-users-backend';
+import { obtenerPerfil, normalizarRol } from 'backend/permisos.jsw';
+
+// getSecret se importa solo si existe en el plan de Wix del sitio.
+// Si el sitio no tiene Secrets Manager disponible, esta línea lanzará
+// un error al publicar — en ese caso comenta la línea hasta tener el plan.
+import { getSecret } from 'wix-secrets-backend';
+
+const SA = { suppressAuth: true };
+
+// normalizarRol importada de backend/permisos.jsw — fuente única.
+const _ROLES_GERENCIA_NORM  = new Set(['gerencia', 'administracion']);
+const _ROLES_ADMIN_NORM     = new Set(['administracion']);
+
+// ── HELPERS INTERNOS ──────────────────────────────────────────────
+
+async function _requireIdentidad() {
+  const email = await wixUsersBackend.currentUser.getEmail();
+  if (!email) throw new Error('No autenticado. Inicia sesión para continuar.');
+  const perfil = await obtenerPerfil(email);
+  if (!perfil || !perfil.rol) throw new Error('Perfil no encontrado. Contacta a Administración.');
+  return { email: email.toLowerCase().trim(), ...perfil };
+}
+
+async function _validarAccesoCuenta(cuentaId, email) {
+  const res = await wixData.get('CuentasSociales', cuentaId, SA);
+  if (!res) throw new Error('Cuenta social no encontrada.');
+  if (res.estado !== 'activa') throw new Error(`La cuenta "${res.paginaNombre}" está ${res.estado}.`);
+
+  const autorizados = _parseJson(res.vendedoresAutorizados, []);
+  const esPropietario = res.propietarioEmail === email;
+  const estaAutorizado = autorizados.includes(email);
+
+  if (!esPropietario && !estaAutorizado) {
+    throw new Error('No tienes permiso para publicar en esta cuenta.');
+  }
+  return res;
+}
+
+function _parseJson(str, fallback) {
+  if (!str) return fallback;
+  try { return JSON.parse(str); } catch { return fallback; }
+}
+
+function _wixUriToUrl(uri) {
+  if (!uri) return '';
+  if (uri.startsWith('http')) return uri;
+  const match = uri.match(/wix:image:\/\/v1\/([^/]+)/);
+  return match ? `https://static.wixstatic.com/media/${match[1]}` : uri;
+}
+
+// ── CONSULTA DE VEHÍCULOS ─────────────────────────────────────────
+
+/**
+ * Devuelve vehículos disponibles para publicar.
+ * Vendedor → todo el inventario disponible (Cars no tiene vendedorEmail).
+ * Gerencia/Admin → igual: todo el inventario disponible.
+ */
+export async function obtenerVehiculos() {
+  await _requireIdentidad(); // valida que el usuario esté autenticado y tenga perfil
+
+  const res = await wixData.query('Cars')
+    .ne('estatusVenta', 'Vendido')
+    .ne('estatusVenta', 'Consigna')
+    .descending('_createdDate')
+    .limit(100)
+    .find(SA);
+
+  return res.items.map(c => ({
+    _id: c._id,
+    marca: c.marca || '',
+    modelo: c.modelo || '',
+    año: c.año || '',
+    version: c.version || '',
+    color: c.color || '',
+    km: c.km || 0,
+    precio: c.precio || 0,
+    combustible: c.combustible || '',
+    transmision: c.transmision || '',
+    descripcion: c.descripcion || '',
+    fotoPrincipal: _wixUriToUrl(c.fotoPrincipal || (Array.isArray(c.fotos) ? c.fotos[0] : c.fotos)),
+    fotos: (Array.isArray(c.fotos) ? c.fotos : [c.fotos]).filter(Boolean).map(_wixUriToUrl),
+  }));
+}
+
+// ── CUENTAS SOCIALES ──────────────────────────────────────────────
+
+/**
+ * Devuelve las cuentas sociales que el usuario autenticado puede usar para publicar.
+ * Incluye: cuentas propias + cuentas corporativas donde está autorizado.
+ */
+export async function obtenerCuentasAutorizadas() {
+  const { email } = await _requireIdentidad();
+
+  // Cuentas propias activas
+  const propias = await wixData.query('CuentasSociales')
+    .eq('propietarioEmail', email)
+    .eq('estado', 'activa')
+    .find(SA);
+
+  // Cuentas corporativas donde está en vendedoresAutorizados
+  // (no hay operador "contains" en Wix para JSON dentro de Text; filtramos en memoria)
+  const corporativas = await wixData.query('CuentasSociales')
+    .eq('tipo', 'corporativa')
+    .eq('estado', 'activa')
+    .find(SA);
+
+  const autorizadas = corporativas.items.filter(c => {
+    const lista = _parseJson(c.vendedoresAutorizados, []);
+    return lista.includes(email);
+  });
+
+  const todas = [...propias.items, ...autorizadas];
+
+  return todas.map(c => ({
+    _id: c._id,
+    plataforma: c.plataforma,
+    paginaNombre: c.paginaNombre,
+    tipo: c.tipo,
+    estado: c.estado,
+    // El frontend NO recibe paginaId, secretKey ni tokens
+  }));
+}
+
+// ── BORRADORES ────────────────────────────────────────────────────
+
+/**
+ * Guarda o actualiza un borrador de publicación.
+ * datos: { carroId, cuentaSocialId, plataforma, texto, fotoUrls[] }
+ * Si datos._id existe, actualiza. Si no, inserta nuevo.
+ */
+export async function guardarBorrador(datos) {
+  const { email } = await _requireIdentidad();
+
+  if (!datos.carroId) throw new Error('Se requiere un vehículo.');
+  if (!datos.cuentaSocialId) throw new Error('Se requiere una cuenta social.');
+  if (!datos.texto || datos.texto.trim().length < 10) throw new Error('El texto es muy corto.');
+
+  // Validar que la cuenta existe y el usuario tiene acceso
+  const cuenta = await _validarAccesoCuenta(datos.cuentaSocialId, email);
+
+  // Obtener datos del carro para denormalizar slug
+  const carro = await wixData.get('Cars', datos.carroId, SA);
+  if (!carro) throw new Error('El vehículo no existe.');
+
+  const registro = {
+    carroId: datos.carroId,
+    carroSlug: `${carro.marca || ''} ${carro.modelo || ''} ${carro.año || ''}`.trim(),
+    vendedorEmail: email,
+    cuentaSocialId: datos.cuentaSocialId,
+    plataforma: cuenta.plataforma,
+    texto: datos.texto.trim(),
+    fotoUrls: JSON.stringify(Array.isArray(datos.fotoUrls) ? datos.fotoUrls : []),
+    estado: 'borrador',
+    fechaCreacion: new Date(),
+  };
+
+  if (datos._id) {
+    // Verificar que este borrador pertenece al usuario antes de actualizar
+    const existente = await wixData.get('Publicaciones', datos._id, SA);
+    if (!existente) throw new Error('Borrador no encontrado.');
+    if (existente.vendedorEmail !== email) throw new Error('No puedes modificar publicaciones de otro vendedor.');
+    if (existente.estado === 'publicada') throw new Error('No se puede modificar una publicación ya publicada.');
+
+    return wixData.update('Publicaciones', { ...registro, _id: datos._id }, SA)
+      .then(r => ({ ok: true, _id: r._id }));
+  }
+
+  return wixData.insert('Publicaciones', registro, SA)
+    .then(r => ({ ok: true, _id: r._id }));
+}
+
+// ── PUBLICACIÓN EN META ───────────────────────────────────────────
+
+/**
+ * Publica en Instagram o Facebook usando Meta Graph API oficial.
+ * publicacionId: _id de un registro en Publicaciones con estado='borrador'
+ *
+ * FASE 1: retorna { ok: false, pendiente: true } hasta que Meta esté configurado.
+ * FASE 5: activar la llamada real descomentando el bloque marcado.
+ */
+export async function publicarEnMeta(publicacionId) {
+  const { email } = await _requireIdentidad();
+
+  const pub = await wixData.get('Publicaciones', publicacionId, SA);
+  if (!pub) throw new Error('Publicación no encontrada.');
+  if (pub.vendedorEmail !== email) throw new Error('No puedes publicar en nombre de otro vendedor.');
+  if (pub.estado === 'publicada') throw new Error('Esta publicación ya fue publicada.');
+
+  const cuenta = await _validarAccesoCuenta(pub.cuentaSocialId, email);
+
+  const fotoUrls = _parseJson(pub.fotoUrls, []);
+  if (fotoUrls.length === 0) throw new Error('Se requiere al menos una fotografía.');
+
+  // ── FASE 5: descomentar este bloque cuando Meta esté configurado ──────────
+  // try {
+  //   const token = await getSecret(cuenta.secretKey);
+  //   let externalPostId;
+  //
+  //   if (cuenta.plataforma === 'instagram') {
+  //     externalPostId = await _publicarInstagram(cuenta, pub.texto, fotoUrls, token);
+  //   } else if (cuenta.plataforma === 'facebook') {
+  //     externalPostId = await _publicarFacebook(cuenta, pub.texto, fotoUrls[0], token);
+  //   } else {
+  //     throw new Error(`Plataforma no soportada: ${cuenta.plataforma}`);
+  //   }
+  //
+  //   await wixData.update('Publicaciones', {
+  //     _id: publicacionId,
+  //     estado: 'publicada',
+  //     externalPostId,
+  //     fechaPublicacion: new Date(),
+  //     errorMensaje: '',
+  //   }, SA);
+  //
+  //   return { ok: true, estado: 'publicada', plataforma: cuenta.plataforma, externalPostId };
+  // } catch (err) {
+  //   await wixData.update('Publicaciones', {
+  //     _id: publicacionId,
+  //     estado: 'error',
+  //     errorMensaje: err.message || 'Error desconocido al publicar.',
+  //   }, SA);
+  //   return { ok: false, error: err.message || 'Error al publicar en Meta.' };
+  // }
+  // ── FIN FASE 5 ────────────────────────────────────────────────────────────
+
+  // FASE 1: simulación mientras Meta no está configurado
+  return {
+    ok: false,
+    pendiente: true,
+    mensaje: 'Integración con Meta pendiente de configuración. El borrador fue guardado y se publicará cuando el administrador conecte la cuenta.',
+  };
+}
+
+// ── META GRAPH API: funciones internas (FASE 5) ───────────────────
+
+async function _publicarInstagram(cuenta, texto, fotoUrls, token) {
+  const actorId = cuenta.instagramActorId || cuenta.paginaId;
+
+  // Paso 1: crear media container
+  const body1 = new URLSearchParams({
+    image_url: fotoUrls[0],
+    caption: texto,
+    access_token: token,
+  });
+  const res1 = await fetch(
+    `https://graph.facebook.com/v18.0/${actorId}/media`,
+    { method: 'POST', body: body1 }
+  );
+  const data1 = await res1.json();
+  if (data1.error) throw new Error(`Meta error: ${data1.error.message}`);
+
+  // Paso 2: publicar el container
+  const body2 = new URLSearchParams({
+    creation_id: data1.id,
+    access_token: token,
+  });
+  const res2 = await fetch(
+    `https://graph.facebook.com/v18.0/${actorId}/media_publish`,
+    { method: 'POST', body: body2 }
+  );
+  const data2 = await res2.json();
+  if (data2.error) throw new Error(`Meta error al publicar: ${data2.error.message}`);
+
+  return data2.id;
+}
+
+async function _publicarFacebook(cuenta, texto, fotoUrl, token) {
+  const body = new URLSearchParams({
+    url: fotoUrl,
+    caption: texto,
+    access_token: token,
+  });
+  const res = await fetch(
+    `https://graph.facebook.com/v18.0/${cuenta.paginaId}/photos`,
+    { method: 'POST', body }
+  );
+  const data = await res.json();
+  if (data.error) throw new Error(`Meta error: ${data.error.message}`);
+  return data.post_id || data.id;
+}
+
+// ── HISTORIAL ─────────────────────────────────────────────────────
+
+/**
+ * Devuelve el historial de publicaciones.
+ * filtros: { estado?, plataforma?, desde?, hasta? }
+ * Vendedor → solo sus publicaciones.
+ * Gerencia/Administración → todas.
+ */
+export async function obtenerHistorial(filtros) {
+  const { email, rol } = await _requireIdentidad();
+  const f = filtros || {};
+
+  let query = wixData.query('Publicaciones').descending('fechaCreacion').limit(100);
+
+  if (!_ROLES_GERENCIA_NORM.has(normalizarRol(rol))) {
+    query = query.eq('vendedorEmail', email);
+  }
+  if (f.estado) query = query.eq('estado', f.estado);
+  if (f.plataforma) query = query.eq('plataforma', f.plataforma);
+  if (f.desde) query = query.ge('fechaCreacion', new Date(f.desde));
+  if (f.hasta) query = query.le('fechaCreacion', new Date(f.hasta));
+
+  const res = await query.find(SA);
+  return res.items.map(p => ({
+    _id: p._id,
+    carroId: p.carroId,
+    carroSlug: p.carroSlug,
+    vendedorEmail: p.vendedorEmail,
+    plataforma: p.plataforma,
+    texto: p.texto,
+    fotoUrls: _parseJson(p.fotoUrls, []),
+    estado: p.estado,
+    fechaCreacion: p.fechaCreacion,
+    fechaPublicacion: p.fechaPublicacion,
+    externalPostId: p.externalPostId || null,
+    errorMensaje: p.errorMensaje || null,
+    // cuentaSocialId NO se expone al frontend
+  }));
+}
+
+// ── ADMINISTRACIÓN DE CUENTAS (solo rol Administración) ───────────
+
+/**
+ * Conectar nueva cuenta social. Llamado desde http-functions.js/meta_oauth_callback.
+ * datos: { propietarioEmail, tipo, plataforma, paginaId, paginaNombre,
+ *          instagramActorId?, secretKey }
+ * El token ya fue intercambiado por el callback y guardado en Wix Secrets
+ * antes de llamar esta función. Aquí solo guardamos la metadata.
+ */
+export async function conectarCuenta(datos) {
+  const { rol } = await _requireIdentidad();
+  if (!_ROLES_ADMIN_NORM.has(normalizarRol(rol))) throw new Error('Solo Administración puede conectar cuentas.');
+
+  if (!datos.paginaId || !datos.secretKey || !datos.plataforma) {
+    throw new Error('Faltan datos requeridos para conectar la cuenta.');
+  }
+
+  const registro = {
+    propietarioEmail: (datos.propietarioEmail || '').toLowerCase().trim(),
+    tipo: datos.tipo || 'corporativa',
+    plataforma: datos.plataforma,
+    paginaId: datos.paginaId,
+    paginaNombre: datos.paginaNombre || datos.paginaId,
+    instagramActorId: datos.instagramActorId || '',
+    estado: 'activa',
+    vendedoresAutorizados: datos.vendedoresAutorizados || '[]',
+    secretKey: datos.secretKey,
+    fechaConexion: new Date(),
+    ultimoError: '',
+  };
+
+  return wixData.insert('CuentasSociales', registro, SA)
+    .then(r => ({ ok: true, _id: r._id, paginaNombre: r.paginaNombre }));
+}
+
+/**
+ * Marcar cuenta como desconectada (no elimina el registro ni las publicaciones).
+ */
+export async function desconectarCuenta(cuentaId) {
+  const { rol } = await _requireIdentidad();
+  if (!_ROLES_ADMIN_NORM.has(normalizarRol(rol))) throw new Error('Solo Administración puede desconectar cuentas.');
+
+  const cuenta = await wixData.get('CuentasSociales', cuentaId, SA);
+  if (!cuenta) throw new Error('Cuenta no encontrada.');
+
+  return wixData.update('CuentasSociales', {
+    _id: cuentaId,
+    estado: 'desconectada',
+  }, SA).then(() => ({ ok: true }));
+}
+
+/**
+ * Actualizar lista de vendedores autorizados para una cuenta corporativa.
+ * emails: array de emails de vendedores
+ */
+export async function actualizarAutorizados(cuentaId, emails) {
+  const { rol } = await _requireIdentidad();
+  if (!_ROLES_ADMIN_NORM.has(normalizarRol(rol))) throw new Error('Solo Administración puede gestionar permisos.');
+
+  const cuenta = await wixData.get('CuentasSociales', cuentaId, SA);
+  if (!cuenta) throw new Error('Cuenta no encontrada.');
+  if (cuenta.tipo !== 'corporativa') throw new Error('Solo las cuentas corporativas tienen vendedores autorizados.');
+
+  const lista = Array.isArray(emails)
+    ? emails.map(e => String(e).toLowerCase().trim()).filter(Boolean)
+    : [];
+
+  return wixData.update('CuentasSociales', {
+    _id: cuentaId,
+    vendedoresAutorizados: JSON.stringify(lista),
+  }, SA).then(() => ({ ok: true, autorizados: lista.length }));
+}
+
+/**
+ * Devuelve todas las cuentas sociales (para el panel de Administración).
+ * Incluye estado, no incluye secretKey.
+ */
+export async function obtenerTodasLasCuentas() {
+  const { rol } = await _requireIdentidad();
+  if (!_ROLES_GERENCIA_NORM.has(normalizarRol(rol))) {
+    throw new Error('Acceso no autorizado.');
+  }
+
+  const res = await wixData.query('CuentasSociales')
+    .descending('fechaConexion')
+    .limit(100)
+    .find(SA);
+
+  return res.items.map(c => ({
+    _id: c._id,
+    propietarioEmail: c.propietarioEmail,
+    tipo: c.tipo,
+    plataforma: c.plataforma,
+    paginaNombre: c.paginaNombre,
+    estado: c.estado,
+    vendedoresAutorizados: _parseJson(c.vendedoresAutorizados, []),
+    fechaConexion: c.fechaConexion,
+    ultimoError: c.ultimoError || '',
+    // secretKey NUNCA se devuelve al frontend
+  }));
+}
+
+// ── TRIGGER: auto vendido → archivar publicaciones ───────────────
+
+/**
+ * Marca como 'archivada' todas las publicaciones activas de un vehículo.
+ * Llamar desde backend-flujo.js al cerrar una venta.
+ * No requiere autenticación de usuario — es llamada server-to-server.
+ */
+export async function desactivarPublicacionesDeAuto(carroId) {
+  if (!carroId) return { ok: false, error: 'carroId requerido' };
+
+  const res = await wixData.query('Publicaciones')
+    .eq('carroId', carroId)
+    .eq('estado', 'publicada')
+    .find(SA);
+
+  if (!res.items.length) return { ok: true, archivadas: 0 };
+
+  await Promise.all(
+    res.items.map(p =>
+      wixData.update('Publicaciones', { _id: p._id, estado: 'archivada' }, SA)
+    )
+  );
+
+  return { ok: true, archivadas: res.items.length };
+}
+
+// ── GENERACIÓN DE TEXTO (helper exportado para el frontend) ───────
+
+/**
+ * Genera texto de publicación basado en datos del vehículo.
+ * No llama a ninguna API — es lógica local pura.
+ * carro: objeto del inventario. plataforma: 'instagram' | 'facebook'
+ */
+export async function generarTexto(carro, plataforma) {
+  await _requireIdentidad(); // solo usuarios autenticados
+  return _generarTextoLocal(carro, plataforma);
+}
+
+function _generarTextoLocal(carro, plataforma) {
+  const precio = (carro.precio || 0).toLocaleString('es-MX', {
+    style: 'currency', currency: 'MXN', maximumFractionDigits: 0,
+  });
+  const km = (carro.km || 0).toLocaleString('es-MX');
+  const detalles = [carro.transmision, carro.combustible].filter(Boolean).join(' · ');
+
+  let texto = `🚗 ${carro.marca} ${carro.modelo} ${carro.año}`;
+  if (carro.version) texto += ` ${carro.version}`;
+  texto += `\n${km} km · ${precio}`;
+  if (detalles) texto += `\n${detalles}`;
+  if (carro.color) texto += ` · ${carro.color}`;
+  texto += '\n';
+  if (carro.descripcion) texto += `\n${carro.descripcion.trim()}\n`;
+  texto += '\n📍 weCars Bajío — Celaya, Gto.\n📲 Escríbenos por DM o WhatsApp para más información';
+  if (plataforma === 'instagram') {
+    texto += '\n\n#weCars #weCarsAutos #SeminuevosCelaya #AutosCelaya #Bajío #SeminuevosGuanajuato';
+  }
+  return texto;
+}

@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<!--
+  WECARS BAJÍO · PÁGINA DE INVENTARIO
+  Pegar completo en el elemento HTML iframe de Wix con ID: htmlInventario
+
+  Conexión con Velo:
+  - Escucha  'wecars-inventory'       → { items: [...] }  (autos del CMS)
+  - Envía    'wecars-catalog-ready'   → avisa que ya puede recibir datos
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario · weCars Bajío</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; max-width: 100%; }
+    img, svg, video { max-width: 100%; height: auto; }
+    html {  width: 100%; overflow-x: clip; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body {
+      font-family: "DM Sans", Arial, sans-serif;
+      background: #fff; color: #0b1014; line-height: 1.6;
+      width: 100%; max-width: 100%; overflow-x: clip; position: relative;
+    }
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+    html,body{scrollbar-width:none;-ms-overflow-style:none}
+    :root {
+  /* ── Brand ─────────────────────────────────────────── */
+  --lime:          #56a900;
+  --lime-dark:     #3d7a00;
+  --lime-bg:       rgba(86,169,0,.10);
+  /* ── Neutrals ──────────────────────────────────────── */
+  --ink:           #0f1a0f;
+  --ink-2:         #1a2e1a;
+  --paper:         #F5F7F5;
+  --white:         #ffffff;
+  --muted:         #6d7a83;
+  --line:          #d8e2e5;
+  /* ── Semantic ──────────────────────────────────────── */
+  --c-red:         #e24b4a;   --c-red-bg:    rgba(226,75,74,.10);
+  --c-amber:       #d97706;   --c-amber-bg:  rgba(217,119,6,.10);
+  --c-blue:        #2a78d6;   --c-blue-bg:   rgba(42,120,214,.10);
+  --c-green:       #16a34a;   --c-green-bg:  rgba(22,163,74,.10);
+  --c-purple:      #9333ea;   --c-purple-bg: rgba(147,51,234,.10);
+  --amarillo:      #f59e0b;
+  --violet:        #4338c8;
+  --violet-2:      #5c55e5;
+  /* ── Elevation ─────────────────────────────────────── */
+  --shadow-sm:     0 2px 8px  rgba(12,27,35,.08);
+  --shadow:        0 8px 24px rgba(12,27,35,.10);
+  --shadow-lg:     0 18px 48px rgba(12,27,35,.12);
+  /* ── Radius ────────────────────────────────────────── */
+  --radius-sm:     8px;
+  --radius:        12px;
+  --radius-md:     16px;
+  --radius-lg:     22px;
+  --radius-pill:   999px;
+  /* ── Aliases backward-compat (no tocar) ────────────── */
+  --verde:         var(--lime);
+  --verde-dark:    var(--lime-dark);
+  --negro:         var(--ink);
+  --ink-3:         var(--ink-2);
+  --gris:          var(--paper);
+  --gris-borde:    var(--line);
+  --radio:         var(--radius-md);
+  --sombra:        var(--shadow-lg);
+  --borde:         var(--line);
+  --texto:         var(--muted);
+  --max:           1280px;
+  --nav-h:         72px;
+}
+/* ── Dark mode ──────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #111a0e; --ink: #e8f0e0; --ink-2: #c8d8c0;
+    --line: #2e3d24; --muted: #7a9e68; --white: #1C2416;
+    --gris: #111a0e; --gris-borde: #2e3d24; --negro: #e8f0e0;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,.25);
+    --shadow: 0 8px 24px rgba(0,0,0,.28);
+    --shadow-lg: 0 18px 48px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111a0e; --ink: #e8f0e0; --ink-2: #c8d8c0;
+  --line: #2e3d24; --muted: #7a9e68; --white: #1C2416;
+  --gris: #111a0e; --gris-borde: #2e3d24; --negro: #e8f0e0;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.25);
+  --shadow: 0 8px 24px rgba(0,0,0,.28);
+  --shadow-lg: 0 18px 48px rgba(0,0,0,.35);
+}
+:root[data-theme="light"] {
+  --paper: #F5F7F5; --ink: #0f1a0f; --ink-2: #1a2e1a;
+  --line: #E4EAE4; --muted: #5a7060; --white: #ffffff;
+  --gris: #F5F7F5; --gris-borde: #d8e2e5; --negro: #0b1014;
+}
+    a{color:inherit}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    img{display:block;max-width:100%}
+    .shell { width: min(1280px, calc(100% - 48px)); margin: 0 auto; }
+
+    /* ── NAV ── */
+    .wc-announcement{color:#cbd8de;background:#091015;border-bottom:1px solid rgba(255,255,255,.07);font-size:.78rem}
+    .wc-announcement .shell{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0}
+    .wc-announcement strong{color:#fff}
+    .wc-announcement a{color:#c5fb91;font-weight:800;text-decoration:none}
+    .wc-announcement .bar{width:1px;height:12px;background:rgba(255,255,255,.24)}
+    .wc-header{position:sticky;top:0;z-index:50;background:rgba(11,16,20,.94);backdrop-filter:blur(15px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .wc-nav{min-height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .wc-brand img{width:148px;height:auto;display:block}
+    .wc-links{display:flex;align-items:center;gap:22px;color:#dae4e8;font-size:.86rem;font-weight:700;list-style:none}
+    .wc-links a{position:relative;padding:6px 0;text-decoration:none;color:inherit}
+    .wc-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:2px;background:#70cf05;transition:.2s}
+    .wc-links a:hover::after,.wc-links a.active::after{width:100%}
+    .wc-links a.active{color:#fff}
+    .wc-actions{display:flex;align-items:center;gap:10px}
+    .wc-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;font-size:.82rem;font-weight:800;text-decoration:none;font-family:inherit}
+    .wc-btn.primary{color:#081102;background:#70cf05}
+    .wc-btn.primary:hover{background:#94ed38}
+    .wc-dropdown{position:relative}
+    .wc-drop-btn{background:none;border:none;color:#dae4e8;font-size:.86rem;font-weight:700;cursor:pointer;padding:6px 0;display:flex;align-items:center;gap:5px;font-family:inherit}
+    .wc-caret{font-size:.65rem;transition:transform .2s;display:inline-block}
+    .wc-dropdown.open .wc-caret{transform:rotate(180deg)}
+    .wc-drop-menu{display:none;position:absolute;top:calc(100% + 10px);right:0;min-width:170px;background:#162128;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:6px;list-style:none;box-shadow:0 12px 32px rgba(0,0,0,.35);z-index:99}
+    .wc-dropdown.open .wc-drop-menu{display:block}
+    .wc-drop-menu li{list-style:none}
+    .wc-drop-menu a{display:block;padding:10px 14px;border-radius:8px;color:#c8d6db;text-decoration:none;font-size:.84rem;font-weight:600;transition:.15s}
+    .wc-drop-menu a:hover{background:rgba(112,207,5,.12);color:#70cf05}
+
+    /* ── INTRO ── */
+    .intro{padding:36px 0 24px}
+    .intro-card{
+      position:relative;overflow:hidden;padding:34px;border-radius:22px;color:#fff;
+      background:
+        radial-gradient(circle at 92% 12%,rgba(112,207,5,.28),transparent 40%),
+        radial-gradient(circle at 15% 120%,rgba(112,207,5,.12),transparent 45%),
+        linear-gradient(125deg,#101920,#080d11);
+    }
+    .intro-card:after{
+      content:"";position:absolute;right:-105px;top:-135px;width:360px;height:360px;border-radius:50%;
+      border:1px solid rgba(255,255,255,.09)
+    }
+    .eyebrow{
+      position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border-radius:999px;border:1px solid rgba(112,207,5,.3);
+      color:#ccf99c;background:rgba(112,207,5,.12);font-size:.71rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+    }
+    .eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 5px rgba(112,207,5,.14)}
+    .intro-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
+    .intro h1{
+      margin:14px 0 0;font-family:"Manrope",Arial,sans-serif;font-weight:900;font-size:clamp(2.1rem,4.2vw,3.4rem);
+      line-height:1.05;letter-spacing:-.03em;
+    }
+    .intro h1 span{color:#c0fb7e}
+    .intro p{max-width:640px;margin:14px 0 0;color:#c7d4da;font-size:.96rem}
+    .intro-quick{display:grid;grid-template-columns:repeat(2,auto);gap:10px;justify-content:end}
+    .quick{
+      display:flex;align-items:center;gap:8px;padding:11px 12px;border-radius:12px;
+      background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);
+      color:#e9f0f2;font-size:.76rem;font-weight:700;white-space:nowrap;
+    }
+    .quick b{color:#bffb7d}
+
+    /* ── CATÁLOGO ── */
+    .catalog{padding:0 0 54px}
+    .catalog-layout{display:grid;grid-template-columns:272px minmax(0,1fr);gap:20px}
+    .filters{
+      align-self:start;position:sticky;top:88px;padding:20px;border:1px solid var(--line);
+      border-radius:var(--radius);background:var(--white);box-shadow:0 8px 22px rgba(13,26,33,.04);
+    }
+    .filters-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:15px;border-bottom:1px solid #e9edef}
+    .filters h2{margin:0;font-family:"Manrope";font-weight:800;font-size:1.02rem;letter-spacing:-.02em}
+    .reset{border:0;padding:0;background:none;color:var(--lime-dark);font-size:.76rem;font-weight:900}
+    .filter-block{padding:16px 0;border-bottom:1px solid #e9edef}
+    .filter-block:last-of-type{border-bottom:0}
+    .filter-label{display:block;margin-bottom:9px;color:#37454d;font-size:.78rem;font-weight:900}
+    .search{position:relative}
+    .search svg{position:absolute;top:12px;left:11px;width:17px;height:17px;color:#7b8991}
+    .search input,.select{
+      width:100%;height:43px;padding:0 10px;border:1px solid #d7e1e4;border-radius:10px;
+      outline:0;background:#fbfcfc;color:#334149;font-size:.82rem;
+    }
+    .search input{padding-left:36px}
+    .search input:focus,.select:focus{border-color:var(--lime);box-shadow:0 0 0 4px rgba(112,207,5,.12)}
+    .chips{display:flex;flex-wrap:wrap;gap:7px}
+    .chip{
+      padding:7px 10px;border:1px solid #dce5e7;border-radius:999px;background:#fff;color:#5d6b73;
+      font-size:.72rem;font-weight:800;transition:.18s ease;
+    }
+    .chip.active,.chip:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+    .check{display:flex;align-items:center;gap:8px;margin-top:10px;color:#58676f;font-size:.78rem;font-weight:700}
+    .check input{accent-color:var(--lime-dark)}
+    .apply{
+      width:100%;margin-top:16px;border:0;border-radius:10px;padding:12px;background:var(--lime);color:#081102;font-size:.84rem;font-weight:900;
+    }
+    .apply:hover{background:#94ed38}
+
+    .results-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:3px 0 15px;flex-wrap:wrap}
+    .results-head b{display:block;font-size:.93rem}
+    .results-head span{display:block;margin-top:2px;color:var(--muted);font-size:.75rem}
+    .view-controls{display:flex;align-items:center;gap:8px}
+    .sort{height:38px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:0 9px;color:#53616a;font-size:.77rem;outline:0}
+    .view-btn{
+      display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:9px;background:#fff;color:#35434b;font-weight:900;
+    }
+    .view-btn.active{background:var(--ink);border-color:var(--ink);color:#fff}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .grid.list-mode{grid-template-columns:1fr}
+    .card{
+      overflow:hidden;border:1px solid var(--line);border-radius:16px;background:#fff;
+      box-shadow:0 8px 24px rgba(12,26,34,.06);transition:transform .2s ease,box-shadow .2s ease;
+    }
+    .card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+    .grid.list-mode .card{display:grid;grid-template-columns:255px minmax(0,1fr)}
+    .image{position:relative;overflow:hidden;aspect-ratio:1.48;background:var(--paper)}
+    .grid.list-mode .image{aspect-ratio:auto;min-height:205px}
+    .image img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+    .card:hover .image img{transform:scale(1.045)}
+    .badge-row{position:absolute;left:11px;right:11px;top:11px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:20px;background:var(--lime);backdrop-filter:blur(6px);color:#081102;font-size:.64rem;font-weight:900;letter-spacing:.02em;text-transform:uppercase}
+    .photo-count{position:absolute;left:11px;bottom:11px;display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border-radius:8px;background:rgba(10,16,20,.77);backdrop-filter:blur(6px);color:#fff;font-size:.66rem;font-weight:900}
+    .card-photo-nav{
+      position:absolute;top:50%;z-index:3;display:grid;place-items:center;width:31px;height:31px;
+      border:0;border-radius:50%;background:rgba(255,255,255,.93);color:#17242b;font-size:1.28rem;
+      transform:translateY(-50%);box-shadow:0 5px 14px rgba(0,0,0,.16)
+    }
+    .card-photo-nav:hover{background:#fff;transform:translateY(-50%) scale(1.06)}
+    .card-photo-nav.prev{left:10px}
+    .card-photo-nav.next{right:10px}
+
+    .heart{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:50%;background:rgba(255,255,255,.95);color:#33424a;font-size:1rem}
+    .heart.fav{color:#e53e3e}
+    .body{padding:15px}
+    .grid.list-mode .body{display:flex;flex-direction:column;justify-content:center;padding:20px}
+    .meta{display:flex;flex-wrap:wrap;gap:6px;color:#6d7b84;font-size:.70rem;font-weight:700}
+    .meta span+span:before{content:"•";padding-right:6px;color:#a5b0b5}
+    .card h3{margin:7px 0 0;font-family:"Manrope";font-weight:800;font-size:1.02rem;line-height:1.2;letter-spacing:-.02em}
+    .location{margin-top:7px;color:#7a8890;font-size:.72rem;font-weight:600}
+    .price-line{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:13px;padding-top:12px;border-top:1px solid #edf1f2}
+    .price{font-family:"Manrope";font-weight:800;font-size:1.10rem;letter-spacing:-.02em;color:var(--lime-dark)}
+    .monthly{color:#647179;font-size:.66rem;line-height:1.2;text-align:right}
+    .monthly b{display:block;color:var(--ink);font-size:.78rem}
+    .actions{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;margin-top:14px}
+    .detail{display:flex;align-items:center;justify-content:center;border:0;border-radius:9px;padding:10px;background:var(--ink);color:#fff;font-size:.77rem;font-weight:900;text-decoration:none}
+    .detail:hover{background:var(--lime-dark)}
+    .interest{color:#52616a;font-size:.74rem;font-weight:900;white-space:nowrap;text-decoration:none}
+    .interest:hover{color:var(--lime-dark)}
+
+    .empty{
+      grid-column:1/-1;display:grid;place-items:center;min-height:285px;padding:28px;border:1px dashed #bccbd0;border-radius:16px;background:rgba(255,255,255,.68);text-align:center;color:#66747c;
+    }
+    .empty .spinner{width:34px;height:34px;margin:0 auto 13px;border:4px solid #dcead9;border-top-color:var(--lime-dark);border-radius:50%;animation:spin .85s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .empty b{display:block;color:#2d3b43;font-family:"Manrope";font-weight:800;font-size:1.08rem}
+    .empty p{margin:8px 0 0;font-size:.84rem}
+    .notify{margin:20px auto 0;display:flex;flex-direction:column;align-items:center;gap:10px;max-width:440px}
+    .notify p{margin:0;font-size:.82rem;color:#4d5b63;font-weight:600}
+    .notify-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%}
+    .notify-row input{flex:1;min-width:140px;height:44px;border:1px solid #d8e0e4;border-radius:10px;padding:0 12px;outline:0;background:#fbfcfc;color:#243039;font-family:inherit;font-size:.85rem}
+    .notify-row input:focus{border-color:var(--lime);box-shadow:0 0 0 4px rgba(112,207,5,.12)}
+    .notify button{border:none;border-radius:10px;padding:0 20px;height:44px;background:var(--lime);color:#071100;font-weight:800;font-size:.82rem;cursor:pointer;transition:.15s;white-space:nowrap;font-family:inherit}
+    .notify button:hover{background:#8dea2e}
+    .notify button:disabled{opacity:.65;cursor:default}
+    .load{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:25px}
+    .more{display:none;padding:12px 17px;border:1px solid #cbd7da;border-radius:10px;background:#fff;color:#2d3b43;font-size:.82rem;font-weight:900}
+    .more:hover{border-color:var(--ink);background:var(--ink);color:#fff}
+    .small-note{max-width:720px;margin:0;color:#78858d;font-size:.69rem;line-height:1.45;text-align:center}
+
+    /* ── CTA ASESOR ── */
+    .assist{padding:0 0 60px}
+    .assist-box{
+      display:flex;align-items:center;justify-content:space-between;gap:22px;padding:28px 30px;border-radius:19px;color:#fff;
+      background:linear-gradient(120deg,#0d1117,#1a2a1a);
+    }
+    .assist h2{margin:0;font-family:"Manrope";font-weight:800;font-size:1.4rem;letter-spacing:-.02em}
+    .assist p{margin:5px 0 0;color:#c2d0d5;font-size:.87rem}
+    .assist a{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:10px;background:var(--lime);color:#071102;font-size:.82rem;font-weight:900;white-space:nowrap;text-decoration:none}
+    .assist a:hover{background:#96ef39}
+
+    /* ── FOOTER ── */
+    .wc-footer-rich{background:#0d1117;border-top:1px solid rgba(255,255,255,.07);padding:56px 0 0;color:#9eafb8}
+    .wc-foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .wc-foot-brand img{width:140px;margin-bottom:16px;display:block}
+    .wc-foot-brand p{font-size:.84rem;line-height:1.65;color:#8090a0;max-width:220px;margin-bottom:20px}
+    .wc-socials{display:flex;gap:8px}
+    .wc-socials a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.08);color:#c0cdd5;font-size:.72rem;font-weight:800;text-decoration:none;transition:.15s}
+    .wc-socials a:hover{background:rgba(112,207,5,.15);color:#70cf05}
+    .wc-foot-col h4{color:#fff;font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px}
+    .wc-foot-col ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+    .wc-foot-col ul a{color:#8090a0;text-decoration:none;font-size:.85rem;font-weight:500;transition:.15s}
+    .wc-foot-col ul a:hover{color:#c5fb91}
+    .wc-foot-col p{color:#8090a0;font-size:.84rem;line-height:1.7;margin-bottom:12px}
+    .wc-foot-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;color:#566570;font-size:.74rem}
+    .wc-foot-bottom a{color:#566570;text-decoration:none}
+
+    .menu-toggle{display:none;background:none;border:0;color:white;padding:9px;cursor:pointer;z-index:201;position:relative}
+    .menu-toggle svg{width:26px;height:26px;transition:opacity .2s}
+    .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:198;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+    .mob-drawer{position:fixed;top:0;right:0;bottom:0;width:80vw;max-width:300px;background:#0b0b0b;z-index:199;transform:translateX(110%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-16px 0 60px rgba(0,0,0,.65)}
+    .mob-drawer.open{transform:translateX(0)}
+    .mob-overlay.open{display:block}
+    .mob-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
+    .mob-drawer-head img{height:26px;width:auto;opacity:.9}
+    .mob-close{background:rgba(255,255,255,.07);border:0;color:#777;width:30px;height:30px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,color .15s}
+    .mob-close:hover{background:rgba(255,255,255,.12);color:#fff}
+    .mob-close svg{width:14px;height:14px;display:block}
+    .mob-nav-links{display:flex;flex-direction:column;padding:8px 10px;flex:1;overflow-y:auto;gap:1px}
+    .mob-nav-links a{display:flex;align-items:center;gap:10px;padding:11px 12px;color:#bbb;text-decoration:none;font-size:.88rem;font-weight:600;font-family:'DM Sans',sans-serif;border-radius:10px;transition:background .14s,color .14s}
+    .mob-nav-links a:hover{background:rgba(255,255,255,.05);color:#eee}
+    .mob-nav-links a.active{background:rgba(112,207,5,.1);color:#70cf05}
+    .mob-nav-links a.mob-sec{font-size:.82rem;font-weight:500;color:#555;padding:9px 12px}
+    .mob-nav-links a.mob-sec:hover{background:rgba(255,255,255,.04);color:#888}
+    .mob-nav-links a.mob-sec.active{background:rgba(112,207,5,.08);color:#70cf05}
+    .mob-nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.6}
+    .mob-nav-links a.active .mob-nav-icon{opacity:1}
+    .mob-nav-links .mob-divider{height:1px;background:rgba(255,255,255,.05);margin:5px 0}
+    .mob-cta{padding:12px 12px 18px;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;gap:7px}
+    .mob-cta-wa{display:flex;align-items:center;justify-content:center;gap:8px;background:#25d366;border-radius:12px;padding:13px;text-decoration:none;width:100%;font-weight:700;font-size:.88rem;color:#fff;font-family:'DM Sans',sans-serif;transition:background .18s}
+    .mob-cta-wa:hover{background:#1fc05e}
+    .mob-cta-wa svg{width:17px;height:17px;fill:#fff;flex-shrink:0}
+    .mob-cta-info{display:flex;align-items:center;justify-content:center;gap:8px;padding:2px 0}
+    .mob-cta-info a{color:#444;font-size:.76rem;text-decoration:none;font-family:'DM Sans',sans-serif}
+    .mob-cta-info a:hover{color:#777}
+    .mob-cta-info .sep{color:#2a2a2a;font-size:.65rem}
+    @media(max-width:1000px){
+      .wc-announcement{display:none}
+      .wc-links{display:none}
+      .menu-toggle{display:block}
+      .mob-overlay{backdrop-filter:none;-webkit-backdrop-filter:none}
+      .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .catalog-layout{grid-template-columns:1fr}
+      .filters{position:static}
+      .filters form{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+      .filters-header{grid-column:1/-1}
+      .filter-block:last-of-type{border-bottom:1px solid #e9edef}
+      .apply{grid-column:1/-1}
+      .intro-grid{grid-template-columns:1fr}
+      .intro-quick{grid-template-columns:1fr;justify-content:stretch}
+      .quick{white-space:normal}
+      .filters form{grid-template-columns:1fr}
+      .results-head{align-items:flex-start;flex-direction:column}
+      .view-controls{width:100%}
+      .sort{flex:1}
+      .grid{grid-template-columns:1fr}
+      .grid.list-mode .card{display:block}
+      .grid.list-mode .image{aspect-ratio:1.48;min-height:0}
+      .assist-box{align-items:flex-start;flex-direction:column;padding:24px 20px}
+      .assist a{width:100%}
+      .wc-foot-grid{grid-template-columns:1fr}
+      .wc-foot-bottom{flex-direction:column;align-items:flex-start}
+      .shell{padding:0 16px}
+      .intro-card{padding:20px 16px;border-radius:14px}
+      .intro-card h1{font-size:24px}
+      .intro-card p{font-size:14px}
+      .catalog-layout{gap:14px}
+      .filters{border-radius:14px;padding:16px}
+      .card-body{padding:12px}
+      .card h3{font-size:.95rem}
+      .card-price{font-size:1rem}
+      .card-actions{gap:7px}
+      .card-btn,.card-interest{font-size:.74rem;padding:9px 10px}
+      input,select{min-height:48px;font-size:16px}
+      .notify-row{flex-direction:column}
+      .notify-row input,.notify-row button{width:100%}
+      .wc-header{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(11,16,20,.97);transform:translateZ(0)}
+      .badge{backdrop-filter:none;-webkit-backdrop-filter:none}
+      .photo-count{backdrop-filter:none;-webkit-backdrop-filter:none}
+    }
+
+    /* ── CHAT INTELIGENTE ── */
+    .chat-bubble{position:fixed;right:80px;bottom:18px;z-index:200;width:46px;height:46px;border-radius:50%;background:var(--ink);color:#fff;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:transform .2s}
+    .chat-bubble:hover{transform:scale(1.08)}
+    .chat-bubble svg{width:22px;height:22px}
+    .chat-badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:var(--lime);border-radius:50%;font-size:.6rem;font-weight:900;color:#081102;display:flex;align-items:center;justify-content:center;display:none}
+    .chat-badge.visible{display:flex}
+    .chat-panel{position:fixed;right:80px;bottom:74px;z-index:200;width:320px;max-width:calc(100vw - 96px);background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden;transform:scale(.85) translateY(12px);transform-origin:bottom right;opacity:0;pointer-events:none;transition:transform .22s ease,opacity .22s ease;max-height:72vh}
+    .chat-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+    .chat-head{background:var(--ink);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+    .chat-head-avatar{width:32px;height:32px;border-radius:50%;background:var(--lime);color:#081102;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.75rem;flex-shrink:0}
+    .chat-head-info{flex:1}
+    .chat-head-name{font-weight:800;font-size:.85rem}
+    .chat-head-status{font-size:.68rem;color:#9fb0b8}
+    .chat-close{background:none;border:0;color:#9fb0b8;font-size:1.2rem;cursor:pointer;padding:0;line-height:1}
+    .chat-msgs{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;min-height:180px}
+    .chat-msg{max-width:85%;padding:9px 12px;border-radius:12px;font-size:.79rem;line-height:1.45}
+    .chat-msg.bot{background:#f1f4f5;color:#0b1014;align-self:flex-start;border-bottom-left-radius:4px}
+    .chat-msg.user{background:var(--ink);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+    .chat-msg a{color:var(--lime-dark);font-weight:700;text-decoration:none}
+    .chat-cars{display:flex;flex-direction:column;gap:7px;margin-top:4px}
+    .chat-car-link{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e5ecef;border-radius:10px;padding:7px 10px;text-decoration:none;color:inherit;transition:.15s}
+    .chat-car-link:hover{border-color:var(--lime-dark);background:#f9fff0}
+    .chat-car-img{width:48px;height:34px;object-fit:cover;border-radius:6px;flex-shrink:0;background:#eee}
+    .chat-car-info{flex:1;min-width:0}
+    .chat-car-name{font-size:.72rem;font-weight:700;color:#0b1014;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-car-price{font-size:.75rem;font-weight:900;color:var(--lime-dark)}
+    .chat-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:6px 12px 2px}
+    .chat-sug{background:#f1f4f5;border:0;border-radius:20px;padding:6px 12px;font-size:.72rem;font-weight:700;color:#37454d;cursor:pointer;white-space:nowrap;transition:.15s}
+    .chat-sug:hover{background:var(--ink);color:#fff}
+    .chat-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #edf0f2;flex-shrink:0}
+    .chat-input{flex:1;border:1px solid #dce5e7;border-radius:10px;padding:8px 11px;font-size:.8rem;outline:0;min-width:0}
+    .chat-input:focus{border-color:var(--lime-dark)}
+    .chat-send{background:var(--ink);color:#fff;border:0;border-radius:9px;width:34px;height:34px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .chat-send svg{width:16px;height:16px}
+
+    /* ── FLOATING WA ── */
+    .wa-float{position:fixed;right:18px;bottom:18px;z-index:199;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#25D366;color:#fff;box-shadow:0 8px 24px rgba(1,41,18,.35);transition:transform .2s ease;text-decoration:none}
+    .wa-float:hover,.wa-float:active{transform:scale(1.1)}
+    .wa-float svg{width:26px;height:26px;fill:#fff}
+
+    /* ── MOBILE FILTER BAR ── */
+    .mob-filter-bar{display:none;overflow-x:auto;gap:8px;padding:10px 16px 8px;background:#fff;border-bottom:1px solid #e9edef;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:var(--nav-h);z-index:39}
+    .mob-filter-bar::-webkit-scrollbar{display:none}
+    .mob-filter-bar .chip{white-space:nowrap;flex-shrink:0;padding:8px 14px;font-size:.78rem}
+    @media(max-width:1000px){.mob-filter-bar{display:flex}}
+    @media(max-width:1000px){.filter-block:has(#typeChips){display:none}}
+
+    /* ── SKELETON ── */
+    .sk-card{border-radius:16px;overflow:hidden;border:1px solid #e5ecef;background:#fff}
+    .sk-img{aspect-ratio:1.48;background:linear-gradient(90deg,#edf0f2 25%,#f7f9fa 50%,#edf0f2 75%);background-size:200% 100%;animation:sk-shimmer 1.4s linear infinite}
+    .sk-body{padding:14px;display:flex;flex-direction:column;gap:9px}
+    .sk-line{border-radius:5px;background:linear-gradient(90deg,#edf0f2 25%,#f7f9fa 50%,#edf0f2 75%);background-size:200% 100%;animation:sk-shimmer 1.4s linear infinite}
+    @keyframes sk-shimmer{to{background-position:-200% 0}}
+
+    /* ── CARD ACTIONS MEJORADAS ── */
+    .card-row-actions{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;margin-top:14px}
+    .apartar-btn{display:flex;align-items:center;justify-content:center;gap:5px;border:1.5px solid #d4dfe3;border-radius:9px;padding:9px 11px;background:#fff;color:#35434b;font-size:.74rem;font-weight:800;text-decoration:none;white-space:nowrap;transition:.15s}
+    .apartar-btn:hover,.apartar-btn:active{border-color:#25D366;color:#0a6b3a;background:#f0fdf4}
+    .share-btn{display:grid;place-items:center;width:36px;height:36px;flex-shrink:0;border:1.5px solid #d4dfe3;border-radius:9px;background:#fff;color:#35434b;font-size:1.1rem;cursor:pointer;transition:.15s;font-family:inherit}
+    .share-btn:hover,.share-btn:active{border-color:#25D366;color:#0a6b3a}
+
+    /* ── HISTORIAL ── */
+    .historial{padding:0 0 50px;display:none}
+    .historial.visible{display:block}
+    .historial-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+    .historial-head h2{margin:0;font-family:"Manrope";font-weight:800;font-size:1.05rem;letter-spacing:-.02em}
+    .historial-clear{border:0;background:none;color:var(--muted);font-size:.74rem;font-weight:700;cursor:pointer;padding:0}
+    .historial-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .historial-scroll::-webkit-scrollbar{display:none}
+    .hist-card{flex-shrink:0;width:168px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#fff;text-decoration:none;color:inherit;transition:.15s;display:block}
+    .hist-card:hover{box-shadow:0 8px 22px rgba(12,26,34,.1);transform:translateY(-2px)}
+    .hist-card img{width:100%;aspect-ratio:1.48;object-fit:cover;display:block}
+    .hist-body{padding:10px}
+    .hist-title{font-size:.76rem;font-weight:700;line-height:1.3;margin:0 0 3px;color:var(--ink)}
+    .hist-price{font-size:.8rem;font-weight:800;color:var(--lime-dark)}
+
+    /* ── MIC BUTTON (voice search) ── */
+    .mic-btn{position:absolute;top:50%;right:10px;transform:translateY(-50%);background:none;border:0;padding:4px;cursor:pointer;color:#7b8991;display:flex;align-items:center;transition:.15s}
+    .mic-btn:hover{color:var(--lime-dark)}
+    .mic-btn.listening{color:#e24b4a;animation:mic-pulse 1s ease-in-out infinite}
+    @keyframes mic-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .search input{padding-right:36px}
+
+    /* ── COMPARADOR ── */
+    .comp-btn{display:grid;place-items:center;width:36px;height:36px;flex-shrink:0;border:1.5px solid #d4dfe3;border-radius:9px;background:#fff;color:#35434b;font-size:.9rem;cursor:pointer;transition:.15s;font-family:inherit}
+    .comp-btn:hover{border-color:var(--lime-dark);color:var(--lime-dark)}
+    .comp-btn.selected{border-color:var(--lime-dark);background:var(--lime);color:#081102}
+    .card-row-actions{grid-template-columns:1fr auto auto auto}
+
+    .comp-tray{position:fixed;bottom:0;left:0;right:0;z-index:210;background:#0b1014;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px;transform:translateY(100%);transition:transform .28s ease;box-shadow:0 -4px 30px rgba(0,0,0,.35)}
+    .comp-tray.visible{transform:translateY(0)}
+    .comp-tray-slots{display:flex;gap:10px;flex:1;overflow-x:auto;min-width:0}
+    .comp-slot{width:80px;height:50px;border-radius:8px;border:1.5px dashed rgba(255,255,255,.3);flex-shrink:0;overflow:hidden;position:relative}
+    .comp-slot img{width:100%;height:100%;object-fit:cover;display:block}
+    .comp-slot-rm{position:absolute;top:2px;right:3px;background:rgba(0,0,0,.6);border:0;color:#fff;border-radius:50%;width:18px;height:18px;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+    .comp-tray-label{font-size:.75rem;color:#9fb0b8;white-space:nowrap}
+    .comp-tray-cta{flex-shrink:0;background:var(--lime);color:#081102;border:0;border-radius:10px;padding:10px 18px;font-weight:900;font-size:.82rem;cursor:pointer;white-space:nowrap}
+    .comp-tray-cta:disabled{opacity:.45;cursor:not-allowed}
+    .comp-tray-clear{background:none;border:0;color:#9fb0b8;font-size:.72rem;cursor:pointer;white-space:nowrap;padding:0}
+
+    .comp-modal-bg{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);-webkit-overflow-scrolling:touch}
+    .comp-modal-bg.open{display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 12px 40px}
+    .comp-modal{background:#fff;border-radius:18px;width:100%;max-width:900px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .comp-modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid #e5ecef}
+    .comp-modal-head h2{margin:0;font-family:"Manrope";font-size:1.05rem;font-weight:900}
+    .comp-modal-close{background:none;border:0;font-size:1.4rem;cursor:pointer;color:#5d6b73;padding:0 4px;line-height:1}
+    .comp-table{width:100%;border-collapse:collapse}
+    .comp-table th,.comp-table td{padding:12px 14px;text-align:left;border-bottom:1px solid #edf0f2;font-size:.81rem;vertical-align:top}
+    .comp-table th{background:#f7f9fa;font-weight:900;font-size:.72rem;color:#37454d;text-transform:uppercase;letter-spacing:.04em;width:140px}
+    .comp-table td{color:#334149}
+    .comp-table .comp-img-cell{padding:0;height:140px}
+    .comp-table .comp-img-cell img{width:100%;height:100%;object-fit:cover;display:block}
+    .comp-table .comp-price{font-weight:900;color:var(--lime-dark);font-size:.95rem}
+    @media(max-width:600px){.comp-modal-bg{padding:0}.comp-modal{border-radius:0;min-height:100vh}.comp-table th{width:100px}.comp-table th,.comp-table td{padding:10px 10px;font-size:.76rem}}
+    /* ── E.1 polish: accessibility ────────────────────── */
+    button:focus-visible,a.btn:focus-visible,a[class*="btn"]:focus-visible,.wc-btn:focus-visible,.mob-close:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+    @media(max-width:640px){.wc-btn.primary{min-height:44px}}
+  </style>
+</head>
+<body>
+
+<!-- Verifica tu Auto — tira discreta -->
+<style>
+.vta-strip{display:flex;align-items:center;gap:14px;padding:13px 24px;background:var(--paper,#F5F7F5);border-top:1px solid var(--line,#d8e2e5);border-bottom:1px solid var(--line,#d8e2e5);font-family:'DM Sans',sans-serif;flex-wrap:wrap}
+.vta-strip-dot{width:7px;height:7px;border-radius:50%;background:#56a900;flex-shrink:0;margin-top:1px}
+.vta-strip-text{flex:1;font-size:.82rem;color:var(--muted,#6d7a83);line-height:1.4;min-width:180px;margin:0}
+.vta-strip-text strong{color:var(--ink,#0f1a0f);font-weight:600}
+.vta-strip-link{white-space:nowrap;font-size:.8rem;font-weight:700;color:#56a900;text-decoration:none;padding:5px 14px;border:1.5px solid rgba(86,169,0,.3);border-radius:99px;transition:background .15s,border-color .15s}
+.vta-strip-link:hover{background:rgba(86,169,0,.08);border-color:rgba(86,169,0,.55)}
+@media(max-width:480px){.vta-strip{gap:10px;padding:12px 16px}.vta-strip-text{font-size:.78rem}}
+@media(prefers-color-scheme:dark){.vta-strip{background:var(--white,#1C2416);border-color:var(--line,#2e3d24)}.vta-strip-text strong{color:var(--ink,#e8f0e0)}}
+</style>
+<div class="vta-strip">
+  <div class="vta-strip-dot"></div>
+  <p class="vta-strip-text"><strong>Verifica tu Auto</strong> &mdash; Revisamos factura, INE, tenencia y m&aacute;s antes de que compres. Reporte en 48&nbsp;h desde $189&nbsp;+&nbsp;IVA.</p>
+  <a class="vta-strip-link" href="https://www.wecarsbajio.com/verifica-tu-auto" onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:'https://www.wecarsbajio.com/verifica-tu-auto'},'*')">Saber m&aacute;s &rarr;</a>
+</div>
+
+<!-- NAV -->
+<div class="wc-announcement">
+  <div class="shell">
+    <strong>Atención personalizada en León, Gto.</strong>
+    <span class="bar"></span>
+    <span>Compra, vende o financia tu próximo auto con weCars Bajío.</span>
+    <a href="https://www.wecarsbajio.com/" target="_top">Ir al inicio →</a>
+  </div>
+</div>
+<header class="wc-header">
+  <div class="shell wc-nav">
+    <a class="wc-brand" href="https://www.wecarsbajio.com/" target="_top">
+      <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="weCars Bajío">
+    </a>
+    <ul class="wc-links">
+      <li><a href="https://www.wecarsbajio.com/" target="_top">Inicio</a></li>
+      <li><a href="https://www.wecarsbajio.com/inventario" target="_top" class="active">Inventario</a></li>
+      <li><a href="https://www.wecarsbajio.com/credito" target="_top">Crédito</a></li>
+      <li><a href="https://www.wecarsbajio.com/consigna" target="_top">Consigna</a></li>
+      <li><a href="https://www.wecarsbajio.com/nosotros" target="_top">Nosotros</a></li>
+      <li class="wc-dropdown">
+        <button class="wc-drop-btn" type="button">Más <span class="wc-caret">▾</span></button>
+        <ul class="wc-drop-menu">
+          <li><a href="https://www.wecarsbajio.com/contacto" target="_top">Contacto</a></li>
+          <li><a href="https://www.wecarsbajio.com/testimonios" target="_top">Testimonios</a></li>
+          <li><a href="https://www.wecarsbajio.com/garantias" target="_top">Garantías</a></li>
+        </ul>
+      </li>
+    </ul>
+    <div class="wc-actions">
+      <a class="wc-btn primary" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_top">Hablar con asesor</a>
+      <button class="menu-toggle" type="button" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M3 12h18M3 18h18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile drawer nav -->
+<div class="mob-overlay" id="mobOverlay"></div>
+<nav class="mob-drawer" id="mobDrawer" aria-label="Menú móvil">
+  <div class="mob-drawer-head">
+    <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="WeCars Bajío" />
+    <button class="mob-close" id="mobClose" aria-label="Cerrar menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="mob-nav-links">
+    <a href="https://www.wecarsbajio.com/" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </a>
+    <a href="https://www.wecarsbajio.com/inventario" target="_top" class="active">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Inventario
+    </a>
+    <a href="https://www.wecarsbajio.com/credito" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Crédito
+    </a>
+    <a href="https://www.wecarsbajio.com/consigna" target="_top">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Consigna tu auto
+    </a>
+    <div class="mob-divider"></div>
+    <a href="https://www.wecarsbajio.com/nosotros" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Nosotros
+    </a>
+    <a href="https://www.wecarsbajio.com/testimonios" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Testimonios
+    </a>
+    <a href="https://www.wecarsbajio.com/garantias" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Garantías
+    </a>
+    <a href="https://www.wecarsbajio.com/contacto" target="_top" class="mob-sec">
+      <svg class="mob-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Contacto
+    </a>
+  </div>
+  <div class="mob-cta">
+    <a class="mob-cta-wa" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_top">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.852L0 24l6.335-1.508A11.933 11.933 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.366l-.36-.213-3.72.976.993-3.628-.234-.373A9.818 9.818 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
+      Hablar con un asesor
+    </a>
+    <div class="mob-cta-info">
+      <a href="tel:+524778350020">477 835 0020</a>
+      <span class="sep">·</span>
+      <a href="https://instagram.com/wecars.bajio" target="_top">@wecars.bajio</a>
+    </div>
+  </div>
+</nav>
+<script>
+(function () {var t;
+  function aplicarNavConfig(config) {
+    if (!config) return;
+    const mapa = {};
+    (config.navLinks || []).concat(config.navMas || []).forEach((item) => { mapa[item.key] = item; });
+    const rutaAClave = {
+      '/': 'inicio', '': 'inicio',
+      '/inventario': 'inventario', '/credito': 'credito', '/consigna': 'consigna', '/nosotros': 'nosotros',
+      '/contacto': 'contacto', '/testimonios': 'testimonios', '/garantias': 'garantias',
+    };
+    document.querySelectorAll('.wc-links a').forEach((a) => {
+      try {
+        const u = new URL(a.href);
+        const clave = rutaAClave[u.pathname];
+        if (clave && mapa[clave]) a.href = mapa[clave].url;
+      } catch (e) {}
+    });
+  }
+  function aplicarWhatsAppConfig(config) {
+    if (!config || !config.whatsappNumber) return;
+    document.querySelectorAll('a[href*="524778350020"]').forEach((a) => {
+      a.href = a.href.replace(/524778350020/g, config.whatsappNumber);
+    });
+  }
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'wecars-siteconfig') {
+      aplicarNavConfig(e.data.config);
+      aplicarWhatsAppConfig(e.data.config);
+    }
+  });
+})();
+
+(function(){
+  document.querySelectorAll('.wc-drop-btn').forEach(function(btn){
+    btn.addEventListener('click',function(e){e.stopPropagation();this.closest('.wc-dropdown').classList.toggle('open');});
+  });
+  document.addEventListener('click',function(){document.querySelectorAll('.wc-dropdown').forEach(function(d){d.classList.remove('open');});});
+})();
+
+(function(){
+  var btn=document.querySelector('.menu-toggle');
+  var drawer=document.getElementById('mobDrawer');
+  var overlay=document.getElementById('mobOverlay');
+  var close=document.getElementById('mobClose');
+  function openMenu(){drawer.classList.add('open');overlay.classList.add('open');}
+  function closeMenu(){drawer.classList.remove('open');overlay.classList.remove('open');}
+  if(btn) btn.addEventListener('click',openMenu);
+  if(close) close.addEventListener('click',closeMenu);
+  if(overlay) overlay.addEventListener('click',closeMenu);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&drawer)closeMenu();});
+})();
+</script>
+
+<main>
+  <section class="intro">
+    <div class="shell">
+      <div class="intro-card">
+        <div class="intro-grid">
+          <div>
+            <div class="eyebrow"><i></i> Inventario disponible</div>
+            <h1>Encuentra el auto que <span>sí va contigo.</span></h1>
+            <p>Filtra por tipo, presupuesto, año o transmisión. El catálogo se actualiza directamente desde el inventario de weCars Bajío.</p>
+          </div>
+          <div class="intro-quick">
+            <div class="quick"><b id="heroCount">0</b> autos disponibles</div>
+            <div class="quick">✓ Revisados y con garantía</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Barra de filtros rápidos — solo visible en móvil -->
+  <div class="mob-filter-bar" id="mobFilterBar">
+    <button class="chip active" type="button" data-mob-type="all">Todos</button>
+    <button class="chip" type="button" data-mob-type="suv">SUV</button>
+    <button class="chip" type="button" data-mob-type="sedan">Sedán</button>
+    <button class="chip" type="button" data-mob-type="pickup">Pickup</button>
+    <button class="chip" type="button" data-mob-type="premium">Premium</button>
+  </div>
+
+<style>
+.vta-aside{display:flex;align-items:center;gap:20px;padding:20px 24px;background:var(--white,#fff);border:1px solid var(--line,#d8e2e5);border-left:4px solid var(--lime,#56a900);border-radius:0 12px 12px 0;flex-wrap:wrap;margin:40px 0}
+.vta-aside-icon{font-size:1.5rem;flex-shrink:0;line-height:1}
+.vta-aside-body{flex:1;min-width:180px}
+.vta-aside-body strong{display:block;font-size:.9rem;font-weight:700;color:var(--ink,#0f1a0f);margin-bottom:3px}
+.vta-aside-body p{font-size:.8rem;color:var(--muted,#6d7a83);line-height:1.55;margin:0}
+.vta-aside-link{white-space:nowrap;font-size:.82rem;font-weight:700;color:#fff;background:var(--lime,#56a900);text-decoration:none;padding:9px 18px;border-radius:99px;flex-shrink:0;transition:background .15s}
+.vta-aside-link:hover{background:var(--lime-dark,#3d7a00)}
+@media(max-width:520px){.vta-aside{flex-direction:column;align-items:flex-start;gap:12px}.vta-aside-link{align-self:flex-start}}
+@media(prefers-color-scheme:dark){.vta-aside{background:var(--white,#1C2416);border-color:var(--line,#2e3d24)}.vta-aside-body strong{color:var(--ink,#e8f0e0)}}
+
+/* ── MOBILE: scroll trap fix + pequeños ajustes ── */
+@media(max-width:640px){
+  body{touch-action:pan-y;overscroll-behavior-y:contain}
+  /* Elementos con scroll horizontal propio: no bloquear */
+  .mob-filter-bar,.wc-subtoggle,.overflow-x-scroll,[class*="scroll-x"]{touch-action:pan-x}
+  /* Campos de formulario: fáciles de tocar */
+  input,select,textarea,button{touch-action:manipulation}
+  /* Padding lateral consistente en mobile */
+  .shell{padding-left:16px!important;padding-right:16px!important}
+}
+</style>
+<div class="vta-aside">
+  <div class="vta-aside-icon">&#128269;</div>
+  <div class="vta-aside-body">
+    <strong>¿Cómo sabes que la factura no es falsa? ¿Los papeles del auto están en orden?</strong>
+    <p>Muchas ventas traen facturas con consecutivos rotos, bajas ilegales o propietarios que no coinciden. Nosotros lo detectamos antes de que el dinero cambie de manos &mdash; desde $189&nbsp;+&nbsp;IVA.</p>
+  </div>
+  <a class="vta-aside-link" href="https://www.wecarsbajio.com/verifica-tu-auto" onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:'https://www.wecarsbajio.com/verifica-tu-auto'},'*')">Verifica tu Auto &rarr;</a>
+</div>
+
+  <section class="catalog">
+    <div class="shell catalog-layout">
+      <aside class="filters" aria-label="Filtros de inventario">
+        <form id="filterForm">
+          <div class="filters-header">
+            <h2>Filtra tu búsqueda</h2>
+            <button class="reset" type="button" id="resetBtn">Limpiar</button>
+          </div>
+
+          <div class="filter-block">
+            <label class="filter-label" for="searchInput">¿Qué vehículo buscas?</label>
+            <div class="search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+              <input id="searchInput" type="search" placeholder="Marca, modelo o versión">
+              <button class="mic-btn" id="micBtn" type="button" aria-label="Buscar por voz" title="Buscar por voz">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="22" x2="12" y2="17"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-block">
+            <span class="filter-label">Tipo de vehículo</span>
+            <div class="chips" id="typeChips">
+              <button class="chip active" type="button" data-type="all">Todos</button>
+              <button class="chip" type="button" data-type="suv">SUV</button>
+              <button class="chip" type="button" data-type="sedan">Sedán</button>
+              <button class="chip" type="button" data-type="pickup">Pickup</button>
+              <button class="chip" type="button" data-type="premium">Premium</button>
+            </div>
+          </div>
+
+          <div class="filter-block">
+            <label class="filter-label" for="priceSelect">Rango de precio</label>
+            <select class="select" id="priceSelect">
+              <option value="all">Cualquier precio</option>
+              <option value="0-250">Hasta $250,000</option>
+              <option value="250-500">$250,000 a $500,000</option>
+              <option value="500-1000">$500,000 a $1,000,000</option>
+              <option value="1000-999999">Más de $1,000,000</option>
+            </select>
+          </div>
+
+          <div class="filter-block">
+            <label class="filter-label" for="yearSelect">Año</label>
+            <select class="select" id="yearSelect">
+              <option value="all">Cualquier año</option>
+              <option value="2024">2024 o más reciente</option>
+              <option value="2022">2022 o más reciente</option>
+              <option value="2020">2020 o más reciente</option>
+            </select>
+          </div>
+
+          <div class="filter-block">
+            <span class="filter-label">Preferencias</span>
+            <label class="check"><input id="automaticCheck" type="checkbox"> Transmisión automática</label>
+          </div>
+
+          <button class="apply" type="submit">Ver vehículos</button>
+        </form>
+      </aside>
+
+      <section aria-label="Unidades disponibles">
+        <div class="results-head">
+          <div>
+            <b id="resultCount">Conectando con el inventario…</b>
+            <span id="resultCaption">Esperando los vehículos registrados en Cars.</span>
+          </div>
+          <div class="view-controls">
+            <select class="sort" id="sortSelect" aria-label="Ordenar inventario">
+              <option value="featured">Ordenar: recomendados</option>
+              <option value="low">Precio: menor a mayor</option>
+              <option value="high">Precio: mayor a menor</option>
+              <option value="new">Año: más reciente</option>
+            </select>
+            <button class="view-btn active" type="button" id="gridBtn" aria-label="Vista de cuadrícula">▦</button>
+            <button class="view-btn" type="button" id="listBtn" aria-label="Vista de lista">☷</button>
+          </div>
+        </div>
+
+        <div class="grid" id="vehicleGrid" aria-live="polite">
+          <div class="empty">
+            <div>
+              <div class="spinner"></div>
+              <b>Conectando con el inventario de weCars</b>
+              <p>El catálogo está listo. Esperando que Velo envíe los autos de la colección Cars.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="load">
+          <button class="more" type="button" id="moreBtn">Cargar más vehículos</button>
+          <p class="small-note">Los datos se obtienen desde la colección Cars del CMS. Usa las flechas sobre cada foto para recorrer toda la galería.</p>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class="assist">
+    <div class="shell">
+      <div class="assist-box">
+        <div>
+          <h2>¿No encuentras la unidad que buscas?</h2>
+          <p>Comparte lo que necesitas y te ayudamos a localizar una alternativa acorde a tu presupuesto.</p>
+        </div>
+        <a href="https://wa.me/524778350020?text=Hola%2C%20no%20encontr%C3%A9%20el%20auto%20que%20busco.%20Quiero%20asesor%C3%ADa." target="_top">Hablar por WhatsApp →</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Historial de autos vistos recientemente -->
+<section class="historial" id="historialSection">
+  <div class="shell">
+    <div class="historial-head">
+      <h2>Vistos recientemente</h2>
+      <button class="historial-clear" id="historialClear" type="button">Limpiar</button>
+    </div>
+    <div class="historial-scroll" id="historialScroll"></div>
+  </div>
+</section>
+
+<footer class="wc-footer-rich">
+  <div class="shell">
+    <div class="wc-foot-grid">
+      <div class="wc-foot-brand">
+        <img src="https://static.wixstatic.com/media/dbcb5b_f1f8f94ac4164af18a68a8c2a860e0a8~mv2.png/v1/fill/w_980,h_283,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/logos%20chicos-09.png" alt="weCars Bajío">
+        <p>Compra, venta, consignación y opciones de financiamiento para autos seminuevos en León, Gto.</p>
+        <div class="wc-socials">
+          <a href="https://instagram.com/wecars.bajio" target="_top" title="Instagram">ig</a>
+          <a href="#" target="_top" title="Facebook">f</a>
+          <a href="#" target="_top" title="TikTok">tt</a>
+        </div>
+      </div>
+      <div class="wc-foot-col">
+        <h4>Explora</h4>
+        <ul>
+          <li><a href="https://www.wecarsbajio.com/inventario" target="_top">Inventario</a></li>
+          <li><a href="https://www.wecarsbajio.com/credito" target="_top">Crédito</a></li>
+          <li><a href="https://www.wecarsbajio.com/consigna" target="_top">Consigna tu auto</a></li>
+          <li><a href="https://www.wecarsbajio.com/garantias" target="_top">Garantías</a></li>
+          <li><a href="https://www.wecarsbajio.com/nosotros" target="_top">Nosotros</a></li>
+          <li><a href="https://www.wecarsbajio.com/testimonios" target="_top">Testimonios</a></li>
+        </ul>
+      </div>
+      <div class="wc-foot-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="tel:+524778350020" target="_top">477 835 0020</a></li>
+          <li><a href="https://instagram.com/wecars.bajio" target="_top">@wecars.bajio</a></li>
+          <li><a href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa." target="_top">Solicitar asesoría</a></li>
+          <li><a href="mailto:op.wecars@gmail.com" target="_top">op.wecars@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="wc-foot-col">
+        <h4>Visítanos</h4>
+        <p>Blvrd. Vicente Valtierra 7065<br>Terracota, Hacienda San Ángel<br>León, Guanajuato</p>
+        <p style="margin:0">Lun–Vie 9:00–18:30<br>Sáb 11:00–14:00</p>
+      </div>
+    </div>
+    <div class="wc-foot-bottom">
+      <span>© 2026 weCars Bajío. Todos los derechos reservados.</span>
+      <span><a href="#" target="_top">Aviso de privacidad</a> · <a href="#" target="_top">Términos y condiciones</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Detecta el canal de origen de la visita (Facebook, Instagram, TikTok,
+  // Google, Marketplace, Referido o Sitio web) a partir de parámetros UTM,
+  // los clic-IDs que Meta/Google/TikTok agregan a sus anuncios, o el
+  // referrer del navegador. Se guarda en localStorage para conservar el
+  // origen real de la primera visita aunque el visitante navegue por más
+  // páginas del sitio antes de dejar sus datos (atribución de primer toque).
+  function detectarOrigenVisita() {
+    try {
+      const KEY = 'wc_origen_v1';
+      const guardado = localStorage.getItem(KEY);
+      if (guardado) return guardado;
+
+      const params = new URLSearchParams(window.location.search);
+      const src = (params.get('utm_source') || '').toLowerCase();
+      const ref = (document.referrer || '').toLowerCase();
+      let origen = '';
+
+      if (src.includes('facebook') || src === 'fb') origen = 'Facebook';
+      else if (src.includes('instagram')) origen = 'Instagram';
+      else if (src.includes('tiktok')) origen = 'TikTok';
+      else if (src.includes('google')) origen = 'Google';
+      else if (params.get('gclid')) origen = 'Google';
+      else if (params.get('ttclid')) origen = 'TikTok';
+      else if (params.get('fbclid')) origen = 'Facebook';
+      else if (ref.includes('marketplace.facebook.com')) origen = 'Marketplace';
+      else if (ref.includes('instagram.com')) origen = 'Instagram';
+      else if (ref.includes('facebook.com') || ref.includes('fb.com')) origen = 'Facebook';
+      else if (ref.includes('tiktok.com')) origen = 'TikTok';
+      else if (ref.includes('google.')) origen = 'Google';
+      else if (ref && ref.indexOf('wecarsbajio.com') === -1) origen = 'Otro';
+      else origen = 'Sitio web';
+
+      try { localStorage.setItem(KEY, origen); } catch (e) {}
+      return origen;
+    } catch (e) {
+      return 'Sitio web';
+    }
+  }
+
+  /*
+    ESTE HTML RECIBE EL INVENTARIO DESDE VELO:
+    {
+      type: 'wecars-inventory',
+      items: [{ id, title, brand, type, year, km, transmission, price, priceCredito, city, image, images, sourceUrl }]
+    }
+  */
+  const FALLBACK_IMAGE = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
+      <rect width="900" height="600" fill="#dbe6e9"/>
+      <path d="M218 380l58-135h348l60 135" fill="#a8babf"/>
+      <rect x="205" y="368" width="505" height="96" rx="24" fill="#80969e"/>
+      <path d="M335 245l56-78h178l75 78" fill="#bdccd0"/>
+      <circle cx="328" cy="468" r="43" fill="#445a62"/><circle cx="608" cy="468" r="43" fill="#445a62"/>
+      <circle cx="328" cy="468" r="20" fill="#e8f0f2"/><circle cx="608" cy="468" r="20" fill="#e8f0f2"/>
+      <text x="450" y="540" text-anchor="middle" font-family="Arial" font-size="24" fill="#4e626a">weCars Bajío</text>
+    </svg>
+  `);
+  const WA = '524778350020';
+  const TASA = 14.9;
+
+  let inventory = [];
+  let selectedType = 'all';
+  let filtrosInicialesAplicados = false;
+  let visibleLimit = 9;
+  const FAV_KEY = 'wecars_favorites';
+  function loadFavorites() {
+    try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); }
+    catch (e) { return new Set(); }
+  }
+  function saveFavorites(favs) {
+    try { localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(favs))); } catch (e) {}
+  }
+  let favorites = loadFavorites();
+  let connected = false;
+
+  const el = {
+    grid: document.getElementById('vehicleGrid'),
+    count: document.getElementById('resultCount'),
+    caption: document.getElementById('resultCaption'),
+    heroCount: document.getElementById('heroCount'),
+    search: document.getElementById('searchInput'),
+    price: document.getElementById('priceSelect'),
+    year: document.getElementById('yearSelect'),
+    automatic: document.getElementById('automaticCheck'),
+    sort: document.getElementById('sortSelect'),
+    more: document.getElementById('moreBtn'),
+    filterForm: document.getElementById('filterForm'),
+    reset: document.getElementById('resetBtn'),
+    chips: document.getElementById('typeChips'),
+    gridBtn: document.getElementById('gridBtn'),
+    listBtn: document.getElementById('listBtn')
+  };
+
+  const text = (value, fallback = '') => value === null || value === undefined ? fallback : String(value).trim();
+  const number = value => {
+    const parsed = Number(String(value ?? '').replace(/[$,\s]/g, ''));
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  const money = value => new Intl.NumberFormat('es-MX', {
+    style: 'currency', currency: 'MXN', maximumFractionDigits: 0
+  }).format(number(value));
+  const escapeHtml = value => text(value).replace(/[&<>"']/g, char => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[char]));
+
+  function calcMens(price, engPct, plazo) {
+    const eng = price * (engPct / 100);
+    const monto = price - eng;
+    const tm = TASA / 100 / 12;
+    return tm ? monto * (tm * Math.pow(1 + tm, plazo)) / (Math.pow(1 + tm, plazo) - 1) : monto / plazo;
+  }
+
+  function normalizeType(value) {
+    const type = text(value).toLowerCase();
+    if (type.includes('pick') || type.includes('camioneta')) return 'pickup';
+    if (type.includes('suv') || type.includes('crossover')) return 'suv';
+    if (type.includes('sed') || type.includes('auto')) return 'sedan';
+    if (type.includes('premium') || type.includes('lujo')) return 'premium';
+    return type || 'all';
+  }
+
+  function obtenerImagenes(item) {
+    const candidatos = [];
+    function agregar(valor) {
+      if (Array.isArray(valor)) { valor.forEach(agregar); return; }
+      if (valor && typeof valor === 'object') { agregar(valor.src || valor.image || valor.url || ''); return; }
+      const url = text(valor);
+      if (url) candidatos.push(url);
+    }
+    agregar(item.images);
+    agregar(item.gallery);
+    agregar(item.galeriaFotos);
+    agregar(item.image || item.imagen);
+    const unicas = [...new Set(candidatos)];
+    return unicas.length ? unicas : [FALLBACK_IMAGE];
+  }
+
+  function normalizeVehicle(item, index) {
+    const images = obtenerImagenes(item);
+    const price = number(item.price || item.precio);
+    const priceCredito = number(item.priceCredito) || price;
+
+    return {
+      id: text(item.id || item._id, `auto-${index}`),
+      title: text(item.title || item.nombre, 'Auto disponible'),
+      brand: text(item.brand || item.marca),
+      type: normalizeType(item.type || item.tipo),
+      year: number(item.year || item.ano || item.año),
+      km: number(item.km || item.kilometraje),
+      transmission: text(item.transmission || item.transmision, 'Consultar'),
+      price: price,
+      monthly: number(item.monthly) || (priceCredito ? calcMens(priceCredito, 20, 36) : 0),
+      city: text(item.city || item.ciudad, 'León, Gto.'),
+      fuel: text(item.fuel),
+      image: images[0],
+      images,
+      featured: Boolean(item.featured || item.highDemand),
+      sourceUrl: text(item.sourceUrl || item.url)
+    };
+  }
+
+  function filteredVehicles() {
+    const query = el.search.value.trim().toLowerCase();
+    const range = el.price.value === 'all' ? null : el.price.value.split('-').map(Number);
+    const minPrice = range ? range[0] * 1000 : 0;
+    const maxPrice = range ? range[1] * 1000 : Infinity;
+    const minimumYear = el.year.value === 'all' ? 0 : number(el.year.value);
+
+    const result = inventory.filter(vehicle => {
+      const searchable = `${vehicle.title} ${vehicle.brand} ${vehicle.type}`.toLowerCase();
+      const matchesQuery = !query || searchable.includes(query);
+      const matchesType = selectedType === 'all' || vehicle.type === selectedType;
+      const matchesPrice = !vehicle.price || (vehicle.price >= minPrice && vehicle.price <= maxPrice);
+      const matchesYear = !vehicle.year || vehicle.year >= minimumYear;
+      const matchesTransmission = !el.automatic.checked || vehicle.transmission.toLowerCase().includes('autom');
+      return matchesQuery && matchesType && matchesPrice && matchesYear && matchesTransmission;
+    });
+
+    return result.sort((a, b) => {
+      if (el.sort.value === 'low') return a.price - b.price;
+      if (el.sort.value === 'high') return b.price - a.price;
+      if (el.sort.value === 'new') return b.year - a.year;
+      if (el.sort.value === 'featured') return Number(b.featured) - Number(a.featured);
+      return a.title.localeCompare(b.title);
+    });
+  }
+
+  // Describe qué estaba buscando la persona cuando el catálogo no tuvo
+  // resultados, para que el asesor sepa qué auto avisarle cuando llegue.
+  function describeActiveFilters() {
+    const parts = [];
+    const query = el.search.value.trim();
+    if (query) parts.push(`"${query}"`);
+    if (selectedType !== 'all') parts.push(selectedType);
+    if (el.price.value !== 'all') {
+      const [min, max] = el.price.value.split('-');
+      parts.push(`$${min}k-$${max}k`);
+    }
+    if (el.year.value !== 'all') parts.push(`desde ${el.year.value}`);
+    if (el.automatic.checked) parts.push('automático');
+    return parts.length ? parts.join(' · ') : 'Sin filtros específicos';
+  }
+
+  function render() {
+    el.heroCount.textContent = inventory.length;
+
+    if (!connected) {
+      el.count.textContent = 'Conectando con el inventario…';
+      el.caption.textContent = 'Esperando los vehículos registrados en Cars.';
+      el.more.style.display = 'none';
+      el.grid.innerHTML = [1,2,3,4,5,6].map(() => `
+        <div class="sk-card">
+          <div class="sk-img"></div>
+          <div class="sk-body">
+            <div class="sk-line" style="width:55%;height:11px"></div>
+            <div class="sk-line" style="width:80%;height:18px"></div>
+            <div class="sk-line" style="width:40%;height:11px"></div>
+            <div class="sk-line" style="width:60%;height:26px;margin-top:6px"></div>
+          </div>
+        </div>`).join('');
+      return;
+    }
+
+    const matches = filteredVehicles();
+    const shown = matches.slice(0, visibleLimit);
+    el.count.textContent = `${matches.length} ${matches.length === 1 ? 'unidad encontrada' : 'unidades encontradas'}`;
+    el.caption.textContent = 'Inventario actualizado desde la colección Cars.';
+    el.more.style.display = matches.length > visibleLimit ? 'inline-flex' : 'none';
+
+    if (!shown.length) {
+      el.grid.innerHTML = `
+        <div class="empty"><div>
+          <b>No encontramos autos con esos filtros.</b>
+          <p>Prueba ampliar tu rango de precio o elimina alguno de los filtros.</p>
+          <form class="notify" id="notifyForm">
+            <p>¿No encontraste lo que buscabas? Te avisamos en cuanto llegue.</p>
+            <div class="notify-row">
+              <input type="text" name="name" placeholder="Tu nombre" required>
+              <input type="tel" name="phone" placeholder="WhatsApp" required>
+            </div>
+            <button type="submit">Avísame cuando llegue →</button>
+          </form>
+        </div></div>`;
+      return;
+    }
+
+    el.grid.innerHTML = shown.map(vehicle => {
+      const favorite = favorites.has(vehicle.id);
+      const title = escapeHtml(vehicle.title);
+      const price = vehicle.price ? money(vehicle.price) : 'Consultar precio';
+      const monthly = vehicle.monthly ? `Desde <b>${money(vehicle.monthly)} / mes*</b>` : '<b>Solicita cotización</b>';
+      const year = vehicle.year || 'Año N/D';
+      const km = vehicle.km ? `${vehicle.km.toLocaleString('es-MX')} km` : 'Km N/D';
+      const photoTotal = vehicle.images.length;
+      const vehicleId = escapeHtml(vehicle.id);
+      const detailUrl = `https://www.wecarsbajio.com/detalle?carId=${encodeURIComponent(vehicle.id)}`;
+
+      return `
+        <article class="card" data-card-id="${vehicleId}" data-photo-index="0">
+          <div class="image">
+            <a href="${detailUrl}" target="_top" style="display:block;height:100%;">
+              <img class="card-photo" data-card-image src="${escapeHtml(vehicle.image)}" alt="${title}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" style="pointer-events:none;">
+            </a>
+            <div class="badge-row">
+              <span class="badge">${vehicle.featured ? 'Alta demanda' : 'Disponible'}</span>
+              <button class="heart ${favorite ? 'fav' : ''}" type="button" data-favorite="${vehicleId}" aria-label="Guardar ${title}">${favorite ? '♥' : '♡'}</button>
+            </div>
+            ${photoTotal > 1 ? `
+              <button class="card-photo-nav prev" type="button" data-card-direction="-1" aria-label="Foto anterior de ${title}">‹</button>
+              <button class="card-photo-nav next" type="button" data-card-direction="1" aria-label="Foto siguiente de ${title}">›</button>
+              <span class="photo-count" data-card-counter>1 / ${photoTotal}</span>
+            ` : ''}
+          </div>
+          <div class="body">
+            <div class="meta">
+              <span>${year}</span><span>${escapeHtml(vehicle.transmission)}</span><span>${km}</span>${vehicle.fuel ? `<span>${escapeHtml(vehicle.fuel)}</span>` : ''}
+            </div>
+            <h3>${title}</h3>
+            <div class="location">⌖ ${escapeHtml(vehicle.city)}</div>
+            <div class="price-line">
+              <b class="price">${price}</b>
+              <span class="monthly">${monthly}</span>
+            </div>
+            <div class="card-row-actions">
+              <a class="detail" href="${detailUrl}" target="_top">Ver detalle</a>
+              <a class="apartar-btn" href="https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero apartar el ' + vehicle.title + '. ¿Cuánto es el depósito para apartarlo?')}" target="_blank" rel="noreferrer">Apartar</a>
+              <button class="share-btn" type="button" data-share-id="${vehicleId}" data-share-title="${title}" data-share-url="${detailUrl}" aria-label="Compartir">↗</button>
+              <button class="comp-btn" type="button" data-comp-id="${vehicleId}" aria-label="Comparar ${title}" title="Agregar al comparador">⇌</button>
+            </div>
+          </div>
+        </article>`;
+    }).join('');
+    if (typeof window.__compUpdateTray === 'function') window.__compUpdateTray();
+  }
+
+  function cambiarFotoEnTarjeta(card, direction) {
+    const vehicle = inventory.find(item => item.id === card.dataset.cardId);
+    if (!vehicle || !Array.isArray(vehicle.images) || vehicle.images.length <= 1) return;
+
+    const total = vehicle.images.length;
+    const current = Number(card.dataset.photoIndex || 0);
+    const next = (current + Number(direction) + total) % total;
+    card.dataset.photoIndex = String(next);
+
+    const image = card.querySelector('[data-card-image]');
+    const counter = card.querySelector('[data-card-counter]');
+    if (image) { image.src = vehicle.images[next]; image.alt = `Foto ${next + 1} de ${vehicle.title}`; }
+    if (counter) counter.textContent = `${next + 1} / ${total}`;
+  }
+
+  function resetFilters() {
+    el.search.value = '';
+    el.price.value = 'all';
+    el.year.value = 'all';
+    el.automatic.checked = false;
+    el.sort.value = 'featured';
+    selectedType = 'all';
+    visibleLimit = 9;
+    document.querySelectorAll('[data-type]').forEach(button => {
+      button.classList.toggle('active', button.dataset.type === 'all');
+    });
+    render();
+  }
+
+  el.filterForm.addEventListener('submit', event => { event.preventDefault(); visibleLimit = 9; render(); });
+  el.search.addEventListener('input', () => { visibleLimit = 9; render(); });
+  [el.price, el.year, el.automatic, el.sort].forEach(field => {
+    field.addEventListener('change', () => { visibleLimit = 9; render(); });
+  });
+  el.chips.addEventListener('click', event => {
+    const button = event.target.closest('[data-type]');
+    if (!button) return;
+    selectedType = button.dataset.type;
+    visibleLimit = 9;
+    document.querySelectorAll('[data-type]').forEach(item => item.classList.toggle('active', item === button));
+    render();
+  });
+  el.reset.addEventListener('click', resetFilters);
+  el.more.addEventListener('click', () => { visibleLimit += 9; render(); });
+  el.gridBtn.addEventListener('click', () => {
+    el.grid.classList.remove('list-mode');
+    el.gridBtn.classList.add('active'); el.listBtn.classList.remove('active');
+  });
+  el.listBtn.addEventListener('click', () => {
+    el.grid.classList.add('list-mode');
+    el.listBtn.classList.add('active'); el.gridBtn.classList.remove('active');
+  });
+  el.grid.addEventListener('click', event => {
+    const photoButton = event.target.closest('[data-card-direction]');
+    if (photoButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      const card = photoButton.closest('[data-card-id]');
+      if (card) cambiarFotoEnTarjeta(card, photoButton.dataset.cardDirection);
+      return;
+    }
+    const favoriteButton = event.target.closest('[data-favorite]');
+    if (favoriteButton) {
+      const id = favoriteButton.dataset.favorite;
+      favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+      saveFavorites(favorites);
+      render();
+    }
+  });
+
+  // Formulario "avísame cuando llegue" dentro del estado vacío del catálogo.
+  el.grid.addEventListener('submit', event => {
+    const form = event.target.closest('#notifyForm');
+    if (!form) return;
+    event.preventDefault();
+    const nombre = form.querySelector('[name="name"]').value.trim();
+    const telefono = form.querySelector('[name="phone"]').value.trim();
+    if (!nombre || !telefono) return;
+    window.parent.postMessage({
+      type:   'wecars-lead',
+      pagina: 'Inventario - Sin resultados',
+      data:   { nombre, telefono, interes: describeActiveFilters(), origen: detectarOrigenVisita() }
+    }, '*');
+    const btn = form.querySelector('button[type="submit"]');
+    btn.textContent = '¡Listo! Te avisamos en cuanto llegue.';
+    btn.disabled = true;
+    form.querySelectorAll('input').forEach(input => { input.disabled = true; });
+  });
+
+  // Receptor de los datos enviados desde el código Velo de la página.
+  window.addEventListener('message', function (event) {
+    let data = event.data;
+    if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) { return; } }
+    if (!data || data.type !== 'wecars-inventory' || !Array.isArray(data.items)) return;
+
+    inventory = data.items.map(normalizeVehicle).filter(vehicle => vehicle.title);
+    window.__wecarsInventory = inventory;
+    connected = true;
+    visibleLimit = 9;
+    favorites = loadFavorites();
+
+    // Filtros que vienen del buscador rápido del Home (?tipo=...&precio=...
+    // ya leídos por Velo) — se aplican una sola vez, al primer inventario
+    // que llegue, para no pisar cambios que el usuario haga después.
+    if (!filtrosInicialesAplicados && data.filtrosIniciales) {
+      filtrosInicialesAplicados = true;
+      const { tipo, precio } = data.filtrosIniciales;
+      if (tipo) {
+        const chip = document.querySelector(`[data-type="${tipo}"]`);
+        if (chip) {
+          selectedType = tipo;
+          document.querySelectorAll('[data-type]').forEach(item => item.classList.toggle('active', item === chip));
+        }
+      }
+      if (precio && el.price.querySelector(`option[value="${precio}"]`)) {
+        el.price.value = precio;
+      }
+    }
+
+    render();
+
+    window.parent.postMessage({ type: 'wecars-inventory-received', count: inventory.length }, '*');
+  });
+
+  render();
+
+  // Señal para Velo: el iframe ya puede recibir el inventario.
+  let attempts = 0;
+  const readyTimer = setInterval(() => {
+    window.parent.postMessage({ type: 'wecars-catalog-ready' }, '*');
+    attempts += 1;
+    if (connected || attempts >= 20) clearInterval(readyTimer);
+  }, 500);
+  window.parent.postMessage({ type: 'wecars-catalog-ready' }, '*');
+
+  // Auto-resize del iframe dentro de Wix.
+  (function(){var t,retries=0;function send(){var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight,document.body.offsetHeight);window.parent.postMessage({type:"wecars-resize",height:h},"*");}function rh(){clearTimeout(t);t=setTimeout(function(){requestAnimationFrame(send);},150);}function hookImgs(){document.querySelectorAll("img").forEach(function(img){if(!img.dataset.wcResize){img.dataset.wcResize="1";img.addEventListener("load",rh);img.addEventListener("error",rh);}});}window.addEventListener("load",function(){rh();var iv=setInterval(function(){rh();hookImgs();if(++retries>=12)clearInterval(iv);},400);});window.addEventListener("resize",rh);new MutationObserver(function(){rh();hookImgs();}).observe(document.body,{childList:true,subtree:true,attributes:false,characterData:false});hookImgs();rh();})();
+
+  // ── SWIPE EN FOTOS ──
+  (function(){
+    var sx = 0;
+    el.grid.addEventListener('touchstart', function(e){
+      var img = e.target.closest('.image');
+      if (!img) return;
+      sx = e.touches[0].clientX;
+    }, {passive:true});
+    el.grid.addEventListener('touchend', function(e){
+      var img = e.target.closest('.image');
+      if (!img) return;
+      var dx = e.changedTouches[0].clientX - sx;
+      if (Math.abs(dx) < 35) return;
+      var card = img.closest('[data-card-id]');
+      if (card) cambiarFotoEnTarjeta(card, dx < 0 ? 1 : -1);
+    }, {passive:true});
+  })();
+
+  // ── FILTROS MÓVILES (chip bar) ──
+  (function(){
+    var bar = document.getElementById('mobFilterBar');
+    if (!bar) return;
+    bar.addEventListener('click', function(e){
+      var btn = e.target.closest('[data-mob-type]');
+      if (!btn) return;
+      selectedType = btn.dataset.mobType;
+      visibleLimit = 9;
+      document.querySelectorAll('[data-mob-type]').forEach(function(c){ c.classList.toggle('active', c === btn); });
+      document.querySelectorAll('[data-type]').forEach(function(c){ c.classList.toggle('active', c.dataset.type === selectedType); });
+      render();
+    });
+  })();
+
+  // ── COMPARTIR AUTO ──
+  el.grid.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-share-id]');
+    if (!btn) return;
+    var title = btn.dataset.shareTitle || '';
+    var url = btn.dataset.shareUrl || window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: title + ' · weCars Bajío', url: url }).catch(function(){});
+    } else {
+      window.open('https://wa.me/?text=' + encodeURIComponent('Vi este auto en weCars Bajío: ' + title + ' — ' + url), '_blank', 'noopener');
+    }
+  });
+
+  // ── HISTORIAL DE AUTOS VISTOS ──
+  (function(){
+    var HIST_KEY = 'wc_historial_v1';
+    var section = document.getElementById('historialSection');
+    var scroll = document.getElementById('historialScroll');
+    var clearBtn = document.getElementById('historialClear');
+
+    function loadHist(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); }catch(e){ return []; } }
+    function saveHist(arr){ try{ localStorage.setItem(HIST_KEY, JSON.stringify(arr)); }catch(e){} }
+
+    function addToHist(v){
+      var arr = loadHist().filter(function(h){ return h.id !== v.id; });
+      arr.unshift({ id:v.id, title:v.title, price:v.price, image:v.image, url:'https://www.wecarsbajio.com/detalle?carId='+encodeURIComponent(v.id) });
+      if (arr.length > 10) arr = arr.slice(0,10);
+      saveHist(arr);
+    }
+
+    function renderHist(){
+      var arr = loadHist();
+      if (!arr.length || !section || !scroll) return;
+      section.classList.add('visible');
+      scroll.innerHTML = arr.map(function(h){
+        var p = h.price ? '$'+Math.round(h.price).toLocaleString('es-MX') : 'Consultar';
+        return '<a class="hist-card" href="'+h.url+'" target="_top"><img src="'+h.image+'" alt="'+h.title+'" loading="lazy"><div class="hist-body"><p class="hist-title">'+h.title+'</p><p class="hist-price">'+p+'</p></div></a>';
+      }).join('');
+    }
+
+    if (clearBtn) clearBtn.addEventListener('click', function(){
+      saveHist([]);
+      if (section) section.classList.remove('visible');
+    });
+
+    el.grid.addEventListener('click', function(e){
+      var link = e.target.closest('a.detail');
+      if (!link) return;
+      var card = link.closest('[data-card-id]');
+      if (!card) return;
+      var v = inventory.find(function(x){ return x.id === card.dataset.cardId; });
+      if (v) { addToHist(v); renderHist(); }
+    });
+
+    renderHist();
+  })();
+
+  // ── MODO DEMO ── si este archivo se abre solo (fuera de Wix), carga
+  // autos de ejemplo para poder revisar el diseño sin publicar.
+  if (window.self === window.top) {
+    setTimeout(function () {
+      if (connected) return;
+      const demoParams = new URLSearchParams(window.location.search);
+      window.dispatchEvent(new MessageEvent('message', { data: {
+        type: 'wecars-inventory',
+        filtrosIniciales: { tipo: demoParams.get('tipo') || '', precio: demoParams.get('precio') || '' },
+        items: [
+          { id: 'a', title: 'Nissan Versa Advance 2022', type: 'Sedán', year: 2022, km: 38000, transmission: 'Automático', price: 279000, priceCredito: 289000, city: 'León, Gto.', images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=900&q=80','https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=900&q=80'] },
+          { id: 'b', title: 'Toyota RAV4 2022', type: 'SUV', year: 2022, km: 30000, transmission: 'Automático', price: 459000, priceCredito: 469000, city: 'León, Gto.', images: ['https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=900&q=80'] },
+          { id: 'c', title: 'Ford F-150 2021', type: 'Pickup', year: 2021, km: 42000, transmission: 'Automático', price: 699000, priceCredito: 709000, city: 'León, Gto.', images: ['https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=900&q=80'] },
+          { id: 'd', title: 'Mercedes Benz C250 2020', type: 'Premium', year: 2020, km: 25000, transmission: 'Automático', price: 549000, priceCredito: 559000, city: 'León, Gto.', images: ['https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=900&q=80'] },
+          { id: 'e', title: 'Kia Sportage 2023', type: 'SUV', year: 2023, km: 19000, transmission: 'Automático', price: 399000, priceCredito: 409000, city: 'León, Gto.', images: ['https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=900&q=80'] },
+          { id: 'f', title: 'Honda City 2023', type: 'Sedán', year: 2023, km: 15000, transmission: 'Automático', price: 339000, priceCredito: 349000, city: 'León, Gto.', images: ['https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=900&q=80'] }
+        ]
+      }}));
+    }, 500);
+  }
+})();
+</script>
+
+<!-- Botón WhatsApp flotante -->
+<a class="wa-float" href="https://wa.me/524778350020?text=Hola%2C%20quiero%20asesor%C3%ADa%20con%20weCars%20Baj%C3%ADo." target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<!-- ── CHAT INTELIGENTE ── -->
+<button class="chat-bubble" id="chatBubble" type="button" aria-label="Asistente weCars">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <span class="chat-badge" id="chatBadge">1</span>
+</button>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div class="chat-head-avatar">wC</div>
+    <div class="chat-head-info">
+      <div class="chat-head-name">Asistente weCars</div>
+      <div class="chat-head-status">🟢 En línea · Inventario en tiempo real</div>
+    </div>
+    <button class="chat-close" id="chatClose" type="button">✕</button>
+  </div>
+  <div class="chat-msgs" id="chatMsgs"></div>
+  <div class="chat-suggestions" id="chatSugs"></div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" type="text" placeholder="¿Qué auto buscas?">
+    <button class="chat-send" id="chatSend" type="button" aria-label="Enviar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ── COMPARADOR TRAY ── -->
+<div class="comp-tray" id="compTray">
+  <div>
+    <div class="comp-tray-label">Comparando</div>
+  </div>
+  <div class="comp-tray-slots" id="compSlots"></div>
+  <button class="comp-tray-clear" id="compClear" type="button">Limpiar</button>
+  <button class="comp-tray-cta" id="compComparar" type="button" disabled>Comparar</button>
+</div>
+
+<!-- ── COMPARADOR MODAL ── -->
+<div class="comp-modal-bg" id="compModalBg">
+  <div class="comp-modal" id="compModal">
+    <div class="comp-modal-head">
+      <h2>Comparación de vehículos</h2>
+      <button class="comp-modal-close" id="compModalClose" type="button">✕</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="comp-table" id="compTable"></table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CHAT INTELIGENTE ─────────────────────────────────────────────────
+(function(){
+  var WA = '524778350020';
+  var bubble = document.getElementById('chatBubble');
+  var panel  = document.getElementById('chatPanel');
+  var closeBtn = document.getElementById('chatClose');
+  var msgsEl = document.getElementById('chatMsgs');
+  var sugsEl = document.getElementById('chatSugs');
+  var inputEl = document.getElementById('chatInput');
+  var sendBtn = document.getElementById('chatSend');
+  var badge  = document.getElementById('chatBadge');
+
+  var isOpen = false;
+  var greeted = false;
+
+  function money(n){ return '$' + Math.round(n).toLocaleString('es-MX'); }
+
+  function getInv(){ return window.__wecarsInventory || []; }
+
+  // ── Parsear intención del usuario ──────────────────────────────────
+  function parseQuery(text) {
+    var t = text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    var intent = { brands:[], types:[], maxPrice:null, minPrice:null, transmission:null, fuel:null, maxKm:null };
+
+    // Marcas
+    var brands = ['toyota','honda','volkswagen','vw','nissan','kia','hyundai','mazda','ford','chevrolet','audi','bmw','mercedes','subaru','jeep','mitsubishi','seat','suzuki','dodge','ram','volvo','porsche'];
+    brands.forEach(function(b){ if(t.indexOf(b) !== -1) intent.brands.push(b === 'vw' ? 'volkswagen' : b); });
+
+    // Tipos
+    if(/suv|camioneta|camion/.test(t)) intent.types.push('suv');
+    if(/sedan|sedán/.test(t)) intent.types.push('sedan');
+    if(/pickup|pick.?up/.test(t)) intent.types.push('pickup');
+    if(/premium|lujo/.test(t)) intent.types.push('premium');
+
+    // Precios — "menos de 500k", "bajo 500", "500 mil", "500,000"
+    var priceMatch = t.match(/menos\s+de\s+([\d,.]+)\s*k?|bajo\s+([\d,.]+)\s*k?|hasta\s+([\d,.]+)\s*k?|([\d,.]+)\s*k\b|([\d,.]+)\s*mil|([\d,.]+,\d{3})/);
+    if(priceMatch){
+      var raw = (priceMatch[1]||priceMatch[2]||priceMatch[3]||priceMatch[4]||priceMatch[5]||priceMatch[6]||'').replace(/,/g,'');
+      var n = parseFloat(raw);
+      if(n){
+        if(priceMatch[4] || n < 5000) n = n * 1000;
+        intent.maxPrice = n;
+      }
+    }
+    var priceFrom = t.match(/m[aá]s\s+de\s+([\d,.]+)\s*k?|desde\s+([\d,.]+)\s*k?/);
+    if(priceFrom){
+      var raw2 = (priceFrom[1]||priceFrom[2]||'').replace(/,/g,'');
+      var n2 = parseFloat(raw2);
+      if(n2){ if(n2 < 5000) n2 = n2*1000; intent.minPrice = n2; }
+    }
+
+    // Transmisión
+    if(/auto[mátc]+|tiptronic|cvt/.test(t)) intent.transmission = 'automatica';
+    if(/manual|est[aá]ndar|est[áa]ndar/.test(t)) intent.transmission = 'manual';
+
+    // Combustible
+    if(/electr[oi]|ev\b/.test(t)) intent.fuel = 'electrico';
+    if(/h[íi]brido|hybrid/.test(t)) intent.fuel = 'hibrido';
+    if(/diesel/.test(t)) intent.fuel = 'diesel';
+
+    return intent;
+  }
+
+  function filterInv(intent){
+    return getInv().filter(function(v){
+      var name = (v.title + ' ' + v.brand + ' ' + v.type).toLowerCase();
+      if(intent.brands.length && !intent.brands.some(function(b){ return name.indexOf(b) !== -1; })) return false;
+      if(intent.types.length && !intent.types.some(function(tp){ return (v.type||'').toLowerCase().indexOf(tp) !== -1; })) return false;
+      if(intent.maxPrice && v.price > intent.maxPrice) return false;
+      if(intent.minPrice && v.price < intent.minPrice) return false;
+      if(intent.transmission){
+        var tr = (v.transmission||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+        if(intent.transmission === 'automatica' && tr.indexOf('autom') === -1 && tr !== 'cvt' && tr !== 'tiptronic') return false;
+        if(intent.transmission === 'manual' && tr.indexOf('manual') === -1) return false;
+      }
+      if(intent.fuel){
+        var fu = (v.fuel||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+        if(intent.fuel === 'electrico' && fu.indexOf('electr') === -1) return false;
+        if(intent.fuel === 'hibrido' && fu.indexOf('hibrid') === -1) return false;
+        if(intent.fuel === 'diesel' && fu.indexOf('diesel') === -1) return false;
+      }
+      return true;
+    });
+  }
+
+  // ── Renderizar mensajes ───────────────────────────────────────────
+  function addMsg(html, who){
+    var div = document.createElement('div');
+    div.className = 'chat-msg ' + who;
+    div.innerHTML = html;
+    msgsEl.appendChild(div);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    return div;
+  }
+
+  function addCarsMsg(cars){
+    var div = document.createElement('div');
+    div.className = 'chat-msg bot';
+    var shown = cars.slice(0,3);
+    div.innerHTML = '<div class="chat-cars">' +
+      shown.map(function(v){
+        var img = v.image || '';
+        var url = 'https://www.wecarsbajio.com/detalle?carId=' + encodeURIComponent(v.id);
+        return '<a class="chat-car-link" href="'+url+'" target="_top">' +
+          '<img class="chat-car-img" src="'+img+'" alt="'+v.title+'" loading="lazy">' +
+          '<div class="chat-car-info"><div class="chat-car-name">'+v.title+'</div>' +
+          '<div class="chat-car-price">'+money(v.price)+'</div></div></a>';
+      }).join('') +
+      (cars.length > 3 ? '<a class="chat-car-link" style="justify-content:center;font-size:.76rem;font-weight:800;color:var(--lime-dark)" href="https://www.wecarsbajio.com/inventario" target="_top">Ver los '+(cars.length-3)+' restantes →</a>' : '') +
+    '</div>';
+    msgsEl.appendChild(div);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  function setSugs(list){
+    sugsEl.innerHTML = list.map(function(s){
+      return '<button class="chat-sug" type="button">'+s+'</button>';
+    }).join('');
+  }
+
+  // ── Respuesta inteligente ─────────────────────────────────────────
+  function responder(texto){
+    addMsg(texto, 'user');
+    setSugs([]);
+    var t = texto.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+
+    // Saludo
+    if(/^(hola|buenas|buenos|hey|hi)\b/.test(t)){
+      addMsg('¡Hola! Soy el asistente de weCars Bajío. Puedo ayudarte a encontrar el auto perfecto. 🚗<br>Pregúntame: marca, tipo, presupuesto, transmisión...', 'bot');
+      setSugs(['SUVs automáticas','Toyota bajo $400k','Autos menos de $300,000','¿Tienen diesel?']);
+      return;
+    }
+
+    // Disponibilidad total
+    if(/cuantos|cu[aá]ntos|total|inventario.*completo|qu[eé].*tienen/.test(t) && !/precio|marca|tipo/.test(t)){
+      var total = getInv().length;
+      addMsg('Tenemos <b>'+total+' vehículos</b> disponibles ahora mismo. ¿Qué tipo buscas?', 'bot');
+      setSugs(['SUVs','Sedanes','Pickups','Ver todo el inventario']);
+      return;
+    }
+
+    // WhatsApp directo
+    if(/hablar|asesor|vendedor|llamar|contactar/.test(t)){
+      addMsg('Con gusto te conecto con un asesor. <a href="https://wa.me/'+WA+'?text='+encodeURIComponent('Hola, vengo desde el chat del inventario y quiero asesoría.')+'" target="_blank">Abrir WhatsApp →</a>', 'bot');
+      return;
+    }
+
+    // Captura de lead si dicen que les interesa
+    if(/me interesa|quiero ese|lo quiero|apartar|me lo llevo|contactar|dejame datos|mis datos/.test(t)){
+      mostrarFormCaptura();
+      return;
+    }
+
+    // Buscar por intención
+    var intent = parseQuery(texto);
+    var hasFilter = intent.brands.length || intent.types.length || intent.maxPrice || intent.minPrice || intent.transmission || intent.fuel;
+
+    if(!hasFilter){
+      addMsg('No entendí bien. Intenta algo como: <em>"Toyota automática bajo 500k"</em> o <em>"SUVs disponibles"</em>.<br>También puedo conectarte con un <a href="https://wa.me/'+WA+'" target="_blank">asesor por WhatsApp</a>.', 'bot');
+      setSugs(['SUVs automáticas','Toyota bajo $400k','¿Tienen Mazda?','Hablar con asesor']);
+      return;
+    }
+
+    var results = filterInv(intent);
+    if(!results.length){
+      addMsg('No encontré autos con esos filtros en el inventario actual. ¿Ajustamos la búsqueda? 🔍<br>O <a href="https://wa.me/'+WA+'?text='+encodeURIComponent('Hola, busco: '+texto)+'" target="_blank">avísanos</a> y te buscamos uno.', 'bot');
+      setSugs(['Ver todos los autos','SUVs disponibles','Sedanes bajo $350k']);
+      return;
+    }
+
+    addMsg('Encontré <b>'+results.length+' auto'+(results.length!==1?'s':'')+' que coincide'+(results.length===1?'':'n')+'</b> con tu búsqueda:', 'bot');
+    addCarsMsg(results.sort(function(a,b){ return a.price-b.price; }));
+    if(results.length > 0) setSugs(['Ver detalle en inventario','Solicitar crédito','Hablar con asesor']);
+  }
+
+  // ── Captura de lead dentro del chat ──────────────────────────────
+  var leadCapturado = false;
+
+  function mostrarFormCaptura(){
+    if(leadCapturado){
+      addMsg('¡Ya registré tus datos! Un asesor te contactará pronto. 👍', 'bot');
+      return;
+    }
+    var div = document.createElement('div');
+    div.className = 'chat-msg bot';
+    div.innerHTML = '<div style="font-size:.8rem;margin-bottom:10px">¡Perfecto! Dame tus datos y un asesor te contacta hoy mismo:</div>' +
+      '<input id="chat-lead-nombre" type="text" placeholder="Tu nombre" style="width:100%;margin-bottom:8px;padding:8px 10px;border:1px solid #dce5e7;border-radius:8px;font-size:.8rem;outline:0;box-sizing:border-box">' +
+      '<input id="chat-lead-tel" type="tel" placeholder="WhatsApp / celular" style="width:100%;margin-bottom:10px;padding:8px 10px;border:1px solid #dce5e7;border-radius:8px;font-size:.8rem;outline:0;box-sizing:border-box">' +
+      '<button id="chat-lead-enviar" type="button" style="width:100%;background:#0b1014;color:#fff;border:0;border-radius:9px;padding:9px;font-size:.8rem;font-weight:900;cursor:pointer">Quiero que me contacten →</button>';
+    msgsEl.appendChild(div);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+
+    document.getElementById('chat-lead-enviar').addEventListener('click', function(){
+      var nombre = (document.getElementById('chat-lead-nombre').value || '').trim();
+      var tel = (document.getElementById('chat-lead-tel').value || '').trim();
+      if(!nombre || !tel){ alert('Por favor completa nombre y WhatsApp.'); return; }
+      leadCapturado = true;
+      window.parent.postMessage({ type: 'wecars-lead', data: { nombre: nombre, telefono: tel, origen: 'Sitio web', canalContacto: 'Chat inteligente', interes: 'Chat de inventario', mensaje: 'Lead desde chat de inventario' }, pagina: 'Inventario' }, '*');
+      div.innerHTML = '<span style="color:#1a6b3c;font-weight:800">✓ ¡Listo, '+nombre+'! Un asesor te escribe pronto por WhatsApp.</span>';
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+      setSugs(['Ver más autos','Hablar por WhatsApp']);
+    });
+  }
+
+  // ── Abrir / cerrar ────────────────────────────────────────────────
+  function openChat(){
+    isOpen = true;
+    panel.classList.add('open');
+    badge.classList.remove('visible');
+    if(!greeted){
+      greeted = true;
+      setTimeout(function(){
+        addMsg('¡Hola! 👋 Soy el asistente de weCars Bajío.<br>Pregúntame qué auto buscas y reviso el inventario en tiempo real para ti.', 'bot');
+        setSugs(['SUVs automáticas','Toyota bajo $400k','¿Qué tienen de Nissan?','Ver todo']);
+      }, 200);
+    }
+    setTimeout(function(){ inputEl.focus(); }, 300);
+  }
+
+  function closeChat(){
+    isOpen = false;
+    panel.classList.remove('open');
+  }
+
+  bubble.addEventListener('click', function(){ isOpen ? closeChat() : openChat(); });
+  closeBtn.addEventListener('click', closeChat);
+
+  sugsEl.addEventListener('click', function(e){
+    var btn = e.target.closest('.chat-sug');
+    if(btn) responder(btn.textContent);
+  });
+
+  function enviar(){
+    var txt = inputEl.value.trim();
+    if(!txt) return;
+    inputEl.value = '';
+    responder(txt);
+  }
+
+  sendBtn.addEventListener('click', enviar);
+  inputEl.addEventListener('keydown', function(e){ if(e.key==='Enter') enviar(); });
+
+  // Mostrar badge después de 4s si no han abierto el chat
+  setTimeout(function(){
+    if(!isOpen && !greeted){ badge.classList.add('visible'); }
+  }, 4000);
+})();
+
+// ── VOICE SEARCH ──────────────────────────────────────────────────────
+(function(){
+  var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var micBtn = document.getElementById('micBtn');
+  if (!SpeechRec || !micBtn) { if(micBtn) micBtn.style.display='none'; return; }
+  var rec = new SpeechRec();
+  rec.lang = 'es-MX';
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  var listening = false;
+  micBtn.addEventListener('click', function(){
+    if(listening){ rec.stop(); return; }
+    rec.start();
+  });
+  rec.addEventListener('start', function(){
+    listening = true;
+    micBtn.classList.add('listening');
+    micBtn.title = 'Escuchando... (toca para cancelar)';
+  });
+  rec.addEventListener('end', function(){
+    listening = false;
+    micBtn.classList.remove('listening');
+    micBtn.title = 'Buscar por voz';
+  });
+  rec.addEventListener('result', function(e){
+    var texto = e.results[0][0].transcript;
+    var inp = document.getElementById('searchInput');
+    if(inp){
+      inp.value = texto;
+      inp.dispatchEvent(new Event('input'));
+    }
+  });
+  rec.addEventListener('error', function(e){
+    listening = false;
+    micBtn.classList.remove('listening');
+    if(e.error === 'not-allowed') alert('Activa el micrófono en tu navegador para usar la búsqueda por voz.');
+  });
+})();
+
+// ── COMPARADOR ────────────────────────────────────────────────────────
+(function(){
+  var MAX = 3;
+  var selected = []; // array of vehicle ids
+
+  var tray = document.getElementById('compTray');
+  var slotsEl = document.getElementById('compSlots');
+  var clearBtn = document.getElementById('compClear');
+  var compBtn = document.getElementById('compComparar');
+  var modalBg = document.getElementById('compModalBg');
+  var modalClose = document.getElementById('compModalClose');
+  var compTable = document.getElementById('compTable');
+
+  function getInventory(){
+    return window.__wecarsInventory || [];
+  }
+
+  function getVehicle(id){
+    return getInventory().find(function(v){ return v.id === id; });
+  }
+
+  function money(n){
+    if(!n) return '—';
+    return '$' + Number(n).toLocaleString('es-MX');
+  }
+
+  function updateTray(){
+    var show = selected.length > 0;
+    tray.classList.toggle('visible', show);
+    compBtn.disabled = selected.length < 2;
+
+    slotsEl.innerHTML = selected.map(function(id, i){
+      var v = getVehicle(id);
+      var img = v ? (v.image || '') : '';
+      return '<div class="comp-slot">' +
+        (img ? '<img src="'+img+'" alt="">' : '') +
+        '<button class="comp-slot-rm" data-rm="'+id+'" type="button">✕</button>' +
+        '</div>';
+    }).join('') +
+    (selected.length < MAX ? '<div class="comp-slot" style="display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.35);font-size:1.4rem">+</div>' : '');
+
+    // sync all comp buttons state
+    document.querySelectorAll('[data-comp-id]').forEach(function(btn){
+      var isSelected = selected.indexOf(btn.dataset.compId) !== -1;
+      btn.classList.toggle('selected', isSelected);
+      btn.disabled = !isSelected && selected.length >= MAX;
+    });
+  }
+
+  function toggleCar(id){
+    var idx = selected.indexOf(id);
+    if(idx !== -1){
+      selected.splice(idx, 1);
+    } else {
+      if(selected.length >= MAX) return;
+      selected.push(id);
+    }
+    updateTray();
+  }
+
+  // Click on comp button in card
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-comp-id]');
+    if(btn){ toggleCar(btn.dataset.compId); return; }
+
+    var rm = e.target.closest('[data-rm]');
+    if(rm){ toggleCar(rm.dataset.rm); return; }
+  });
+
+  clearBtn.addEventListener('click', function(){
+    selected = [];
+    updateTray();
+  });
+
+  function buildModal(){
+    var vehicles = selected.map(getVehicle).filter(Boolean);
+    if(!vehicles.length) return;
+
+    var cols = vehicles.length;
+    var rows = [
+      { label: 'Foto', render: function(v){ return '<td class="comp-img-cell"><img src="'+(v.image||'')+'" alt="'+v.title+'"></td>'; } },
+      { label: 'Vehículo', render: function(v){ return '<td><b>'+v.title+'</b></td>'; } },
+      { label: 'Precio', render: function(v){ return '<td class="comp-price">'+money(v.price)+'</td>'; } },
+      { label: 'Mensualidad', render: function(v){ return '<td>'+(v.monthly ? 'Desde '+money(v.monthly)+'/mes' : '—')+'</td>'; } },
+      { label: 'Año', render: function(v){ return '<td>'+(v.year||'—')+'</td>'; } },
+      { label: 'Transmisión', render: function(v){ return '<td>'+(v.transmission||'—')+'</td>'; } },
+      { label: 'Kilometraje', render: function(v){ return '<td>'+(v.km ? v.km.toLocaleString('es-MX')+' km' : '—')+'</td>'; } },
+      { label: 'Combustible', render: function(v){ return '<td>'+(v.fuel||'—')+'</td>'; } },
+      { label: 'Ciudad', render: function(v){ return '<td>'+(v.city||'—')+'</td>'; } },
+      { label: 'Tipo', render: function(v){ return '<td>'+(v.type||'—')+'</td>'; } },
+      { label: '', render: function(v){
+        var url = 'https://www.wecarsbajio.com/detalle?carId='+encodeURIComponent(v.id);
+        return '<td><a href="'+url+'" target="_top" style="display:inline-block;background:var(--lime);color:#081102;font-weight:900;font-size:.79rem;padding:9px 14px;border-radius:8px;text-decoration:none">Ver detalle →</a></td>';
+      }}
+    ];
+
+    compTable.innerHTML = rows.map(function(row){
+      return '<tr><th>'+row.label+'</th>'+vehicles.map(row.render).join('')+'</tr>';
+    }).join('');
+  }
+
+  compBtn.addEventListener('click', function(){
+    buildModal();
+    modalBg.classList.add('open');
+  });
+
+  modalClose.addEventListener('click', closeModal);
+  modalBg.addEventListener('click', function(e){ if(e.target === modalBg) closeModal(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+  function closeModal(){
+    modalBg.classList.remove('open');
+  }
+
+  // Expose so render() can call updateTray after re-render
+  window.__compUpdateTray = updateTray;
+})();
+</script>
+
+<!-- ── BLOQUE MÓVIL: touch targets + UX mejoras ── -->
+<style id="inv-mobile-ux">
+@media(max-width:820px){
+  /* Touch targets mínimos 44px */
+  .heart,.card-photo-nav,.share-btn,.comp-btn,.mob-close{
+    min-width:44px!important;min-height:44px!important;
+  }
+  .mob-filter-bar .chip{padding:10px 16px!important;min-height:44px!important;display:flex;align-items:center}
+  /* Tamaño mínimo de texto legible */
+  .market-badge,.market-photo-count,.market-payment,.market-card-meta{font-size:.8rem!important}
+  /* Filtros: botón "Filtros" accesible en móvil */
+  .mob-filter-open-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:10px 16px;min-height:44px;
+    background:#fff;border:1.5px solid var(--line,#d8e2e5);border-radius:99px;
+    font-size:.8rem;font-weight:700;color:var(--ink,#0f1a0f);
+    cursor:pointer;white-space:nowrap;flex-shrink:0;
+  }
+  /* Imágenes de historial lazy */
+  .hist-card img{loading:lazy}
+}
+</style>
+</body>
+</html>

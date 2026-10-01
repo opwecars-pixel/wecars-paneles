@@ -1,0 +1,766 @@
+/* weCars ERP Design System v2.0 — Override unificado
+   Punto de referencia: Design System Artifact v2.0
+   Tema claro unico. Sin dark mode. Sin codigo condicional. */
+
+/* ── 1. FORZAR TEMA CLARO — elimina dark mode completamente ──────── */
+/* Redefine todos los tokens bajo CUALQUIER condición posible:
+   sistema oscuro, data-theme="dark", preferencia del browser */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light;
+  }
+}
+:root,
+:root[data-theme="dark"],
+:root[data-theme="light"],
+:root:not([data-theme]) {
+  color-scheme: light;
+
+  /* ── 2. TOKENS CORRECTOS — fuente única de verdad ── */
+
+  /* Marca */
+  --brand:        #56a900;
+  --brand-dark:   #3d7a00;
+  --brand-light:  #eaf5d8;
+  --brand-xlight: #f3fae8;
+
+  /* Aliases de compatibilidad (no romper JS/HTML existente) */
+  --lime:         #56a900;
+  --lime-dark:    #3d7a00;
+  --lime-bg:      #eaf5d8;
+  --lime-mid:     rgba(86,169,0,.18);
+
+  /* Sidebar */
+  --sidebar-bg:   #0d1a0d;
+  --sidebar-acc:  #b7f779;
+  --sidebar-mut:  rgba(183,247,121,.45);
+  --sidebar-w:    220px;
+
+  /* Fondos — SOLO claros */
+  --bg:           #f5f7f5;
+  --paper:        #f5f7f5;
+  --surface:      #ffffff;
+  --surface-2:    #f8faf8;
+  --overlay:      rgba(13,26,13,.4);
+
+  /* Texto */
+  --ink:          #0d1a0d;
+  --ink-2:        #3b4d3b;
+  --muted:        #6b7b6b;
+  --faint:        #a8b8a8;
+
+  /* Bordes */
+  --line:         #e2eae2;
+  --line-2:       #cdd6cd;
+
+  /* Semáforo — colores correctos según DS */
+  --ok:           #16a34a;
+  --ok-bg:        #f0fdf4;
+  --ok-bd:        #bbf7d0;
+
+  --warn:         #d97706;
+  --warn-bg:      #fffbeb;
+  --warn-bd:      #fde68a;
+
+  --err:          #dc2626;
+  --err-bg:       #fef2f2;
+  --err-bd:       #fecaca;
+
+  --info:         #2563eb;
+  --info-bg:      #eff6ff;
+  --info-bd:      #bfdbfe;
+
+  /* Alias semáforo (compatibilidad) */
+  --success:      #16a34a;
+  --success-bg:   #f0fdf4;
+  --danger:       #dc2626;
+  --danger-bg:    #fef2f2;
+  --warning:      #d97706;
+  --warning-bg:   #fffbeb;
+
+  /* Radius */
+  --r-xs:  4px;
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  16px;
+  --r-xl:  24px;
+  --r-full: 9999px;
+  --radius: 12px;
+
+  /* Spacing — grilla de 4px */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* Tipografía */
+  --t-xs:   11px;
+  --t-sm:   12px;
+  --t-base: 13px;
+  --t-md:   14px;
+  --t-lg:   16px;
+  --t-xl:   18px;
+  --t-2xl:  22px;
+  --t-3xl:  28px;
+  --t-4xl:  38px;
+
+  /* Sombras */
+  --sh-0:     none;
+  --sh-1:     0 1px 3px rgba(13,26,13,.08), 0 1px 2px rgba(13,26,13,.05);
+  --sh-2:     0 4px 12px rgba(13,26,13,.10), 0 2px 4px rgba(13,26,13,.06);
+  --sh-3:     0 8px 24px rgba(13,26,13,.13), 0 4px 8px rgba(13,26,13,.07);
+  --sh-modal: 0 24px 64px rgba(13,26,13,.22);
+  --shadow-sm: 0 1px 3px rgba(13,26,13,.08), 0 1px 2px rgba(13,26,13,.05);
+  --shadow-md: 0 4px 12px rgba(13,26,13,.10), 0 2px 4px rgba(13,26,13,.06);
+
+  /* Z-index (8 niveles, no más) */
+  --z-drop:    100;
+  --z-sticky:  200;
+  --z-sidebar: 300;
+  --z-overlay: 400;
+  --z-modal:   500;
+  --z-toast:   600;
+
+  /* Layout */
+  --topbar-h: 56px;
+  --main-max: 1280px;
+}
+
+/* ── 3. BODY — fondo claro siempre ──────────────────────────────── */
+html, body {
+  color-scheme: light !important;
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+/* ── 4. SIDEBAR — oscuro profundo + acento verde lima ───────────── */
+.wc-sidebar {
+  background: var(--sidebar-bg) !important;
+  width: var(--sidebar-w) !important;
+}
+
+/* Marca en sidebar */
+.wc-sidebar-brand-text,
+.wc-sidebar .wc-sidebar-brand-text {
+  color: rgba(255,255,255,.92) !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-weight: 900 !important;
+}
+.wc-brand-sub { color: var(--sidebar-mut) !important; }
+
+/* Logo mark */
+.wc-sidebar-mark {
+  background: var(--brand) !important;
+  color: #081102 !important;
+}
+
+/* Items de nav en sidebar */
+.wc-sidebar-nav a,
+.wc-sidebar-nav button.wc-nav-item,
+.wc-sidebar-nav .wc-sub-item,
+.wc-sidebar-sublink {
+  color: var(--sidebar-mut) !important;
+  transition: color .14s, background .14s !important;
+}
+.wc-sidebar-nav a:hover,
+.wc-sidebar-nav button.wc-nav-item:hover,
+.wc-sidebar-nav .wc-sub-item:hover {
+  color: var(--sidebar-acc) !important;
+  background: rgba(183,247,121,.07) !important;
+}
+.wc-sidebar-nav a.active,
+.wc-sidebar-nav button.wc-nav-item.active,
+.wc-sidebar-nav .wc-sub-item.active,
+.wc-sidebar-sublink.active {
+  color: var(--sidebar-acc) !important;
+  background: rgba(183,247,121,.10) !important;
+  font-weight: 700 !important;
+}
+/* Barra activa derecha */
+.wc-sidebar-nav a.active,
+.wc-sidebar-nav button.wc-nav-item.active {
+  border-right: 3px solid var(--sidebar-acc) !important;
+}
+
+/* Iconos del sidebar */
+.wc-sidebar-nav .wc-nav-icon,
+.wc-sidebar-nav i,
+.wc-sidebar-nav a i,
+.wc-sidebar-nav button i { opacity: .55 !important; }
+.wc-sidebar-nav a.active i,
+.wc-sidebar-nav button.wc-nav-item.active i,
+.wc-sidebar-nav a:hover i,
+.wc-sidebar-nav button:hover i { opacity: 1 !important; }
+
+/* Labels de sección ("CLIENTES", "HERRAMIENTAS") */
+.wc-sidebar-link:not(.ext),
+.wc-nav-section-label,
+.wc-sidebar-section {
+  color: rgba(183,247,121,.30) !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+/* Links entre paneles */
+.wc-sidebar-link.ext {
+  color: var(--sidebar-mut) !important;
+}
+.wc-sidebar-link.ext:hover { color: var(--sidebar-acc) !important; }
+
+/* Perfil en sidebar */
+.wc-sidebar-profile-name { color: rgba(255,255,255,.88) !important; }
+.wc-sidebar-profile-role { color: var(--sidebar-mut) !important; }
+
+/* Backdrop sidebar mobile */
+.wc-sidebar-backdrop,
+.wc-overlay,
+#wc-overlay {
+  background: var(--overlay) !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+/* ── 5. TOPBAR / HEADER MOBILE ───────────────────────────────────── */
+.pv-header,
+.wc-topbar,
+.panel-header,
+.wc-header {
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--line) !important;
+  color: var(--ink) !important;
+}
+.pv-header-brand,
+.wc-topbar-title,
+.panel-header-title {
+  font-family: 'Manrope', sans-serif !important;
+  font-weight: 800 !important;
+  color: var(--ink) !important;
+  letter-spacing: -.03em !important;
+}
+.pv-header-brand span { color: var(--brand) !important; }
+
+/* ── 6. CONTENIDO PRINCIPAL ──────────────────────────────────────── */
+.wc-content,
+.wc-main,
+.panel-body,
+.pv-content {
+  background: var(--bg) !important;
+}
+
+/* ── 7. BOTONES ──────────────────────────────────────────────────── */
+/* Primario */
+.btn-primary,
+.pv-btn-primary,
+.wc-btn-primary,
+button.primary {
+  background: var(--brand) !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 600 !important;
+}
+.btn-primary:hover,
+.pv-btn-primary:hover,
+.wc-btn-primary:hover { background: var(--brand-dark) !important; }
+
+/* Secundario */
+.btn-secondary,
+.pv-btn-secondary,
+.wc-btn-secondary,
+button.secondary {
+  background: var(--surface) !important;
+  color: var(--ink-2) !important;
+  border: 1.5px solid var(--line-2) !important;
+}
+.btn-secondary:hover,
+.pv-btn-secondary:hover { border-color: var(--brand) !important; color: var(--brand-dark) !important; }
+
+/* Ghost */
+.btn-ghost,
+.pv-btn-ghost,
+.wc-btn-ghost {
+  background: transparent !important;
+  color: var(--ink-2) !important;
+  border: none !important;
+}
+.btn-ghost:hover { background: var(--surface-2) !important; }
+
+/* Danger */
+.btn-danger,
+.pv-btn-danger,
+button.danger {
+  background: var(--err-bg) !important;
+  color: var(--err) !important;
+  border: 1.5px solid var(--err-bd) !important;
+}
+.btn-danger:hover { background: var(--err) !important; color: #fff !important; }
+
+/* ── 8. INPUTS ───────────────────────────────────────────────────── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+select,
+textarea {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--line-2) !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 3px rgba(86,169,0,.15) !important;
+  outline: none !important;
+}
+input::placeholder, textarea::placeholder { color: var(--faint) !important; }
+
+/* ── 9. CARDS ────────────────────────────────────────────────────── */
+.card,
+.wc-card,
+.pv-card,
+.kpi-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg) !important;
+}
+
+/* KPI tiles — barra lateral de color */
+.kpi-card,
+.pv-kpi,
+.wc-kpi,
+.kpi-tile {
+  position: relative !important;
+  overflow: hidden !important;
+}
+.kpi-card::before,
+.pv-kpi::before,
+.wc-kpi::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important; top: 0 !important; bottom: 0 !important;
+  width: 4px !important;
+  background: var(--kpi-accent, var(--brand)) !important;
+  border-radius: var(--r-lg) 0 0 var(--r-lg) !important;
+}
+.kpi-value,
+.pv-kpi-value,
+.wc-kpi-value {
+  font-family: 'Manrope', sans-serif !important;
+  font-weight: 900 !important;
+  letter-spacing: -.04em !important;
+  color: var(--ink) !important;
+}
+.kpi-label,
+.pv-kpi-label,
+.wc-kpi-label {
+  font-size: var(--t-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .05em !important;
+  text-transform: uppercase !important;
+  color: var(--muted) !important;
+}
+
+/* ── 10. TABLAS ──────────────────────────────────────────────────── */
+table thead th,
+.wc-table thead th,
+.pv-table thead th {
+  background: var(--surface-2) !important;
+  color: var(--muted) !important;
+  border-bottom: 2px solid var(--line) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: .05em !important;
+  text-transform: uppercase !important;
+}
+table tbody tr:hover,
+.wc-table tbody tr:hover,
+.pv-table tbody tr:hover {
+  background: var(--brand-xlight) !important;
+}
+table tbody td,
+.wc-table tbody td,
+.pv-table tbody td {
+  border-bottom: 1px solid var(--line) !important;
+  color: var(--ink-2) !important;
+}
+
+/* ── 11. BADGES / CHIPS ──────────────────────────────────────────── */
+/* Verde (activo, ok, disponible) */
+.badge-ok, .badge-success, .badge-green,
+.badge.ok, .chip-ok {
+  background: var(--ok-bg) !important;
+  color: var(--ok) !important;
+  border: 1px solid var(--ok-bd) !important;
+}
+/* Amarillo (en proceso, pendiente) */
+.badge-warn, .badge-warning, .badge-yellow,
+.badge.warn, .chip-warn {
+  background: var(--warn-bg) !important;
+  color: var(--warn) !important;
+  border: 1px solid var(--warn-bd) !important;
+}
+/* Rojo (error, cancelado, urgente) */
+.badge-err, .badge-error, .badge-danger, .badge-red,
+.badge.err, .chip-err {
+  background: var(--err-bg) !important;
+  color: var(--err) !important;
+  border: 1px solid var(--err-bd) !important;
+}
+/* Azul (info, crédito) */
+.badge-info, .badge-blue,
+.badge.info, .chip-info {
+  background: var(--info-bg) !important;
+  color: var(--info) !important;
+  border: 1px solid var(--info-bd) !important;
+}
+/* Brand (weCars, apartado) */
+.badge-brand, .badge-lime,
+.badge.brand {
+  background: var(--brand-light) !important;
+  color: var(--brand-dark) !important;
+  border: 1px solid var(--brand) !important;
+}
+/* Neutral */
+.badge-neutral, .badge-muted,
+.badge.neutral {
+  background: var(--surface-2) !important;
+  color: var(--muted) !important;
+  border: 1px solid var(--line) !important;
+}
+
+/* Status: estatus del expediente — mapa completo */
+[data-estatus="nuevo_lead"],
+.estatus-nuevo_lead,
+.badge[data-status="nuevo_lead"] {
+  background: var(--surface-2) !important; color: var(--muted) !important; border: 1px solid var(--line) !important;
+}
+[data-estatus="contactado"], .estatus-contactado,
+[data-estatus="cita_agendada"], .estatus-cita_agendada {
+  background: var(--info-bg) !important; color: var(--info) !important; border: 1px solid var(--info-bd) !important;
+}
+[data-estatus="apartado"], .estatus-apartado,
+[data-estatus="credito_solicitado"], .estatus-credito_solicitado {
+  background: var(--brand-light) !important; color: var(--brand-dark) !important; border: 1px solid var(--brand) !important;
+}
+[data-estatus="credito_aprobado"], .estatus-credito_aprobado,
+[data-estatus="firma_contrato"], .estatus-firma_contrato,
+[data-estatus="entregado"], .estatus-entregado {
+  background: var(--ok-bg) !important; color: var(--ok) !important; border: 1px solid var(--ok-bd) !important;
+}
+[data-estatus="cancelado"], .estatus-cancelado {
+  background: var(--err-bg) !important; color: var(--err) !important; border: 1px solid var(--err-bd) !important;
+}
+
+/* ── 12. ALERTAS INLINE ──────────────────────────────────────────── */
+.alert-ok, .alert-success {
+  background: var(--ok-bg) !important;
+  border-left-color: var(--ok) !important;
+  color: var(--ok) !important;
+}
+.alert-warn, .alert-warning {
+  background: var(--warn-bg) !important;
+  border-left-color: var(--warn) !important;
+  color: var(--warn) !important;
+}
+.alert-err, .alert-error, .alert-danger {
+  background: var(--err-bg) !important;
+  border-left-color: var(--err) !important;
+  color: var(--err) !important;
+}
+.alert-info {
+  background: var(--info-bg) !important;
+  border-left-color: var(--info) !important;
+  color: var(--info) !important;
+}
+
+/* ── 13. MODALES ─────────────────────────────────────────────────── */
+.modal,
+.wc-modal,
+.pv-modal,
+[class*="modal"],
+[id*="modal"] {
+  --modal-bg: var(--surface) !important;
+}
+.modal-inner,
+.wc-modal-inner,
+.pv-modal-content,
+.modal-content,
+.modal-box {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-xl) !important;
+  box-shadow: var(--sh-modal) !important;
+}
+.modal-title,
+.wc-modal-title,
+.pv-modal-title {
+  font-family: 'Manrope', sans-serif !important;
+  font-weight: 900 !important;
+  letter-spacing: -.03em !important;
+  color: var(--ink) !important;
+}
+.modal-footer,
+.wc-modal-footer,
+.pv-modal-footer {
+  border-top: 1px solid var(--line) !important;
+}
+/* Overlay oscuro */
+.modal-backdrop,
+.pv-modal-overlay,
+.wc-modal-overlay {
+  background: rgba(13,26,13,.45) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+/* ── 14. TOASTS ──────────────────────────────────────────────────── */
+.toast,
+.wc-toast,
+.pv-toast,
+.notification {
+  background: var(--ink) !important;
+  color: #fff !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--sh-3) !important;
+  font-size: var(--t-sm) !important;
+  font-weight: 500 !important;
+}
+.toast-ok, .toast-success { background: var(--ok) !important; }
+.toast-err, .toast-error  { background: var(--err) !important; }
+.toast-warn               { background: var(--warn) !important; }
+
+/* ── 15. BOTTOM NAV MOBILE ───────────────────────────────────────── */
+.wc-bottom-nav,
+nav.wc-bottom-nav,
+#wc-bottom-nav {
+  background: var(--surface) !important;
+  border-top: 1px solid var(--line) !important;
+  box-shadow: 0 -2px 12px rgba(13,26,13,.07) !important;
+}
+.wc-bn-item {
+  color: var(--muted) !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+  transition: color .12s !important;
+}
+.wc-bn-item i { color: inherit !important; }
+.wc-bn-item.active {
+  color: var(--brand-dark) !important;
+}
+.wc-bn-item.active i {
+  filter: drop-shadow(0 0 5px rgba(86,169,0,.35)) !important;
+}
+/* Botón central "+" (acción rápida) */
+.wc-bn-item.wc-bn-add,
+.wc-bn-item.bn-add,
+.wc-bn-fab {
+  background: var(--brand) !important;
+  color: #fff !important;
+  border-radius: var(--r-full) !important;
+  width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 22px !important;
+  box-shadow: 0 2px 8px rgba(86,169,0,.35) !important;
+}
+
+/* ── 16. TIPOGRAFÍA ESPECIAL ─────────────────────────────────────── */
+/* Títulos de sección / vista */
+.pv-section-title,
+.wc-view-title,
+.panel-title,
+h1.view-title,
+.section-heading {
+  font-family: 'Manrope', sans-serif !important;
+  font-weight: 900 !important;
+  letter-spacing: -.04em !important;
+  color: var(--ink) !important;
+}
+/* Labels de campos de formulario */
+label,
+.field-label,
+.wc-label,
+.pv-label {
+  font-size: var(--t-sm) !important;
+  font-weight: 600 !important;
+  color: var(--ink-2) !important;
+}
+/* Timestamps, metadata */
+.timestamp,
+.meta,
+.text-muted,
+.wc-meta {
+  font-size: var(--t-xs) !important;
+  color: var(--muted) !important;
+}
+
+/* ── 17. FONDOS DE SECCIÓN ───────────────────────────────────────── */
+/* Cualquier área con fondo oscuro heredado del dark mode */
+.pv-section,
+.wc-section,
+.panel-section {
+  background: transparent !important;
+  color: var(--ink) !important;
+}
+/* Surface blanca para contenedores de datos */
+.wc-panel,
+.data-panel,
+.content-box {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+}
+
+/* ── 18. AVATARES ────────────────────────────────────────────────── */
+.avatar,
+.wc-avatar,
+.pv-avatar,
+.user-avatar {
+  background: var(--brand-light) !important;
+  color: var(--brand-dark) !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-weight: 900 !important;
+}
+
+/* ── 19. KANBAN / PIPELINE ───────────────────────────────────────── */
+.kanban-col,
+.pipeline-col {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-md) !important;
+}
+.kanban-card,
+.pipeline-card,
+.wc-kanban-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-md) !important;
+  box-shadow: var(--sh-1) !important;
+}
+.kanban-card:hover,
+.pipeline-card:hover {
+  box-shadow: var(--sh-2) !important;
+  border-color: var(--brand) !important;
+}
+.kanban-col-header,
+.pipeline-col-header {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: .05em !important;
+  text-transform: uppercase !important;
+  color: var(--muted) !important;
+}
+
+/* ── 20. SKELETONS / LOADING ─────────────────────────────────────── */
+@keyframes wc-shimmer {
+  from { background-position: -400px 0; }
+  to   { background-position: 400px 0; }
+}
+.skeleton,
+.skel,
+.loading-bar {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 25%,
+    var(--line) 50%,
+    var(--surface-2) 75%
+  ) !important;
+  background-size: 800px 100% !important;
+  animation: wc-shimmer 1.4s infinite linear !important;
+  border-radius: var(--r-sm) !important;
+}
+
+/* ── 21. SCROLLBARS — sutiles en tema claro ──────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--faint); }
+.wc-sidebar::-webkit-scrollbar-thumb { background: rgba(183,247,121,.2); }
+.wc-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(183,247,121,.4); }
+
+/* ── 22. FOCUS VISIBLE — accesibilidad ──────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--brand) !important;
+  outline-offset: 2px !important;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--brand) !important;
+  outline-offset: 2px !important;
+}
+
+/* ── 23. SELECCIÓN DE TEXTO ──────────────────────────────────────── */
+::selection {
+  background: var(--brand-light) !important;
+  color: var(--brand-dark) !important;
+}
+
+/* ── 24. MOBILE RESPONSIVE — breakpoints unificados ─────────────── */
+/* ≤ 820px → sidebar oculto, bottom nav visible */
+@media (max-width: 820px) {
+  .wc-sidebar {
+    position: fixed !important;
+    left: -100% !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    z-index: var(--z-sidebar) !important;
+    transition: left .22s ease !important;
+    box-shadow: var(--sh-3) !important;
+  }
+  .wc-sidebar.open {
+    left: 0 !important;
+  }
+  .wc-bottom-nav { display: block !important; }
+  input, select, textarea { font-size: 16px !important; }
+}
+/* > 820px → sidebar visible, bottom nav oculto */
+@media (min-width: 821px) {
+  .wc-sidebar {
+    position: sticky !important;
+    left: 0 !important;
+  }
+  .wc-bottom-nav { display: none !important; }
+}
+
+/* ── 25. DARK MODE KILLSWITCH — anula TODO dark mode previo ─────── */
+/* Cualquier regla oscura que venga antes queda anulada aquí */
+@media (prefers-color-scheme: dark) {
+  body,
+  .wc-content,
+  .wc-main,
+  .pv-content,
+  .card,
+  .wc-card,
+  .pv-card,
+  .modal-inner,
+  .modal-content,
+  table,
+  input,
+  select,
+  textarea {
+    background-color: revert !important;
+    color: revert !important;
+  }
+  /* Tokens: forzar claro sin importar preferencia del sistema */
+  :root {
+    --bg: #f5f7f5 !important;
+    --surface: #ffffff !important;
+    --surface-2: #f8faf8 !important;
+    --ink: #0d1a0d !important;
+    --ink-2: #3b4d3b !important;
+    --muted: #6b7b6b !important;
+    --line: #e2eae2 !important;
+    --line-2: #cdd6cd !important;
+  }
+}
+
+/* fin wecars-ds-v2 */

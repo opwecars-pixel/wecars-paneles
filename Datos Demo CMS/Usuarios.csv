@@ -1,0 +1,6 @@
+﻿_id,nombre,email,telefono,rol,estatus,fechaIngreso,avatar
+u001,Carlos Mendoza,cmendoza@wecars.mx,4771234567,vendedor,activo,2025-06-15,
+u002,Sofía Ramírez,sramirez@wecars.mx,4772345678,vendedor,activo,2025-09-13,
+u003,Diego Torres,dtorres@wecars.mx,4773456789,vendedor,activo,2026-01-01,
+u004,Alejandra Vega,avega@wecars.mx,4774567890,gerente,activo,2024-11-27,
+u005,Marco Jiménez,mjimenez@wecars.mx,4775678901,finanzas,activo,2025-03-07,

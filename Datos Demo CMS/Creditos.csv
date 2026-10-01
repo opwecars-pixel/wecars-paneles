@@ -1,0 +1,8 @@
+﻿_id,clienteId,ventaId,banco,montoAprobado,tasa,plazoMeses,mensualidad,estatus,fechaAprobacion,fechaPrimerPago,vehiculo
+cr001,cl001,v001,Scotiabank,800000,11.5,60,17600,activo,2026-07-10,2026-08-09,Ford Lobo Raptor 2022
+cr002,cl003,v002,Kuna,255400,12.9,36,8500,activo,2026-07-13,2026-08-14,Kia Sportage 2018
+cr003,cl014,,Atria,435000,12.5,48,12200,preaprobado,2026-07-17,,Honda CR-V 2023
+cr004,cl016,,Scotiabank,350000,11.8,48,9400,aprobado,2026-07-16,,Toyota RAV4 2020
+cr005,cl002,,Kuna,420000,12.0,48,11700,en-tramite,,,Kia Sportage 2023
+cr006,cl038,,Atria,435000,12.3,48,12000,en-tramite,,,Honda CR-V 2023
+cr007,cl046,,Scotiabank,480000,11.9,60,10800,aprobado,2026-07-19,,Kia Seltos 2024

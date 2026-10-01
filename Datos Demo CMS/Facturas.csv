@@ -1,0 +1,6 @@
+﻿_id,clienteId,ventaId,folio,rfc,razonSocial,monto,iva,total,fechaEmision,estatus,uuid,xmlUrl,pdfUrl
+f001,cl001,v001,WCB-2026-001,FUAM880312AB1,Alejandro Fuentes Mora,862069,137931,1000000,2026-07-12,emitida,UUID-2026-001,,
+f002,cl003,v002,WCB-2026-002,RECR910705CD2,Ricardo Olvera Blanco,258103,41297,299400,2026-07-15,emitida,UUID-2026-002,,
+f003,cl005,v003,WCB-2026-003,HEPS850520EF3,Héctor Sánchez Peña,181034,28966,210000,2026-07-08,emitida,UUID-2026-003,,
+f004,cl007,v004,WCB-2026-004,FEHR920630GH4,Fernando Herrera Vega,241379,38621,280000,2026-07-05,pendiente,,,
+f005,cl009,v005,WCB-2026-005,ESAE880914IJ5,Eduardo Salinas Torres,112069,17931,130000,2026-07-02,pendiente,,,

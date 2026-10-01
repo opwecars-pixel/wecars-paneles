@@ -1,0 +1,91 @@
+﻿_id,clienteId,vendedorId,autor,tipo,descripcion,fecha,resultado,proximoPaso
+act001,cl001,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,llamada,Contacto inicial. Muy interesado. Agendó visita para ver el auto en persona.,2026-07-11,positivo,
+act002,cl001,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,visita,Prueba de manejo realizada. Le encantó el auto. Solicitó cotización formal.,2026-07-13,positivo,Llamar para confirmar cita de firma
+act003,cl002,op.wecars@gmail.com,weCars Bajío,visita,Prueba de manejo realizada. Le encantó el auto. Solicitó cotización formal.,2026-07-20,positivo,
+act004,cl002,op.wecars@gmail.com,weCars Bajío,whatsapp,Enviada cotización con financiamiento a 48 meses. Esperando respuesta.,2026-07-20,positivo,
+act005,cl002,op.wecars@gmail.com,weCars Bajío,llamada,Confirmó que va a traer a su esposa/esposo el fin de semana.,2026-07-20,positivo,
+act006,cl002,op.wecars@gmail.com,weCars Bajío,whatsapp,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-07-20,positivo,Llamar para confirmar cita de firma
+act007,cl003,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Enviada cotización con financiamiento a 48 meses. Esperando respuesta.,2026-07-16,positivo,
+act008,cl003,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,llamada,Confirmó que va a traer a su esposa/esposo el fin de semana.,2026-07-19,positivo,
+act009,cl003,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-07-20,positivo,
+act010,cl003,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,email,"Seguimiento: sigue interesado, espera quincena para dar enganche.",2026-07-20,positivo,Llamar para confirmar cita de firma
+act011,cl004,op.wecars@gmail.com,weCars Bajío,llamada,Confirmó que va a traer a su esposa/esposo el fin de semana.,2026-07-03,positivo,
+act012,cl004,op.wecars@gmail.com,weCars Bajío,whatsapp,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-07-07,positivo,
+act013,cl004,op.wecars@gmail.com,weCars Bajío,email,"Seguimiento: sigue interesado, espera quincena para dar enganche.",2026-07-13,positivo,
+act014,cl004,op.wecars@gmail.com,weCars Bajío,visita,Reunión de cierre. Revisaron contrato. Firma pendiente de aval de banco.,2026-07-16,positivo,Llamar para confirmar cita de firma
+act015,cl005,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-07-15,positivo,
+act016,cl005,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,email,"Seguimiento: sigue interesado, espera quincena para dar enganche.",2026-07-18,positivo,
+act017,cl005,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,visita,Reunión de cierre. Revisaron contrato. Firma pendiente de aval de banco.,2026-07-20,positivo,
+act018,cl005,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Checó opciones de financiamiento en línea. Recibe respuesta en 24h.,2026-07-20,positivo,Llamar para confirmar cita de firma
+act019,cl006,Brandonu446@gmail.com,weCars Bajío,email,"Seguimiento: sigue interesado, espera quincena para dar enganche.",2026-06-29,positivo,
+act020,cl006,Brandonu446@gmail.com,weCars Bajío,visita,Reunión de cierre. Revisaron contrato. Firma pendiente de aval de banco.,2026-07-04,positivo,Llamar para confirmar cita de firma
+act021,cl007,op.wecars@gmail.com,Brandon Eduardo Zuñiga,visita,Reunión de cierre. Revisaron contrato. Firma pendiente de aval de banco.,2026-07-04,positivo,
+act022,cl007,op.wecars@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Checó opciones de financiamiento en línea. Recibe respuesta en 24h.,2026-07-08,positivo,Llamar para confirmar cita de firma
+act023,cl008,Brandonu446@gmail.com,weCars Bajío,whatsapp,Checó opciones de financiamiento en línea. Recibe respuesta en 24h.,2026-06-25,positivo,
+act024,cl008,Brandonu446@gmail.com,weCars Bajío,llamada,Visita sin cita. Muy decidido. Pidió apartar con depósito.,2026-06-29,positivo,
+act025,cl008,Brandonu446@gmail.com,weCars Bajío,visita,WhatsApp enviado con fotos adicionales del auto. Respondió positivamente.,2026-07-05,positivo,
+act026,cl008,Brandonu446@gmail.com,weCars Bajío,whatsapp,Llamada de seguimiento post-cotización. Negociando precio final.,2026-07-02,positivo,Llamar para confirmar cita de firma
+act027,cl009,op.wecars@gmail.com,Brandon Eduardo Zuñiga,llamada,Visita sin cita. Muy decidido. Pidió apartar con depósito.,2026-07-12,positivo,
+act028,cl009,op.wecars@gmail.com,Brandon Eduardo Zuñiga,visita,WhatsApp enviado con fotos adicionales del auto. Respondió positivamente.,2026-07-18,positivo,
+act029,cl009,op.wecars@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Llamada de seguimiento post-cotización. Negociando precio final.,2026-07-20,positivo,
+act030,cl009,op.wecars@gmail.com,Brandon Eduardo Zuñiga,llamada,Cliente confirma que tiene el enganche listo. Cita para firma el viernes.,2026-07-20,positivo,Llamar para confirmar cita de firma
+act031,cl010,Brandonu446@gmail.com,weCars Bajío,visita,WhatsApp enviado con fotos adicionales del auto. Respondió positivamente.,2026-06-28,positivo,
+act032,cl010,Brandonu446@gmail.com,weCars Bajío,whatsapp,Llamada de seguimiento post-cotización. Negociando precio final.,2026-07-02,positivo,Llamar para confirmar cita de firma
+act033,cl011,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Llamada de seguimiento post-cotización. Negociando precio final.,2026-07-08,positivo,
+act034,cl011,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,llamada,Cliente confirma que tiene el enganche listo. Cita para firma el viernes.,2026-07-12,positivo,
+act035,cl011,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Contacto inicial. Muy interesado. Agendó visita para ver el auto en persona.,2026-07-13,positivo,
+act036,cl011,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,email,Prueba de manejo realizada. Le encantó el auto. Solicitó cotización formal.,2026-07-16,positivo,Llamar para confirmar cita de firma
+act037,cl012,op.wecars@gmail.com,weCars Bajío,llamada,Cliente confirma que tiene el enganche listo. Cita para firma el viernes.,2026-07-05,positivo,
+act038,cl012,op.wecars@gmail.com,weCars Bajío,whatsapp,Contacto inicial. Muy interesado. Agendó visita para ver el auto en persona.,2026-07-09,positivo,
+act039,cl012,op.wecars@gmail.com,weCars Bajío,email,Prueba de manejo realizada. Le encantó el auto. Solicitó cotización formal.,2026-07-17,positivo,
+act040,cl012,op.wecars@gmail.com,weCars Bajío,visita,Enviada cotización con financiamiento a 48 meses. Esperando respuesta.,2026-07-20,positivo,Llamar para confirmar cita de firma
+act041,cl013,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Contacto inicial. Muy interesado. Agendó visita para ver el auto en persona.,2026-07-15,positivo,
+act042,cl013,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,email,Prueba de manejo realizada. Le encantó el auto. Solicitó cotización formal.,2026-07-16,positivo,Llamar para confirmar cita de firma
+act043,cl014,op.wecars@gmail.com,weCars Bajío,email,Prueba de manejo realizada. Le encantó el auto. Solicitó cotización formal.,2026-06-27,positivo,
+act044,cl014,op.wecars@gmail.com,weCars Bajío,visita,Enviada cotización con financiamiento a 48 meses. Esperando respuesta.,2026-07-01,positivo,
+act045,cl014,op.wecars@gmail.com,weCars Bajío,whatsapp,Confirmó que va a traer a su esposa/esposo el fin de semana.,2026-07-03,positivo,Llamar para confirmar cita de firma
+act046,cl015,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,visita,Enviada cotización con financiamiento a 48 meses. Esperando respuesta.,2026-07-10,positivo,
+act047,cl015,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Confirmó que va a traer a su esposa/esposo el fin de semana.,2026-07-15,positivo,
+act048,cl015,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,llamada,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-07-18,positivo,Llamar para confirmar cita de firma
+act049,cl016,Brandonu446@gmail.com,weCars Bajío,whatsapp,Confirmó que va a traer a su esposa/esposo el fin de semana.,2026-07-11,positivo,
+act050,cl016,Brandonu446@gmail.com,weCars Bajío,llamada,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-07-12,positivo,Llamar para confirmar cita de firma
+act051,cl017,op.wecars@gmail.com,Brandon Eduardo Zuñiga,llamada,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-07-07,positivo,
+act052,cl017,op.wecars@gmail.com,Brandon Eduardo Zuñiga,visita,"Seguimiento: sigue interesado, espera quincena para dar enganche.",2026-07-10,positivo,Llamar para confirmar cita de firma
+act053,cl018,Brandonu446@gmail.com,weCars Bajío,visita,"Seguimiento: sigue interesado, espera quincena para dar enganche.",2026-06-28,positivo,
+act054,cl018,Brandonu446@gmail.com,weCars Bajío,whatsapp,Reunión de cierre. Revisaron contrato. Firma pendiente de aval de banco.,2026-06-29,positivo,
+act055,cl018,Brandonu446@gmail.com,weCars Bajío,llamada,Checó opciones de financiamiento en línea. Recibe respuesta en 24h.,2026-07-06,positivo,
+act056,cl018,Brandonu446@gmail.com,weCars Bajío,whatsapp,Visita sin cita. Muy decidido. Pidió apartar con depósito.,2026-07-08,positivo,Llamar para confirmar cita de firma
+act057,cl019,op.wecars@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Reunión de cierre. Revisaron contrato. Firma pendiente de aval de banco.,2026-07-05,positivo,
+act058,cl019,op.wecars@gmail.com,Brandon Eduardo Zuñiga,llamada,Checó opciones de financiamiento en línea. Recibe respuesta en 24h.,2026-07-05,positivo,
+act059,cl019,op.wecars@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Visita sin cita. Muy decidido. Pidió apartar con depósito.,2026-07-08,positivo,Llamar para confirmar cita de firma
+act060,cl020,Brandonu446@gmail.com,weCars Bajío,llamada,Checó opciones de financiamiento en línea. Recibe respuesta en 24h.,2026-06-29,positivo,
+act061,cl020,Brandonu446@gmail.com,weCars Bajío,whatsapp,Visita sin cita. Muy decidido. Pidió apartar con depósito.,2026-07-03,positivo,
+act062,cl020,Brandonu446@gmail.com,weCars Bajío,email,WhatsApp enviado con fotos adicionales del auto. Respondió positivamente.,2026-07-05,positivo,Llamar para confirmar cita de firma
+act063,cl021,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Visita sin cita. Muy decidido. Pidió apartar con depósito.,2026-07-06,positivo,
+act064,cl021,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,email,WhatsApp enviado con fotos adicionales del auto. Respondió positivamente.,2026-07-07,positivo,Llamar para confirmar cita de firma
+act065,cl022,op.wecars@gmail.com,weCars Bajío,email,WhatsApp enviado con fotos adicionales del auto. Respondió positivamente.,2026-07-07,positivo,
+act066,cl022,op.wecars@gmail.com,weCars Bajío,visita,Llamada de seguimiento post-cotización. Negociando precio final.,2026-07-10,positivo,
+act067,cl022,op.wecars@gmail.com,weCars Bajío,whatsapp,Cliente confirma que tiene el enganche listo. Cita para firma el viernes.,2026-07-18,positivo,Llamar para confirmar cita de firma
+act068,cl023,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,visita,Llamada de seguimiento post-cotización. Negociando precio final.,2026-07-15,positivo,
+act069,cl023,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Cliente confirma que tiene el enganche listo. Cita para firma el viernes.,2026-07-18,positivo,Llamar para confirmar cita de firma
+act070,cl024,op.wecars@gmail.com,weCars Bajío,whatsapp,Cliente confirma que tiene el enganche listo. Cita para firma el viernes.,2026-07-11,positivo,
+act071,cl024,op.wecars@gmail.com,weCars Bajío,llamada,Contacto inicial. Muy interesado. Agendó visita para ver el auto en persona.,2026-07-13,positivo,
+act072,cl024,op.wecars@gmail.com,weCars Bajío,visita,Prueba de manejo realizada. Le encantó el auto. Solicitó cotización formal.,2026-07-20,positivo,Llamar para confirmar cita de firma
+act073,cl025,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,llamada,Contacto inicial. Muy interesado. Agendó visita para ver el auto en persona.,2026-07-12,positivo,
+act074,cl025,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,visita,Prueba de manejo realizada. Le encantó el auto. Solicitó cotización formal.,2026-07-14,positivo,
+act075,cl025,Brandonu446@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Enviada cotización con financiamiento a 48 meses. Esperando respuesta.,2026-07-20,positivo,Llamar para confirmar cita de firma
+act076,cl026,Brandonu446@gmail.com,weCars Bajío,visita,Prueba de manejo realizada. Le encantó el auto. Solicitó cotización formal.,2026-07-10,positivo,
+act077,cl026,Brandonu446@gmail.com,weCars Bajío,whatsapp,Enviada cotización con financiamiento a 48 meses. Esperando respuesta.,2026-07-14,positivo,
+act078,cl026,Brandonu446@gmail.com,weCars Bajío,llamada,Confirmó que va a traer a su esposa/esposo el fin de semana.,2026-07-20,positivo,
+act079,cl026,Brandonu446@gmail.com,weCars Bajío,whatsapp,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-07-20,positivo,Llamar para confirmar cita de firma
+act080,cl027,op.wecars@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Enviada cotización con financiamiento a 48 meses. Esperando respuesta.,2026-07-03,positivo,
+act081,cl027,op.wecars@gmail.com,Brandon Eduardo Zuñiga,llamada,Confirmó que va a traer a su esposa/esposo el fin de semana.,2026-07-03,positivo,
+act082,cl027,op.wecars@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-07-14,positivo,
+act083,cl027,op.wecars@gmail.com,Brandon Eduardo Zuñiga,email,"Seguimiento: sigue interesado, espera quincena para dar enganche.",2026-07-18,positivo,Llamar para confirmar cita de firma
+act084,cl028,Brandonu446@gmail.com,weCars Bajío,llamada,Confirmó que va a traer a su esposa/esposo el fin de semana.,2026-07-10,positivo,
+act085,cl028,Brandonu446@gmail.com,weCars Bajío,whatsapp,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-07-14,positivo,Llamar para confirmar cita de firma
+act086,cl029,op.wecars@gmail.com,Brandon Eduardo Zuñiga,whatsapp,Resolvió dudas sobre garantía y trámites. Listo para avanzar.,2026-06-29,positivo,
+act087,cl029,op.wecars@gmail.com,Brandon Eduardo Zuñiga,email,"Seguimiento: sigue interesado, espera quincena para dar enganche.",2026-07-04,positivo,Llamar para confirmar cita de firma
+act088,cl030,Brandonu446@gmail.com,weCars Bajío,email,"Seguimiento: sigue interesado, espera quincena para dar enganche.",2026-07-11,positivo,
+act089,cl030,Brandonu446@gmail.com,weCars Bajío,visita,Reunión de cierre. Revisaron contrato. Firma pendiente de aval de banco.,2026-07-17,positivo,
+act090,cl030,Brandonu446@gmail.com,weCars Bajío,whatsapp,Checó opciones de financiamiento en línea. Recibe respuesta en 24h.,2026-07-20,positivo,Llamar para confirmar cita de firma

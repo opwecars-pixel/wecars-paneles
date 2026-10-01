@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Registro Rápido de Cliente · weCars Bajío</title>
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────── */
+:root {
+  --lime:      #56a900;
+  --lime-dark: #3d7a00;
+  --lime-bg:   rgba(86,169,0,.10);
+  --bg:        #f4f6f5;
+  --surface:   #ffffff;
+  --ink:       #0d1a0d;
+  --ink-2:     #2c3d2c;
+  --muted:     #6b7e6b;
+  --faint:     #9aab9a;
+  --line:      #e2eae2;
+  --line-2:    #cdd8cd;
+  --err:       #dc2626;
+  --err-bg:    rgba(220,38,38,.08);
+  --ok:        #56a900;
+  --ok-bg:     rgba(86,169,0,.10);
+  --warn:      #d97706;
+  --r-sm:      8px;
+  --r-md:      12px;
+  --r-lg:      18px;
+  --sh-1:      0 2px 8px rgba(0,0,0,.08);
+  --sh-2:      0 6px 20px rgba(0,0,0,.12);
+
+  /* Legacy aliases */
+  --white:     #ffffff;
+  --black:     #0d1a0d;
+  --green:     #56a900;
+}
+
+/* ── RESET ──────────────────────────────────────────────────── */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: .9375rem;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100%;
+  padding: 0 0 env(safe-area-inset-bottom);
+}
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+    html,body{scrollbar-width:none;-ms-overflow-style:none}
+
+/* ── LAYOUT ─────────────────────────────────────────────────── */
+.rr-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+/* ── HEADER ─────────────────────────────────────────────────── */
+.rr-header {
+  text-align: center;
+  padding: 28px 0 24px;
+}
+.rr-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.rr-logo-mark {
+  width: 40px;
+  height: 40px;
+  background: var(--lime);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rr-logo-mark svg { width:22px; height:22px; fill:#fff; }
+.rr-logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.02em;
+}
+.rr-logo-text span { color: var(--lime); }
+
+.rr-title {
+  margin-top: 20px;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.02em;
+  line-height: 1.25;
+}
+.rr-subtitle {
+  margin-top: 6px;
+  font-size: .875rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── CARD ───────────────────────────────────────────────────── */
+.rr-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  box-shadow: var(--sh-1);
+  padding: 24px 20px;
+  margin-top: 20px;
+}
+
+/* ── FORM ───────────────────────────────────────────────────── */
+.rr-field {
+  margin-bottom: 16px;
+}
+.rr-label {
+  display: block;
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+  letter-spacing: .01em;
+}
+.rr-label .req {
+  color: var(--err);
+  margin-left: 2px;
+}
+.rr-label .opt {
+  font-weight: 400;
+  color: var(--faint);
+  font-size: .75rem;
+  margin-left: 4px;
+}
+
+.rr-input,
+.rr-select {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: .9375rem;
+  transition: border-color .15s, box-shadow .15s;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+}
+.rr-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7e6b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 38px;
+  cursor: pointer;
+}
+.rr-input::placeholder { color: var(--faint); }
+.rr-input:focus,
+.rr-select:focus {
+  border-color: var(--lime);
+  box-shadow: 0 0 0 3px var(--lime-bg);
+}
+.rr-input:focus-visible,
+.rr-select:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+.rr-input.error { border-color: var(--err); }
+
+/* Radio group — crédito / contado */
+.rr-radios {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.rr-radio-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-size: .9375rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: border-color .15s, background .15s, color .15s;
+  user-select: none;
+}
+.rr-radio-label input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.rr-radio-label:has(input:checked) {
+  border-color: var(--lime);
+  background: var(--lime-bg);
+  color: var(--lime-dark);
+  font-weight: 600;
+}
+.rr-radio-label:has(input:focus-visible) {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+.rr-radio-icon { font-size: 1.1rem; }
+
+/* Divider */
+.rr-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 20px 0;
+}
+
+/* Section label */
+.rr-section-label {
+  font-size: .75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--faint);
+  margin-bottom: 14px;
+}
+
+/* ── INLINE ERROR ───────────────────────────────────────────── */
+.rr-field-error {
+  display: none;
+  font-size: .8125rem;
+  color: var(--err);
+  margin-top: 5px;
+}
+.rr-field-error.show { display: block; }
+
+/* ── SUBMIT ─────────────────────────────────────────────────── */
+.rr-submit {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: var(--r-md);
+  background: var(--lime);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background .15s, box-shadow .15s, transform .1s;
+  margin-top: 20px;
+}
+.rr-submit:hover { background: var(--lime-dark); box-shadow: var(--sh-2); }
+.rr-submit:active { transform: scale(.985); }
+.rr-submit:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+.rr-submit:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+}
+.rr-submit .spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: none;
+}
+.rr-submit.loading .spinner { display: block; }
+.rr-submit.loading .btn-text { display: none; }
+
+/* ── GLOBAL ERROR BANNER ────────────────────────────────────── */
+.rr-banner {
+  display: none;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  font-size: .875rem;
+  font-weight: 500;
+  margin-top: 14px;
+  line-height: 1.4;
+}
+.rr-banner.err { display: flex; gap:8px; background: var(--err-bg); color: var(--err); border: 1px solid rgba(220,38,38,.2); }
+.rr-banner.ok  { display: flex; gap:8px; background: var(--ok-bg); color: var(--lime-dark); border: 1px solid rgba(86,169,0,.2); }
+
+/* ── SUCCESS SCREEN ─────────────────────────────────────────── */
+.rr-success {
+  display: none;
+  text-align: center;
+  padding: 16px 0 8px;
+}
+.rr-success.show { display: block; }
+.rr-existe.show {
+  border: 2px solid #f59e0b;
+  background: #fffbeb;
+}
+@media (prefers-color-scheme: dark) {
+  .rr-existe.show { background: #2d2206; border-color: #d97706; }
+}
+.rr-existe .rr-success-icon { background: #fef3c7; }
+.rr-success-icon {
+  width: 72px;
+  height: 72px;
+  background: var(--lime-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 2rem;
+}
+.rr-success-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.rr-success-msg {
+  font-size: .9375rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+.rr-success-detail {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+.rr-success-detail-row {
+  display: flex;
+  gap: 8px;
+  font-size: .875rem;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.rr-success-detail-row .lbl {
+  color: var(--muted);
+  flex: 0 0 90px;
+  font-size: .8125rem;
+}
+.rr-btn-nuevo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 20px;
+  border: 1.5px solid var(--lime);
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--lime-dark);
+  font-family: inherit;
+  font-size: .9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.rr-btn-nuevo:hover { background: var(--lime-bg); }
+.rr-btn-nuevo:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+
+/* ── LOADING STATE ──────────────────────────────────────────── */
+.rr-vendedor-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .875rem;
+  color: var(--muted);
+  padding: 12px 0;
+}
+.rr-vendedor-loading .dot-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--line-2);
+  border-top-color: var(--lime);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+/* ── FOOTER ─────────────────────────────────────────────────── */
+.rr-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: .8125rem;
+  color: var(--faint);
+  line-height: 1.5;
+}
+
+/* ── ANIMATIONS ─────────────────────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── A11Y ───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ── MOBILE TOUCH ───────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .rr-input, .rr-select, .rr-radio-label { min-height: 48px; }
+  .rr-submit { min-height: 52px; }
+}
+</style>
+</head>
+<body>
+
+<div class="rr-wrap">
+
+  <!-- HEADER -->
+  <div class="rr-header">
+    <div class="rr-logo">
+      <div class="rr-logo-mark">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3m-1 9a2 2 0 1 0 4 0 2 2 0 0 0-4 0m-6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/>
+          <path d="M9 17H7m8 0h-1.5M9 17V9h10l2 4v4H9z"/>
+        </svg>
+      </div>
+      <span class="rr-logo-text">we<span>Cars</span> Bajío</span>
+    </div>
+    <h1 class="rr-title">Registro rápido de cliente</h1>
+    <p class="rr-subtitle">Llena los datos del cliente y queda registrado<br>en tu panel de inmediato.</p>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="rr-card" id="formCard">
+
+    <!-- SUCCESS STATE (oculto hasta envío exitoso) -->
+    <div class="rr-success" id="successScreen">
+      <div class="rr-success-icon">✅</div>
+      <p class="rr-success-title">¡Cliente registrado!</p>
+      <p class="rr-success-msg">El cliente ya aparece en tu panel. Puedes cerrar esta ventana o registrar otro cliente.</p>
+      <div class="rr-success-detail" id="successDetail"></div>
+      <button class="rr-btn-nuevo" id="btnNuevoCliente" type="button">
+        + Registrar otro cliente
+      </button>
+    </div>
+
+    <!-- CLIENTE YA EXISTE (oculto hasta que el backend detecta duplicado) -->
+    <div class="rr-success rr-existe" id="existeScreen">
+      <div class="rr-success-icon">🚫</div>
+      <p class="rr-success-title" style="color:#b45309;">No se puede registrar este cliente</p>
+      <p class="rr-success-msg">Este cliente ya fue registrado previamente en el sistema con ese número de teléfono o correo electrónico.<br><br>Contáctate con tu gerente para más información.</p>
+      <button class="rr-btn-nuevo" id="btnNuevoClienteExiste" type="button">
+        + Registrar otro cliente
+      </button>
+    </div>
+
+    <!-- FORM (visible por defecto) -->
+    <form id="regForm" novalidate>
+
+      <div class="rr-section-label">Datos del cliente</div>
+
+      <!-- Nombre -->
+      <div class="rr-field">
+        <label class="rr-label" for="nombre">
+          Nombre completo <span class="req">*</span>
+        </label>
+        <input
+          class="rr-input"
+          id="nombre"
+          name="nombre"
+          type="text"
+          placeholder="Ej. Carlos Mendoza López"
+          autocomplete="name"
+          inputmode="text"
+          required
+        >
+        <p class="rr-field-error" id="err-nombre">Por favor ingresa el nombre del cliente.</p>
+      </div>
+
+      <!-- Teléfono -->
+      <div class="rr-field">
+        <label class="rr-label" for="telefono">
+          Teléfono <span class="req">*</span>
+        </label>
+        <input
+          class="rr-input"
+          id="telefono"
+          name="telefono"
+          type="tel"
+          placeholder="10 dígitos"
+          autocomplete="tel"
+          inputmode="numeric"
+          maxlength="15"
+          required
+        >
+        <p class="rr-field-error" id="err-telefono">Ingresa un teléfono válido (mínimo 10 dígitos).</p>
+      </div>
+
+      <!-- Correo -->
+      <div class="rr-field">
+        <label class="rr-label" for="correo">
+          Correo electrónico <span class="opt">(opcional)</span>
+        </label>
+        <input
+          class="rr-input"
+          id="correo"
+          name="correo"
+          type="email"
+          placeholder="cliente@email.com"
+          autocomplete="email"
+          inputmode="email"
+        >
+      </div>
+
+      <div class="rr-divider"></div>
+      <div class="rr-section-label">Interés</div>
+
+      <!-- Auto de interés -->
+      <div class="rr-field">
+        <label class="rr-label" for="autoInteres">
+          Auto de interés <span class="opt">(opcional)</span>
+        </label>
+        <input
+          class="rr-input"
+          id="autoInteres"
+          name="autoInteres"
+          type="text"
+          placeholder="Ej. Nissan Versa 2022, SUV familiar…"
+          inputmode="text"
+        >
+      </div>
+
+      <!-- Crédito o Contado -->
+      <div class="rr-field">
+        <span class="rr-label">Forma de pago <span class="opt">(opcional)</span></span>
+        <div class="rr-radios">
+          <label class="rr-radio-label">
+            <input type="radio" name="tipoPago" value="credito">
+            <span class="rr-radio-icon">🏦</span> Crédito
+          </label>
+          <label class="rr-radio-label">
+            <input type="radio" name="tipoPago" value="contado">
+            <span class="rr-radio-icon">💵</span> Contado
+          </label>
+        </div>
+      </div>
+
+      <div class="rr-divider"></div>
+      <div class="rr-section-label">Vendedor</div>
+
+      <!-- Vendor selector -->
+      <div class="rr-field" id="vendedorField">
+        <label class="rr-label" for="vendedor">
+          ¿Quién registra este cliente? <span class="req">*</span>
+        </label>
+        <div class="rr-vendedor-loading" id="vendedorLoading">
+          <div class="dot-spinner"></div>
+          <span>Cargando vendedores…</span>
+        </div>
+        <select class="rr-select" id="vendedor" name="vendedor" style="display:none" required>
+          <option value="">Selecciona tu nombre</option>
+        </select>
+        <p class="rr-field-error" id="err-vendedor">Selecciona quién registra el cliente.</p>
+      </div>
+
+      <!-- Banner de error global -->
+      <div class="rr-banner" id="bannerError" role="alert">
+        <span>⚠️</span>
+        <span id="bannerErrorMsg"></span>
+      </div>
+
+      <!-- Submit -->
+      <button class="rr-submit" id="btnSubmit" type="submit">
+        <span class="btn-text">Registrar cliente</span>
+        <div class="spinner" aria-hidden="true"></div>
+      </button>
+
+    </form>
+  </div>
+
+  <!-- FOOTER -->
+  <p class="rr-footer">weCars Bajío · Uso interno del equipo de ventas</p>
+
+</div>
+
+<script>
+(function () {
+  /* ── Estado ─────────────────────────────────────────────── */
+  var vendedores = [];    // [{nombre, email}] recibidos del Velo
+  var iframeReady = false;
+  var pendientePayload = null;
+
+  /* ── Refs ───────────────────────────────────────────────── */
+  var form          = document.getElementById('regForm');
+  var btnSubmit     = document.getElementById('btnSubmit');
+  var bannerError   = document.getElementById('bannerError');
+  var bannerMsg     = document.getElementById('bannerErrorMsg');
+  var successScreen = document.getElementById('successScreen');
+  var successDetail = document.getElementById('successDetail');
+  var vendedorSel   = document.getElementById('vendedor');
+  var vendedorLoad  = document.getElementById('vendedorLoading');
+
+  /* ── postMessage al padre ───────────────────────────────── */
+  function enviar(obj) {
+    window.parent.postMessage(obj, '*');
+  }
+
+  /* ── Solicitar lista de vendedores al cargar ────────────── */
+  enviar({ type: 'wecars-rr-ready' });
+
+  /* ── Recibir mensajes del Velo ──────────────────────────── */
+  window.addEventListener('message', function (e) {
+    if (!e.data || !e.data.type) return;
+    var d = e.data;
+
+    if (d.type === 'wecars-rr-vendedores') {
+      vendedores = d.vendedores || [];
+      poblarVendedores(vendedores);
+    }
+
+    if (d.type === 'wecars-rr-ok') {
+      clearTimeout(_timeoutHandle);
+      mostrarExito(d.cliente);
+    }
+
+    if (d.type === 'wecars-rr-existe') {
+      clearTimeout(_timeoutHandle);
+      mostrarExiste();
+    }
+
+    if (d.type === 'wecars-rr-error') {
+      clearTimeout(_timeoutHandle);
+      mostrarError(d.mensaje || 'Ocurrió un error. Intenta de nuevo.');
+      setLoading(false);
+    }
+
+    if (d.type === 'wecars-resize') {
+      // El Velo puede pedir resize — lo ignoramos en esta dirección
+    }
+  });
+
+  /* ── Poblar select de vendedores ────────────────────────── */
+  function poblarVendedores(lista) {
+    vendedorLoad.style.display = 'none';
+    vendedorSel.style.display  = '';
+    lista.forEach(function (v) {
+      var opt = document.createElement('option');
+      opt.value = v.email;
+      opt.textContent = v.nombre;
+      vendedorSel.appendChild(opt);
+    });
+    notificarAltura();
+  }
+
+  /* ── Notificar altura al padre ──────────────────────────── */
+  function notificarAltura() {
+    var h = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight
+    );
+    enviar({ type: 'wecars-resize', height: h + 20 }); // +20 buffer anti-scroll
+  }
+
+  /* ── Validación ─────────────────────────────────────────── */
+  function limpiarErrores() {
+    document.querySelectorAll('.rr-field-error').forEach(function (el) {
+      el.classList.remove('show');
+    });
+    document.querySelectorAll('.rr-input').forEach(function (el) {
+      el.classList.remove('error');
+    });
+    bannerError.className = 'rr-banner';
+  }
+
+  function mostrarFieldError(inputId, errId) {
+    var input = document.getElementById(inputId);
+    var err   = document.getElementById(errId);
+    if (input) input.classList.add('error');
+    if (err)   err.classList.add('show');
+  }
+
+  function validar() {
+    var ok = true;
+    limpiarErrores();
+
+    var nombre = document.getElementById('nombre').value.trim();
+    if (!nombre) { mostrarFieldError('nombre', 'err-nombre'); ok = false; }
+
+    var tel = document.getElementById('telefono').value.replace(/\D/g, '');
+    if (tel.length < 10) { mostrarFieldError('telefono', 'err-telefono'); ok = false; }
+
+    var vend = vendedorSel.value;
+    if (!vend) { document.getElementById('err-vendedor').classList.add('show'); ok = false; }
+
+    return ok;
+  }
+
+  /* ── Estado de carga del botón ──────────────────────────── */
+  function setLoading(loading) {
+    btnSubmit.disabled = loading;
+    btnSubmit.classList.toggle('loading', loading);
+  }
+
+  /* ── Mostrar error global ───────────────────────────────── */
+  function mostrarError(msg) {
+    bannerMsg.textContent = msg;
+    bannerError.className = 'rr-banner err';
+    bannerError.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    notificarAltura();
+  }
+
+  /* ── Mostrar pantalla de éxito ──────────────────────────── */
+  function mostrarExito(cliente) {
+    setLoading(false);
+    form.style.display = 'none';
+    successDetail.innerHTML = _filasDatos(cliente);
+    successScreen.classList.add('show');
+    notificarAltura();
+  }
+
+  /* ── Mostrar pantalla de cliente ya existente ────────────── */
+  function mostrarExiste() {
+    setLoading(false);
+    form.style.display = 'none';
+    document.getElementById('existeScreen').classList.add('show');
+    notificarAltura();
+  }
+
+  function _filasDatos(cliente) {
+    return [
+      row('Nombre',   cliente.nombre   || '—'),
+      row('Teléfono', cliente.telefono || '—'),
+      row('Correo',   cliente.correo   || '—'),
+      row('Interés',  cliente.interes  || '—'),
+      row('Pago',     cliente.tipoPago ? capitalizar(cliente.tipoPago) : '—'),
+      row('Vendedor', cliente.vendedorNombre || '—'),
+    ].join('');
+  }
+
+  function row(lbl, val) {
+    return '<div class="rr-success-detail-row"><span class="lbl">' + lbl + '</span><span>' + escHtml(val) + '</span></div>';
+  }
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function capitalizar(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  /* ── Botón "Registrar otro" (éxito) ────────────────────── */
+  document.getElementById('btnNuevoClienteExiste').addEventListener('click', function () {
+    form.reset();
+    limpiarErrores();
+    form.style.display = '';
+    document.getElementById('existeScreen').classList.remove('show');
+    notificarAltura();
+  });
+
+  document.getElementById('btnNuevoCliente').addEventListener('click', function () {
+    form.reset();
+    limpiarErrores();
+    form.style.display = '';
+    successScreen.classList.remove('show');
+    // Re-agregar opción default si se perdió
+    if (!vendedorSel.querySelector('option[value=""]')) {
+      var opt = document.createElement('option');
+      opt.value = ''; opt.textContent = 'Selecciona tu nombre';
+      vendedorSel.insertBefore(opt, vendedorSel.firstChild);
+    }
+    vendedorSel.value = '';
+    document.getElementById('nombre').focus();
+    notificarAltura();
+  });
+
+  /* ── Submit ─────────────────────────────────────────────── */
+  var _timeoutHandle = null;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!validar()) return;
+
+    var vendedorEmail  = vendedorSel.value;
+    var vendedorNombre = vendedorSel.options[vendedorSel.selectedIndex].textContent;
+    var tipoPagoEl     = form.querySelector('input[name="tipoPago"]:checked');
+
+    var payload = {
+      nombre:         document.getElementById('nombre').value.trim(),
+      telefono:       document.getElementById('telefono').value.replace(/\D/g, ''),
+      correo:         document.getElementById('correo').value.trim(),
+      autoInteres:    document.getElementById('autoInteres').value.trim(),
+      tipoPago:       tipoPagoEl ? tipoPagoEl.value : '',
+      vendedorEmail:  vendedorEmail,
+      vendedorNombre: vendedorNombre,
+    };
+
+    setLoading(true);
+    limpiarErrores();
+
+    // Timeout de seguridad: si el backend no responde en 25s re-habilita
+    // el botón con mensaje de error. NO reenvía automáticamente.
+    clearTimeout(_timeoutHandle);
+    _timeoutHandle = setTimeout(function () {
+      setLoading(false);
+      mostrarError('El servidor tardó demasiado. Verifica tu conexión e intenta de nuevo.');
+    }, 25000);
+
+    enviar({ type: 'wecars-registro-rapido', payload: payload });
+  });
+
+  /* ── Resize en cambios de layout ────────────────────────── */
+  window.addEventListener('resize', notificarAltura);
+  // Image load hooks + retry para imágenes tardas
+  (function(){var retries=0;function hookImgs(){document.querySelectorAll('img').forEach(function(img){if(!img.dataset.wcResize){img.dataset.wcResize='1';img.addEventListener('load',notificarAltura);img.addEventListener('error',notificarAltura);}});}window.addEventListener('load',function(){var iv=setInterval(function(){notificarAltura();hookImgs();if(++retries>=12)clearInterval(iv);},400);});hookImgs();})();
+
+  // ResizeObserver garantiza que el iframe siempre tenga la altura
+  // correcta en móvil, incluyendo cuando el DOM cambia después de cargar.
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(function () { notificarAltura(); });
+    ro.observe(document.body);
+  }
+  // Fallback: múltiples llamadas en cascada para cubrir renders tardíos
+  notificarAltura();
+  setTimeout(notificarAltura, 300);
+  setTimeout(notificarAltura, 800);
+  setTimeout(notificarAltura, 1500);
+
+})();
+</script>
+</body>
+</html>
