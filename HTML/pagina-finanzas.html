@@ -5117,7 +5117,7 @@ input.fn-input:focus {
 </nav>
 
 <style id="fn-mobile-home-css">
-@media (max-width: 640px) {
+@media (max-width: 820px) {
 
 /* ── FAB ── */
 #fn-fab-nuevo { display: flex !important; }
@@ -5376,7 +5376,7 @@ input.fn-input:focus {
 <script id="fn-mobile-home-js">
 (function(){
 'use strict';
-function _isMobile(){ return window.innerWidth<=640; }
+function _isMobile(){ return window.innerWidth<=820; }
 function _esc(v){ return String(v||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);}); }
 function _rel(d){ if(!d) return ''; var diff=Date.now()-new Date(d).getTime(); var m=Math.floor(diff/60000); if(m<2) return 'hace un momento'; if(m<60) return 'hace '+m+' min'; var h=Math.floor(m/60); if(h<24) return 'hace '+h+'h'; return 'hace '+Math.floor(h/24)+' días'; }
 function _fechaHoy(){ var dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado']; var meses=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']; var d=new Date(); return dias[d.getDay()].toUpperCase()+' '+d.getDate()+' '+meses[d.getMonth()].toUpperCase(); }
@@ -5482,6 +5482,8 @@ window._fnMobileCerrar=function(){
   if(sheet) sheet.style.display='none';
   if(overlay) overlay.style.display='none';
   document.body.style.overflow='';
+  var fab=document.getElementById('fn-fab-nuevo');
+  if(fab) fab.style.removeProperty('display');
 };
 
 function _initFnMobile(){
