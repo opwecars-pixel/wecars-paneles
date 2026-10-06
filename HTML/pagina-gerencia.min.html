@@ -12214,6 +12214,8 @@ window._geMobileCerrar=function(){
   if(sheet) sheet.style.display='none';
   if(overlay) overlay.style.display='none';
   document.body.style.overflow='';
+  var fab=document.getElementById('ge-fab-nuevo');
+  if(fab) fab.style.removeProperty('display');
 };
 
 function _initGeMobile(){
