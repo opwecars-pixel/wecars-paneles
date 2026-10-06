@@ -568,6 +568,42 @@ $w.onReady(function () {
         });
     }
 
+    // ── Alias FAB móvil → handlers existentes ───────────────────────────
+    if (data.type === 'wecars-nuevo-cliente' && data.datos) {
+      data.type = 'wecars-cliente-crear';
+      // re-dispatch inline
+      if (data.datos) crearCliente(data.datos);
+    }
+    if (data.type === 'wecars-nueva-cita' && data.datos) {
+      const d = data.datos;
+      wixData.insert('Appointments', {
+        clienteNombre: d.cliente, fecha: d.fecha ? new Date(d.fecha + 'T' + (d.hora || '10:00')) : new Date(),
+        tipo: d.tipo || 'Cita', vehiculo: d.vehiculo || '', notas: d.notas || '',
+        origenPanel: 'vendedores',
+      }, { suppressAuth: true })
+        .then((cita) => $w(HTML_ID).postMessage({ type: 'wecars-cita-creada', ok: true, citaId: cita._id }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-cita-creada', ok: false, error: String(e) }));
+    }
+    if (data.type === 'wecars-nueva-tarea' && data.datos) {
+      const t = data.datos;
+      wixData.insert('Tasks', {
+        descripcion: t.desc, clienteNombre: t.cliente || '', fechaVencimiento: t.fecha ? new Date(t.fecha) : null,
+        prioridad: t.prioridad || 'Media', estatus: 'pendiente', origenPanel: 'vendedores',
+      }, { suppressAuth: true })
+        .then((task) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', ok: true, tareaId: task._id }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', ok: false, error: String(e) }));
+    }
+    if (data.type === 'wecars-solicitud-vehiculo' && data.datos) {
+      const v = data.datos;
+      wixData.insert('VehicleRequests', {
+        clienteNombre: v.cliente || '', descripcion: v.desc, precioMax: v.precio || '',
+        plazo: v.plazo || '', urgencia: v.urgencia || '', notas: v.notas || '',
+        origenPanel: 'vendedores', fechaSolicitud: new Date(),
+      }, { suppressAuth: true })
+        .then((req) => $w(HTML_ID).postMessage({ type: 'wecars-solicitud-vehiculo-guardada', ok: true, reqId: req._id }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-solicitud-vehiculo-guardada', ok: false, error: String(e) }));
+    }
+
     // ── Actualizar etapa de expediente ──────────────────────────────────
     if (data.type === 'wecars-expediente-actualizar' && data.clienteId && data.cambios) {
       wixData.get('ClientRecords', data.clienteId, { suppressAuth: true })
