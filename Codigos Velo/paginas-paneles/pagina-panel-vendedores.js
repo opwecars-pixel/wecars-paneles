@@ -545,6 +545,46 @@ $w.onReady(function () {
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-pub-historial', items: [], error: String(e) }));
     }
 
+    // ── Alta rápida de lead desde el panel ──────────────────────────────
+    if (data.type === 'wecars-lead' && data.data) {
+      const ld = data.data;
+      wixUsers.currentUser.getEmail()
+        .then((email) => obtenerPerfil(email).catch(() => ({ nombre: email }))
+          .then((p) => wixData.insert('ALeads', Object.assign({}, ld, {
+            vendedorAsignado: ld.vendedorAsignado || email,
+            vendedorNombre:   ld.vendedorNombre   || p.nombre || email,
+            fechaRegistro:    ld.fechaRegistro    || new Date(),
+            estatus:          ld.estatus          || 'nuevo_lead',
+            origen:           ld.pagina           || ld.origen || 'Panel Vendedor',
+          }), { suppressAuth: true }))
+        )
+        .then((lead) => {
+          $w(HTML_ID).postMessage({ type: 'wecars-lead-creado', ok: true, leadId: lead._id });
+          enviarLeadsVendedor();
+        })
+        .catch((e) => {
+          console.error('[Vendedor] Error creando lead:', e);
+          $w(HTML_ID).postMessage({ type: 'wecars-lead-creado', ok: false, error: String(e) });
+        });
+    }
+
+    // ── Actualizar etapa de expediente ──────────────────────────────────
+    if (data.type === 'wecars-expediente-actualizar' && data.clienteId && data.cambios) {
+      wixData.get('ClientRecords', data.clienteId, { suppressAuth: true })
+        .then((rec) => {
+          if (!rec) throw new Error('Cliente no encontrado: ' + data.clienteId);
+          return wixData.update('ClientRecords', Object.assign({}, rec, data.cambios), { suppressAuth: true });
+        })
+        .then((updated) => {
+          $w(HTML_ID).postMessage({ type: 'wecars-expediente-actualizado', ok: true, clienteId: updated._id });
+          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-expediente-actualizado', clienteId: updated._id, cambios: data.cambios }); } catch (e) {}
+        })
+        .catch((e) => {
+          console.error('[Vendedor] Error actualizando expediente:', e);
+          $w(HTML_ID).postMessage({ type: 'wecars-expediente-actualizado', ok: false, error: String(e), clienteId: data.clienteId });
+        });
+    }
+
   });
 
 });

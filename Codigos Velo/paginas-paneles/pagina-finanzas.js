@@ -13,6 +13,7 @@
 //    Ventas          → ventas históricas
 // ───────────────────────────────────────────────────────────────────
 
+import wixData from 'wix-data';
 import wixUsers from 'wix-users';
 import wixLocation from 'wix-location';
 import { obtenerPerfil } from 'backend/permisos.jsw';
@@ -170,6 +171,45 @@ $w.onReady(function () {
           console.error('[Finanzas] Error creando factura:', e);
           $w(HTML_ID).postMessage({ type: 'wecars-cliente-facturado-resultado', ok: false, clienteId: data.clienteId, error: String(e) });
         });
+    }
+
+    // ── Registrar egreso en CMS ───────────────────────────────────
+    if (data.type === 'wecars-egreso-registrado' && data.egreso) {
+      const eg = data.egreso;
+      wixUsers.currentUser.getEmail()
+        .then((email) => wixData.insert('Pagos', {
+          tipo:        'Egreso',
+          categoria:   eg.categoria || 'General',
+          descripcion: eg.descripcion || '',
+          monto:       Number(eg.monto) || 0,
+          referencia:  eg.ref || '—',
+          fecha:       eg.fecha ? new Date(eg.fecha) : new Date(),
+          registradoPor: email,
+          area:        'Finanzas',
+        }, { suppressAuth: true }))
+        .then((pago) => {
+          $w(HTML_ID).postMessage({ type: 'wecars-egreso-guardado', ok: true, pagoId: pago._id });
+          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'egreso-registrado', pagoId: pago._id, monto: pago.monto, categoria: pago.categoria }); } catch (e) {}
+        })
+        .catch((e) => console.error('[Finanzas] Error guardando egreso:', e));
+    }
+
+    // ── Registrar ingreso/egreso rápido desde mobile ──────────────
+    if (data.type === 'wecars-finanza' && data.data) {
+      const fn = data.data;
+      wixUsers.currentUser.getEmail()
+        .then((email) => wixData.insert('Pagos', {
+          tipo:        fn.tipo === 'egreso' ? 'Egreso' : 'Ingreso',
+          descripcion: fn.concepto || '',
+          monto:       Number(fn.monto) || 0,
+          fecha:       fn.fecha ? new Date(fn.fecha) : new Date(),
+          registradoPor: email,
+          area:        'Finanzas',
+        }, { suppressAuth: true }))
+        .then((pago) => {
+          $w(HTML_ID).postMessage({ type: 'wecars-finanza-guardada', ok: true, pagoId: pago._id });
+        })
+        .catch((e) => console.error('[Finanzas] Error guardando finanza mobile:', e));
     }
 
     // ── Evento global (broadcast entre paneles, sin CMS) ─────────

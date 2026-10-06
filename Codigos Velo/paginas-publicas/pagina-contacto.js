@@ -8,7 +8,7 @@ import wixLocation from 'wix-location';
 import { crearLeadYVincular, actualizarClienteIdLead } from 'backend/leads.jsw';
 import { findOrCreateCliente } from 'backend/clientes.jsw';
 import { getSiteConfig } from 'backend/siteConfig.jsw';
-import { notificarLeadNuevo } from 'backend/notificaciones.jsw';
+// notificarLeadNuevo ya se llama desde backend/leads.jsw → no duplicar aquí
 
 $w.onReady(function () {
   getSiteConfig().then(function(config) {
@@ -45,7 +45,6 @@ $w.onReady(function () {
             if (r && r.clienteId) actualizarClienteIdLead(inserted._id, r.clienteId).catch(() => {});
           })
           .catch(() => {});
-        notificarLeadNuevo({ nombre, telefono, correo, interes, pagina, origen, vehiculo: '', ingreso: '', empresa: '' });
         const params = new URLSearchParams({ nombre, interes, origen }).toString();
         wixLocation.to('/confirmacion?' + params);
       }).catch((err) => console.error('Error guardando lead contacto:', err));

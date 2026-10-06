@@ -26,6 +26,14 @@
 import wixData from 'wix-data';
 import { contacts, triggeredEmails } from 'wix-crm-backend';
 
+// ─── CONFIGURACIÓN RÁPIDA ─────────────────────────────────────────────────
+// Pon aquí el correo del dueño/gerente. Es el fallback SIEMPRE — aunque no
+// haya nadie en la colección Usuarios, este correo siempre recibirá el aviso.
+const CORREO_OWNER       = 'rodrigocastillo.9718@gmail.com';
+const NOMBRE_OWNER       = 'Rodrigo';
+
+// ID del Triggered Email creado en Wix (Automatizaciones → Correos disparados).
+// Ya está configurado; si lo recreás, actualizá este ID.
 const TRIGGERED_EMAIL_ID = '4c8cb294-f452-4e76-8a7a-65419ec14a21';
 
 function normalizarEmail(v) {
@@ -72,18 +80,47 @@ function destinatariosPorRol(rol) {
     .catch(() => []);
 }
 
-// Un lead nuevo cae en la bolsa "Sin asignar" y lo puede ver cualquier
-// vendedor — por eso se avisa a TODOS los vendedores activos, no solo a
-// uno. Se dispara únicamente cuando el cliente se CREA por primera vez
-// (nunca en visitas/contactos posteriores del mismo teléfono).
+// Un lead nuevo cae en la bolsa "Sin asignar". Se avisa a TODOS los
+// vendedores activos, a Gerencia, y siempre al owner como fallback.
 export function notificarLeadNuevo(cliente) {
-  return destinatariosPorRol('Vendedor').then((vendedores) => Promise.all(
-    vendedores.map((v) => enviarAviso(v.email, v.nombre, {
-      titulo: 'Nuevo lead sin asignar',
-      mensaje: `${cliente.nombre || 'Un cliente nuevo'} (${cliente.telefono || 'sin teléfono'}) llegó por ${cliente.origen || 'el sitio web'}. Entra al panel para asignártelo.`,
-      link: 'https://www.wecarsbajio.com/panel-vendedores',
-    }))
-  ));
+  const vars = {
+    titulo:  'Nuevo lead sin asignar — weCars Bajío',
+    mensaje: [
+      `👤 ${cliente.nombre || 'Sin nombre'}`,
+      `📱 ${cliente.telefono || 'Sin teléfono'}`,
+      cliente.correo  ? `✉️ ${cliente.correo}`  : '',
+      cliente.interes ? `🚘 Interés: ${cliente.interes}` : '',
+      `📍 Origen: ${cliente.pagina || cliente.origen || 'Sitio web'}`,
+      ``,
+      `Entra al panel para asignártelo.`,
+    ].filter(Boolean).join('\n'),
+    link: 'https://www.wecarsbajio.com/panel-vendedores',
+  };
+
+  // 1. Owner directo (siempre)
+  const avisarOwner = enviarAviso(CORREO_OWNER, NOMBRE_OWNER, vars);
+
+  // 2. Todos los vendedores activos
+  const avisarVendedores = destinatariosPorRol('Vendedor').then((vendedores) =>
+    Promise.all(vendedores
+      .filter((v) => normalizarEmail(v.email) !== normalizarEmail(CORREO_OWNER))
+      .map((v) => enviarAviso(v.email, v.nombre, vars))
+    )
+  );
+
+  // 3. Gerencia (para que también se entere aunque no sea vendedor)
+  const avisarGerencia = destinatariosPorRol('Gerencia').then((gerentes) =>
+    Promise.all(gerentes
+      .filter((g) => normalizarEmail(g.email) !== normalizarEmail(CORREO_OWNER))
+      .map((g) => enviarAviso(g.email, g.nombre, {
+        titulo:  'Nuevo lead — weCars Bajío',
+        mensaje: vars.mensaje,
+        link:    'https://www.wecarsbajio.com/panel-administracion',
+      }))
+    )
+  );
+
+  return Promise.all([avisarOwner, avisarVendedores, avisarGerencia]);
 }
 
 // Aviso específico cuando alguien llena el formulario de consigna.
@@ -92,19 +129,28 @@ export function notificarLeadNuevo(cliente) {
 // aquí ya sabemos exactamente qué auto quieren consignar.
 export function notificarConsignaNueva(consigna) {
   const fmt = (n) => n ? '$' + Math.round(n).toLocaleString('es-MX') : '—';
-  return destinatariosPorRol('Vendedor').then((vendedores) => Promise.all(
-    vendedores.map((v) => enviarAviso(v.email, v.nombre, {
-      titulo: 'Nueva solicitud de consigna',
-      mensaje: [
-        `${consigna.nombre || 'Un propietario'} quiere consignar un ${consigna.vehiculo || 'vehículo'}.`,
-        `Precio solicitado: ${fmt(consigna.precio)}.`,
-        consigna.urgencia ? `Urgencia: ${consigna.urgencia}.` : '',
-        `Tel: ${consigna.telefono || '—'}  |  Origen: ${consigna.origen || 'Sitio web'}.`,
-        `Entra al panel para contactarlo y asignártelo.`,
-      ].filter(Boolean).join(' '),
-      link: 'https://www.wecarsbajio.com/panel-vendedores',
-    }))
-  ));
+  const vars = {
+    titulo: 'Nueva solicitud de consigna — weCars Bajío',
+    mensaje: [
+      `🔄 ${consigna.nombre || 'Un propietario'} quiere consignar un ${consigna.vehiculo || 'vehículo'}.`,
+      `💰 Precio solicitado: ${fmt(consigna.precio)}.`,
+      consigna.urgencia ? `⚡ Urgencia: ${consigna.urgencia}.` : '',
+      `📱 Tel: ${consigna.telefono || '—'}  |  Origen: ${consigna.origen || 'Sitio web'}.`,
+      ``,
+      `Entra al panel para contactarlo y asignártelo.`,
+    ].filter(Boolean).join('\n'),
+    link: 'https://www.wecarsbajio.com/panel-vendedores',
+  };
+
+  const avisarOwner = enviarAviso(CORREO_OWNER, NOMBRE_OWNER, vars);
+  const avisarVendedores = destinatariosPorRol('Vendedor').then((vendedores) =>
+    Promise.all(vendedores
+      .filter((v) => normalizarEmail(v.email) !== normalizarEmail(CORREO_OWNER))
+      .map((v) => enviarAviso(v.email, v.nombre, vars))
+    )
+  );
+
+  return Promise.all([avisarOwner, avisarVendedores]);
 }
 
 // Una unidad se cierra (Vendido) o se aparta (Apartado) — le corresponde

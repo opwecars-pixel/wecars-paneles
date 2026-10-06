@@ -243,6 +243,20 @@ $w.onReady(function () {
       try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'ge-nota-vendedor', ...data }); } catch (e) {}
     }
 
+    if (data.type === 'wecars-gerencia-nota' && data.data && data.data.mensaje) {
+      registrarActividad({
+        tipo:      'nota-gerencia',
+        descripcion: data.data.mensaje,
+        fecha:     data.data.fecha ? new Date(data.data.fecha) : new Date(),
+        autor:     'Gerencia',
+      })
+        .then(() => $w(HTML_ID).postMessage({ type: 'wecars-gerencia-nota-ok' }))
+        .catch((e) => {
+          console.error('[Gerencia] Error guardando nota:', e);
+          $w(HTML_ID).postMessage({ type: 'wecars-gerencia-nota-ok' });
+        });
+    }
+
     // ── Registrar bono ────────────────────────────────────────────────
     if (data.type === 'wecars-bono-registrar' && data.vendedor) {
       const bono = {

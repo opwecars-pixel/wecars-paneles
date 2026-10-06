@@ -24,6 +24,7 @@ import { fetch } from 'wix-fetch';
 import { registrarActividad } from 'backend/actividades.jsw';
 import wixUsersBackend from 'wix-users-backend';
 import { obtenerRol, normalizarRol } from 'backend/permisos.jsw';
+import { notificarLeadNuevo } from 'backend/notificaciones.jsw';
 
 const SA = { suppressAuth: true };
 
@@ -80,6 +81,8 @@ export function crearLead(datos) {
 
   return wixData.insert('ALeads', lead, SA)
     .then((inserted) => {
+      // Notificar por correo (owner + vendedores + gerencia) Y por WhatsApp en paralelo
+      notificarLeadNuevo(lead).catch((e) => console.error('[Leads] Email error:', e));
       _notificarWhatsApp(lead).catch((e) => console.error('[Leads] WhatsApp error:', e));
       registrarActividad({
         tipo: 'lead_recibido', leadId: inserted._id,

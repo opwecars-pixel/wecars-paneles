@@ -376,6 +376,28 @@ Un panel está **terminado** cuando, señalando cualquier elemento de la pantall
 | Panel | Fecha | Status |
 |---|---|---|
 | Gerencia | 2026-08-26/27 | En proceso — auditoría completa, implementación pendiente |
-| Administración | — | Pendiente |
-| Finanzas | — | Pendiente |
-| Vendedores | — | Pendiente |
+| Administración | — | Pendiente auditoría funcional (secciones 05+) |
+| Finanzas | — | Pendiente auditoría funcional (secciones 12+) |
+| Vendedores | — | Pendiente auditoría funcional completa |
+
+### Sprints transversales aplicados (todos los paneles)
+
+| Sprint | Fecha | Contenido |
+|---|---|---|
+| Sprint 2 | 2026-09 | Homologación Style B — headers de modales/drawers a fondo blanco con border-bottom |
+| Sprint 3 | 2026-09-30 | Mobile overscroll fix — `overscroll-behavior: none` en raíz e inner containers, safe-area-inset en headers/sidebar/toast/FAB, `-webkit-overflow-scrolling: touch` en scroll owners |
+| Sprint 4 | 2026-09-30 | Design system homologación — paleta master G/A/F (`--lime:#56a900`), tokens faltantes definidos (`--card`, `--border`, `--accent`, `--fn-surface`), sombras verde-tinted unificadas, badges `border-radius:4px`, inputs `border-width:1.5px` |
+
+### FASE 2 trazabilidad aplicada (backend)
+
+| Fix | Archivo | Descripción |
+|---|---|---|
+| F2-07-A | `pagina-panel-vendedores.html` | BroadcastChannel usa `departamentoActual` directo en vez de parsear `estadoNuevo` |
+| F2 Fix 1–4 | `backend-leads.js` | `registrarActividad` en `_reclamarLeadInterno` (cons/vta) y `_asignarLeadInterno` (cons/vta) |
+| F2 Fix 5 | `backend-flujo.js` | `registrarAccion` escribe `departamentoActual`, `responsableComercial`, `responsableNombre` en Historial |
+
+### Pendientes de acción del usuario (deploy en Wix Studio)
+
+- [ ] Subir los 4 HTML (Sprint 2 + 3 + 4 + F2-07-A) y publicar
+- [ ] Subir `backend-leads.js` y `backend-flujo.js` y publicar
+- [ ] Agregar campos al CMS `Historial`: `departamentoActual`, `responsableComercial`, `responsableNombre`

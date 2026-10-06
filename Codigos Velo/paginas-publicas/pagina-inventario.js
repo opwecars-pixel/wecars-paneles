@@ -9,7 +9,7 @@ import wixData from 'wix-data';
 import wixLocation from 'wix-location';
 import { findOrCreateCliente } from 'backend/clientes.jsw';
 import { getSiteConfig } from 'backend/siteConfig.jsw';
-import { notificarLeadNuevo } from 'backend/notificaciones.jsw';
+// notificarLeadNuevo centralizado en backend/leads.jsw
 import { fetchInventarioCars } from 'backend/datos.jsw';
 import { crearLead } from 'backend/leads.jsw';
 
@@ -89,7 +89,7 @@ $w.onReady(function () {
           return findOrCreateCliente(data.data.nombre, data.data.telefono, data.data.correo, data.data.origen)
             .then((r) => {
               console.log('[Clientes] debug:', r.debug);
-              notificarLeadNuevo({ nombre: data.data.nombre, telefono: data.data.telefono, correo: data.data.correo, interes: data.data.interes || '', pagina: 'Inventario', origen: data.data.origen || 'Sitio web', vehiculo: data.data.interes || '', ingreso: '', empresa: '' });
+              // notificarLeadNuevo centralizado en backend/leads.jsw — no duplicar
               if (r.clienteId) return wixData.update('ALeads', Object.assign({}, inserted, { clienteId: r.clienteId }));
             });
         })

@@ -1,0 +1,329 @@
+<!-- weCars Mobile Lead Sheet — shared module v3
+     Inject this block (style + script) before </body> in each panel.
+     Then call: window.wcLeadSheetAbrir(cliente, cfg)
+     cfg = { sheetId, overlayId, cerrar, actividades, onEtapaChange, vendedorNombre, vendedorRol }
+-->
+<style id="wc-lead-sheet-css">
+/* ── SHEET CONTAINER OVERRIDES ── */
+/* Asegurar que el sheet cubra completamente y no se vea el panel detrás */
+#pv-mobile-cliente-sheet,
+#ge-mobile-sheet,
+#ad-mobile-sheet,
+#fn-mobile-sheet {
+  border-radius: 20px 20px 0 0 !important;
+  overflow: hidden !important;
+}
+
+/* ── SHEET HEADER (dark, matches mockup) ── */
+.pvmh-sheet-header {
+  background: var(--sidebar-bg, #1a2a19) !important;
+  padding: 16px 20px 20px !important;
+  border-radius: 0 !important;
+  position: relative !important;
+}
+.pvmh-sheet-back {
+  background: none !important; border: none !important;
+  color: rgba(255,255,255,.55) !important;
+  font-size: 13px !important; font-weight: 600 !important;
+  padding: 0 !important; cursor: pointer !important;
+  display: flex !important; align-items: center !important; gap: 5px !important;
+  margin-bottom: 14px !important;
+  -webkit-tap-highlight-color: transparent !important;
+  /* Eliminar cualquier pseudo-content o ::before que agregue flechas extra */
+}
+.pvmh-sheet-back::before { content: none !important; }
+.pvmh-sheet-toprow {
+  display: flex !important; align-items: center !important; gap: 12px !important;
+}
+.pvmh-sheet-av {
+  width: 46px !important; height: 46px !important; border-radius: 50% !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 800 !important; font-size: 17px !important; color: #fff !important;
+  flex-shrink: 0 !important; border: 2px solid rgba(86,169,0,.45) !important;
+}
+.pvmh-sheet-info { flex: 1 !important; min-width: 0 !important; }
+.pvmh-sheet-name {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 800 !important; font-size: 18px !important; color: #fff !important;
+  line-height: 1.1 !important; white-space: nowrap !important;
+  overflow: hidden !important; text-overflow: ellipsis !important;
+}
+.pvmh-sheet-car {
+  font-size: 11px !important; color: rgba(255,255,255,.45) !important;
+  text-transform: uppercase !important; letter-spacing: .06em !important;
+  font-weight: 600 !important; margin-top: 3px !important;
+}
+.pvmh-sheet-bell-wrap { position: relative !important; }
+.pvmh-sheet-bell {
+  width: 38px !important; height: 38px !important; border-radius: 50% !important;
+  background: rgba(255,255,255,.1) !important; border: none !important;
+  cursor: pointer !important; display: flex !important;
+  align-items: center !important; justify-content: center !important; flex-shrink: 0 !important;
+}
+.pvmh-sheet-bell svg { width: 18px !important; height: 18px !important; stroke: rgba(255,255,255,.8) !important; fill: none !important; stroke-width: 1.8 !important; }
+.pvmh-bell-dot {
+  position: absolute !important; top: 1px !important; right: 1px !important;
+  width: 9px !important; height: 9px !important; border-radius: 50% !important;
+  background: var(--lime, #56a900) !important; border: 2px solid var(--sidebar-bg, #1a2a19) !important;
+}
+.pvmh-sin-contacto {
+  display: inline-flex !important; align-items: center !important; gap: 6px !important;
+  background: rgba(180,83,9,.2) !important; color: #f59e0b !important;
+  border: 1px solid rgba(245,158,11,.3) !important;
+  border-radius: 999px !important; padding: 5px 13px !important;
+  font-size: 11px !important; font-weight: 800 !important;
+  letter-spacing: .05em !important; text-transform: uppercase !important; margin-top: 13px !important;
+}
+.pvmh-sin-contacto svg { width: 12px !important; height: 12px !important; stroke: #f59e0b !important; fill: none !important; stroke-width: 2.5 !important; }
+
+/* ── ACTION BUTTONS ── */
+.pvmh-action-row { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 10px !important; padding: 14px !important; }
+.pvmh-action-btn {
+  background: var(--card, #fff) !important; border-radius: 14px !important;
+  border: 1px solid var(--border, #e0e5e0) !important; padding: 14px 6px !important;
+  display: flex !important; flex-direction: column !important; align-items: center !important; gap: 7px !important;
+  cursor: pointer !important; box-shadow: 0 2px 10px rgba(13,26,13,.08) !important;
+  transition: transform .12s !important; -webkit-tap-highlight-color: transparent !important;
+  text-decoration: none !important;
+}
+.pvmh-action-btn:active { transform: scale(.95) !important; }
+.pvmh-action-icon {
+  width: 44px !important; height: 44px !important; border-radius: 50% !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+}
+.pvmh-action-icon svg { width: 20px !important; height: 20px !important; stroke: currentColor !important; fill: none !important; stroke-width: 1.9 !important; stroke-linecap: round !important; stroke-linejoin: round !important; }
+/* Todos los iconos de acción usan verde — consistente con el mockup */
+.pvmh-action-icon.green { background: rgba(86,169,0,.11) !important; color: #3a7200 !important; }
+/* WhatsApp usa verde WhatsApp */
+.pvmh-action-icon.wa    { background: rgba(37,211,102,.12) !important; color: #128c7e !important; }
+/* Nota usa verde lima igual que los demás */
+.pvmh-action-icon.nota  { background: rgba(86,169,0,.11) !important; color: #3a7200 !important; }
+.pvmh-action-lbl { font-size: 12px !important; font-weight: 700 !important; color: var(--ink2, #2d3d2d) !important; font-family: 'Inter', sans-serif !important; }
+
+/* ── INFO ICONS SVG (reemplaza emojis) ── */
+.pvmh-info-icon-svg {
+  flex-shrink: 0 !important; width: 22px !important; height: 22px !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+}
+.pvmh-info-icon-svg svg {
+  width: 18px !important; height: 18px !important;
+  stroke: var(--muted, #6b7c6b) !important; fill: none !important;
+  stroke-width: 1.7 !important; stroke-linecap: round !important; stroke-linejoin: round !important;
+}
+
+/* ── INFO SECTION ── */
+.pvmh-info-section { margin: 0 14px 12px !important; background: var(--card, #fff) !important; border-radius: 14px !important; overflow: hidden !important; border: 1px solid var(--border, #e0e5e0) !important; box-shadow: 0 2px 8px rgba(13,26,13,.06) !important; }
+.pvmh-info-row { display: flex !important; align-items: center !important; gap: 14px !important; padding: 14px 16px !important; border-bottom: 1px solid #edf0ed !important; }
+.pvmh-info-row:last-child { border-bottom: none !important; }
+.pvmh-info-lbl { font-size: 11px !important; color: var(--muted, #6b7c6b) !important; font-weight: 600 !important; letter-spacing: .04em !important; text-transform: uppercase !important; }
+.pvmh-info-val { font-size: 15px !important; color: var(--ink, #0f1a0f) !important; font-weight: 500 !important; margin-top: 3px !important; }
+
+/* ── STATUS PILLS ── */
+.pvmh-status-pills { display: flex !important; gap: 8px !important; padding: 0 14px 14px !important; overflow-x: auto !important; scrollbar-width: none !important; }
+.pvmh-status-pills::-webkit-scrollbar { display: none !important; }
+.pvmh-spill {
+  flex-shrink: 0 !important; padding: 8px 16px !important; border-radius: 999px !important;
+  font-size: 12px !important; font-weight: 700 !important; cursor: pointer !important;
+  border: 1.5px solid var(--border, #dde3dd) !important;
+  color: var(--muted, #6b7c6b) !important; background: var(--card, #fff) !important;
+  white-space: nowrap !important; font-family: 'Inter', sans-serif !important; transition: all .15s !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+.pvmh-spill.active { background: var(--lime, #56a900) !important; color: #fff !important; border-color: var(--lime, #56a900) !important; box-shadow: 0 3px 10px rgba(86,169,0,.28) !important; }
+
+/* ── TIMELINE ── */
+.pvmh-tl-wrap { padding: 0 14px 10px !important; }
+.pvmh-tl-item { display: flex !important; gap: 12px !important; align-items: flex-start !important; margin-bottom: 13px !important; }
+.pvmh-tl-dot { width: 9px !important; height: 9px !important; border-radius: 50% !important; background: var(--lime, #56a900) !important; margin-top: 3px !important; flex-shrink: 0 !important; box-shadow: 0 0 0 3px rgba(86,169,0,.15) !important; }
+.pvmh-tl-dot.g { background: #c8d4c8 !important; box-shadow: none !important; }
+.pvmh-tl-text { font-size: 13px !important; color: var(--ink2, #2d3d2d) !important; font-weight: 500 !important; line-height: 1.3 !important; }
+.pvmh-tl-time { font-size: 11px !important; color: var(--muted, #6b7c6b) !important; margin-top: 3px !important; }
+
+/* ── ADD NOTE BUTTON ── */
+.pvmh-note-btn {
+  margin: 4px 14px 14px !important; width: calc(100% - 28px) !important;
+  background: rgba(86,169,0,.07) !important; color: #3a7200 !important;
+  border: 1.5px dashed var(--lime, #56a900) !important;
+  border-radius: 14px !important; padding: 14px !important;
+  font-size: 13px !important; font-weight: 700 !important;
+  cursor: pointer !important; text-align: center !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  -webkit-tap-highlight-color: transparent !important;
+  display: block !important;
+}
+
+/* ── SECTION HEADER ── */
+.pvmh-section-hd { display: flex !important; align-items: center !important; justify-content: space-between !important; padding: 14px 16px 8px !important; }
+.pvmh-section-title { font-family: 'Plus Jakarta Sans', sans-serif !important; font-weight: 700 !important; font-size: 15px !important; color: var(--ink, #0f1a0f) !important; }
+</style>
+<script id="wc-lead-sheet-js">
+(function(){
+'use strict';
+var COLORS=['#56a900','#7c3aed','#0ea5e9','#059669','#e07a00','#e91e8c','#0d47a1'];
+function _ini(n){var p=(n||'').trim().split(/\s+/);return((p[0]||'')[0]||'').toUpperCase()+((p[1]||'')[0]||'').toUpperCase()||'?';}
+function _color(n){var h=0;for(var i=0;i<(n||'').length;i++)h=(h*31+n.charCodeAt(i))>>>0;return COLORS[h%COLORS.length];}
+function _esc(v){return String(v||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);});}
+function _rel(d){if(!d)return'';var diff=Date.now()-new Date(d).getTime();var m=Math.floor(diff/60000);if(m<2)return'hace un momento';if(m<60)return'hace '+m+' min';var h=Math.floor(m/60);if(h<24)return'hace '+h+'h';return'hace '+Math.floor(h/24)+' días';}
+
+/* SVG icons — Tabler style */
+var SVG_PHONE='<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.08 6.08l1.08-.9a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+/* WhatsApp — logo real (burbuja de chat con teléfono dentro) */
+var SVG_WA='<svg viewBox="0 0 24 24" fill="none"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.656 1.438 5.168L2 22l4.978-1.393A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>';
+var SVG_NOTE='<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+var SVG_BELL='<svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+var SVG_WARN='<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+var SVG_BACK='<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+/* Info icons SVG (reemplazan emojis) */
+var SVG_PHONE_SM='<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.08 6.08l1.08-.9a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+var SVG_CAR='<svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14l4 4v4a2 2 0 0 1-2 2h-1"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 9l1.5-4h7L15 9"/></svg>';
+var SVG_CARD='<svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+
+window.wcLeadSheetAbrir = function(c, cfg) {
+  var sheetEl   = document.getElementById(cfg.sheetId);
+  var overlayEl = document.getElementById(cfg.overlayId);
+  if (!sheetEl || !overlayEl) return;
+
+  var ini = _ini(c.nombre);
+  var col = _color(c.nombre);
+  var tel = c.telefono || '';
+  var telLimpio = tel.replace(/\D/g,'');
+  var wa = 'https://wa.me/521' + telLimpio.slice(-10);
+  var etapa = c.estatusExpediente || c.estatus || 'nuevo_lead';
+  var auto  = c.vehiculoInteres || c.interes || '—';
+  var pago  = c.formaPago ? (c.formaPago + (c.plazoMeses ? ' · ' + c.plazoMeses + ' meses' : '')) : '—';
+  var vdRol = (cfg.vendedorRol || 'VENDEDOR').toUpperCase();
+  var cerrarFn = cfg.cerrar || function(){};
+  var id = c._id || c.id;
+
+  /* ── Actividades: prioridad a c.actividades[], luego filtrar cfg.actividades por id ── */
+  var acts = [];
+  if (c.actividades && c.actividades.length) {
+    acts = c.actividades.slice();
+  } else {
+    acts = (cfg.actividades || []).filter(function(a){
+      return a.clienteId === id || a.leadId === id;
+    });
+  }
+  acts = acts.sort(function(a,b){ return new Date(b.fecha||b._createdDate||0) - new Date(a.fecha||a._createdDate||0); });
+
+  var diasSC = 0;
+  if (acts.length) diasSC = Math.floor((Date.now() - new Date(acts[0].fecha||acts[0]._createdDate).getTime()) / 86400000);
+  var sinContactoHtml = diasSC >= 2
+    ? '<div class="pvmh-sin-contacto">'+SVG_WARN+'SIN CONTACTO '+diasSC+' DÍAS</div>'
+    : '';
+
+  /* ── Timeline ── */
+  var tlHtml = '';
+  if (!acts.length) {
+    tlHtml = '<div class="pvmh-tl-wrap"><div style="padding:12px 0;text-align:center;font-size:13px;color:var(--muted,#6b7c6b)">Sin actividad registrada</div></div>';
+  } else {
+    tlHtml = '<div class="pvmh-tl-wrap">';
+    acts.slice(0,5).forEach(function(a, i){
+      var tipo = a.tipo || a.descripcion || 'Actividad';
+      var res  = a.resultado || a.respuesta || '';
+      var txt  = res ? tipo + ' — ' + res : tipo;
+      var autor = a.autor || a.vendedorNombre || '';
+      var tiempo = _rel(a.fecha||a._createdDate) + (autor ? ' · por ' + autor : '');
+      tlHtml += '<div class="pvmh-tl-item">'
+        + '<div class="pvmh-tl-dot'+(i>=2?' g':'')+'"></div>'
+        + '<div><div class="pvmh-tl-text">'+_esc(txt)+'</div>'
+        + '<div class="pvmh-tl-time">'+_esc(tiempo)+'</div></div></div>';
+    });
+    tlHtml += '</div>';
+  }
+
+  /* ── Pills ── */
+  var pillsMap = [['nuevo_lead','Nuevo lead'],['contactado','Contactado'],['propuesta','Propuesta'],['credito','Crédito'],['cierre','Cierre']];
+  var pillsHtml = pillsMap.map(function(p){
+    var isAct = etapa === p[0] || etapa === p[0].replace('é','e') || etapa.toLowerCase().indexOf(p[0].split('_')[0]) === 0;
+    return '<button class="pvmh-spill'+(isAct?' active':'')+'" onclick="wcLeadSheetSetEtapa(\''+_esc(id)+'\',\''+p[0]+'\',this)">'+p[1]+'</button>';
+  }).join('');
+
+  var noteHandler = cfg.onNota
+    ? 'wcLeadSheetNota(\''+_esc(id)+'\')'
+    : (typeof window[cfg.notaFn] === 'function' ? cfg.notaFn+'(\''+_esc(id)+'\')' : 'void 0');
+
+  var html = '<div class="pvmh-sheet-header">'
+    + '<button class="pvmh-sheet-back" onclick="('+cerrarFn.toString()+')()">'+SVG_BACK+' Volver</button>'
+    + '<div class="pvmh-sheet-toprow">'
+      + '<div class="pvmh-sheet-av" style="background:'+col+'">'+ini+'</div>'
+      + '<div class="pvmh-sheet-info">'
+        + '<div class="pvmh-sheet-name">'+_esc(c.nombre||'Sin nombre')+'</div>'
+        + '<div class="pvmh-sheet-car">'+_esc(vdRol)+' · WECARS BAJÍO</div>'
+      + '</div>'
+      + '<div class="pvmh-sheet-bell-wrap"><button class="pvmh-sheet-bell">'+SVG_BELL+'</button><span class="pvmh-bell-dot"></span></div>'
+    + '</div>'
+    + sinContactoHtml
+  + '</div>'
+
+  + '<div class="pvmh-action-row">'
+    + '<button class="pvmh-action-btn" onclick="window.open(\'tel:'+_esc(tel)+'\',\'_self\')">'
+      + '<div class="pvmh-action-icon green">'+SVG_PHONE+'</div>'
+      + '<span class="pvmh-action-lbl">Llamar</span>'
+    + '</button>'
+    + '<a class="pvmh-action-btn" href="'+_esc(wa)+'" target="_blank" rel="noreferrer">'
+      + '<div class="pvmh-action-icon wa">'+SVG_WA+'</div>'
+      + '<span class="pvmh-action-lbl">WhatsApp</span>'
+    + '</a>'
+    + '<button class="pvmh-action-btn" onclick="'+noteHandler+'">'
+      + '<div class="pvmh-action-icon nota">'+SVG_NOTE+'</div>'
+      + '<span class="pvmh-action-lbl">Nota</span>'
+    + '</button>'
+  + '</div>'
+
+  + '<div class="pvmh-section-hd" style="padding-top:4px"><span class="pvmh-section-title">Estatus del cliente</span></div>'
+  + '<div class="pvmh-status-pills">'+pillsHtml+'</div>'
+
+  + '<div class="pvmh-info-section">'
+    + '<div class="pvmh-info-row"><div class="pvmh-info-icon-svg">'+SVG_PHONE_SM+'</div><div><div class="pvmh-info-lbl">Teléfono</div><div class="pvmh-info-val">'+_esc(tel||'—')+'</div></div></div>'
+    + '<div class="pvmh-info-row"><div class="pvmh-info-icon-svg">'+SVG_CAR+'</div><div><div class="pvmh-info-lbl">Auto de interés</div><div class="pvmh-info-val">'+_esc(auto)+'</div></div></div>'
+    + '<div class="pvmh-info-row"><div class="pvmh-info-icon-svg">'+SVG_CARD+'</div><div><div class="pvmh-info-lbl">Forma de pago</div><div class="pvmh-info-val">'+_esc(pago)+'</div></div></div>'
+  + '</div>'
+
+  + '<div class="pvmh-section-hd"><span class="pvmh-section-title">Actividad reciente</span></div>'
+  + tlHtml
+  + '<button class="pvmh-note-btn" onclick="'+noteHandler+'">+ Agregar nota o actividad</button>';
+
+  sheetEl._wcCfg = cfg;
+  sheetEl._wcCliente = c;
+  sheetEl.innerHTML = html;
+  sheetEl.scrollTop = 0;
+  sheetEl.style.display = 'block';
+  overlayEl.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  /* Ocultar FABs mientras el sheet está abierto */
+  ['pv-fab-nuevo','ge-fab-nuevo','ad-fab-nuevo','fn-fab-nuevo'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.style.setProperty('display','none','important');
+  });
+};
+
+window.wcLeadSheetSetEtapa = function(id, etapa, btn) {
+  var allPills = btn.closest('.pvmh-status-pills');
+  if (allPills) allPills.querySelectorAll('.pvmh-spill').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var sheets = ['pv-mobile-cliente-sheet','ge-mobile-sheet','ad-mobile-sheet','fn-mobile-sheet'];
+  for (var i=0; i<sheets.length; i++) {
+    var el = document.getElementById(sheets[i]);
+    if (el && el._wcCfg && el._wcCfg.onEtapaChange) {
+      el._wcCfg.onEtapaChange(id, etapa);
+      if (el._wcCliente) el._wcCliente.estatusExpediente = etapa;
+      break;
+    }
+  }
+};
+
+window.wcLeadSheetNota = function(id) {
+  var sheets = ['pv-mobile-cliente-sheet','ge-mobile-sheet','ad-mobile-sheet','fn-mobile-sheet'];
+  for (var i=0; i<sheets.length; i++) {
+    var el = document.getElementById(sheets[i]);
+    if (el && el._wcCfg) {
+      if (typeof el._wcCfg.onNota === 'function') { el._wcCfg.onNota(id); }
+      break;
+    }
+  }
+};
+
+})();
+</script>

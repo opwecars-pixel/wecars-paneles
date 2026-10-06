@@ -8,7 +8,7 @@ import wixData from 'wix-data';
 import { crearLeadYVincular, actualizarClienteIdLead } from 'backend/leads.jsw';
 import { findOrCreateCliente } from 'backend/clientes.jsw';
 import { getSiteConfig } from 'backend/siteConfig.jsw';
-import { notificarLeadNuevo } from 'backend/notificaciones.jsw';
+// notificarLeadNuevo centralizado en backend/leads.jsw
 import wixLocation from 'wix-location';
 import wixWindow from 'wix-window';
 
@@ -144,5 +144,5 @@ function saveLead(data, pagina) {
       .catch(() => {});
   }).catch((err) => console.error('Error guardando lead:', err));
 
-  notificarLeadNuevo({ nombre, telefono, correo, interes, pagina, origen, vehiculo: '', ingreso: '', empresa: '' });
+  // notificarLeadNuevo centralizado en backend/leads.jsw — no duplicar
 }

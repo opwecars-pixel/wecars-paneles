@@ -65,6 +65,33 @@ $w.onReady(function () {
     // uploadFotoBtn es opcional — la página funciona sin él
   }
 
+  // ── BroadcastChannel — sync en tiempo real entre paneles ─────────
+  let _wcBC = null;
+  try {
+    _wcBC = new BroadcastChannel('wecars-erp-v2');
+    _wcBC.onmessage = function(ev) {
+      const msg = ev.data || {};
+      if (!msg.type || msg._from === 'administracion') return;
+      // Refrescar UI cuando otro panel hace cambios relevantes
+      if (msg.type === 'wecars-expediente-actualizado' || msg.type === 'wecars-cliente-nuevo') {
+        enviarDatosAdmin();
+      }
+      if (msg.type === 'wecars-cierre-creado' || msg.type === 'wecars-cierre-actualizado') {
+        $w(HTML_ID).postMessage({ type: 'wecars-bc-cierre-update', cierre: msg.cierre });
+      }
+      if (msg.type === 'wecars-inventario-update' || msg.type === 'wecars-inventario-nuevo') {
+        // Notificar al HTML para refrescar la lista de autos
+        $w(HTML_ID).postMessage({ type: 'wecars-bc-inventario-update' });
+      }
+      if (msg.type === 'credito-nuevo' || msg.type === 'credito-estado-actualizado') {
+        $w(HTML_ID).postMessage({ type: 'wecars-bc-credito-update', ...msg });
+      }
+    };
+  } catch (e) {
+    _wcBC = null;
+    console.warn('[Admin] BroadcastChannel no disponible:', e);
+  }
+
   // ── Escucha de mensajes del iframe ────────────────────────────────
   $w(HTML_ID).onMessage((event) => {
     ;(async () => {
@@ -601,6 +628,29 @@ $w.onReady(function () {
         .catch(e => {
           console.error('[Admin] Error actualizando cierre:', e);
           $w(HTML_ID).postMessage({ type: 'wecars-cierre-error', error: String(e) });
+        });
+    }
+
+    // ── Alta rápida de lead desde Admin ─────────────────────────────
+    if (data.type === 'wecars-lead' && data.data) {
+      const ld = data.data;
+      wixUsers.currentUser.getEmail()
+        .then((email) => obtenerPerfil(email).catch(() => ({ nombre: email }))
+          .then((p) => wixData.insert('ALeads', Object.assign({}, ld, {
+            vendedorAsignado: ld.vendedorAsignado || email,
+            vendedorNombre:   ld.vendedorNombre   || p.nombre || email,
+            fechaRegistro:    ld.fechaRegistro    || new Date(),
+            estatus:          ld.estatus          || 'nuevo_lead',
+            origen:           ld.pagina           || ld.origen || 'Panel Admin',
+          }), { suppressAuth: true }))
+        )
+        .then((lead) => {
+          $w(HTML_ID).postMessage({ type: 'wecars-lead-creado', ok: true, leadId: lead._id });
+          enviarLeadsAdmin();
+        })
+        .catch((e) => {
+          console.error('[Admin] Error creando lead:', e);
+          $w(HTML_ID).postMessage({ type: 'wecars-lead-creado', ok: false, error: String(e) });
         });
     }
 
