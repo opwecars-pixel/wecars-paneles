@@ -2881,12 +2881,14 @@ if (id === 'hoy') { renderHoy(); }
 // VENTAS
 if (id === 'leads' || id === 'pipeline') {
 window.parent.postMessage({ type: 'wecars-leads-solicitar' }, '*');
-geRenderLeads();
+if(typeof geRenderLeads==='function') geRenderLeads();
+else if(typeof window.geRenderLeads==='function') window.geRenderLeads();
 if(typeof window.geRenderFunnel==='function')window.geRenderFunnel();
 }
 if (id === 'sinasignar') {
 window.parent.postMessage({ type: 'wecars-leads-solicitar' }, '*');
-renderSinAsignarDedicado();
+if(typeof renderSinAsignarDedicado==='function') renderSinAsignarDedicado();
+else if(typeof window.renderSinAsignarDedicado==='function') window.renderSinAsignarDedicado();
 }
 if (id === 'metas') { renderMetasView(); renderMetasKpis(); }
 // BASE DE DATOS
@@ -3069,7 +3071,8 @@ const panelHTML = panelesExt.length
 ).join('')
 : '';
 document.getElementById('wc-sidebar-nav').innerHTML = secHTML + panelHTML;
-showView('leads'); // Pipeline como vista inicial
+// Diferir vista inicial hasta que todos los scripts estén cargados
+setTimeout(function(){ showView('leads'); }, 0); // Pipeline como vista inicial
 }
 (function(){var _el=document.getElementById('wc-sidebar-logout');if(_el)_el.addEventListener('click', () => {
 window.parent.postMessage({ type: 'wecars-logout' }, '*');
@@ -8337,7 +8340,7 @@ window.renderMetasKpis = renderMetasKpis;
           {l:'Mejor mes actual',v:Math.max(vtasUlt30,1),c:'#7c3aed'},
         ].map(({l,v,c})=>
           '<div style="background:var(--surface,var(--line));border-radius:var(--r-sm);padding:8px 10px;text-align:center">'+
-            '<div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:1.3rem;font-weight:800;color:'+c+'">'+v+'</div>'+
+            '<div style="font-family:\'Plus Jakarta Sans\',system-ui,sans-serif;font-size:1.3rem;font-weight:800;color:'+c+'">'+v+'</div>'+
             '<div style="font-size:var(--t-xs);color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-top:2px">'+l+'</div>'+
           '</div>'
         ).join('');
