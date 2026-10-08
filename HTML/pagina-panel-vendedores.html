@@ -5221,17 +5221,21 @@ select {
   padding: var(--sp-3);
   cursor: pointer;
   box-shadow: var(--sh-1);
-  transition: border-color .12s, box-shadow .12s;
+  transition: border-color .15s, box-shadow .15s, transform .1s;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
 }
 @media (hover: hover) and (pointer: fine) {
   .wc-kanban-card:hover{
-  box-shadow: 0 4px 14px rgba(13,26,13,.13);
-  border-color: var(--lime);
+    box-shadow: 0 6px 20px rgba(13,26,13,.14);
+    border-color: var(--lime);
+    transform: translateY(-1px);
+  }
 }
-}
+.wc-kanban-card:active { transform: scale(.98); opacity: .9; }
 
 .wc-kanban-card b {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -9240,7 +9244,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
         ? `<div style="display:flex;gap:5px">${expBtn}<button class="pv-tomar-btn" data-tomar-id="${esc(c._id)}" type="button" title="Tomar este lead y asignarlo a mi cartera"><i class="ti ti-hand-grab"></i> Tomar</button></div>`
         : `<div style="display:flex;gap:5px">${expBtn}<button class="pv-detail-btn" data-id="${esc(c._id)}" type="button" ${deOtro ? 'style="opacity:.6"' : ''}>Ver →</button></div>`;
       return `
-      <tr class="${rowClass}">
+      <tr class="${rowClass}" data-id="${esc(c._id)}" style="cursor:pointer">
         <td>
           <div class="pv-row-name">${esc(c.nombre || 'Sin nombre')}${c.inactivo24h ? '<span class="pv-inactivo-dot" title="+24h sin actividad"></span>' : ''}${deOtro ? '' : contactBtns(c)}</div>
           <div class="pv-row-phone">${esc(c.telefono)}${c.estatusExpediente ? ' ' + (window.estadoBadgeHTML||function(){return'';})(c.estatusExpediente) : ''} ${_tempBadge(c)}</div>
@@ -9304,30 +9308,51 @@ section.pv-table-wrap > .shell > #pv-compradores {
       if (!drop) return;
       drop.innerHTML = lista.length ? lista.map(c => {
         const r = riesgoInfo(c);
-        const borde = (r.nivel === 'vencido' || r.nivel === 'urgente') ? '#dc2626' : (r.nivel === 'atencion' ? '#EF9F27' : 'var(--line)');
+        // Color del borde izquierdo según urgencia real
+        const _esVencido = r.nivel === 'vencido';
+        const _esUrgente = r.nivel === 'urgente';
+        const _esAtencion = r.nivel === 'atencion';
+        const borde = _esVencido ? '#dc2626' : _esUrgente ? '#f97316' : _esAtencion ? '#EF9F27' : 'var(--lime,#56a900)';
+        // Fondo sutil de la card según urgencia
+        const _cardBg = _esVencido ? 'rgba(220,38,38,.04)' : _esUrgente ? 'rgba(249,115,22,.03)' : 'var(--surface)';
         // Badge de tiempo en etapa actual
         const _desde = new Date(c.fechaLlegada || c.ultimaActividad || c._createdDate || Date.now()).getTime();
         const _mins = Math.floor((Date.now() - _desde) / 60000);
         const _hrs = Math.floor(_mins / 60);
-        const _tTxt = _mins < 60 ? (_mins + 'm') : _hrs < 24 ? (_hrs + 'h') : (Math.floor(_hrs/24) + 'd');
+        const _dias = Math.floor(_hrs / 24);
+        const _tTxt = _mins < 60 ? (_mins + 'm') : _hrs < 24 ? (_hrs + 'h') : (_dias + 'd');
         const _esNuevo = (c.estatus === 'Nuevo' || c.estatusExpediente === 'nuevo_lead');
-        const _tBg = _esNuevo ? (_mins < 5 ? 'rgba(86,169,0,.10)' : _mins < 30 ? 'rgba(217,119,6,.10)' : '#fee2e2') : '#f1f5f9';
+        const _tBg = _esNuevo ? (_mins < 5 ? 'rgba(86,169,0,.12)' : _mins < 30 ? 'rgba(217,119,6,.12)' : 'rgba(220,38,38,.12)') : 'rgba(100,116,139,.10)';
         const _tClr = _esNuevo ? (_mins < 5 ? '#166534' : _mins < 30 ? '#92400e' : '#991b1b') : '#64748b';
-        const timeBadge = `<span style="font-size:.62rem;font-weight:800;padding:1px 6px;border-radius:var(--r-sm);background:${_tBg};color:${_tClr}">${_tTxt}</span>`;
+        const timeBadge = `<span style="font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:10px;background:${_tBg};color:${_tClr};letter-spacing:.02em">${_tTxt}</span>`;
+        // Indicador de urgencia (solo cuando hay urgencia real)
+        const urgBadge = _esVencido
+          ? `<span style="font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:10px;background:rgba(220,38,38,.12);color:#dc2626;letter-spacing:.02em">VENCIDO</span>`
+          : _esUrgente
+          ? `<span style="font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:10px;background:rgba(249,115,22,.12);color:#c2410c;letter-spacing:.02em">URGENTE</span>`
+          : '';
         const waUrl = c.telefono ? waLink(c) : '';
+        // Avatar inicial para identificación rápida
+        const _avClr = ['#3d7a00','#1d4ed8','#9333ea','#0e7490','#be185d'][c.nombre ? c.nombre.charCodeAt(0) % 5 : 0];
+        const _ini = (c.nombre||'?').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
         return `
-        <div class="wc-kanban-card" draggable="true" data-id="${esc(c._id)}" style="border-left-color:${borde}">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
-            <b style="flex:1;min-width:0">${esc(c.nombre || 'Sin nombre')}</b>
-            ${timeBadge}
+        <div class="wc-kanban-card" draggable="true" data-id="${esc(c._id)}" style="border-left-color:${borde};background:${_cardBg}">
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <div style="width:30px;height:30px;border-radius:50%;background:${_avClr};color:#fff;font-size:.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Plus Jakarta Sans',sans-serif">${esc(_ini)}</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
+                <b style="flex:1;min-width:0">${esc(c.nombre || 'Sin nombre')}</b>
+                ${timeBadge}
+              </div>
+              ${urgBadge ? `<div style="margin-bottom:3px">${urgBadge}</div>` : ''}
+              ${c.autoInteres ? `<div style="color:var(--ink);font-size:.72rem;display:flex;align-items:center;gap:3px"><i class="ti ti-car" style="font-size:.78rem;color:var(--muted)"></i> ${esc(c.autoInteres)}</div>` : ''}
+              ${c.telefono ? `<div class="wc-kanban-phone" style="font-size:.72rem">${esc(c.telefono)}</div>` : ''}
+            </div>
           </div>
-          ${c.autoInteres ? `<div class="wc-kanban-phone" style="color:var(--ink);font-weight:600;font-size:.75rem"><i class="ti ti-car" style="font-size:.8rem"></i> ${esc(c.autoInteres)}</div>` : ''}
-          <div class="wc-kanban-phone">${esc(c.telefono || '')}</div>
-          <div class="wc-kanban-meta">
-            <span class="pv-badge-origen ${origenClass(c.origen)}" style="font-size:.66rem">${esc(c.origen || 'Sitio web')}</span>
-            <div style="display:flex;gap:4px;align-items:center">
-              ${waUrl ? `<a href="${waUrl}" target="_blank" rel="noreferrer" onclick="event.stopPropagation();registrarClickWa('${esc(c._id)}')" style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;background:rgba(86,169,0,.10);color:#56a900;text-decoration:none" title="WhatsApp"><i class="ti ti-brand-whatsapp" style="font-size:.82rem"></i></a>` : ''}
-              <button class="pv-detail-btn" data-id="${esc(c._id)}" type="button" aria-label="Ver expediente de ${esc(c.nombre || 'cliente')}" style="padding:4px 9px;font-size:.68rem">Ver →</button>
+          <div class="wc-kanban-meta" style="margin-top:2px">
+            <span class="pv-badge-origen ${origenClass(c.origen)}" style="font-size:.63rem">${esc(c.origen || 'Sitio web')}</span>
+            <div style="display:flex;gap:4px;align-items:center" onclick="event.stopPropagation()">
+              ${waUrl ? `<a href="${waUrl}" target="_blank" rel="noreferrer" onclick="registrarClickWa('${esc(c._id)}')" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;background:rgba(86,169,0,.10);color:#56a900;text-decoration:none" title="WhatsApp"><i class="ti ti-brand-whatsapp" style="font-size:.88rem"></i></a>` : ''}
             </div>
           </div>
         </div>`;
@@ -9453,6 +9478,11 @@ section.pv-table-wrap > .shell > #pv-compradores {
   });
 
   function abrirDetalle(clienteId) {
+    // En móvil, usa el sheet inferior en lugar del overlay de escritorio
+    if (window.innerWidth <= 820 && typeof window._pvMobileAbrirCliente === 'function') {
+      window._pvMobileAbrirCliente(clienteId);
+      return;
+    }
     const c = clientes.find(x => x._id === clienteId);
     if (!c) return;
     clienteAbiertoId = clienteId;
@@ -11531,9 +11561,18 @@ section.pv-table-wrap > .shell > #pv-compradores {
       b.classList.toggle('active', isActive);
       if (isActive) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
-    // Abrir grupo accordion del item activo (Fix Bug B)
+    // Abrir grupo accordion del item activo — solo abre, nunca cierra
     const _grupoActivo = _VD_GRUPO_DE[vista];
-    if (_grupoActivo && _grupoActivo !== vista) _vdAbrirGrupo(_grupoActivo);
+    if (_grupoActivo && _grupoActivo !== vista) {
+      const _grpBtn = document.getElementById('vd-grp-btn-' + _grupoActivo);
+      const _grpList = document.getElementById('vd-grp-list-' + _grupoActivo);
+      if (_grpBtn && _grpList) {
+        _grpList.classList.add('open');
+        _grpBtn.classList.add('open');
+        const _ch = _grpBtn.querySelector('.wc-chev');
+        if (_ch) _ch.classList.add('open');
+      }
+    }
 
     document.getElementById('pv-vista-dashboard').style.display = vista === 'dashboard' ? '' : 'none';
     document.getElementById('pv-cola').style.display = vista === 'cola' ? '' : 'none';
