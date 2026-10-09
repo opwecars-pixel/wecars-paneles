@@ -6658,15 +6658,32 @@ section.pv-table-wrap > .shell > #pv-compradores {
 
     <div class="wc-kanban" id="pv-kanban" style="display:none"></div>
 
-    <div id="pv-compradores" style="display:none">
-      <div class="pv-mgr-card">
-        <div class="pv-card-head"><span class="pv-card-icon"><i class="ti ti-trophy"></i></span><h3>Compradores</h3></div>
-        <p class="pv-card-sub">Clientes que ya cerraron — estatus "Ganado".</p>
-        <table class="pv-mgr-table">
-          <thead><tr><th>Cliente</th><th>Origen</th><th>Vehículo</th><th>Última actividad</th><th></th></tr></thead>
-          <tbody id="pv-compradores-body"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px 0">Cargando...</td></tr></tbody>
-        </table>
+    <div id="pv-compradores" style="display:none;padding:20px 0 60px">
+      <!-- Encabezado -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <span style="font-size:1.4rem">🏆</span>
+        <div>
+          <h2 style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:1.15rem;font-weight:900;color:var(--ink);margin:0">Mis compradores</h2>
+          <p style="font-size:.8rem;color:var(--muted);margin:2px 0 0">Clientes que ya cerraron contigo</p>
+        </div>
       </div>
+      <!-- KPI strip -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px">
+        <div class="pv-dash-card" style="padding:14px 16px;margin:0;text-align:center">
+          <div style="font-size:1.8rem;font-weight:900;color:var(--lime-dark);line-height:1" id="pv-comp-total">0</div>
+          <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px">Compradores</div>
+        </div>
+        <div class="pv-dash-card" style="padding:14px 16px;margin:0;text-align:center">
+          <div style="font-size:1.4rem;font-weight:900;color:var(--lime-dark);line-height:1" id="pv-comp-monto">$0</div>
+          <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px">Vendido total</div>
+        </div>
+        <div class="pv-dash-card" style="padding:14px 16px;margin:0;text-align:center">
+          <div style="font-size:1.4rem;font-weight:900;color:#2563eb;line-height:1" id="pv-comp-comision">$0</div>
+          <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px">Comisión total</div>
+        </div>
+      </div>
+      <!-- Cards de compradores -->
+      <div id="pv-compradores-grid" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 
     <div id="pv-reportes" style="display:none;padding:20px 0 60px">
@@ -11268,22 +11285,57 @@ section.pv-table-wrap > .shell > #pv-compradores {
   }
 
   function renderCompradores() {
-    const tbody = document.getElementById('pv-compradores-body');
-    const ganados = misClientes().filter((c) => _esClienteGanado(c));
+    var ganados = misClientes().filter(function(c) { return _esClienteGanado(c); });
+    var grid = document.getElementById('pv-compradores-grid');
+
+    // KPIs: cruzar con ventasComisiones
+    var idGanados = new Set(ganados.map(function(c) { return c._id; }));
+    var ventasGanados = (ventasComisiones || []).filter(function(v) {
+      return (v.vendedorId || '').toLowerCase() === vendedorActual.toLowerCase();
+    });
+    var montoTotal = ventasGanados.reduce(function(s, v) { return s + (Number(v.precioVenta) || 0); }, 0);
+    var comisionTotal = ventasGanados.reduce(function(s, v) { return s + (Number(v.comisionMonto) || 0); }, 0);
+    var compTotal = document.getElementById('pv-comp-total');
+    var compMonto = document.getElementById('pv-comp-monto');
+    var compComision = document.getElementById('pv-comp-comision');
+    if (compTotal) compTotal.textContent = ganados.length;
+    if (compMonto) compMonto.textContent = montoTotal ? '$' + Math.round(montoTotal).toLocaleString('es-MX') : '$0';
+    if (compComision) compComision.textContent = comisionTotal ? '$' + Math.round(comisionTotal).toLocaleString('es-MX') : '$0';
+
+    if (!grid) return;
     if (!ganados.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px 0">Todavía no tienes compradores.</td></tr>';
+      grid.innerHTML = '<div style="text-align:center;padding:48px 0;color:var(--muted);font-size:.9rem"><i class="ti ti-trophy" style="font-size:2rem;display:block;margin:0 auto 10px;opacity:.3"></i>Todavía no tienes compradores.<br><span style="font-size:.78rem">Cuando un cliente llegue a estatus "Ganado" aparecerá aquí.</span></div>';
       return;
     }
-    tbody.innerHTML = ganados.map((c) => {
-      const opActual = oportunidadActualDe(c._id);
-      return `
-      <tr>
-        <td><div class="pv-row-name">${esc(c.nombre || 'Sin nombre')}${contactBtns(c)}</div><div class="pv-row-phone">${esc(c.telefono)}</div></td>
-        <td><span class="pv-badge-origen ${origenClass(c.origen)}">${esc(c.origen || 'Sitio web')}</span></td>
-        <td>${opActual ? esc(opActual.vehiculo || opActual.autoInteres || '—') : '—'}</td>
-        <td>${fmtFecha(c.ultimaActividad)}</td>
-        <td><button class="pv-detail-btn" data-id="${esc(c._id)}" type="button">Ver detalle →</button></td>
-      </tr>`;
+
+    var _avColors = ['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#10b981'];
+    grid.innerHTML = ganados.map(function(c) {
+      var nombre = c.nombre || 'Sin nombre';
+      var avClr = _avColors[nombre.charCodeAt(0) % _avColors.length];
+      var ini = _ini(nombre);
+      var op = oportunidadActualDe(c._id);
+      var vehiculo = op ? (op.vehiculo || op.autoInteres || '') : '';
+      var waUrl = c.telefono ? 'https://wa.me/52' + c.telefono.replace(/\D/g,'').slice(-10) : '';
+      var fechaCierre = c.ultimaActividad || c._updatedDate || '';
+      var formaPago = op ? (op.formaPago || '') : '';
+      var formaPagoClr = formaPago === 'Contado' ? '#22c55e' : formaPago === 'Crédito' ? '#3b82f6' : '#9ca3af';
+
+      return '<div class="pv-dash-card" style="padding:14px 16px;margin:0;display:flex;align-items:center;gap:14px;cursor:pointer" onclick="abrirDetalle(\'' + _esc(c._id) + '\')">'
+        + '<div style="width:42px;height:42px;border-radius:50%;background:' + avClr + ';display:flex;align-items:center;justify-content:center;font-family:\'Plus Jakarta Sans\',system-ui,sans-serif;font-weight:800;font-size:.9rem;color:#fff;flex-shrink:0">' + ini + '</div>'
+        + '<div style="flex:1;min-width:0">'
+          + '<div style="font-weight:700;font-size:.9rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(nombre) + '</div>'
+          + (vehiculo ? '<div style="font-size:.8rem;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><i class="ti ti-car" style="font-size:.78rem"></i> ' + esc(vehiculo) + '</div>' : '')
+          + '<div style="display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap">'
+            + '<span class="pv-badge-origen ' + origenClass(c.origen) + '" style="font-size:.65rem">' + esc(c.origen || 'Sitio web') + '</span>'
+            + (formaPago ? '<span style="font-size:.68rem;font-weight:700;color:' + formaPagoClr + '">' + esc(formaPago) + '</span>' : '')
+            + (fechaCierre ? '<span style="font-size:.68rem;color:var(--muted)">' + fmtFecha(fechaCierre) + '</span>' : '')
+          + '</div>'
+        + '</div>'
+        + '<div style="display:flex;gap:6px;flex-shrink:0" onclick="event.stopPropagation()">'
+          + (waUrl ? '<a href="' + waUrl + '" target="_blank" class="pv-contact-btn pv-contact-btn-wa" title="WhatsApp" style="text-decoration:none"><i class="ti ti-brand-whatsapp"></i></a>' : '')
+          + '<button class="pv-detail-btn" onclick="abrirDetalle(\'' + _esc(c._id) + '\')" type="button" style="padding:5px 10px;font-size:.75rem">Ver →</button>'
+        + '</div>'
+        + '</div>';
     }).join('');
   }
 
