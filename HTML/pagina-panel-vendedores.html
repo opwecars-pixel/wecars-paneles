@@ -8472,6 +8472,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
             <div style="font-weight:600;font-size:.88rem;color:var(--ink)">${esc(cr.solicitanteNombre || cr.clienteNombre || '—')}</div>
             <div style="font-size:.77rem;color:var(--muted)">${esc(cr.vehiculoInteres || 'Sin vehículo')} · ${esc(cr.folioInterno || '')}</div>
             ${esFaltaDoc ? `<div style="font-size:.72rem;font-weight:700;color:#d97706;margin-top:2px">${cr.notaRechazo || cr.motivoRechazo || cr.comentarioAdmin ? '⚠ ' + esc(cr.notaRechazo || cr.motivoRechazo || cr.comentarioAdmin) : '⚠ Sube los documentos faltantes al expediente'}</div>` : ''}
+            ${(esFaltaDoc || esAprobado) && cr.clienteId ? `<button type="button" onclick="mostrarVista('contactos');setTimeout(()=>abrirDetalle('${esc(cr.clienteId)}'),350)" style="margin-top:4px;font-size:.7rem;padding:2px 8px;border-radius:6px;background:var(--lime-bg);color:var(--lime-dark);border:1px solid rgba(86,169,0,.3);cursor:pointer;font-weight:700;font-family:inherit">Ver expediente →</button>` : ''}
           </div>
           <div style="font-size:.82rem;color:var(--ink)">${esc(cr.banco || cr.financiera || '—')}</div>
           <div><span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:.75rem;font-weight:700;background:${ei.bg};color:${ei.color}">${ei.label}</span></div>
@@ -8492,13 +8493,17 @@ section.pv-table-wrap > .shell > #pv-compradores {
   document.getElementById('pv-cr-form-submit')?.addEventListener('click', function() {
     const clienteId = document.getElementById('pv-cr-form-cliente')?.value;
     if (!clienteId) { mostrarToast('Selecciona un cliente'); return; }
+    const _crCliente = misClientes().find(c => c._id === clienteId);
     const datos = {
       clienteId,
+      clienteNombre: _crCliente ? (_crCliente.nombre || '') : '',
+      clienteTelefono: _crCliente ? (_crCliente.telefono || '') : '',
       vehiculoInteres: document.getElementById('pv-cr-form-vehiculo')?.value || '',
       monto: Number(document.getElementById('pv-cr-form-precio')?.value || 0),
       enganche: Number(document.getElementById('pv-cr-form-enganche')?.value || 0),
       plazoMeses: Number(document.getElementById('pv-cr-form-plazo')?.value || 36),
       banco: document.getElementById('pv-cr-form-banco')?.value || '',
+      notas: document.getElementById('pv-cr-form-notas')?.value?.trim() || '',
       vendedorEmail: vendedorActual,
       vendedorNombre: vendedorNombre || vendedorActual,
       origen: 'vendedor',
@@ -11412,6 +11417,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
       notas:        document.getElementById('ag-notas').value.trim(),
       vendedorId:   vendedorActual || '',
       vendedorNombre: document.getElementById('wc-sidebar-name') ? document.getElementById('wc-sidebar-name').textContent.trim() : '',
+      clienteId: (document.getElementById('ag-cliente-id') && document.getElementById('ag-cliente-id').value) || '',
     };
     if (editId) {
       // Actualizar optimísticamente en local y pedir persistencia al CMS
@@ -11467,13 +11473,31 @@ section.pv-table-wrap > .shell > #pv-compradores {
   function marcarContactado(id) {
     const c = clientes.find(x => x._id === id);
     if (!c) return;
+    const ahora = new Date().toISOString();
+    // Registrar actividad de contacto
     window.parent.postMessage({
       type: 'wecars-actividad-crear', clienteId: id,
-      datos: { tipo: 'nota', detalle: 'Contacto rápido marcado desde Cola de trabajo', autor: vendedorActual },
+      datos: { tipo: 'llamada', detalle: 'Contacto rápido registrado desde Cola de trabajo', resultado: 'contactado', autor: vendedorActual },
     }, '*');
-    c.ultimaActividad = new Date().toISOString();
+    // Avanzar estatus si sigue en "Nuevo"
+    if (c.estatus === 'Nuevo' || c.estatus === 'nuevo_lead') {
+      c.estatus = 'Contactado';
+      window.parent.postMessage({ type: 'wecars-cliente-actualizar', id, datos: { estatus: 'Contactado', ultimaActividad: ahora } }, '*');
+    }
+    // Resolver el seguimiento pendiente (limpiar fecha pasada)
+    if (c.proximoSeguimiento && new Date(c.proximoSeguimiento) <= new Date()) {
+      c.proximoSeguimiento = null;
+      window.parent.postMessage({ type: 'wecars-cliente-actualizar', id, datos: { proximoSeguimiento: null, ultimaActividad: ahora } }, '*');
+    }
+    c.ultimaActividad = ahora;
     renderCola();
-    mostrarToast('Contacto registrado — el cliente sale de urgente');
+    mostrarToast('Contacto registrado ✓');
+    // Mostrar modal de próximo paso
+    const _proxEl = document.getElementById('pv-prox-overlay');
+    if (_proxEl) {
+      proxPasoClienteId = id;
+      _proxEl.classList.add('show');
+    }
   }
 
   // ── Mis Tareas ────────────────────────────────────────────────────
