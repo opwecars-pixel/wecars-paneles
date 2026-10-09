@@ -3073,6 +3073,53 @@ html { scroll-behavior: smooth; }
 /* Dashboard section wrapper */
 .pv-stats { padding: var(--sp-6); }
 
+/* Animación de entrada para tarjetas del dashboard */
+@keyframes _pvCardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.pv-stats .pv-dash-card,
+.pv-stats .pv-bono-card,
+.pv-stats .pv-dash-topbar,
+.pv-stats #pv-hoy-block {
+  animation: _pvCardIn .25s ease both;
+}
+.pv-stats .pv-dash-topbar { animation-delay: .00s; }
+.pv-stats #pv-hoy-block    { animation-delay: .04s; }
+.pv-stats #pv-dash-urgentes-card { animation-delay: .08s; }
+.pv-stats .pv-dash-2col > * { animation-delay: .12s; }
+.pv-stats .pv-bono-card    { animation-delay: .16s; }
+
+/* Urgentes card — estado alerta cuando hay urgentes */
+#pv-dash-urgentes-card.pv-urgentes-activo {
+  border-color: rgba(220,38,38,.4);
+  box-shadow: 0 0 0 3px rgba(220,38,38,.08), var(--sh-1);
+}
+#pv-dash-urgentes-card.pv-urgentes-activo .pv-dash-card-head {
+  background: rgba(220,38,38,.04);
+}
+
+/* Hoy block — siempre visible con estado de carga */
+#pv-hoy-block {
+  margin-bottom: 16px;
+}
+#pv-hoy-block .pv-hoy-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#pv-hoy-block .pv-hoy-sk-item {
+  height: 56px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--line) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: _pvSkel 1.4s infinite;
+}
+@keyframes _pvSkel {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* Bono ganado overlay */
 .pv-bono-ganado {
   position: fixed;
@@ -6118,11 +6165,16 @@ section.pv-table-wrap > .shell > #pv-compradores {
     </div>
 
     <!-- ══ QUÉ HACER HOY ══════════════════════════════════════════ -->
-    <div id="pv-hoy-block" style="display:none;margin-bottom:4px">
+    <div id="pv-hoy-block" style="margin-bottom:16px">
       <div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px">
         <i class="ti ti-bolt" style="font-size:13px;color:var(--lime-dark)"></i> Qué hacer hoy
       </div>
-      <div id="pv-hoy-lista" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div id="pv-hoy-lista" style="display:flex;flex-direction:column;gap:8px">
+        <div class="pv-hoy-skeleton">
+          <div class="pv-hoy-sk-item"></div>
+          <div class="pv-hoy-sk-item" style="animation-delay:.1s;opacity:.7"></div>
+        </div>
+      </div>
     </div>
 
 
@@ -8266,7 +8318,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
       }
 
       if (_items.length) {
-        _hoyBlock.style.display = 'block';
         _hoyLista.innerHTML = _items.slice(0,3).map(item =>
           `<div onclick="(${item.accion.toString()})()" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:${item.bg};border:1.5px solid ${item.border};border-radius:var(--r-sm);cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
             <div style="width:30px;height:30px;border-radius:var(--r-sm);background:${item.iconColor}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${item.iconColor}">
@@ -8280,7 +8331,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
           </div>`
         ).join('');
       } else {
-        _hoyBlock.style.display = 'block';
         _hoyLista.innerHTML = `<div style="padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);font-size:.83rem;color:var(--muted);display:flex;align-items:center;gap:8px"><i class="ti ti-check" style="color:var(--lime-dark)"></i> Todo al corriente — no tienes pendientes urgentes hoy.</div>`;
       }
     })();
@@ -9126,6 +9176,8 @@ section.pv-table-wrap > .shell > #pv-compradores {
       .sort((a, b) => _diasDesde(b.ultimaActividad) - _diasDesde(a.ultimaActividad))
       .slice(0, 5);
     if (badgeEl) badgeEl.textContent = urgentes.length;
+    const cardEl = document.getElementById('pv-dash-urgentes-card');
+    if (cardEl) cardEl.classList.toggle('pv-urgentes-activo', urgentes.length > 0);
     if (!urgentes.length) {
       cont.innerHTML = `<div class="pv-assign-empty">Sin clientes urgentes 🎉</div>`;
       return;
