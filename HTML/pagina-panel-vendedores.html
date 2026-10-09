@@ -6826,6 +6826,84 @@ section.pv-table-wrap > .shell > #pv-compradores {
 
     </div>
 
+<!-- ══ PUBLICACIONES ═══════════════════════════════════════════ -->
+<div id="pv-vista-publicaciones" style="display:none;padding:20px 0 80px">
+  <!-- Banner: sin cuentas conectadas -->
+  <div id="pv-pub-sin-cuentas" class="pv-pub-aviso" style="display:none">
+    <i class="ti ti-plug-connected-x" style="font-size:1.4rem;color:var(--muted)"></i>
+    <div>
+      <strong>No hay cuentas de redes sociales conectadas</strong>
+      <span>Pide al Administrador que conecte la cuenta de Facebook o Instagram desde el panel de Administración → Redes Sociales.</span>
+    </div>
+  </div>
+
+  <!-- Paso 1: seleccionar auto -->
+  <div id="pv-pub-paso1">
+    <div class="pv-pub-sec-head">
+      <div class="pv-pub-step-chip">Paso 1 de 3</div>
+      <h3>Elige el auto a publicar</h3>
+      <p>Selecciona un vehículo disponible en el inventario.</p>
+    </div>
+    <input id="pv-pub-q" type="search" placeholder="Buscar por marca, modelo o año…" oninput="pvPubFiltrarAutos()" class="pv-pub-search">
+    <div id="pv-pub-autos-grid" class="pv-pub-grid"><div class="pv-loading">Cargando inventario…</div></div>
+  </div>
+
+  <!-- Paso 2: plataforma + copy (aparece tras seleccionar auto) -->
+  <div id="pv-pub-paso2" style="display:none">
+    <div class="pv-pub-sec-head">
+      <div class="pv-pub-step-chip">Paso 2 de 3</div>
+      <h3 id="pv-pub-titulo-paso2">Crea el anuncio</h3>
+      <button type="button" onclick="pvPubVolverPaso1()" class="pv-pub-back-btn"><i class="ti ti-arrow-left"></i> Cambiar auto</button>
+    </div>
+    <div class="pv-pub-plataformas">
+      <button type="button" class="pv-pub-plat-btn active" data-plat="facebook" onclick="pvPubSelPlat(this,'facebook')">
+        <i class="ti ti-brand-facebook"></i> Facebook
+      </button>
+      <button type="button" class="pv-pub-plat-btn" data-plat="instagram" onclick="pvPubSelPlat(this,'instagram')">
+        <i class="ti ti-brand-instagram"></i> Instagram
+      </button>
+      <button type="button" class="pv-pub-plat-btn" data-plat="ambas" onclick="pvPubSelPlat(this,'ambas')">
+        <i class="ti ti-share-2"></i> Ambas
+      </button>
+    </div>
+    <div class="pv-pub-copy-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <label style="font-size:.78rem;font-weight:700;color:var(--ink)">Texto del anuncio</label>
+        <button type="button" id="pv-pub-gen-btn" onclick="pvPubGenerarTexto()" class="pv-pub-gen-btn"><i class="ti ti-sparkles"></i> Generar con IA</button>
+      </div>
+      <textarea id="pv-pub-copy" class="pv-pub-textarea" rows="5" placeholder="Escribe el texto del anuncio o genera uno con IA…"></textarea>
+      <div id="pv-pub-gen-status" style="font-size:.72rem;color:var(--muted);margin-top:4px"></div>
+    </div>
+    <button type="button" onclick="pvPubAvanzarPaso3()" class="pv-pub-next-btn">Continuar → Preview <i class="ti ti-arrow-right"></i></button>
+  </div>
+
+  <!-- Paso 3: preview + publicar -->
+  <div id="pv-pub-paso3" style="display:none">
+    <div class="pv-pub-sec-head">
+      <div class="pv-pub-step-chip">Paso 3 de 3</div>
+      <h3>Preview y publicar</h3>
+      <button type="button" onclick="document.getElementById('pv-pub-paso2').style.display='';document.getElementById('pv-pub-paso3').style.display='none'" class="pv-pub-back-btn"><i class="ti ti-arrow-left"></i> Editar texto</button>
+    </div>
+    <div class="pv-pub-preview-card" id="pv-pub-preview-card"></div>
+    <div id="pv-pub-resultado" style="display:none" class="pv-pub-resultado"></div>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+      <button type="button" id="pv-pub-publicar-btn" onclick="pvPubPublicar()" class="pv-pub-publicar-btn"><i class="ti ti-send"></i> Publicar ahora</button>
+      <button type="button" onclick="pvPubGuardarBorrador()" class="pv-pub-borrador-btn"><i class="ti ti-device-floppy"></i> Guardar borrador</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HISTORIAL PUBLICACIONES ═════════════════════════════════ -->
+<div id="pv-vista-pub-historial" style="display:none;padding:20px 0 80px">
+  <div class="pv-pub-hist-kpis" id="pv-pub-hist-kpis"></div>
+  <div class="pv-pub-hist-filtros">
+    <button class="pv-pub-hist-btn active" data-plat="" onclick="pvPubHistFiltrar(this,'')">Todas</button>
+    <button class="pv-pub-hist-btn" data-plat="facebook" onclick="pvPubHistFiltrar(this,'facebook')"><i class="ti ti-brand-facebook"></i> Facebook</button>
+    <button class="pv-pub-hist-btn" data-plat="instagram" onclick="pvPubHistFiltrar(this,'instagram')"><i class="ti ti-brand-instagram"></i> Instagram</button>
+  </div>
+  <div id="pv-pub-hist-lista" class="pv-pub-hist-lista"><div class="pv-loading">Cargando historial…</div></div>
+</div>
+
 <!-- Modal detalle tarea (vendedor) -->
 <div id="td-overlay" role="dialog" aria-modal="true" aria-label="Detalle de tarea">
   <div class="td-modal">
@@ -7797,6 +7875,10 @@ section.pv-table-wrap > .shell > #pv-compradores {
     { id:'creditos-grp', icon:'ti-building-bank', label:'Créditos', subs:[
       { id:'creditos',        icon:'ti-list-details',    label:'Mis créditos', badge:'pv-creditos-sidebar-badge' },
       { id:'credito-nuevo',   icon:'ti-plus',            label:'Iniciar crédito' },
+    ]},
+    { id:'pub-grp', icon:'ti-brand-meta', label:'Publicaciones', subs:[
+      { id:'publicaciones',  icon:'ti-photo-up', label:'Nueva publicación' },
+      { id:'pub-historial',  icon:'ti-history',  label:'Historial' },
     ]},
     { id:'configuracion', icon:'ti-settings', label:'Configuración', subs:[] },
   ];
@@ -11044,9 +11126,9 @@ section.pv-table-wrap > .shell > #pv-compradores {
   }
 
   // Restaurar última sección visitada (persiste entre recargas de la misma sesión)
-  const _VISTA_LABELS_EARLY = {dashboard:'Dashboard',leads:'Leads',tareas:'Mis Tareas',cola:'Cola de Leads',contactos:'Contactos',inventario:'Inventario',compradores:'Compradores',agenda:'Agenda',gamificacion:'Gamificación',reportes:'Reportes',configuracion:'Configuración',actividad:'Actividad Comercial',creditos:'Mis Créditos',consignas:'Mis Consignas'};
+  const _VISTA_LABELS_EARLY = {dashboard:'Dashboard',leads:'Leads',tareas:'Mis Tareas',cola:'Cola de Leads',contactos:'Contactos',inventario:'Inventario',compradores:'Compradores',agenda:'Agenda',gamificacion:'Gamificación',reportes:'Reportes',configuracion:'Configuración',actividad:'Actividad Comercial',creditos:'Mis Créditos',consignas:'Mis Consignas',publicaciones:'Nueva Publicación','pub-historial':'Historial de Publicaciones'};
   const _vistaGuardada = (() => { try { return sessionStorage.getItem('pv-vista'); } catch(e) { return null; } })();
-  const _vistasValidas = ['dashboard','tareas','cola','contactos','leads','inventario','compradores','agenda','gamificacion','reportes','configuracion','creditos','credito-nuevo','consignas'];
+  const _vistasValidas = ['dashboard','tareas','cola','contactos','leads','inventario','compradores','agenda','gamificacion','reportes','configuracion','creditos','credito-nuevo','consignas','publicaciones','pub-historial'];
   // Declarar antes de la llamada a mostrarVista para evitar TDZ con let
   let contactosSub = 'lista';
   let inventarioSub = 'inventario';
@@ -11340,6 +11422,12 @@ section.pv-table-wrap > .shell > #pv-compradores {
     if (vista === 'configuracion') renderConfiguracion();
     if (vista === 'agenda') { loadCitas(); renderAgendaVendedor(); }
     if (vista === 'gamificacion') renderGamificacion();
+    const _pvPubEl = document.getElementById('pv-vista-publicaciones');
+    const _pvPubHistEl = document.getElementById('pv-vista-pub-historial');
+    if (_pvPubEl) _pvPubEl.style.display = vista === 'publicaciones' ? '' : 'none';
+    if (_pvPubHistEl) _pvPubHistEl.style.display = vista === 'pub-historial' ? '' : 'none';
+    if (vista === 'publicaciones') pvPublicacionesInit();
+    if (vista === 'pub-historial') pvPubHistorialInit();
     const _crVista = document.getElementById('pv-vista-creditos');
     const _crNuevo = document.getElementById('pv-vista-credito-nuevo');
     if (_crVista) _crVista.style.display = vista === 'creditos' ? '' : 'none';
@@ -12867,6 +12955,47 @@ section.pv-table-wrap > .shell > #pv-compradores {
       } else {
         alert('Error al convertir: ' + (d.error||'Intenta de nuevo.'));
       }
+    }
+
+    /* ── Publicaciones ────────────────────────────────────── */
+    if (d.type === 'wecars-pub-vehiculos') {
+      window._pvPubVehiculos = d.items || [];
+      pvPubRenderAutos();
+    }
+    if (d.type === 'wecars-pub-cuentas') {
+      window._pvPubCuentas = d.cuentas || [];
+      const sinCuentas = document.getElementById('pv-pub-sin-cuentas');
+      if (sinCuentas) sinCuentas.style.display = (window._pvPubCuentas.length === 0) ? 'flex' : 'none';
+    }
+    if (d.type === 'wecars-pub-texto-generado') {
+      const ta = document.getElementById('pv-pub-copy');
+      const st = document.getElementById('pv-pub-gen-status');
+      const btn = document.getElementById('pv-pub-gen-btn');
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-sparkles"></i> Generar con IA'; }
+      if (ta && d.texto) ta.value = d.texto;
+      if (st) st.textContent = d.texto ? '✓ Texto generado — puedes editarlo.' : (d.error ? 'No disponible aún.' : '');
+    }
+    if (d.type === 'wecars-pub-borrador-guardado') {
+      const res = document.getElementById('pv-pub-resultado');
+      if (res) {
+        res.style.display = '';
+        res.className = 'pv-pub-resultado ' + (d.ok ? 'ok' : 'pending');
+        res.innerHTML = d.ok ? '✅ Borrador guardado.' : '⏳ ' + (d.mensaje || 'El módulo de publicaciones estará disponible próximamente.');
+      }
+    }
+    if (d.type === 'wecars-pub-resultado') {
+      const btn = document.getElementById('pv-pub-publicar-btn');
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> Publicar ahora'; }
+      const res = document.getElementById('pv-pub-resultado');
+      if (res) {
+        res.style.display = '';
+        res.className = 'pv-pub-resultado ' + (d.ok ? 'ok' : 'pending');
+        res.innerHTML = d.ok ? '✅ Publicado exitosamente.' : '⏳ ' + (d.mensaje || 'La integración con Meta estará disponible próximamente.');
+      }
+    }
+    if (d.type === 'wecars-pub-historial') {
+      window._pvPubHistorial = d.items || [];
+      pvPubHistorialRender(window._pvPubHistorial, window._pvPubHistFiltro || '');
     }
   });
 
@@ -21402,5 +21531,273 @@ window.wcLeadSheetNota = function(id) {
 
 })();
 </script>
+
+<!-- ══ PUBLICACIONES — CSS ════════════════════════════════════ -->
+<style>
+/* Aviso sin cuentas */
+.pv-pub-aviso{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--surface,var(--paper));border:1.5px solid var(--line);border-left:4px solid var(--c-amber);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:20px}
+.pv-pub-aviso strong{display:block;font-size:.84rem;font-weight:700;color:var(--ink);margin-bottom:2px}
+.pv-pub-aviso span{font-size:.78rem;color:var(--muted);line-height:1.55}
+/* Encabezados de paso */
+.pv-pub-sec-head{margin-bottom:18px}
+.pv-pub-step-chip{display:inline-block;background:var(--lime-bg);color:var(--lime-dark);font-size:.72rem;font-weight:800;letter-spacing:.04em;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+.pv-pub-sec-head h3{font-size:1rem;font-weight:800;color:var(--ink);margin:0 0 4px}
+.pv-pub-sec-head p{font-size:.82rem;color:var(--muted);margin:0}
+.pv-pub-back-btn{background:none;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:5px 12px;font-size:.78rem;font-weight:700;cursor:pointer;color:var(--muted);font-family:inherit;margin-top:8px;transition:all .12s}
+.pv-pub-back-btn:hover{color:var(--ink);border-color:var(--ink)}
+/* Buscador */
+.pv-pub-search{width:100%;padding:8px 12px;border:1.5px solid var(--line);border-radius:var(--r-sm);font-size:.85rem;font-family:inherit;background:var(--bg,var(--paper));color:var(--ink);margin-bottom:14px;box-sizing:border-box}
+.pv-pub-search::placeholder{color:var(--muted)}
+/* Grid de autos */
+.pv-pub-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+.pv-pub-auto-card{border:1.5px solid var(--line);border-radius:var(--r-md);padding:12px;cursor:pointer;transition:border-color .15s,box-shadow .15s;background:var(--white)}
+.pv-pub-auto-card:hover{border-color:var(--lime);box-shadow:var(--sh-1)}
+.pv-pub-auto-card.selected{border-color:var(--lime);background:var(--lime-bg)}
+.pv-pub-auto-card img{width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px;background:var(--line)}
+.pv-pub-auto-card strong{display:block;font-size:.82rem;font-weight:800;color:var(--ink);margin-bottom:2px}
+.pv-pub-auto-card span{font-size:.75rem;color:var(--muted)}
+.pv-pub-auto-price{font-size:.8rem;font-weight:800;color:var(--lime-dark);margin-top:4px}
+/* Plataformas */
+.pv-pub-plataformas{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.pv-pub-plat-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1.5px solid var(--line);border-radius:20px;background:var(--white);cursor:pointer;font-size:.82rem;font-weight:700;color:var(--muted);font-family:inherit;transition:all .15s}
+.pv-pub-plat-btn.active{background:rgba(86,169,0,.1);color:var(--lime-dark);border-color:rgba(86,169,0,.4)}
+/* Copy área */
+.pv-pub-copy-wrap{margin-bottom:14px}
+.pv-pub-textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:var(--r-sm);font-size:.84rem;font-family:inherit;background:var(--bg,var(--paper));color:var(--ink);resize:vertical;box-sizing:border-box;line-height:1.6}
+.pv-pub-gen-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--lime);color:#fff;border:none;border-radius:var(--r-sm);font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .12s}
+.pv-pub-gen-btn:hover{background:var(--lime-dark)}
+.pv-pub-gen-btn:disabled{opacity:.55;cursor:not-allowed}
+/* Botones de acción */
+.pv-pub-next-btn{background:var(--lime);color:#fff;border:none;border-radius:var(--r-md);padding:10px 22px;font-size:.86rem;font-weight:800;cursor:pointer;font-family:inherit;transition:background .12s;display:inline-flex;align-items:center;gap:7px}
+.pv-pub-next-btn:hover{background:var(--lime-dark)}
+.pv-pub-publicar-btn{background:var(--lime);color:#fff;border:none;border-radius:var(--r-md);padding:10px 22px;font-size:.86rem;font-weight:800;cursor:pointer;font-family:inherit;transition:background .12s;display:inline-flex;align-items:center;gap:7px}
+.pv-pub-publicar-btn:hover{background:var(--lime-dark)}
+.pv-pub-publicar-btn:disabled{opacity:.55;cursor:not-allowed}
+.pv-pub-borrador-btn{background:none;border:1.5px solid var(--line);border-radius:var(--r-md);padding:10px 18px;font-size:.84rem;font-weight:700;cursor:pointer;color:var(--muted);font-family:inherit;display:inline-flex;align-items:center;gap:7px}
+.pv-pub-borrador-btn:hover{border-color:var(--ink);color:var(--ink)}
+/* Preview card */
+.pv-pub-preview-card{background:var(--white);border:1.5px solid var(--line);border-radius:var(--r-md);padding:16px;margin-bottom:12px;max-width:420px}
+/* Resultado */
+.pv-pub-resultado{padding:10px 14px;border-radius:var(--r-sm);font-size:.82rem;font-weight:600;margin-bottom:4px}
+.pv-pub-resultado.ok{background:var(--c-green-bg);color:var(--c-green);border:1px solid rgba(22,163,74,.25)}
+.pv-pub-resultado.pending{background:var(--c-amber-bg);color:var(--c-amber);border:1px solid rgba(217,119,6,.25)}
+/* Historial */
+.pv-pub-hist-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.pv-pub-hist-kpi{background:var(--white);border:1.5px solid var(--line);border-radius:var(--r-md);padding:12px 10px;text-align:center}
+.pv-pub-hist-kpi strong{display:block;font-size:1.4rem;font-weight:900;color:var(--lime-dark);font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+.pv-pub-hist-kpi span{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.pv-pub-hist-filtros{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.pv-pub-hist-btn{padding:5px 12px;border-radius:20px;border:1.5px solid var(--line);background:var(--white);font-size:.78rem;font-weight:600;cursor:pointer;color:var(--muted);font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:.12s}
+.pv-pub-hist-btn.active,.pv-pub-hist-btn:hover{background:rgba(86,169,0,.1);color:var(--lime-dark);border-color:rgba(86,169,0,.4)}
+.pv-pub-hist-lista{display:flex;flex-direction:column;gap:8px}
+.pv-pub-hist-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--white);border:1.5px solid var(--line);border-radius:var(--r-md)}
+.pv-pub-hist-item-img{width:48px;height:40px;border-radius:6px;object-fit:cover;background:var(--line);flex-shrink:0}
+.pv-pub-hist-info{flex:1;min-width:0}
+.pv-pub-hist-info strong{display:block;font-size:.83rem;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-pub-hist-info span{font-size:.73rem;color:var(--muted)}
+.pv-pub-hist-chip{font-size:.7rem;font-weight:800;padding:3px 8px;border-radius:20px;flex-shrink:0}
+.pv-pub-hist-chip.publicado{background:var(--c-green-bg);color:var(--c-green)}
+.pv-pub-hist-chip.pendiente{background:var(--c-amber-bg);color:var(--c-amber)}
+.pv-pub-hist-chip.error{background:var(--c-red-bg);color:var(--c-red)}
+@media(max-width:600px){
+  .pv-pub-grid{grid-template-columns:repeat(2,1fr)}
+  .pv-pub-hist-kpis{grid-template-columns:1fr 1fr}
+}
+@media(max-width:380px){
+  .pv-pub-grid{grid-template-columns:1fr}
+}
+</style>
+
+<!-- ══ PUBLICACIONES — JS ══════════════════════════════════════ -->
+<script>
+(function(){
+  var _pvPubAutoSel = null;
+  var _pvPubPlat    = 'facebook';
+
+  window.pvPublicacionesInit = function() {
+    window.parent.postMessage({type:'wecars-pub-vehiculos-solicitar'},'*');
+    window.parent.postMessage({type:'wecars-pub-cuentas-solicitar'},'*');
+    // Reset wizard al entrar
+    var p1 = document.getElementById('pv-pub-paso1');
+    var p2 = document.getElementById('pv-pub-paso2');
+    var p3 = document.getElementById('pv-pub-paso3');
+    if (p1) p1.style.display = '';
+    if (p2) p2.style.display = 'none';
+    if (p3) p3.style.display = 'none';
+    _pvPubAutoSel = null;
+    pvPubRenderAutos();
+  };
+
+  window.pvPubRenderAutos = function() {
+    var grid = document.getElementById('pv-pub-autos-grid');
+    if (!grid) return;
+    var src = window._pvPubVehiculos || [];
+    var q = ((document.getElementById('pv-pub-q')||{}).value||'').toLowerCase();
+    var filtered = q ? src.filter(function(a){ return ((a.marca||'')+(a.modelo||'')+(a.anio||'')+(a.color||'')).toLowerCase().includes(q); }) : src;
+    if (!filtered.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted);font-size:.84rem">' + (src.length ? 'Sin resultados.' : 'No hay autos disponibles para publicar en este momento.') + '</div>';
+      return;
+    }
+    var esc = function(v){ return String(v||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
+    grid.innerHTML = filtered.map(function(a){
+      var precio = a.precio ? '$' + Number(a.precio).toLocaleString('es-MX') : '';
+      var img = (a.fotos && a.fotos[0]) ? a.fotos[0] : '';
+      var isSel = _pvPubAutoSel && _pvPubAutoSel._id === a._id;
+      return '<div class="pv-pub-auto-card' + (isSel ? ' selected' : '') + '" onclick="pvPubSelAuto(\''+esc(a._id)+'\')" data-id="'+esc(a._id)+'">' +
+        (img ? '<img src="'+esc(img)+'" alt="" loading="lazy">' : '<div style="width:100%;height:80px;background:var(--line);border-radius:6px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)"><i class="ti ti-car" style="font-size:1.8rem"></i></div>') +
+        '<strong>' + esc((a.anio||'')+' '+( a.marca||'')+' '+(a.modelo||'')) + '</strong>' +
+        '<span>' + esc(a.color||'') + '</span>' +
+        (precio ? '<div class="pv-pub-auto-price">' + precio + '</div>' : '') +
+      '</div>';
+    }).join('');
+  };
+
+  window.pvPubFiltrarAutos = function() { pvPubRenderAutos(); };
+
+  window.pvPubSelAuto = function(id) {
+    var src = window._pvPubVehiculos || [];
+    _pvPubAutoSel = src.find(function(a){ return a._id === id; }) || null;
+    pvPubRenderAutos();
+    if (!_pvPubAutoSel) return;
+    var p1 = document.getElementById('pv-pub-paso1');
+    var p2 = document.getElementById('pv-pub-paso2');
+    if (p1) p1.style.display = 'none';
+    if (p2) p2.style.display = '';
+    var tit = document.getElementById('pv-pub-titulo-paso2');
+    var a = _pvPubAutoSel;
+    if (tit) tit.textContent = 'Anuncio: ' + ((a.anio||'')+' '+(a.marca||'')+' '+(a.modelo||'')).trim();
+    var ta = document.getElementById('pv-pub-copy');
+    if (ta) ta.value = '';
+    var st = document.getElementById('pv-pub-gen-status');
+    if (st) st.textContent = '';
+  };
+
+  window.pvPubVolverPaso1 = function() {
+    _pvPubAutoSel = null;
+    var p1 = document.getElementById('pv-pub-paso1');
+    var p2 = document.getElementById('pv-pub-paso2');
+    if (p1) p1.style.display = '';
+    if (p2) p2.style.display = 'none';
+    pvPubRenderAutos();
+  };
+
+  window.pvPubSelPlat = function(btn, plat) {
+    document.querySelectorAll('.pv-pub-plat-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    _pvPubPlat = plat;
+  };
+
+  window.pvPubGenerarTexto = function() {
+    if (!_pvPubAutoSel) return;
+    var btn = document.getElementById('pv-pub-gen-btn');
+    var st = document.getElementById('pv-pub-gen-status');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2 ti-spin"></i> Generando…'; }
+    if (st) st.textContent = '';
+    window.parent.postMessage({type:'wecars-pub-texto-generar', carro:_pvPubAutoSel, plataforma:_pvPubPlat},'*');
+  };
+
+  window.pvPubAvanzarPaso3 = function() {
+    var p2 = document.getElementById('pv-pub-paso2');
+    var p3 = document.getElementById('pv-pub-paso3');
+    if (p2) p2.style.display = 'none';
+    if (p3) p3.style.display = '';
+    var res = document.getElementById('pv-pub-resultado');
+    if (res) res.style.display = 'none';
+    var esc = function(v){ return String(v||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
+    var a = _pvPubAutoSel || {};
+    var copy = ((document.getElementById('pv-pub-copy')||{}).value||'').trim();
+    var platLbl = {facebook:'Facebook',instagram:'Instagram',ambas:'Facebook + Instagram'}[_pvPubPlat] || _pvPubPlat;
+    var precio = a.precio ? '$' + Number(a.precio).toLocaleString('es-MX') : '';
+    var preview = document.getElementById('pv-pub-preview-card');
+    if (preview) preview.innerHTML =
+      '<div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px"><i class="ti ti-brand-meta"></i> ' + esc(platLbl) + '</div>' +
+      '<strong style="font-size:.9rem;color:var(--ink);display:block;margin-bottom:4px">' + esc((a.anio||'')+' '+(a.marca||'')+' '+(a.modelo||'')) + '</strong>' +
+      (precio ? '<div style="font-size:.85rem;font-weight:800;color:var(--lime-dark);margin-bottom:8px">' + precio + '</div>' : '') +
+      (copy ? '<p style="font-size:.8rem;color:var(--muted);line-height:1.55;margin:0;white-space:pre-wrap">' + esc(copy) + '</p>' : '<p style="font-size:.8rem;color:var(--muted);font-style:italic">Sin texto de anuncio.</p>');
+  };
+
+  window.pvPubPublicar = function() {
+    var btn = document.getElementById('pv-pub-publicar-btn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2 ti-spin"></i> Publicando…'; }
+    if (!_pvPubAutoSel) {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> Publicar ahora'; }
+      return;
+    }
+    var copy = ((document.getElementById('pv-pub-copy')||{}).value||'').trim();
+    // El backend guarda el borrador y luego lo publica. Enviamos borrador primero.
+    window.parent.postMessage({type:'wecars-pub-borrador-guardar', datos:{
+      carroId: _pvPubAutoSel._id,
+      carro: _pvPubAutoSel,
+      plataforma: _pvPubPlat,
+      texto: copy
+    }},'*');
+  };
+
+  window.pvPubGuardarBorrador = function() {
+    if (!_pvPubAutoSel) return;
+    var copy = ((document.getElementById('pv-pub-copy')||{}).value||'').trim();
+    window.parent.postMessage({type:'wecars-pub-borrador-guardar', datos:{
+      carroId: _pvPubAutoSel._id,
+      carro: _pvPubAutoSel,
+      plataforma: _pvPubPlat,
+      texto: copy,
+      solo_borrador: true
+    }},'*');
+  };
+
+  /* ── Historial ─────────────────────────────── */
+  window.pvPubHistorialInit = function() {
+    window._pvPubHistFiltro = '';
+    window.parent.postMessage({type:'wecars-pub-historial-solicitar'},'*');
+    var lista = document.getElementById('pv-pub-hist-lista');
+    if (lista && !(window._pvPubHistorial||[]).length) lista.innerHTML = '<div class="pv-loading">Cargando historial…</div>';
+    pvPubHistorialRender(window._pvPubHistorial || [], '');
+  };
+
+  window.pvPubHistFiltrar = function(btn, plat) {
+    document.querySelectorAll('.pv-pub-hist-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    window._pvPubHistFiltro = plat;
+    pvPubHistorialRender(window._pvPubHistorial || [], plat);
+  };
+
+  window.pvPubHistorialRender = function(src, filtroPlat) {
+    var esc = function(v){ return String(v||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
+    // KPIs
+    var kpis = document.getElementById('pv-pub-hist-kpis');
+    if (kpis) kpis.innerHTML =
+      '<div class="pv-pub-hist-kpi"><strong>' + src.length + '</strong><span>Total</span></div>' +
+      '<div class="pv-pub-hist-kpi"><strong>' + src.filter(function(i){ return i.estatus === 'publicado'; }).length + '</strong><span>Publicados</span></div>' +
+      '<div class="pv-pub-hist-kpi"><strong>' + src.filter(function(i){ return !i.estatus || i.estatus === 'pendiente'; }).length + '</strong><span>Pendientes</span></div>';
+
+    var lista = document.getElementById('pv-pub-hist-lista');
+    if (!lista) return;
+    var filtered = filtroPlat ? src.filter(function(i){ return i.plataforma === filtroPlat || i.plataforma === 'ambas'; }) : src;
+    if (!filtered.length) {
+      lista.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:.84rem">' + (src.length ? 'Sin resultados.' : 'No hay publicaciones en el historial aún.') + '</div>';
+      return;
+    }
+    var CHIP = { publicado:'publicado', pendiente:'pendiente', error:'error' };
+    lista.innerHTML = filtered.map(function(item) {
+      var a = item.carro || {};
+      var nombre = ((a.anio||item.anio||'')+' '+(a.marca||item.marca||'')+' '+(a.modelo||item.modelo||'')).trim() || 'Auto';
+      var img = (a.fotos && a.fotos[0]) ? a.fotos[0] : '';
+      var plat = {facebook:'Facebook',instagram:'Instagram',ambas:'FB + IG'}[item.plataforma] || (item.plataforma||'');
+      var est = item.estatus || 'pendiente';
+      var fecha = item.fecha ? new Date(item.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}) : '';
+      return '<div class="pv-pub-hist-item">' +
+        (img ? '<img class="pv-pub-hist-item-img" src="'+esc(img)+'" alt="">' :
+          '<div class="pv-pub-hist-item-img" style="display:flex;align-items:center;justify-content:center;color:var(--muted)"><i class="ti ti-car"></i></div>') +
+        '<div class="pv-pub-hist-info">' +
+          '<strong>' + esc(nombre) + '</strong>' +
+          '<span>' + esc(plat) + (fecha ? ' · ' + fecha : '') + '</span>' +
+        '</div>' +
+        '<span class="pv-pub-hist-chip ' + esc(CHIP[est]||'pendiente') + '">' + esc(est) + '</span>' +
+      '</div>';
+    }).join('');
+  };
+})();
+</script>
+
 </body>
 </html>
