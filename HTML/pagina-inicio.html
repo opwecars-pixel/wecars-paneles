@@ -241,8 +241,44 @@
       content:"";position:absolute;width:680px;height:680px;right:-270px;bottom:-300px;border-radius:50%;
       background:radial-gradient(circle,rgba(67,56,200,.40) 0%,rgba(67,56,200,0) 70%);
     }
-    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr;gap:0;align-items:center;padding:88px 0 80px}
-    .hero-copy{max-width:720px}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:center;padding:88px 0 80px}
+    .hero-copy{max-width:600px}
+    /* ── Simulador de mensualidad ── */
+    .sim-card{
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+      border-radius:var(--radius-md);padding:28px;backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);display:flex;flex-direction:column;gap:20px;
+    }
+    .sim-card-title{font-family:"Manrope",Arial,sans-serif;font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:2px}
+    .sim-card-sub{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.5}
+    .sim-row-label{font-size:.78rem;font-weight:600;color:rgba(255,255,255,.55);letter-spacing:.03em;text-transform:uppercase;margin-bottom:5px}
+    .sim-val{font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:6px}
+    .sim-val .sim-accent{color:#b7f779}
+    input[type=range].sim-range{
+      width:100%;height:4px;-webkit-appearance:none;appearance:none;
+      background:rgba(255,255,255,.15);border-radius:2px;outline:none;cursor:pointer;
+    }
+    input[type=range].sim-range::-webkit-slider-thumb{
+      -webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;
+      background:var(--lime);box-shadow:0 0 0 4px rgba(86,169,0,.25);cursor:pointer;
+    }
+    input[type=range].sim-range::-moz-range-thumb{
+      width:18px;height:18px;border-radius:50%;border:none;
+      background:var(--lime);box-shadow:0 0 0 4px rgba(86,169,0,.25);cursor:pointer;
+    }
+    .sim-range-labels{display:flex;justify-content:space-between;font-size:.7rem;color:rgba(255,255,255,.3);margin-top:3px}
+    .sim-divider{height:1px;background:rgba(255,255,255,.08)}
+    .sim-result-block{text-align:center}
+    .sim-result-label{font-size:.76rem;color:rgba(255,255,255,.45);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+    .sim-result-amount{font-family:"Manrope",Arial,sans-serif;font-size:2.4rem;font-weight:800;color:#b7f779;letter-spacing:-.04em;line-height:1}
+    .sim-result-unit{font-size:.82rem;color:rgba(255,255,255,.4);margin-top:4px}
+    .sim-disclaimer{font-size:.7rem;color:rgba(255,255,255,.28);text-align:center;line-height:1.45}
+    .sim-cta{
+      display:block;text-align:center;width:100%;
+      padding:12px 16px;background:var(--lime);color:#071100;font-weight:800;font-size:.9rem;
+      border-radius:999px;text-decoration:none;transition:background .2s ease;font-family:inherit;border:none;
+    }
+    .sim-cta:hover{background:#8dea2e}
     .hero-copy h1{
       margin:17px 0 0;max-width:710px;font-family:"Manrope",Arial,sans-serif;
       font-size:clamp(3rem,6vw,5.35rem);line-height:.98;letter-spacing:-.072em;
@@ -288,18 +324,6 @@
     .finder-note{margin:15px 0 0;color:#6b7780;font-size:.76rem;text-align:center}
     .finder-note b{color:#28343c}
 
-    /* Franja de captura — nombre + celular "a la entrada" (en el flujo normal, no un pop-up) */
-    .entry-capture{background:var(--ink);color:white;padding:34px 0 82px;position:relative;z-index:1}
-    .entry-capture-inner{display:flex;align-items:center;justify-content:space-between;gap:26px;flex-wrap:wrap}
-    .entry-capture-copy{max-width:480px}
-    .entry-capture-kicker{margin:0;color:#b7f779;font-weight:800;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
-    .entry-capture-copy h3{margin:8px 0 0;font-family:"Manrope",Arial,sans-serif;font-size:1.3rem;line-height:1.3;letter-spacing:-.02em;color:white;font-weight:800}
-    .entry-capture-form{display:flex;gap:10px;flex-wrap:wrap;flex:1;min-width:290px;max-width:580px}
-    .entry-capture-form input{flex:1;min-width:130px;height:48px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);padding:0 14px;color:white;outline:none;font-family:inherit;font-size:.9rem}
-    .entry-capture-form input::placeholder{color:#9fb0b8}
-    .entry-capture-form input:focus{border-color:var(--lime)}
-    .entry-capture-form .btn{white-space:nowrap;padding:0 20px;height:48px}
-    @media(max-width:1000px){.announcement{display:none}.entry-capture-inner{flex-direction:column;align-items:stretch}.entry-capture-form{max-width:none;flex-direction:column}.entry-capture-form input,.entry-capture-form .btn{width:100%}}
 
     /* Trust bar */
     .trust-wrap{position:relative;z-index:2;margin-top:-39px}
@@ -502,119 +526,6 @@
       .market-grid.list-mode .market-card-image{min-height:auto;aspect-ratio:1.47}
     }
 
-    /* Perfil de compra segura */
-    .security.purchase-profile{
-      overflow:hidden;position:relative;background:#090d10;color:white;padding:112px 0;
-    }
-    .security.purchase-profile::before{
-      content:"";position:absolute;inset:0;
-      background:
-        radial-gradient(circle at 92% 15%,rgba(103,199,0,.22),transparent 20%),
-        radial-gradient(circle at 74% 78%,rgba(67,56,200,.32),transparent 28%);
-      pointer-events:none;
-    }
-    .purchase-profile .security-grid{
-      position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-      gap:62px;align-items:center;
-    }
-    .purchase-profile .section-copy{color:#b9c7cf}
-    .profile-benefits{display:grid;gap:13px;margin-top:31px}
-    .profile-benefit{display:flex;align-items:flex-start;gap:13px}
-    .profile-benefit-icon{
-      display:grid;place-items:center;flex:0 0 auto;width:35px;height:35px;border-radius:10px;
-      background:rgba(103,199,0,.13);color:#b6f96e;font-size:.83rem;font-weight:900;
-    }
-    .profile-benefit h4{margin:2px 0 0;font-size:.95rem}
-    .profile-benefit p{margin:4px 0 0;color:#b3c1c9;font-size:.85rem}
-    .profile-note{
-      display:flex;align-items:center;gap:9px;margin-top:27px;color:#d4e0e5;font-size:.79rem;font-weight:700;
-    }
-    .profile-note i{
-      display:grid;place-items:center;width:22px;height:22px;border-radius:50%;
-      background:rgba(103,199,0,.16);color:#bdf77b;font-style:normal;font-size:.72rem;
-    }
-
-    .profile-wizard{
-      position:relative;overflow:hidden;padding:24px;border-radius:23px;background:#fff;color:var(--ink);
-      border:1px solid rgba(255,255,255,.66);box-shadow:0 25px 65px rgba(0,0,0,.30);
-    }
-    .profile-wizard::before{
-      content:"";position:absolute;top:0;left:0;right:0;height:4px;
-      background:linear-gradient(90deg,var(--lime),var(--violet));
-    }
-    .profile-wizard-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .profile-kicker{margin:0;color:var(--violet);font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-    .profile-step-label{color:#65727b;font-size:.75rem;font-weight:800}
-    .profile-progress{height:7px;margin-top:14px;border-radius:999px;background:#e8edef;overflow:hidden}
-    .profile-progress span{display:block;width:25%;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--lime),#93ea36);transition:width .28s ease}
-    .profile-form{margin-top:22px}
-    .profile-question{margin:0;font-family:"Manrope";font-size:1.43rem;line-height:1.15;letter-spacing:-.045em}
-    .profile-helper{margin:7px 0 0;color:#74818a;font-size:.82rem}
-    .wizard-step{display:none;animation:profileFade .2s ease}
-    .wizard-step.active{display:block}
-    @keyframes profileFade{from{opacity:.2;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
-    .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:19px}
-    .choice-grid.three{grid-template-columns:repeat(3,1fr)}
-    .profile-choice{
-      min-height:72px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;
-      padding:12px;border:1px solid #dbe3e6;border-radius:13px;background:#fff;color:#35424a;text-align:left;
-      transition:border-color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease;
-    }
-    .profile-choice:hover{transform:translateY(-1px);border-color:#acbac0}
-    .profile-choice.active{
-      border-color:var(--violet);background:#f4f3ff;color:#3027a4;box-shadow:0 0 0 3px rgba(67,56,200,.10);
-    }
-    .profile-choice strong{font-size:.83rem;line-height:1.16}
-    .profile-choice span{color:#74818a;font-size:.70rem;line-height:1.22}
-    .profile-choice.active span{color:#5f58bd}
-    .choice-icon{font-size:1.12rem}
-    .profile-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:19px}
-    .profile-split h4{margin:0;color:#48565f;font-size:.78rem}
-    .profile-split .choice-grid{margin-top:9px}
-    .profile-split .profile-choice{min-height:57px}
-    .profile-split .profile-choice span{display:none}
-    .profile-error{min-height:18px;margin:11px 0 0;color:#bc2542;font-size:.75rem;font-weight:700}
-    .profile-controls{display:flex;align-items:center;justify-content:space-between;gap:11px;margin-top:10px}
-    .profile-back{border:0;background:none;padding:10px 0;color:#60707a;font-size:.82rem;font-weight:900}
-    .profile-back.hidden{visibility:hidden}
-    .profile-next{
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:12px 15px;
-      background:var(--ink);color:#fff;font-size:.82rem;font-weight:900;
-    }
-    .profile-next:hover{background:var(--violet)}
-    .profile-result{display:none;margin-top:22px;animation:profileFade .24s ease}
-    .profile-result.visible{display:block}
-    .result-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 9px;border-radius:999px;background:#effbdd;color:#4c9200;font-size:.71rem;font-weight:900}
-    .result-title{margin:12px 0 0;font-family:"Manrope";font-size:1.52rem;line-height:1.12;letter-spacing:-.045em}
-    .result-copy{margin:9px 0 0;color:#66737c;font-size:.87rem}
-    .result-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}
-    .result-tag{padding:7px 9px;border-radius:999px;background:#f0f4f5;color:#4d5a63;font-size:.72rem;font-weight:800}
-    .result-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:19px}
-    .result-actions a,.result-actions button{
-      display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:10px;padding:12px;text-align:center;
-      font-size:.78rem;font-weight:900;
-    }
-    .result-primary{border:0;background:var(--lime);color:#081203}
-    .result-primary:hover{background:#91ea2e}
-    .result-secondary{border:1px solid #d6e0e3;background:#fff;color:#3b4951}
-    .result-secondary:hover{border-color:var(--violet);color:var(--violet)}
-    .personality-invite{
-      display:flex;align-items:flex-start;gap:10px;margin-top:13px;padding:12px;border-radius:12px;
-      background:#f5f4ff;border:1px solid #dfdcff;color:#363068;
-    }
-    .personality-invite b{display:block;font-size:.76rem}
-    .personality-invite p{margin:3px 0 0;color:#66619a;font-size:.71rem;line-height:1.35}
-    .personality-invite .spark{font-size:1.05rem}
-    .profile-restart{display:block;margin:14px auto 0;border:0;background:none;color:#6d7880;font-size:.76rem;font-weight:800}
-
-    @media (max-width:1000px){
-      .purchase-profile .security-grid{grid-template-columns:1fr;gap:37px}
-      .profile-wizard{max-width:590px;padding:20px;border-radius:18px}
-      .security.purchase-profile{padding:74px 0}
-      .choice-grid,.choice-grid.three{grid-template-columns:1fr 1fr}
-      .profile-split{grid-template-columns:1fr;gap:14px}
-      .result-actions{grid-template-columns:1fr}
-    }
 
 
     /* Lead area */
@@ -705,7 +616,9 @@
       .shell{width:min(var(--max),calc(100% - 28px))}
       .wc-nav{height:67px}
       .wc-brand img{width:135px}
-      .hero-grid{padding:56px 0 62px}
+      .hero-grid{grid-template-columns:1fr;padding:56px 0 62px}
+      .hero-copy{max-width:100%}
+      .sim-card{max-width:480px}
       .hero-copy h1{font-size:3.18rem}
       .hero-actions{display:grid;grid-template-columns:1fr}
       .hero-actions .btn{width:100%}
@@ -746,7 +659,6 @@
       /* Quitar gradiente decorativo del hero */
       .hero::after{display:none}
       /* Sección oscura: fondo sólido en vez de radial-gradients */
-      .purchase-profile{background:#090d10}
       /* Path cards: desactivar zoom de imagen en hover y transición */
       .path-card::after{transition:none}
       .path-card:hover::after{transform:none}
@@ -886,20 +798,40 @@
           </div>
         </div>
 
-      </div>
-    </section>
+        <!-- Simulador de mensualidad -->
+        <div class="sim-card" aria-label="Simulador de mensualidad estimada">
+          <div>
+            <div class="sim-card-title">¿Cuánto pagarías al mes?</div>
+            <div class="sim-card-sub">Mueve los controles y obtén una estimación al instante — sin comprometerte a nada.</div>
+          </div>
 
-    <section class="entry-capture">
-      <div class="shell entry-capture-inner">
-        <div class="entry-capture-copy">
-          <p class="entry-capture-kicker">¿Buscas tu próximo auto?</p>
-          <h3>Déjanos tu nombre y celular — un asesor te ayuda a encontrar la mejor opción, sin compromiso.</h3>
+          <div>
+            <div class="sim-row-label">Precio del auto</div>
+            <div class="sim-val"><span id="simCarVal">$350,000</span></div>
+            <input type="range" class="sim-range" id="simCar" min="100000" max="1500000" step="10000" value="350000" oninput="wcsCalcSim()">
+            <div class="sim-range-labels"><span>$100k</span><span>$750k</span><span>$1.5M</span></div>
+          </div>
+
+          <div>
+            <div class="sim-row-label">Enganche — <span id="simEngPct">20</span>%</div>
+            <div class="sim-val"><span class="sim-accent" id="simEngVal">$70,000</span></div>
+            <input type="range" class="sim-range" id="simEng" min="10" max="40" step="5" value="20" oninput="wcsCalcSim()">
+            <div class="sim-range-labels"><span>10%</span><span>25%</span><span>40%</span></div>
+          </div>
+
+          <div class="sim-divider"></div>
+
+          <div class="sim-result-block">
+            <div class="sim-result-label">Mensualidad estimada · 36 meses</div>
+            <div class="sim-result-amount" id="simResult">$8,230</div>
+            <div class="sim-result-unit">/ mes · tasa referencial 18% anual</div>
+          </div>
+
+          <div class="sim-disclaimer">Estimación sin compromisos. La tasa real depende de tu perfil crediticio y la institución financiera.</div>
+
+          <a class="sim-cta" href="https://www.wecarsbajio.com/credito" target="_top">Iniciar cotización formal →</a>
         </div>
-        <form id="entryCaptureForm" class="entry-capture-form">
-          <input type="text" name="name" placeholder="Tu nombre" required>
-          <input type="tel" name="phone" placeholder="Tu celular" required>
-          <button class="btn primary" type="submit">Quiero que me ayuden <span>→</span></button>
-        </form>
+
       </div>
     </section>
 
@@ -1185,161 +1117,6 @@
     </section>
 
 
-    <section class="security purchase-profile" id="proceso">
-      <div class="shell security-grid">
-        <div>
-          <div class="eyebrow"><span class="dot"></span> Compra segura, desde tu estilo</div>
-          <h2 class="section-title">No te ofrecemos "cualquier auto".<br>Primero entendemos qué va contigo.</h2>
-          <p class="section-copy">Responde cuatro preguntas rápidas para perfilar el tipo de vehículo, equipamiento y forma de compra que mejor encajan con tu día a día.</p>
-
-          <div class="profile-benefits">
-            <div class="profile-benefit">
-              <div class="profile-benefit-icon">01</div>
-              <div><h4>Recomendaciones más relevantes</h4><p>Prioriza opciones alineadas con tu uso real, no solo con una marca o un precio.</p></div>
-            </div>
-            <div class="profile-benefit">
-              <div class="profile-benefit-icon">02</div>
-              <div><h4>Sin datos sensibles al inicio</h4><p>Primero te conocemos como comprador; los documentos se solicitan únicamente cuando decidas avanzar.</p></div>
-            </div>
-            <div class="profile-benefit">
-              <div class="profile-benefit-icon">03</div>
-              <div><h4>Una conversación mejor preparada</h4><p>Tu asesor recibe un resumen claro para proponerte unidades con mayor sentido para ti.</p></div>
-            </div>
-          </div>
-
-          <div class="profile-note"><i>✓</i> Toma menos de un minuto y puedes cambiar tus respuestas cuando quieras.</div>
-        </div>
-
-        <div class="profile-wizard" id="buyerProfile">
-          <div class="profile-wizard-head">
-            <p class="profile-kicker">Tu perfil de búsqueda</p>
-            <span class="profile-step-label" id="profileStepLabel">Pregunta 1 de 4</span>
-          </div>
-          <div class="profile-progress" aria-hidden="true"><span id="profileProgress"></span></div>
-
-          <form class="profile-form" id="buyerProfileForm">
-            <section class="wizard-step active" data-step="1">
-              <h3 class="profile-question">¿Para qué vas a usar más tu próximo auto?</h3>
-              <p class="profile-helper">Elige la situación que más se parezca a tu día a día.</p>
-              <div class="choice-grid">
-                <button class="profile-choice" type="button" data-group="use" data-value="ciudad">
-                  <span class="choice-icon">◉</span><strong>Ciudad y trayectos diarios</strong><span>Comodidad, consumo y practicidad.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="use" data-value="familia">
-                  <span class="choice-icon">◫</span><strong>Familia y actividades</strong><span>Espacio, seguridad y versatilidad.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="use" data-value="trabajo">
-                  <span class="choice-icon">▣</span><strong>Trabajo o negocio</strong><span>Carga, resistencia y presencia.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="use" data-value="viajes">
-                  <span class="choice-icon">↗</span><strong>Viajes y escapadas</strong><span>Confort, espacio y desempeño.</span>
-                </button>
-              </div>
-            </section>
-
-            <section class="wizard-step" data-step="2">
-              <h3 class="profile-question">¿Qué no puede faltar?</h3>
-              <p class="profile-helper">Elige hasta dos prioridades. Así afinamos mejor la búsqueda.</p>
-              <div class="choice-grid three">
-                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="ahorro">
-                  <span class="choice-icon">⌁</span><strong>Ahorro de combustible</strong><span>Menor gasto en uso diario.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="seguridad">
-                  <span class="choice-icon">✓</span><strong>Seguridad</strong><span>Asistencias y protección.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="espacio">
-                  <span class="choice-icon">↔</span><strong>Espacio</strong><span>Pasajeros, cajuela o carga.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="tecnologia">
-                  <span class="choice-icon">◈</span><strong>Tecnología</strong><span>Pantalla, conectividad y confort.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="desempeno">
-                  <span class="choice-icon">↯</span><strong>Desempeño</strong><span>Respuesta y sensación de manejo.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="priorities" data-multiple="true" data-value="estilo">
-                  <span class="choice-icon">✦</span><strong>Diseño y presencia</strong><span>Que refleje tu estilo.</span>
-                </button>
-              </div>
-            </section>
-
-            <section class="wizard-step" data-step="3">
-              <h3 class="profile-question">Hablemos de tu punto de partida.</h3>
-              <p class="profile-helper">No es una solicitud de crédito. Solo nos ayuda a no mostrarte opciones fuera de contexto.</p>
-
-              <div class="profile-split">
-                <div>
-                  <h4>Presupuesto aproximado</h4>
-                  <div class="choice-grid">
-                    <button class="profile-choice" type="button" data-group="budget" data-value="hasta350"><strong>Hasta $350 mil</strong><span>Opciones accesibles.</span></button>
-                    <button class="profile-choice" type="button" data-group="budget" data-value="350a550"><strong>$350 a $550 mil</strong><span>Rango medio.</span></button>
-                    <button class="profile-choice" type="button" data-group="budget" data-value="mas550"><strong>Más de $550 mil</strong><span>Premium o reciente.</span></button>
-                    <button class="profile-choice" type="button" data-group="budget" data-value="comparando"><strong>Aún comparo</strong><span>Quiero explorar.</span></button>
-                  </div>
-                </div>
-                <div>
-                  <h4>Forma de compra</h4>
-                  <div class="choice-grid">
-                    <button class="profile-choice" type="button" data-group="payment" data-value="credito"><strong>Crédito</strong><span>Quiero mensualidad.</span></button>
-                    <button class="profile-choice" type="button" data-group="payment" data-value="contado"><strong>Contado</strong><span>Compra directa.</span></button>
-                    <button class="profile-choice" type="button" data-group="payment" data-value="autoCuenta"><strong>Auto a cuenta</strong><span>Quiero tomar el mío.</span></button>
-                    <button class="profile-choice" type="button" data-group="payment" data-value="evaluando"><strong>Estoy evaluando</strong><span>Necesito orientación.</span></button>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section class="wizard-step" data-step="4">
-              <h3 class="profile-question">Al elegir, ¿qué estilo te representa más?</h3>
-              <p class="profile-helper">No es una etiqueta: es una pista extra para recomendarte mejor.</p>
-              <div class="choice-grid">
-                <button class="profile-choice" type="button" data-group="style" data-value="practico">
-                  <span class="choice-icon">◌</span><strong>Práctico y eficiente</strong><span>Quiero que todo sea fácil y funcional.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="style" data-value="protector">
-                  <span class="choice-icon">◍</span><strong>Cuido a los míos</strong><span>Busco tranquilidad y espacio.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="style" data-value="explorador">
-                  <span class="choice-icon">△</span><strong>Siempre listo para salir</strong><span>Me gusta moverme, viajar y descubrir.</span>
-                </button>
-                <button class="profile-choice" type="button" data-group="style" data-value="entusiasta">
-                  <span class="choice-icon">✦</span><strong>Me importa cómo se siente</strong><span>Diseño, potencia y carácter.</span>
-                </button>
-              </div>
-            </section>
-
-            <p class="profile-error" id="profileError" role="alert"></p>
-            <div class="profile-controls">
-              <button class="profile-back hidden" id="profileBack" type="button">← Anterior</button>
-              <button class="profile-next" id="profileNext" type="button">Continuar <span>→</span></button>
-            </div>
-          </form>
-
-          <div class="profile-result" id="profileResult">
-            <span class="result-badge">✓ Perfil inicial listo</span>
-            <h3 class="result-title" id="profileResultTitle">Tu búsqueda toma forma.</h3>
-            <p class="result-copy" id="profileResultCopy"></p>
-            <div class="result-tags" id="profileResultTags"></div>
-
-            <div class="result-actions">
-              <a class="result-primary" href="https://www.wecarsbajio.com/inventario" target="_top">Ver opciones de inventario →</a>
-              <a class="result-secondary" id="profileAdvisor" href="#" target="_top">Enviar mi perfil a un asesor</a>
-            </div>
-
-            <div class="personality-invite">
-              <span class="spark">✦</span>
-              <div>
-                <b>¿Te interesaría validar tu personalidad para conocer qué auto encaja mejor contigo?</b>
-                <p>Completa una evaluación breve y recibe una perspectiva adicional sobre el estilo de vehículo que más se alinea contigo.</p>
-              </div>
-            </div>
-            <a class="result-secondary" href="http://www.wecarsbajio.com/vc" target="_top" style="margin-top:10px;width:100%;">Quiero validar mi personalidad →</a>
-
-            <button class="profile-restart" type="button" id="profileRestart">Cambiar mis respuestas</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="lead" id="contacto">
       <div class="shell">
         <div class="lead-box">
@@ -1442,6 +1219,25 @@
       <a class="btn" href="#contacto" id="modalLead">Solicitar información</a>
     </div>
   </div>
+
+  <script>
+    // ── Simulador de mensualidad ──────────────────────────────────────────
+    function wcsCalcSim() {
+      var car = parseInt(document.getElementById('simCar').value, 10);
+      var engPct = parseInt(document.getElementById('simEng').value, 10);
+      var engMonto = car * engPct / 100;
+      var monto = car - engMonto;
+      var rate = 0.18 / 12;
+      var n = 36;
+      var pago = monto * (rate * Math.pow(1 + rate, n)) / (Math.pow(1 + rate, n) - 1);
+      var fmt = function(n){ return '$' + Math.round(n).toLocaleString('es-MX'); };
+      document.getElementById('simCarVal').textContent = fmt(car);
+      document.getElementById('simEngPct').textContent = engPct;
+      document.getElementById('simEngVal').textContent = fmt(engMonto);
+      document.getElementById('simResult').textContent = fmt(pago);
+    }
+    wcsCalcSim();
+  </script>
 
   <script>
     // Recibe de Velo el número de WhatsApp y los links del menú (un solo
@@ -2000,211 +1796,6 @@
     })();
 
 
-    // Perfil rápido del comprador: guía de 4 preguntas.
-    const buyerProfileForm = document.getElementById('buyerProfileForm');
-
-    if (buyerProfileForm) {
-      const profileState = {
-        use: '',
-        priorities: [],
-        budget: '',
-        payment: '',
-        style: ''
-      };
-
-      let profileStep = 1;
-      const profileSteps = [...buyerProfileForm.querySelectorAll('.wizard-step')];
-      const profileNext = document.getElementById('profileNext');
-      const profileBack = document.getElementById('profileBack');
-      const profileError = document.getElementById('profileError');
-      const profileProgress = document.getElementById('profileProgress');
-      const profileStepLabel = document.getElementById('profileStepLabel');
-      const profileResult = document.getElementById('profileResult');
-      const profileAdvisor = document.getElementById('profileAdvisor');
-
-      const readable = {
-        use: {
-          ciudad: 'ciudad y trayectos diarios',
-          familia: 'familia y actividades',
-          trabajo: 'trabajo o negocio',
-          viajes: 'viajes y escapadas'
-        },
-        priorities: {
-          ahorro: 'ahorro de combustible',
-          seguridad: 'seguridad',
-          espacio: 'espacio',
-          tecnologia: 'tecnología',
-          desempeno: 'desempeño',
-          estilo: 'diseño y presencia'
-        },
-        budget: {
-          hasta350: 'hasta $350 mil',
-          '350a550': '$350 a $550 mil',
-          mas550: 'más de $550 mil',
-          comparando: 'aún comparando'
-        },
-        payment: {
-          credito: 'crédito',
-          contado: 'contado',
-          autoCuenta: 'auto a cuenta',
-          evaluando: 'forma de compra por definir'
-        },
-        style: {
-          practico: 'práctico y eficiente',
-          protector: 'protector y orientado a la familia',
-          explorador: 'explorador',
-          entusiasta: 'entusiasta del manejo y diseño'
-        }
-      };
-
-      function updateProfileUI() {
-        profileSteps.forEach(step => {
-          step.classList.toggle('active', Number(step.dataset.step) === profileStep);
-        });
-
-        profileStepLabel.textContent = `Pregunta ${profileStep} de 4`;
-        profileProgress.style.width = `${profileStep * 25}%`;
-        profileBack.classList.toggle('hidden', profileStep === 1);
-        profileNext.innerHTML = profileStep === 4 ? 'Ver mi perfil <span>✓</span>' : 'Continuar <span>→</span>';
-        profileError.textContent = '';
-      }
-
-      function profileStepIsValid() {
-        if (profileStep === 1) return Boolean(profileState.use);
-        if (profileStep === 2) return profileState.priorities.length > 0;
-        if (profileStep === 3) return Boolean(profileState.budget && profileState.payment);
-        if (profileStep === 4) return Boolean(profileState.style);
-        return true;
-      }
-
-      function profileErrorMessage() {
-        if (profileStep === 1) return 'Elige el uso principal que tendrá tu auto.';
-        if (profileStep === 2) return 'Elige al menos una prioridad para continuar.';
-        if (profileStep === 3) return 'Elige un presupuesto aproximado y una forma de compra.';
-        if (profileStep === 4) return 'Elige el estilo que más se parece a ti.';
-        return '';
-      }
-
-      function showProfileResult() {
-        buyerProfileForm.style.display = 'none';
-        document.querySelector('.profile-wizard-head').style.display = 'none';
-        document.querySelector('.profile-progress').style.display = 'none';
-
-        const recommendations = {
-          ciudad: 'Te conviene comenzar por sedanes compactos, hatchbacks o crossovers eficientes que hagan simples tus trayectos diarios.',
-          familia: 'Tu perfil apunta a SUVs y crossovers con buen espacio, seguridad y comodidad para acompañar cada plan.',
-          trabajo: 'Vale la pena comparar pickups, SUVs robustas o unidades con espacio y capacidad para el ritmo de tu negocio.',
-          viajes: 'Busca SUVs o crossovers cómodos, estables y con espacio suficiente para recorrer más kilómetros con tranquilidad.'
-        };
-
-        const styleAdd = {
-          practico: ' Priorizaremos funcionalidad, consumo y costo de uso.',
-          protector: ' Pondremos especial atención en seguridad, confort y espacio.',
-          explorador: ' Consideraremos versatilidad, altura y capacidad para salir de la rutina.',
-          entusiasta: ' También te mostraremos opciones con diseño, equipamiento y sensación de manejo.'
-        };
-
-        document.getElementById('profileResultTitle').textContent =
-          'Tu búsqueda ya tiene una dirección.';
-        document.getElementById('profileResultCopy').textContent =
-          `${recommendations[profileState.use]}${styleAdd[profileState.style]}`;
-
-        const tags = [
-          readable.use[profileState.use],
-          ...profileState.priorities.map(item => readable.priorities[item]),
-          readable.budget[profileState.budget],
-          readable.payment[profileState.payment]
-        ].filter(Boolean);
-
-        document.getElementById('profileResultTags').innerHTML =
-          tags.map(tag => `<span class="result-tag">${tag}</span>`).join('');
-
-        const message = [
-          'Hola, completé mi perfil de búsqueda en WeCars.',
-          `Uso principal: ${readable.use[profileState.use]}.`,
-          `Prioridades: ${profileState.priorities.map(item => readable.priorities[item]).join(', ')}.`,
-          `Presupuesto: ${readable.budget[profileState.budget]}.`,
-          `Compra: ${readable.payment[profileState.payment]}.`,
-          `Estilo: ${readable.style[profileState.style]}.`,
-          'Me gustaría recibir recomendaciones de vehículos.'
-        ].join(' ');
-
-        profileAdvisor.href = `https://wa.me/524778350020?text=${encodeURIComponent(message)}`;
-        profileResult.classList.add('visible');
-      }
-
-      buyerProfileForm.addEventListener('click', event => {
-        const choice = event.target.closest('.profile-choice');
-        if (!choice) return;
-
-        const group = choice.dataset.group;
-        const value = choice.dataset.value;
-        const isMultiple = choice.dataset.multiple === 'true';
-
-        if (isMultiple) {
-          const current = profileState[group];
-          const index = current.indexOf(value);
-
-          if (index > -1) {
-            current.splice(index, 1);
-            choice.classList.remove('active');
-          } else if (current.length < 2) {
-            current.push(value);
-            choice.classList.add('active');
-          } else {
-            profileError.textContent = 'Elige máximo dos prioridades para mantener tu perfil claro.';
-          }
-
-          return;
-        }
-
-        profileState[group] = value;
-        buyerProfileForm.querySelectorAll(`.profile-choice[data-group="${group}"]`).forEach(button => {
-          button.classList.toggle('active', button === choice);
-        });
-        profileError.textContent = '';
-      });
-
-      profileNext.addEventListener('click', () => {
-        if (!profileStepIsValid()) {
-          profileError.textContent = profileErrorMessage();
-          return;
-        }
-
-        if (profileStep === 4) {
-          showProfileResult();
-          return;
-        }
-
-        profileStep += 1;
-        updateProfileUI();
-      });
-
-      profileBack.addEventListener('click', () => {
-        if (profileStep > 1) {
-          profileStep -= 1;
-          updateProfileUI();
-        }
-      });
-
-      document.getElementById('profileRestart').addEventListener('click', () => {
-        profileState.use = '';
-        profileState.priorities = [];
-        profileState.budget = '';
-        profileState.payment = '';
-        profileState.style = '';
-        profileStep = 1;
-
-        buyerProfileForm.querySelectorAll('.profile-choice').forEach(button => button.classList.remove('active'));
-        profileResult.classList.remove('visible');
-        buyerProfileForm.style.display = '';
-        document.querySelector('.profile-wizard-head').style.display = '';
-        document.querySelector('.profile-progress').style.display = '';
-        updateProfileUI();
-      });
-
-      updateProfileUI();
-    }
 
 
     // Este formulario no envía datos: deja el punto de integración listo para Wix Forms, CRM o Make.
