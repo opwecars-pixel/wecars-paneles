@@ -1796,6 +1796,21 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
   body { overflow: visible !important; }
 }
 
+/* ── A-LEADS: Kanban de leads ────────────────────────────── */
+.leads-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.leads-kpi-card{background:var(--white);border:1.5px solid var(--line);border-radius:var(--r-md);padding:14px 10px;text-align:center}
+.leads-kpi-num{display:block;font-size:1.6rem;font-weight:900;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--lime-dark)}
+.leads-kpi-lbl{font-size:var(--t-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:2px;display:block}
+.ge-leads-controls{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.leads-filter-row{display:flex;gap:6px;flex-wrap:wrap}
+.leads-tipo-btn{padding:5px 12px;border-radius:20px;border:1.5px solid var(--line);background:var(--white);font-size:var(--t-sm);font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;font-family:inherit}
+.leads-tipo-btn.active,.leads-tipo-btn:hover{background:rgba(86,169,0,.1);color:var(--lime-dark);border-color:rgba(86,169,0,.4)}
+.ge-leads-search{padding:7px 12px;border:1.5px solid var(--line);border-radius:var(--r-sm);font-size:var(--t-sm);background:var(--white);color:var(--ink);font-family:inherit;width:100%;box-sizing:border-box}
+.ge-leads-search::placeholder{color:var(--muted)}
+.ge-leads-kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
+@media(max-width:900px){.ge-leads-kanban{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.leads-kpi-row{grid-template-columns:repeat(2,1fr)}.ge-leads-kanban{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body class="wc-loading">
@@ -3500,6 +3515,12 @@ window.addEventListener('message', function(e) {
       solicitudesCompra = Array.isArray(d.items) ? d.items : [];
       if (vistaActual === 'compras') renderCompras();
       break;
+
+    case 'wecars-leads-datos':
+      window._geLeadsAll = Array.isArray(d.items) ? d.items : (d.leads || []);
+      actualizarBadgesAd();
+      if (vistaActual === 'leads') adRenderLeads();
+      break;
   }
 });
 
@@ -3521,6 +3542,79 @@ window.adLeadsFiltroTipo = function(btn, tipo) {
   btn.classList.add('active');
   window._adLeadsTipoFiltro = tipo;
   if (typeof adRenderLeads === 'function') adRenderLeads();
+};
+
+/* adRenderLeads — kanban de leads para Admin (Sección 15) */
+window.adRenderLeads = function adRenderLeads() {
+  var wrap = document.getElementById('ad-leads-kanban');
+  if (!wrap) return;
+  var src = window._geLeadsAll || [];
+  var tipo = window._adLeadsTipoFiltro || '';
+  var q = ((document.getElementById('ad-leads-q') || {}).value || '').toLowerCase();
+  var filtered = src.filter(function(l) {
+    if (tipo && l.tipo !== tipo) return false;
+    if (q) {
+      var s = ((l.nombre||'')+(l.telefono||'')+(l.email||'')+(l.auto||'')).toLowerCase();
+      if (!s.includes(q)) return false;
+    }
+    return true;
+  });
+  // KPIs
+  var t_total = src.length;
+  var t_nuevos = src.filter(function(l){ return !l.etapa || l.etapa === 'Nuevo'; }).length;
+  var t_proceso = src.filter(function(l){ return l.etapa === 'En contacto' || l.etapa === 'Propuesta'; }).length;
+  var t_cerrados = src.filter(function(l){ return l.etapa === 'Cerrado'; }).length;
+  var kpi = function(id, n) { var el = document.getElementById(id); if (el) el.textContent = n; };
+  kpi('ad-kpi-total', t_total);
+  kpi('ad-kpi-nuevos', t_nuevos);
+  kpi('ad-kpi-asignados', t_proceso);
+  kpi('ad-kpi-cerrados', t_cerrados);
+
+  if (!filtered.length) {
+    wrap.innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px;font-size:.85rem;grid-column:1/-1">' + (q || tipo ? 'Sin resultados para ese filtro.' : 'Sin leads registrados aún.') + '</div>';
+    return;
+  }
+
+  var ETAPAS = ['Nuevo', 'En contacto', 'Propuesta', 'Cerrado'];
+  var TIPO_LABELS = { lead:'Inventario', consigna:'Consigna', credito:'Crédito', prueba_manejo:'Prueba', verificacion:'Verificación' };
+  var ETAPA_COLOR = { 'Nuevo':'var(--lime)', 'En contacto':'var(--c-blue)', 'Propuesta':'var(--c-amber)', 'Cerrado':'var(--c-green)' };
+  var grupos = {};
+  ETAPAS.forEach(function(e){ grupos[e] = []; });
+  filtered.forEach(function(l) {
+    var et = l.etapa || 'Nuevo';
+    if (!grupos[et]) grupos[et] = [];
+    grupos[et].push(l);
+  });
+  var esc = function(v) { return String(v||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
+
+  wrap.innerHTML = ETAPAS.map(function(et) {
+    var items = grupos[et] || [];
+    var color = ETAPA_COLOR[et] || 'var(--muted)';
+    var cards = items.map(function(l) {
+      var tipoLabel = TIPO_LABELS[l.tipo] || l.tipo || '';
+      var fecha = l.fechaCreado ? new Date(l.fechaCreado).toLocaleDateString('es-MX',{day:'numeric',month:'short'}) : '';
+      var wa = l.telefono ? l.telefono.replace(/\D/g,'') : '';
+      return '<div style="background:var(--surface,var(--white));border:1px solid var(--border,var(--line));border-radius:var(--r-md,10px);padding:10px 12px;margin-bottom:6px;font-size:.82rem">' +
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">' +
+          '<strong style="color:var(--ink);font-size:.83rem;flex:1">' + esc(l.nombre||'Sin nombre') + '</strong>' +
+          (tipoLabel ? '<span style="font-size:.68rem;background:var(--lime-bg);color:var(--lime-dark);padding:2px 7px;border-radius:20px;font-weight:700;white-space:nowrap;flex-shrink:0">' + esc(tipoLabel) + '</span>' : '') +
+        '</div>' +
+        (l.auto ? '<div style="color:var(--muted);font-size:.77rem;margin-bottom:3px"><i class="ti ti-car" style="font-size:.72rem"></i> ' + esc(l.auto) + '</div>' : '') +
+        '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px">' +
+          (wa ? '<a href="https://wa.me/52'+wa+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;background:#25D366;color:#fff;padding:2px 8px;border-radius:6px;font-size:.69rem;font-weight:700;text-decoration:none"><i class="ti ti-brand-whatsapp"></i> WA</a>' : '') +
+          (fecha ? '<span style="font-size:.68rem;color:var(--muted)">' + fecha + '</span>' : '') +
+          (l.emailVendedor ? '<span style="font-size:.68rem;color:var(--muted)">→ ' + esc((l.emailVendedor||'').split('@')[0]) + '</span>' : '<span style="font-size:.68rem;color:var(--c-amber);font-weight:700">Sin asignar</span>') +
+        '</div>' +
+      '</div>';
+    }).join('') || '<div style="text-align:center;padding:14px 0;color:var(--muted);font-size:.75rem;opacity:.55">Sin leads</div>';
+
+    return '<div style="background:var(--line);border-radius:12px;padding:10px">' +
+      '<div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:' + color + ';margin-bottom:8px;display:flex;align-items:center;gap:5px">' +
+        esc(et) + ' <span style="background:' + color + ';color:#fff;border-radius:20px;padding:1px 7px;font-size:.65rem;font-weight:800">' + items.length + '</span>' +
+      '</div>' +
+      cards +
+    '</div>';
+  }).join('');
 };
 
 window.ciSwitchTab          = function(t){ ciSwitchTab(t); };
