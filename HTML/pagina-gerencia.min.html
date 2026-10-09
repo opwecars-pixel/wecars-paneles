@@ -2643,7 +2643,6 @@ z-index: 60;
   </div>
 </div></div>
 <script>
-console.log('[WECARS GERENCIA] VERSION 2026-08-26-f — dom-fix + sort-reciente + mini-profile');
 (function () {var t;
 const ESTATUS_LIST = ['Nuevo', 'Contactado', 'En proceso', 'Ganado', 'Perdido'];
 const ESTATUS_VENTA_OPCIONES = ['Disponible', 'Apartado', 'Vendido'];
@@ -5104,7 +5103,6 @@ if (!data || !data.type) return;
 if (data.type === 'wecars-gerencia-datos') {
 clientes = Array.isArray(data.clientes) ? data.clientes : [];
 window.clientes = clientes; // sincronizar con otros bloques de script
-console.log('[weCars] ClientRecords recibidos:', clientes.length, '| Actividades:', (data.actividades||[]).length, '| Empleados:', (data.empleados||[]).length);
 todasOportunidades = Array.isArray(data.oportunidades) ? data.oportunidades : [];
 todasActividades = Array.isArray(data.actividades) ? data.actividades : [];
 inventarioAutos = Array.isArray(data.inventario) ? data.inventario : [];
