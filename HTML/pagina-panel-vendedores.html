@@ -13730,8 +13730,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")window.cerrarExpedie
   #pv-kpi-bar { grid-template-columns:1fr !important; }
 
   /* Templates biblioteca: 5 col → 3 col */
-  .bl-tpl-grid { grid-template-columns:repeat(3,1fr) !important; }
-
+  
   /* Tablero de tareas: 3 col → 1 col (ya tiene 640px, reforzamos 480) */
   #pv-tareas-board { grid-template-columns:1fr !important; }
 
@@ -14398,12 +14397,10 @@ body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
     background: var(--surface-2) !important;
     color: var(--ink) !important;
   }
-}
-</style>
+}  /* merged */
 
-<!-- ══ MOBILE DEMO DESIGN — Diseño visual del demo aplicado al panel real ══ -->
-<style>
 @media (max-width: 820px) {
+
 
   /* ── Bottom nav: z-index max y safe-area reforzado ── */
   .wc-bottom-nav {
@@ -16418,15 +16415,10 @@ body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
   }
   :root:not([data-theme="dark"]) .pv-brand-text { color: var(--ink) !important; }
   :root:not([data-theme="dark"]) .pv-brand-sub  { color: var(--muted) !important; }
-}
-</style>
+}  /* merged */
 
-<!-- ═══════════════════════════════════════════════════════════
-     BLOQUE 11 — Demo Visual: Agenda · FAB · Expediente Hero
-     Usa var(--surface), var(--ink), var(--line) para dual-theme
-     ═══════════════════════════════════════════════════════════ -->
-<style>
 @media (max-width: 820px) {
+
 
   /* ─── Contactos: car + time sobre card existente ─── */
   .wc-m-card { position: relative; }
@@ -18154,10 +18146,6 @@ body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
     pointer-events: none !important;
   }
 }
-</style>
-
-<!-- Micro-fix: forzar fondo del search bar de Block 8 con variable -->
-<style>
 @media (max-width: 820px) {
   #wc-mob-search-bar {
     background: var(--surface) !important;
@@ -18172,14 +18160,10 @@ body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
   }
   #wc-mob-search-inp::placeholder { color: var(--faint) !important; }
   #wc-mob-count { color: var(--muted) !important; }
-}
-</style>
+}  /* merged */
 
-<!-- ═══════════════════════════════════════════════════════════
-     BLOQUE 13 — Rediseño completo cards contactos: tema dual + tiempo en card-top + pills
-     ═══════════════════════════════════════════════════════════ -->
-<style>
 @media (max-width: 820px) {
+
 
   /* ─── CARD: sobreescribir TODOS los colores hardcodeados de Block 8 con variables ─── */
   #wc-mob-clientes .wc-m-card,
@@ -18828,14 +18812,10 @@ body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
   }
   .pv-card-head { background: transparent !important; color: var(--ink) !important; }
   .pv-card-sub { color: var(--muted) !important; }
-}
-</style>
+}  /* merged */
 
-<!-- ══ BLOQUE DASHBOARD MOBILE — Sección 02 ════════════════════════════
-     Elimina doble scroll, ajusta KPI tiles y grid en móvil
-═══════════════════════════════════════════════════════════════════════ -->
-<style id="wc-dash-mobile">
 @media (max-width: 820px) {
+
   /* ── KPI bar: en ≤360px wrap a 2+1 para que no queden cortados ── */
   #pv-kpi-bar {
     grid-template-columns: repeat(3, 1fr) !important;
@@ -18897,15 +18877,10 @@ body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
   #pv-kpi-bar {
     grid-template-columns: 1fr !important;
   }
-}
-</style>
+}  /* merged */
 
-<!-- ══ BLOQUE APP-SCROLL — Scroll tipo app en móvil ═══════════════════
-     Header fijo arriba · Bottom nav fija abajo · Contenido scrollea
-     Aplica solo en ≤820px. No modifica desktop.
-═══════════════════════════════════════════════════════════════════════ -->
-<style id="wc-app-scroll">
 @media (max-width: 820px) {
+
   /* ── 1. Viewport completo sin scroll de página ── */
   html {
     height: 100%;
@@ -19230,8 +19205,6 @@ html { background-color: var(--bg) !important; }
 .pv-pipeline-steps,
 .pv-pipeline-wrap,
 #td-box,
-.bl-client-list,
-.bl-resultado,
 .pv-ranking-scroll,
 .td-modal,
 .td-body,
