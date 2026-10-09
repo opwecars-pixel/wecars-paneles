@@ -2541,83 +2541,6 @@ body:not(.wc-loading) .wc-main { opacity: 1; transition: opacity .3s; }
 }
 
 /* Boletín redesign — nuevo nivel */
-.bl-stats-bar { display:flex; align-items:center; gap:8px; padding:10px 16px; background:var(--card); border-radius:14px; margin-bottom:12px; border:1px solid var(--line); flex-wrap:wrap; }
-.bl-stat { display:flex; align-items:baseline; gap:6px; }
-.bl-stat + .bl-stat { padding-left:12px; border-left:1px solid var(--line); }
-.bl-stat-num { font-size:1.25rem; font-weight:800; color:var(--lime-dark); font-variant-numeric:tabular-nums; }
-.bl-stat-lbl { font-size:var(--t-xs); color:var(--ink-2); font-weight:600; }
-.bl-prog-bar { flex:1; height:6px; background:var(--line); border-radius:99px; min-width:80px; }
-.bl-prog-fill { height:100%; background:var(--lime-dark); border-radius:99px; transition:width .3s; }
-.bl-stat-progress { flex:1; gap:10px; display:flex; align-items:center; }
-.bl-section-label { font-size:var(--t-xs); font-weight:800; color:var(--ink-2); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
-.bl-section-label code { text-transform:none; letter-spacing:0; background:var(--lime-bg); color:var(--lime-dark); padding:1px 5px; border-radius:4px; font-size:.75rem; }
-.bl-tpl-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:18px; }
-@media (max-width:700px) { .bl-tpl-grid { grid-template-columns:repeat(3,1fr); } }
-.bl-tpl-card { display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:12px; border:1.5px solid var(--line); border-radius:var(--r-md); background:var(--surface); cursor:pointer; font-family:inherit; text-align:left; transition:border-color .15s,background .15s; min-width:0; }
-@media (hover: hover) and (pointer: fine) {
-  .bl-tpl-card:hover{ border-color:var(--lime); background:var(--lime-bg); }
-}
-
-.bl-tpl-card.activa { border-color:var(--lime-dark); background:var(--lime-bg); }
-.bl-tpl-card.activa .bl-tpl-name { color:var(--lime-dark); }
-.bl-tpl-icon { font-size:1.1rem; color:var(--lime-dark); margin-bottom:2px; }
-.bl-tpl-name { font-size:var(--t-sm); font-weight:800; color:var(--ink); }
-.bl-tpl-preview-txt { font-size:.7rem; color:var(--ink-2); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%; }
-.bl-body { display:grid; grid-template-columns:1fr 340px; gap:20px; }
-@media (max-width:900px) { .bl-body { grid-template-columns:1fr; } }
-.bl-textarea { width:100%; box-sizing:border-box; padding:11px 13px; border:1.5px solid var(--line); border-radius:var(--r-sm); font-size:var(--t-sm); color:var(--ink); background:var(--bg); font-family:inherit; resize:vertical; min-height:110px; outline:none; transition:border-color .15s; }
-.bl-textarea:focus { border-color:var(--lime-dark); }
-.bl-filters { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
-.bl-select { width:100%; padding:8px 11px; border:1.5px solid var(--line); border-radius:var(--r-sm); font-size:var(--t-sm); color:var(--ink); background:var(--bg); font-family:inherit; outline:none; }
-.bl-check-label { display:flex; align-items:center; gap:7px; font-size:var(--t-sm); font-weight:600; color:var(--ink-2); cursor:pointer; }
-.bl-list-head { display:flex; align-items:center; gap:8px; padding:8px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin:10px 0 8px; flex-wrap:wrap; }
-.bl-chip-btn { padding:4px 12px; border:1px solid var(--line); border-radius:20px; font-size:var(--t-xs); font-weight:700; color:var(--ink-2); background:var(--surface); cursor:pointer; font-family:inherit; transition:.15s; }
-@media (hover: hover) and (pointer: fine) {
-  .bl-chip-btn:hover{ border-color:var(--lime-dark); color:var(--lime-dark); }
-}
-
-.bl-count { margin-left:auto; font-size:var(--t-xs); font-weight:800; color:var(--lime-dark); }
-.bl-client-list { display:flex; flex-direction:column; gap:4px; max-height:280px; overflow-y:auto; }
-.bl-client-row { display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--line); border-radius:9px; background:var(--surface); transition:border-color .12s; cursor:pointer; }
-@media (hover: hover) and (pointer: fine) {
-  .bl-client-row:hover:not(.bl-client-dis){ border-color:var(--lime); }
-}
-
-.bl-client-row input[type=checkbox] { flex-shrink:0; width:16px; height:16px; cursor:pointer; }
-.bl-client-sem { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-.bl-client-info { flex:1; min-width:0; }
-.bl-client-name { font-size:var(--t-sm); font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.bl-client-meta { font-size:.7rem; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.bl-client-dis { opacity:.45; cursor:not-allowed; }
-.bl-actions { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
-.bl-btn-primary { display:inline-flex; align-items:center; gap:8px; background:#25d366; color:#fff; border:none; border-radius:var(--r-sm); padding:10px 20px; font-size:var(--t-sm); font-weight:800; cursor:pointer; font-family:inherit; transition:filter .15s; }
-@media (hover: hover) and (pointer: fine) {
-  .bl-btn-primary:hover{ filter:brightness(1.08); }
-}
-
-.bl-btn-seq { display:inline-flex; align-items:center; gap:8px; background:var(--lime-dark); color:#fff; border:none; border-radius:var(--r-sm); padding:10px 18px; font-size:var(--t-sm); font-weight:800; cursor:pointer; font-family:inherit; transition:filter .15s; }
-@media (hover: hover) and (pointer: fine) {
-  .bl-btn-seq:hover{ filter:brightness(1.1); }
-}
-
-.bl-btn-seq:disabled { opacity:.55; cursor:not-allowed; }
-.bl-wa-phone { border-radius:14px; overflow:hidden; border:1.5px solid var(--line); box-shadow:0 4px 16px rgba(13,26,13,.08); }
-.bl-wa-header { display:flex; align-items:center; gap:10px; background:#075e54; padding:10px 14px; }
-.bl-wa-avatar { width:36px; height:36px; border-radius:50%; background:var(--line-2); display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; flex-shrink:0; }
-.bl-wa-contact { font-size:var(--t-sm); font-weight:700; color:#fff; }
-.bl-wa-status { font-size:.7rem; color:rgba(255,255,255,.65); }
-.bl-wa-body { background:#e5ddd5; padding:14px 12px; min-height:90px; }
-.bl-wa-bubble { background:#dcf8c6; border-radius:var(--r-sm) 8px 2px 8px; padding:9px 12px; font-size:.82rem; line-height:1.55; color:#111; white-space:pre-wrap; max-width:90%; display:inline-block; box-shadow:0 1px 2px rgba(13,26,13,.12); word-break:break-word; }
-.bl-wa-time { text-align:right; font-size:.67rem; color:#666; margin-top:4px; }
-.bl-resultado { display:flex; flex-direction:column; gap:6px; max-height:240px; overflow-y:auto; }
-.bl-resultado-empty { text-align:center; color:var(--muted); font-size:var(--t-sm); padding:20px 0; }
-.bl-resultado-item { display:flex; align-items:center; gap:8px; padding:9px 12px; background:#e8f5e9; border:1px solid #a5d6a7; border-radius:9px; text-decoration:none; color:#1b5e20; font-size:var(--t-sm); font-weight:700; transition:background .12s; }
-@media (hover: hover) and (pointer: fine) {
-  .bl-resultado-item:hover{ background:#c8e6c9; }
-}
-
-.bl-resultado-item.sent { opacity:.5; pointer-events:none; }
-.bl-resultado-item.sent::after { content:' ✓'; }
 
 /* Doc checklist */
 #pv-doc-checklist { display: flex; flex-direction: column; gap: var(--sp-4); }
@@ -5693,10 +5616,8 @@ select {
   #pv-search { width: 100% !important; }
 
   /* Pub veh grid 2 col */
-  #pub-veh-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* Platform buttons stack */
-  #pub-paso2-card .flex-row { flex-direction: column !important; }
 }
 
 /* ── 375px ───────────────────────────────────────────────── */
@@ -5705,7 +5626,6 @@ select {
   #pv-kpi-bar { grid-template-columns: repeat(3,1fr) !important; }
   .wc-content { padding: var(--sp-3) !important; }
   .pv-dash-topbar { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
-  #pub-veh-grid { grid-template-columns: 1fr 1fr !important; }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -7079,141 +6999,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
       </div>
     </div>
 
-    <div id="pv-boletin" style="display:none">
-      <!-- Stats bar -->
-      <div class="bl-stats-bar">
-        <div class="bl-stat"><span class="bl-stat-num" id="bl-stat-hoy">0</span><span class="bl-stat-lbl">enviados hoy</span></div>
-        <div class="bl-stat"><span class="bl-stat-num" id="bl-stat-semana">0</span><span class="bl-stat-lbl">esta semana</span></div>
-        <div class="bl-stat"><span class="bl-stat-num" id="pv-boletin-count">0</span><span class="bl-stat-lbl">seleccionados</span></div>
-        <div class="bl-stat bl-stat-progress" id="bl-stat-prog-wrap" style="display:none">
-          <div class="bl-prog-bar"><div class="bl-prog-fill" id="bl-prog-fill" style="width:0%"></div></div>
-          <span class="bl-stat-lbl" id="bl-prog-label">0 / 0</span>
-        </div>
-      </div>
-
-      <div class="pv-mgr-card">
-        <!-- Plantillas como cards -->
-        <div class="bl-section-label">Plantilla rápida</div>
-        <div class="bl-tpl-grid" id="pv-boletin-templates">
-          <button class="bl-tpl-card" data-tpl="seguimiento" type="button">
-            <div class="bl-tpl-icon"><i class="ti ti-phone-call"></i></div>
-            <div class="bl-tpl-name">Seguimiento</div>
-            <div class="bl-tpl-preview-txt">Hace {dias} días — ¿sigues buscando?</div>
-          </button>
-          <button class="bl-tpl-card" data-tpl="promo" type="button">
-            <div class="bl-tpl-icon"><i class="ti ti-tag"></i></div>
-            <div class="bl-tpl-name">Promoción</div>
-            <div class="bl-tpl-preview-txt">Financiamiento sin enganche…</div>
-          </button>
-          <button class="bl-tpl-card" data-tpl="nuevo-auto" type="button">
-            <div class="bl-tpl-icon"><i class="ti ti-car"></i></div>
-            <div class="bl-tpl-name">Auto nuevo</div>
-            <div class="bl-tpl-preview-txt">Acaba de llegar al piso…</div>
-          </button>
-          <button class="bl-tpl-card" data-tpl="cita" type="button">
-            <div class="bl-tpl-icon"><i class="ti ti-calendar-event"></i></div>
-            <div class="bl-tpl-name">Invitar a cita</div>
-            <div class="bl-tpl-preview-txt">¿Tienes disponibilidad esta semana?</div>
-          </button>
-          <button class="bl-tpl-card" data-tpl="reactivar" type="button">
-            <div class="bl-tpl-icon"><i class="ti ti-bolt"></i></div>
-            <div class="bl-tpl-name">Reactivar</div>
-            <div class="bl-tpl-preview-txt">Tenemos opciones nuevas…</div>
-          </button>
-        </div>
-
-        <div class="bl-body">
-          <!-- Izquierda: mensaje + filtros + lista -->
-          <div class="bl-left">
-            <div class="bl-section-label">Mensaje — variables: <code>{nombre}</code> <code>{vendedor}</code> <code>{auto}</code> <code>{precio}</code> <code>{dias}</code></div>
-            <textarea id="pv-boletin-mensaje" class="bl-textarea" rows="5" placeholder="Hola {nombre}, soy {vendedor} de weCars Bajío..."></textarea>
-            <div class="pv-field" style="margin-top:10px">
-              <label>Imagen opcional (URL de Wix Media)</label>
-              <input type="text" id="pv-boletin-imagen" class="bl-select" placeholder="https://...">
-            </div>
-
-            <div class="bl-section-label" style="margin-top:14px">Filtrar clientes</div>
-            <div class="bl-filters">
-              <select id="pv-boletin-filtro-estatus" class="bl-select">
-                <option value="all">Todos los estatus</option>
-                <option value="Nuevo">Nuevo</option>
-                <option value="Contactado">Contactado</option>
-                <option value="En proceso">En proceso</option>
-                <option value="Ganado">Ganado</option>
-                <option value="Perdido">Perdido</option>
-              </select>
-              <select id="pv-boletin-filtro-origen" class="bl-select">
-                <option value="all">Todos los orígenes</option>
-                <option value="Sitio web">Sitio web</option>
-                <option value="Facebook">Facebook</option>
-                <option value="Instagram">Instagram</option>
-                <option value="TikTok">TikTok</option>
-                <option value="Google">Google</option>
-                <option value="Marketplace">Marketplace</option>
-                <option value="Referido">Referido</option>
-                <option value="Llamada telefónica">Llamada telefónica</option>
-              </select>
-              <select id="pv-boletin-filtro-interes" class="bl-select">
-                <option value="all">Todo tipo de interés</option>
-                <option value="Chico">Chico</option>
-                <option value="Sedán">Sedán</option>
-                <option value="SUV">SUV</option>
-                <option value="Pickup">Pickup</option>
-                <option value="Lujo">Lujo</option>
-              </select>
-              <select id="pv-boletin-filtro-dias" class="bl-select">
-                <option value="all">Cualquier fecha de contacto</option>
-                <option value="7">Sin contacto +7 días 🔴</option>
-                <option value="14">Sin contacto +14 días</option>
-                <option value="30">Sin contacto +30 días</option>
-              </select>
-              <select id="pv-boletin-orden" class="bl-select">
-                <option value="urgencia">Ordenar: urgentes primero</option>
-                <option value="nombre">Ordenar: A – Z</option>
-                <option value="reciente">Ordenar: contacto reciente</option>
-              </select>
-              <label class="bl-check-label"><input type="checkbox" id="pv-boletin-solo-mios"> Solo mis clientes</label>
-            </div>
-
-            <div class="bl-list-head">
-              <button type="button" id="pv-boletin-seleccionar-todos" class="bl-chip-btn">Seleccionar todos</button>
-              <button type="button" id="pv-boletin-limpiar" class="bl-chip-btn">Limpiar selección</button>
-            </div>
-            <div class="bl-client-list" id="pv-boletin-lista"></div>
-
-            <div class="bl-actions">
-              <button class="bl-btn-primary" id="pv-boletin-generar" type="button"><i class="ti ti-brand-whatsapp"></i> Generar mensajes</button>
-              <button class="bl-btn-seq" id="pv-boletin-secuencial" type="button" style="display:none">
-                <i class="ti ti-player-skip-forward"></i> Enviar siguiente <span id="bl-seq-counter">(1/0)</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Derecha: preview WA + resultados -->
-          <div class="bl-right">
-            <div class="bl-section-label">Vista previa — WhatsApp</div>
-            <div class="bl-wa-phone">
-              <div class="bl-wa-header">
-                <div class="bl-wa-avatar"><i class="ti ti-user"></i></div>
-                <div>
-                  <div class="bl-wa-contact">Carlos (ejemplo)</div>
-                  <div class="bl-wa-status">en línea</div>
-                </div>
-              </div>
-              <div class="bl-wa-body">
-                <div class="bl-wa-bubble" id="pv-boletin-preview">El preview aparecerá aquí mientras escribes…</div>
-                <div class="bl-wa-time">ahora &nbsp;<i class="ti ti-checks" style="color:#53bdeb"></i></div>
-              </div>
-            </div>
-
-            <div class="bl-section-label" style="margin-top:16px">Links generados</div>
-            <div class="bl-resultado" id="pv-boletin-resultado">
-              <div class="bl-resultado-empty">Genera los mensajes para ver los links aquí</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -7628,74 +7413,8 @@ section.pv-table-wrap > .shell > #pv-compradores {
      DRAWER DE PUBLICACIONES — se abre desde cada fila de Inventario
      ══════════════════════════════════════════════════════ -->
 <!-- Backdrop -->
-<div id="pub-drawer-backdrop" onclick="_pubCerrarDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1200;backdrop-filter:blur(2px)"></div>
 
 <!-- Drawer -->
-<div id="pub-drawer" style="display:none;position:fixed;top:0;right:0;width:min(480px,100vw);height:100vh;background:var(--surface);box-shadow:-4px 0 32px rgba(13,26,13,.15);z-index:1201;overflow-y:auto;padding:20px">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-    <div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-weight:900;font-size:1rem;color:var(--ink);display:flex;align-items:center;gap:8px"><i class="ti ti-brand-instagram" style="color:var(--lime-dark)"></i> Publicar en redes</div>
-    <button type="button" onclick="_pubCerrarDrawer()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.3rem;line-height:1;padding:4px"><i class="ti ti-x"></i></button>
-  </div>
-
-  <!-- Info del auto seleccionado -->
-  <div id="pub-auto-info" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface-2,var(--bg));border:1.5px solid var(--line);border-radius:var(--r-sm);margin-bottom:16px">
-    <img id="pub-auto-foto-principal" src="" alt="" style="width:64px;height:48px;object-fit:cover;border-radius:var(--r-sm);display:none">
-    <div>
-      <div id="pub-auto-nombre" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-weight:800;font-size:.95rem;color:var(--ink)">—</div>
-      <div id="pub-auto-detalle" style="font-size:.8rem;color:var(--muted)">—</div>
-    </div>
-  </div>
-
-  <!-- Selección de fotos -->
-  <div style="margin-bottom:16px">
-    <div style="font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:8px"><i class="ti ti-photo"></i> Fotos a incluir <span style="font-weight:400;color:var(--muted)">(máx. 10)</span></div>
-    <div id="pub-fotos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px"></div>
-    <div id="pub-fotos-vacio" style="color:var(--muted);font-size:.82rem;display:none">Este vehículo no tiene fotos registradas.</div>
-  </div>
-
-  <!-- Plataforma -->
-  <div style="margin-bottom:16px">
-    <div style="font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:8px"><i class="ti ti-share"></i> Plataforma</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 12px;border:1.5px solid var(--line);border-radius:var(--r-sm);font-size:.84rem;background:var(--bg)" id="pub-plat-ig-label">
-        <input type="radio" name="pub-plataforma" value="instagram" id="pub-plat-ig" style="accent-color:var(--lime-dark)"> <i class="ti ti-brand-instagram"></i> Instagram
-      </label>
-      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 12px;border:1.5px solid var(--line);border-radius:var(--r-sm);font-size:.84rem;background:var(--bg)" id="pub-plat-fb-label">
-        <input type="radio" name="pub-plataforma" value="facebook" id="pub-plat-fb" style="accent-color:var(--lime-dark)"> <i class="ti ti-brand-facebook"></i> Facebook
-      </label>
-    </div>
-  </div>
-
-  <!-- Cuenta social -->
-  <div style="margin-bottom:16px">
-    <div style="font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:8px"><i class="ti ti-at"></i> Cuenta</div>
-    <select id="pub-cuenta-select" style="width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.88rem">
-      <option value="">Cargando cuentas…</option>
-    </select>
-    <div id="pub-cuentas-vacio" style="color:var(--muted);font-size:.8rem;margin-top:6px;display:none">
-      No tienes cuentas conectadas. Pide a <strong>Administración</strong> que configure las integraciones.
-    </div>
-  </div>
-
-  <!-- Texto generado -->
-  <div style="margin-bottom:16px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:.85rem;font-weight:700;color:var(--ink)"><i class="ti ti-pencil"></i> Texto</div>
-      <button type="button" id="pub-generar-texto-btn" style="background:none;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:4px 10px;cursor:pointer;font-size:.76rem;color:var(--muted);font-family:inherit"><i class="ti ti-wand"></i> Regenerar</button>
-    </div>
-    <textarea id="pub-texto" rows="7" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.85rem;resize:vertical;line-height:1.5" placeholder="El texto aparecerá aquí automáticamente…"></textarea>
-    <div id="pub-texto-chars" style="text-align:right;font-size:.73rem;color:var(--muted);margin-top:4px">0 caracteres</div>
-  </div>
-
-  <!-- Estado / mensaje -->
-  <div id="pub-estado-msg" style="display:none;padding:10px 14px;border-radius:var(--r-sm);font-size:.85rem;margin-bottom:14px"></div>
-
-  <!-- Acciones -->
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-    <button type="button" id="pub-guardar-borrador-btn" style="padding:9px 16px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:none;color:var(--ink);cursor:pointer;font-family:inherit;font-size:.86rem;font-weight:600"><i class="ti ti-device-floppy"></i> Guardar borrador</button>
-    <button type="button" id="pub-publicar-btn" style="padding:9px 20px;border:none;border-radius:var(--r-sm);background:var(--lime-dark);color:#fff;cursor:pointer;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:.9rem;font-weight:800"><i class="ti ti-send"></i> Publicar ahora</button>
-  </div>
-</div>
 
 <!-- ══════════════════════════════════════════════════════
      CONSIGNAS — Vista: Consignas asignadas a este vendedor
@@ -7716,87 +7435,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
 <!-- ══════════════════════════════════════════════════════════
      CENTRO DE PUBLICACIONES — Vista Vendedor
      ══════════════════════════════════════════════════════════ -->
-<div id="pv-vista-pub-historial" style="display:none;padding:0 0 60px">
-
-  <!-- PASO 1: Selector de vehículo + nueva publicación -->
-  <div class="pv-dash-card" id="pub-paso1-card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-weight:800;font-size:1rem;color:var(--ink)"><i class="ti ti-send" style="color:var(--lime-dark)"></i> Nueva publicación</div>
-      <button class="pv-refresh" id="pub-veh-refresh" type="button" style="font-size:.8rem;padding:6px 12px"><i class="ti ti-refresh"></i></button>
-    </div>
-    <div id="pub-veh-loading" style="color:var(--muted);font-size:.88rem;display:none">Cargando vehículos…</div>
-    <div id="pub-veh-vacio" style="color:var(--muted);font-size:.88rem;display:none;text-align:center;padding:20px 0"><i class="ti ti-car" style="font-size:2rem;opacity:.3;display:block;margin-bottom:8px"></i>Sin vehículos disponibles.</div>
-    <!-- Grid de tarjetas de vehículos -->
-    <div id="pub-veh-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px"></div>
-  </div>
-
-  <!-- PASO 2: Composer (aparece al seleccionar un vehículo) -->
-  <div class="pv-dash-card" id="pub-paso2-card" style="display:none;margin-top:12px">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-      <button id="pub-back-btn" type="button" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0"><i class="ti ti-arrow-left"></i></button>
-      <div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-weight:800;font-size:1rem;color:var(--ink)"><i class="ti ti-edit" style="color:var(--lime-dark)"></i> Componer publicación</div>
-    </div>
-    <!-- Vehículo seleccionado -->
-    <div id="pub-veh-sel" style="display:flex;gap:12px;align-items:flex-start;background:var(--surface-2);border-radius:var(--r-sm);padding:12px;margin-bottom:16px">
-      <img id="pub-veh-foto" src="" alt="" style="width:80px;height:60px;object-fit:cover;border-radius:var(--r-sm);border:1px solid var(--line);flex-shrink:0" loading="lazy" onerror="this.style.display='none'">
-      <div>
-        <div id="pub-veh-titulo" style="font-weight:700;font-size:.95rem;color:var(--ink)"></div>
-        <div id="pub-veh-precio" style="font-size:.82rem;color:var(--muted);margin-top:2px"></div>
-        <div id="pub-veh-estatus-badge" style="display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:20px;background:rgba(86,169,0,.10);color:#56a900;margin-top:4px"></div>
-      </div>
-    </div>
-    <!-- Selector de plataforma -->
-    <div style="margin-bottom:12px">
-      <label style="font-size:.8rem;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">PLATAFORMA</label>
-      <div style="display:flex;gap:8px">
-        <button class="pub-plat-btn pub-plat-active" data-plat="instagram" id="pub-plat-ig" type="button" style="flex:1;padding:8px 0;border-radius:var(--r-sm);border:2px solid var(--lime-dark);background:var(--surface-2);cursor:pointer;font-size:.85rem;font-weight:600;color:var(--ink)"><i class="ti ti-brand-instagram"></i> Instagram</button>
-        <button class="pub-plat-btn" data-plat="facebook" id="pub-plat-fb" type="button" style="flex:1;padding:8px 0;border-radius:var(--r-sm);border:2px solid var(--line);background:var(--surface);cursor:pointer;font-size:.85rem;font-weight:600;color:var(--muted)"><i class="ti ti-brand-facebook"></i> Facebook</button>
-      </div>
-    </div>
-    <!-- Selector de cuenta -->
-    <div style="margin-bottom:12px">
-      <label style="font-size:.8rem;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">CUENTA SOCIAL</label>
-      <select id="pub-cuenta-sel" style="width:100%;padding:8px 10px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:.88rem">
-        <option value="">Cargando cuentas…</option>
-      </select>
-      <div id="pub-sin-cuentas" style="display:none;font-size:.8rem;color:#dc2626;margin-top:4px"><i class="ti ti-alert-circle"></i> No tienes cuentas autorizadas. Contacta a Administración.</div>
-    </div>
-    <!-- Texto de publicación -->
-    <div style="margin-bottom:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <label style="font-size:.8rem;font-weight:600;color:var(--muted)">TEXTO</label>
-        <button id="pub-gen-texto-btn" type="button" style="font-size:.75rem;padding:4px 10px;border-radius:6px;background:var(--lime-dark);color:#fff;border:none;cursor:pointer"><i class="ti ti-wand"></i> Generar</button>
-      </div>
-      <textarea id="pub-texto" rows="5" style="width:100%;padding:8px 10px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:.88rem;resize:vertical;box-sizing:border-box" placeholder="Describe el vehículo o genera texto automáticamente…"></textarea>
-      <div id="pub-gen-loading" style="display:none;font-size:.8rem;color:var(--muted);margin-top:4px"><i class="ti ti-loader ti-spin"></i> Generando texto…</div>
-    </div>
-    <!-- Botones de acción -->
-    <div style="display:flex;gap:8px">
-      <button id="pub-borrador-btn" type="button" style="flex:1;padding:10px 0;border-radius:var(--r-sm);border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-size:.88rem;font-weight:600;cursor:pointer"><i class="ti ti-device-floppy"></i> Guardar borrador</button>
-      <button id="pub-publicar-btn" type="button" style="flex:2;padding:10px 0;border-radius:var(--r-sm);border:none;background:var(--lime-dark);color:#fff;font-size:.88rem;font-weight:700;cursor:pointer"><i class="ti ti-send"></i> Publicar ahora</button>
-    </div>
-    <div id="pub-accion-msg" style="display:none;margin-top:10px;font-size:.85rem;text-align:center;border-radius:var(--r-sm);padding:8px"></div>
-  </div>
-
-  <!-- HISTORIAL -->
-  <div class="pv-dash-card" style="margin-top:12px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-weight:800;font-size:1rem;color:var(--ink)"><i class="ti ti-clock-hour-4" style="color:var(--lime-dark)"></i> Mis publicaciones</div>
-      <div style="display:flex;gap:8px">
-        <select id="pub-hist-filtro-estado"style="padding:6px 10px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);font-family:inherit;font-size:.82rem">
-          <option value="">Todos los estados</option>
-          <option value="publicada">Publicadas</option>
-          <option value="borrador">Borradores</option>
-          <option value="error">Con error</option>
-        </select>
-        <button class="pv-refresh" type="button" id="pub-hist-refresh" style="font-size:.8rem;padding:6px 12px"><i class="ti ti-refresh"></i></button>
-      </div>
-    </div>
-    <div id="pub-hist-loading" style="color:var(--muted);font-size:.88rem;display:none">Cargando historial…</div>
-    <div id="pub-hist-vacio" style="color:var(--muted);font-size:.88rem;display:none;padding:20px 0;text-align:center"><i class="ti ti-send" style="font-size:2rem;opacity:.3;display:block;margin-bottom:8px"></i>Aún no tienes publicaciones.</div>
-    <div id="pub-hist-lista"></div>
-  </div>
-</div>
 
 <div class="pv-toast" id="pv-toast" role="status" aria-live="polite" aria-atomic="true">Listo</div>
 
@@ -7977,7 +7615,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
     ]},
     { id:'inventario-grp', icon:'ti-car', label:'Inventario', subs:[
       { id:'inventario', icon:'ti-car',            label:'Autos disponibles' },
-      { id:'boletin',    icon:'ti-mail-forward',   label:'Boletín' },
       { id:'consignas',  icon:'ti-steering-wheel', label:'Consignas', badge:'pv-consignas-badge' },
     ]},
     { id:'mi-panel', icon:'ti-chart-bar', label:'Mi Panel', subs:[
@@ -10226,7 +9863,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
     renderConversionOrigen();
     renderFacturasEmitidas();
     renderGanadosSinFactura();
-    renderBoletinLista();
   }
 
   function fmtDuracionHoras(horas) {
@@ -10422,7 +10058,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
       btn.addEventListener('click', () => {
         const id = btn.dataset.carId;
         const auto = inventarioAutos.find(a => a.id === id);
-        if (auto) _pubAbrirDrawer(auto);
       });
     });
   }
@@ -10567,68 +10202,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
     tbody.innerHTML = filas.length
       ? filas.map(([origen, d]) => `<tr><td>${esc(origen)}</td><td>${d.mes}</td><td>${d.total}</td></tr>`).join('')
       : '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:16px 0">Sin datos todavía</td></tr>';
-  }
-
-  function _blDias(c) {
-    const ua = c.ultimaActividad || c._updatedDate || c._createdDate;
-    if (!ua) return 999;
-    return Math.floor((Date.now() - new Date(ua)) / 86400000);
-  }
-  function _blSem(dias) {
-    if (dias <= 2) return 'var(--c-green,#56a900)';
-    if (dias <= 7) return 'var(--c-amber,#d97706)';
-    return 'var(--c-red,#dc2626)';
-  }
-
-  function renderBoletinLista() {
-    const cont = document.getElementById('pv-boletin-lista');
-    const estatusF = document.getElementById('pv-boletin-filtro-estatus').value;
-    const origenF  = document.getElementById('pv-boletin-filtro-origen').value;
-    const interesF = document.getElementById('pv-boletin-filtro-interes').value;
-    const diasF    = document.getElementById('pv-boletin-filtro-dias').value;
-    const orden    = document.getElementById('pv-boletin-orden').value;
-    const soloMios = document.getElementById('pv-boletin-solo-mios').checked;
-
-    const _blPool = soloMios ? misClientes() : clientes;
-    let filtrados = _blPool.filter(c => {
-      const okEstatus = estatusF === 'all' || c.estatus === estatusF;
-      const okOrigen  = origenF === 'all' || (c.origen || 'Sitio web') === origenF;
-      const okInteres = interesF === 'all' || c.tipoInteres === interesF;
-      const dias      = _blDias(c);
-      const okDias    = diasF === 'all' || dias >= Number(diasF);
-      return okEstatus && okOrigen && okInteres && okDias;
-    });
-
-    if (orden === 'urgencia') filtrados.sort((a,b) => _blDias(b) - _blDias(a));
-    else if (orden === 'nombre') filtrados.sort((a,b) => (a.nombre||'').localeCompare(b.nombre||''));
-    else if (orden === 'reciente') filtrados.sort((a,b) => _blDias(a) - _blDias(b));
-
-    if (!filtrados.length) {
-      cont.innerHTML = '<div class="pv-doc-empty" style="padding:16px;text-align:center;color:var(--muted)">Sin clientes que coincidan con estos filtros.</div>';
-      actualizarBoletinCount();
-      return;
-    }
-    cont.innerHTML = filtrados.map(c => {
-      const sinTel = !String(c.telefono || '').replace(/\D/g, '');
-      const dias   = _blDias(c);
-      const sem    = _blSem(dias);
-      const diasTxt = dias === 999 ? 'sin fecha' : dias === 0 ? 'hoy' : dias === 1 ? 'ayer' : `${dias}d sin contacto`;
-      return `<div class="bl-client-row${sinTel ? ' bl-client-dis' : ''}">
-        <input type="checkbox" class="pv-boletin-check" value="${esc(c._id)}" ${sinTel ? 'disabled title="Sin teléfono"' : ''}>
-        <div class="bl-client-sem" style="background:${sem}"></div>
-        <div class="bl-client-info">
-          <div class="bl-client-name">${esc(c.nombre || 'Sin nombre')}</div>
-          <div class="bl-client-meta">${esc(c.telefono || 'sin teléfono')}${c.tipoInteres ? ' · ' + esc(c.tipoInteres) : ''} · ${diasTxt}</div>
-        </div>
-      </div>`;
-    }).join('');
-    actualizarBoletinCount();
-  }
-
-  function actualizarBoletinCount() {
-    const marcados = document.querySelectorAll('.pv-boletin-check:checked').length;
-    const el = document.getElementById('pv-boletin-count');
-    if (el) el.textContent = marcados;
   }
 
   function renderFacturasEmitidas() {
@@ -11003,175 +10576,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
     setTimeout(() => { status.textContent = ''; }, 3000);
   });
 
-  // ── Boletín WhatsApp — nuevo nivel ───────────────────────────────
-  const BOLETIN_TPLS = {
-    seguimiento:  'Hola {nombre}! 👋 Soy {vendedor} de weCars Bajío. Han pasado {dias} días desde que platicamos y quería saber si sigues buscando tu auto. ¿En qué te puedo ayudar?',
-    promo:        'Hola {nombre}! 🏷️ En weCars Bajío tenemos una promoción especial este mes — financiamiento sin enganche y hasta 60 meses. ¿Te gustaría conocer las opciones?',
-    'nuevo-auto': 'Hola {nombre}, soy {vendedor} de weCars Bajío. 🚗 Acaba de llegar un auto al piso que creo que te puede interesar. ¿Te cuento los detalles?',
-    cita:         'Hola {nombre}! Te escribe {vendedor} de weCars Bajío. Me gustaría invitarte a conocer nuestro inventario sin compromiso. ¿Tienes disponibilidad esta semana? 📅',
-    reactivar:    'Hola {nombre}, qué gusto saludarte! 🔥 Soy {vendedor} de weCars Bajío. Hace {dias} días que no hablamos — ¿sigues en búsqueda de tu {auto}? Tenemos opciones nuevas que te pueden interesar.',
-  };
-
-  // Stats del día / semana (se alimenta de actividades al recibir datos)
-  function calcBoletinStats() {
-    if (!window._boletinActividades) return;
-    const hoy = new Date(); hoy.setHours(0,0,0,0);
-    const sem = new Date(hoy); sem.setDate(sem.getDate() - 7);
-    const filtro = a => a.tipo === 'whatsapp' && (a.autor === vendedorNombre || a.autor === vendedorActual);
-    const todas  = window._boletinActividades.filter(filtro);
-    const cHoy   = todas.filter(a => new Date(a._createdDate||a.fecha||0) >= hoy).length;
-    const cSem   = todas.filter(a => new Date(a._createdDate||a.fecha||0) >= sem).length;
-    const eHoy = document.getElementById('bl-stat-hoy');
-    const eSem = document.getElementById('bl-stat-semana');
-    if (eHoy) eHoy.textContent = cHoy;
-    if (eSem) eSem.textContent = cSem;
-  }
-
-  document.querySelectorAll('.bl-tpl-card').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.bl-tpl-card').forEach(b => b.classList.remove('activa'));
-      btn.classList.add('activa');
-      document.getElementById('pv-boletin-mensaje').value = BOLETIN_TPLS[btn.dataset.tpl] || '';
-      actualizarBoletinPreview();
-    });
-  });
-
-  function actualizarBoletinPreview() {
-    const msg = document.getElementById('pv-boletin-mensaje').value;
-    const preview = document.getElementById('pv-boletin-preview');
-    if (!preview) return;
-    const ejemplo = msg
-      .replace(/\{nombre\}/gi, 'Carlos')
-      .replace(/\{vendedor\}/gi, vendedorNombre || 'Tu nombre')
-      .replace(/\{auto\}/gi, 'Nissan Kicks 2023')
-      .replace(/\{precio\}/gi, '$349,000')
-      .replace(/\{dias\}/gi, '12');
-    preview.textContent = ejemplo || 'El preview aparecerá aquí mientras escribes…';
-  }
-
-  document.getElementById('pv-boletin-mensaje').addEventListener('input', actualizarBoletinPreview);
-
-  ['pv-boletin-filtro-estatus','pv-boletin-filtro-origen','pv-boletin-filtro-interes',
-   'pv-boletin-filtro-dias','pv-boletin-orden','pv-boletin-solo-mios'].forEach(id => {
-    document.getElementById(id).addEventListener('change', renderBoletinLista);
-  });
-  document.getElementById('pv-boletin-lista').addEventListener('change', e => {
-    if (e.target.classList.contains('pv-boletin-check')) actualizarBoletinCount();
-  });
-  document.getElementById('pv-boletin-lista').addEventListener('click', e => {
-    const row = e.target.closest('.bl-client-row');
-    if (!row || row.classList.contains('bl-client-dis')) return;
-    const cb = row.querySelector('.pv-boletin-check');
-    if (cb && e.target !== cb) { cb.checked = !cb.checked; actualizarBoletinCount(); }
-  });
-  document.getElementById('pv-boletin-seleccionar-todos').addEventListener('click', () => {
-    document.querySelectorAll('.pv-boletin-check:not(:disabled)').forEach(cb => { cb.checked = true; });
-    actualizarBoletinCount();
-  });
-  document.getElementById('pv-boletin-limpiar').addEventListener('click', () => {
-    document.querySelectorAll('.pv-boletin-check').forEach(cb => { cb.checked = false; });
-    actualizarBoletinCount();
-    const res = document.getElementById('pv-boletin-resultado');
-    res.innerHTML = '<div class="bl-resultado-empty">Genera los mensajes para ver los links aquí</div>';
-    const btnSeq = document.getElementById('pv-boletin-secuencial');
-    btnSeq.style.display = 'none'; btnSeq.disabled = false;
-    const pw = document.getElementById('bl-stat-prog-wrap');
-    if (pw) pw.style.display = 'none';
-  });
-
-  // ── Generar + modo secuencial ─────────────────────────────────────
-  let boletinQueue = [];
-  let boletinIdx   = 0;
-
-  function _blProgreso() {
-    const pw   = document.getElementById('bl-stat-prog-wrap');
-    const fill = document.getElementById('bl-prog-fill');
-    const lbl  = document.getElementById('bl-prog-label');
-    if (!pw) return;
-    if (!boletinQueue.length) { pw.style.display = 'none'; return; }
-    pw.style.display = '';
-    const pct = Math.round((boletinIdx / boletinQueue.length) * 100);
-    if (fill) fill.style.width = pct + '%';
-    if (lbl)  lbl.textContent  = boletinIdx + ' / ' + boletinQueue.length;
-  }
-
-  document.getElementById('pv-boletin-generar').addEventListener('click', () => {
-    const mensaje = document.getElementById('pv-boletin-mensaje').value.trim();
-    const imagen  = document.getElementById('pv-boletin-imagen').value.trim();
-    const resultado = document.getElementById('pv-boletin-resultado');
-    if (!mensaje) { mostrarToast('Escribe un mensaje primero'); return; }
-    const seleccionados = Array.from(document.querySelectorAll('.pv-boletin-check:checked')).map(el => el.value);
-    if (!seleccionados.length) { mostrarToast('Selecciona al menos un cliente'); return; }
-
-    boletinQueue = seleccionados.map(id => {
-      const c = clientes.find(x => x._id === id);
-      if (!c) return null;
-      const dias = _blDias(c);
-      let texto = mensaje
-        .replace(/\{nombre\}/gi,   c.nombre || '')
-        .replace(/\{vendedor\}/gi,  vendedorNombre || '')
-        .replace(/\{auto\}/gi,     c.tipoInteres || 'auto')
-        .replace(/\{precio\}/gi,   c.presupuestoMax ? '$' + Number(c.presupuestoMax).toLocaleString('es-MX') : '')
-        .replace(/\{dias\}/gi,     dias === 999 ? '' : String(dias));
-      if (imagen) texto += '\n' + imagen;
-      const tel = String(c.telefono || '').replace(/\D/g, '');
-      if (!tel) return null;
-      return { id, nombre: c.nombre || 'cliente', link: `https://wa.me/52${tel}?text=${encodeURIComponent(texto)}` };
-    }).filter(Boolean);
-    boletinIdx = 0;
-
-    resultado.innerHTML = boletinQueue.length
-      ? boletinQueue.map((item, i) =>
-          `<a class="bl-resultado-item" href="${item.link}" target="_blank" rel="noreferrer" data-idx="${i}" data-id="${esc(item.id)}"><i class="ti ti-brand-whatsapp"></i>${esc(item.nombre)}</a>`
-        ).join('')
-      : '<div class="bl-resultado-empty">Ningún cliente con teléfono válido</div>';
-
-    const btnSeq = document.getElementById('pv-boletin-secuencial');
-    if (boletinQueue.length > 1) {
-      btnSeq.style.display = '';
-      btnSeq.disabled = false;
-      btnSeq.querySelector('#bl-seq-counter').textContent = `(1/${boletinQueue.length})`;
-    } else {
-      btnSeq.style.display = 'none';
-    }
-    _blProgreso();
-    mostrarToast(`✓ ${boletinQueue.length} mensaje(s) listos`);
-  });
-
-  document.getElementById('pv-boletin-secuencial').addEventListener('click', () => {
-    if (boletinIdx >= boletinQueue.length) { mostrarToast('Ya enviaste a todos ✓'); return; }
-    const item = boletinQueue[boletinIdx];
-    window.open(item.link, '_blank', 'noopener');
-    const linkEl = document.querySelector(`.bl-resultado-item[data-idx="${boletinIdx}"]`);
-    if (linkEl) linkEl.classList.add('sent');
-    window.parent.postMessage({
-      type: 'wecars-actividad-crear',
-      clienteId: item.id,
-      datos: { tipo: 'whatsapp', resultado: 'Mensaje enviado por boletín', detalle: 'Contacto vía WhatsApp desde panel de vendedores', autor: vendedorNombre || vendedorActual },
-    }, '*');
-    boletinIdx++;
-    _blProgreso();
-    const btnSeq = document.getElementById('pv-boletin-secuencial');
-    if (boletinIdx < boletinQueue.length) {
-      btnSeq.querySelector('#bl-seq-counter').textContent = `(${boletinIdx + 1}/${boletinQueue.length})`;
-    } else {
-      btnSeq.textContent = '✓ Todos enviados';
-      btnSeq.disabled = true;
-      mostrarToast(`✓ Boletín completo — ${boletinQueue.length} mensajes enviados`);
-    }
-  });
-
-  document.getElementById('pv-boletin-resultado').addEventListener('click', e => {
-    const link = e.target.closest('[data-id]');
-    if (!link) return;
-    setTimeout(() => link.classList.add('sent'), 300);
-    window.parent.postMessage({
-      type: 'wecars-actividad-crear',
-      clienteId: link.dataset.id,
-      datos: { tipo: 'whatsapp', resultado: 'Mensaje enviado por boletín', detalle: 'Contacto vía WhatsApp desde panel de vendedores', autor: vendedorNombre || vendedorActual },
-    }, '*');
-  });
-
   function renderMensajesGerencia() {
     const wrap = document.getElementById('pv-mensajes-gerencia-wrap');
     const list = document.getElementById('pv-mensajes-gerencia-list');
@@ -11463,9 +10867,9 @@ section.pv-table-wrap > .shell > #pv-compradores {
   }
 
   // Restaurar última sección visitada (persiste entre recargas de la misma sesión)
-  const _VISTA_LABELS_EARLY = {dashboard:'Dashboard',leads:'Leads',tareas:'Mis Tareas',cola:'Cola de Leads',contactos:'Contactos',inventario:'Inventario',compradores:'Compradores',agenda:'Agenda',boletin:'Boletín',gamificacion:'Gamificación',reportes:'Reportes',configuracion:'Configuración',actividad:'Actividad Comercial',creditos:'Mis Créditos',consignas:'Mis Consignas'};
+  const _VISTA_LABELS_EARLY = {dashboard:'Dashboard',leads:'Leads',tareas:'Mis Tareas',cola:'Cola de Leads',contactos:'Contactos',inventario:'Inventario',compradores:'Compradores',agenda:'Agenda',gamificacion:'Gamificación',reportes:'Reportes',configuracion:'Configuración',actividad:'Actividad Comercial',creditos:'Mis Créditos',consignas:'Mis Consignas'};
   const _vistaGuardada = (() => { try { return sessionStorage.getItem('pv-vista'); } catch(e) { return null; } })();
-  const _vistasValidas = ['dashboard','tareas','cola','contactos','leads','inventario','compradores','agenda','boletin','gamificacion','reportes','configuracion','creditos','credito-nuevo','consignas'];
+  const _vistasValidas = ['dashboard','tareas','cola','contactos','leads','inventario','compradores','agenda','gamificacion','reportes','configuracion','creditos','credito-nuevo','consignas'];
   // Declarar antes de la llamada a mostrarVista para evitar TDZ con let
   let contactosSub = 'lista';
   let inventarioSub = 'inventario';
@@ -11723,9 +11127,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
     if (_alertaEl) _alertaEl.style.display = (vista === 'contactos') ? '' : 'none';
     document.getElementById('pv-inventario-panel').style.display = (vista === 'inventario' && inventarioSub === 'inventario') ? '' : 'none';
     document.getElementById('pv-interes-panel').style.display = (vista === 'inventario' && inventarioSub === 'interes') ? '' : 'none';
-    const _pubHistInv = document.getElementById('pv-vista-pub-historial');
-    if (_pubHistInv) _pubHistInv.style.display = (vista === 'inventario' && inventarioSub === 'pub-historial') ? '' : 'none';
-    if (vista === 'inventario' && inventarioSub === 'pub-historial' && typeof window._pubCargarHistorial === 'function') _pubCargarHistorial();
     const _consignasVista = document.getElementById('pv-vista-consignas');
     if (_consignasVista) _consignasVista.style.display = vista === 'consignas' ? '' : 'none';
     if (vista === 'consignas') {
@@ -11735,7 +11136,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
     document.getElementById('pv-compradores').style.display = vista === 'compradores' ? '' : 'none';
     document.getElementById('pv-reportes').style.display = vista === 'reportes' ? '' : 'none';
     document.getElementById('pv-configuracion').style.display = vista === 'configuracion' ? '' : 'none';
-    document.getElementById('pv-boletin').style.display = vista === 'boletin' ? '' : 'none';
     document.getElementById('pv-vista-tareas').style.display = vista === 'tareas' ? '' : 'none';
     document.getElementById('pv-vista-agenda').style.display = vista === 'agenda' ? '' : 'none';
     if (vista === 'agenda') renderAgendaVendedor();
@@ -11761,7 +11161,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
       window.parent.postMessage({ type: 'wecars-facturas-emitidas-solicitar' }, '*');
     }
     if (vista === 'configuracion') renderConfiguracion();
-    if (vista === 'boletin') renderBoletinLista();
     if (vista === 'agenda') { loadCitas(); renderAgendaVendedor(); }
     if (vista === 'gamificacion') renderGamificacion();
     const _crVista = document.getElementById('pv-vista-creditos');
@@ -11786,7 +11185,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
       el.innerHTML = `
         <button class="${inventarioSub === 'inventario' ? 'active' : ''}" data-sub="inventario" type="button"><i class="ti ti-car"></i> Inventario</button>
         <button class="${inventarioSub === 'interes' ? 'active' : ''}" data-sub="interes" type="button"><i class="ti ti-target"></i> <span class="pv-tab-lbl-full">Buscador de interés</span><span class="pv-tab-lbl-short">Interés</span></button>
-        <button class="${inventarioSub === 'pub-historial' ? 'active' : ''}" data-sub="pub-historial" type="button"><i class="ti ti-brand-instagram"></i> Publicaciones</button>
       `;
     } else {
       el.style.display = 'none';
@@ -11798,7 +11196,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
         if (vistaActual === 'contactos') contactosSub = btn.dataset.sub;
         if (vistaActual === 'inventario') {
           inventarioSub = btn.dataset.sub;
-          if (btn.dataset.sub === 'pub-historial') _pubCargarHistorial(true);
         }
         mostrarVista(vistaActual);
       });
@@ -13177,16 +12574,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
 
 
 <!-- PWA Service Worker -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/_functions/pwa-sw')
-        .then(reg => console.log('[PWA] SW registrado, scope:', reg.scope))
-        .catch(() => {}); // Silencioso si Wix no soporta el scope
-    });
-  }
-</script>
-
 <div class="wc-exp-overlay" id="wc-exp-overlay" role="dialog" aria-modal="true" aria-label="Expediente del cliente">
   <div class="wc-exp-drawer">
     <div class="wc-exp-head">
@@ -13871,518 +13258,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")window.cerrarExpedie
 <!-- ══════════════════════════════════════════════════════
      CENTRO DE PUBLICACIONES — JavaScript
      ══════════════════════════════════════════════════════ -->
-<script>
-(function(){
-  // ── Estado local del módulo ───────────────────────────────────────
-  let _pubVehiculos = [];
-  let _pubCuentas   = [];
-  // ── MÓDULO PUBLICACIONES (drawer contextual desde Inventario) ──────
-  let _pubAutoActual = null;
-  let _pubFotosSeleccionadas = [];
-  let _pubBorradorId = null;
-  let _pubPublicando = false;
 
-  // ── Abrir drawer con un auto pre-cargado ─────────────────────────
-  window._pubAbrirDrawer = function(autoObj) {
-    // autoObj puede ser objeto del inventario o un _id string (legacy)
-    const carro = typeof autoObj === 'string'
-      ? (inventarioAutos.find(a => a.id === autoObj || a._id === autoObj) || _pubVehiculos.find(c => c._id === autoObj))
-      : autoObj;
-    if (!carro) return;
-
-    _pubAutoActual = _pubNormalizarAuto(carro);
-    _pubFotosSeleccionadas = _pubAutoActual.fotos.length > 0 ? [_pubAutoActual.fotos[0]] : [];
-    _pubBorradorId = null;
-    _pubPublicando = false;
-
-    // Poblar info del auto en el drawer
-    document.getElementById('pub-auto-nombre').textContent = `${_pubAutoActual.marca} ${_pubAutoActual.modelo} ${_pubAutoActual.año}`;
-    document.getElementById('pub-auto-detalle').textContent = [_pubAutoActual.version, `${(_pubAutoActual.km||0).toLocaleString('es-MX')} km`, _pubAutoActual.color].filter(Boolean).join(' · ');
-    const fotoEl = document.getElementById('pub-auto-foto-principal');
-    if (_pubAutoActual.fotoPrincipal) { fotoEl.src = _pubAutoActual.fotoPrincipal; fotoEl.style.display = ''; }
-    else fotoEl.style.display = 'none';
-
-    _pubRenderFotosSelector();
-    document.getElementById('pub-plat-ig').checked = true;
-    document.getElementById('pub-estado-msg').style.display = 'none';
-    document.getElementById('pub-texto').value = '';
-    document.getElementById('pub-texto-chars').textContent = '0 caracteres';
-
-    // Pedir texto generado y cuentas
-    window.parent.postMessage({ type: 'wecars-pub-texto-generar', carro: _pubAutoActual, plataforma: 'instagram' }, '*');
-    if (_pubCuentas.length > 0) _pubRenderCuentasSelect();
-    else window.parent.postMessage({ type: 'wecars-pub-cuentas-solicitar' }, '*');
-
-    // Mostrar drawer
-    document.getElementById('pub-drawer').style.display = '';
-    document.getElementById('pub-drawer-backdrop').style.display = '';
-    document.body.style.overflow = 'hidden';
-  };
-
-  window._pubCerrarDrawer = function() {
-    document.getElementById('pub-drawer').style.display = 'none';
-    document.getElementById('pub-drawer-backdrop').style.display = 'none';
-    document.body.style.overflow = '';
-  };
-
-  // normaliza campos de Cars (del inventario) a formato pub
-  function _pubNormalizarAuto(a) {
-    const fotos = (Array.isArray(a.fotos) ? a.fotos : (a.fotos ? [a.fotos] : []))
-      .concat(Array.isArray(a.galeria) ? a.galeria : [])
-      .filter(Boolean);
-    return {
-      _id: a.id || a._id || '',
-      marca: a.marca || a.brand || '',
-      modelo: a.modelo || a.model || '',
-      año: a.año || a.year || a.anio || '',
-      version: a.version || a.trim || '',
-      color: a.color || '',
-      km: a.km || a.mileage || a.kilometraje || 0,
-      precio: a.precio || a.precioVenta || 0,
-      transmision: a.transmision || '',
-      combustible: a.combustible || '',
-      descripcion: a.descripcion || a.description || '',
-      fotoPrincipal: a.fotoPrincipal || fotos[0] || '',
-      fotos,
-    };
-  }
-
-  function _pubRenderFotosSelector() {
-    const grid = document.getElementById('pub-fotos-grid');
-    const vacio = document.getElementById('pub-fotos-vacio');
-    if (!grid || !_pubAutoActual) return;
-    const fotos = _pubAutoActual.fotos || [];
-    if (!fotos.length) { grid.innerHTML = ''; if(vacio)vacio.style.display=''; return; }
-    if(vacio)vacio.style.display='none';
-    grid.innerHTML = fotos.map((url, i) => {
-      const sel = _pubFotosSeleccionadas.includes(url);
-      return `<div onclick="_pubToggleFoto('${url.replace(/'/g, "\\'")}')" id="pub-foto-thumb-${i}" style="cursor:pointer;border-radius:var(--r-sm);overflow:hidden;position:relative;border:2.5px solid ${sel?'var(--lime-dark)':'var(--line)'};transition:border-color .15s">
-        <img src="${url}" alt="foto ${i+1}" style="width:100%;height:76px;object-fit:cover;display:block">
-        <div id="pub-foto-check-${i}" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--lime-dark);color:#fff;display:${sel?'flex':'none'};align-items:center;justify-content:center;font-size:11px">✓</div>
-      </div>`;
-    }).join('');
-  }
-
-  window._pubToggleFoto = function(url) {
-    if (!_pubAutoActual) return;
-    const fotos = _pubAutoActual.fotos || [];
-    const yaSelec = _pubFotosSeleccionadas.includes(url);
-    if (yaSelec) {
-      if (_pubFotosSeleccionadas.length <= 1) return;
-      _pubFotosSeleccionadas = _pubFotosSeleccionadas.filter(u => u !== url);
-    } else {
-      if (_pubFotosSeleccionadas.length >= 10) { _pubMostrarEstado('Máximo 10 fotos.', 'warn'); return; }
-      _pubFotosSeleccionadas.push(url);
-    }
-    fotos.forEach((u, i) => {
-      const sel = _pubFotosSeleccionadas.includes(u);
-      const cont = document.getElementById(`pub-foto-thumb-${i}`);
-      const check = document.getElementById(`pub-foto-check-${i}`);
-      if (cont) cont.style.borderColor = sel ? 'var(--lime-dark)' : 'var(--line)';
-      if (check) check.style.display = sel ? 'flex' : 'none';
-    });
-  };
-
-  function _pubRenderCuentasSelect() {
-    const sel = document.getElementById('pub-cuenta-select');
-    const vacio = document.getElementById('pub-cuentas-vacio');
-    if (!sel) return;
-    const plat = (document.querySelector('input[name="pub-plataforma"]:checked') || document.getElementById('pub-plat-ig')).value;
-    const filtradas = _pubCuentas.filter(c => c.plataforma === plat);
-    if (!filtradas.length) {
-      sel.innerHTML = '<option value="">Sin cuentas conectadas</option>';
-      if (vacio) vacio.style.display = '';
-    } else {
-      sel.innerHTML = filtradas.map(c => `<option value="${c._id}">${c.paginaNombre} (${c.plataforma})</option>`).join('');
-      if (vacio) vacio.style.display = 'none';
-    }
-  }
-
-  function _pubMostrarEstado(msg, tipo) {
-    const el = document.getElementById('pub-estado-msg');
-    if (!el) return;
-    const colores = {
-      ok:   { bg:'rgba(26,158,98,.08)',  color:'#1a9e62', border:'rgba(26,158,98,.2)' },
-      error:{ bg:'var(--err-bg)',         color:'var(--err)', border:'rgba(220,38,38,.2)' },
-      warn: { bg:'rgba(217,119,6,.08)',   color:'#b45309', border:'rgba(217,119,6,.2)' },
-    };
-    const c = colores[tipo] || colores.ok;
-    el.style.cssText = `background:${c.bg};color:${c.color};border:1.5px solid ${c.border};padding:10px 14px;border-radius:var(--r-sm);font-size:.85rem;margin-bottom:14px`;
-    el.textContent = msg; el.style.display = '';
-  }
-
-  function _pubLanzarPublicacion(publicacionId) {
-    const btn = document.getElementById('pub-publicar-btn');
-    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2"></i> Publicando…'; }
-    window.parent.postMessage({ type: 'wecars-pub-publicar', publicacionId }, '*');
-  }
-
-  // ── Eventos del drawer ────────────────────────────────────────────
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('#pub-guardar-borrador-btn')) {
-      if (!_pubAutoActual) return;
-      const cuentaId = document.getElementById('pub-cuenta-select')?.value;
-      const texto = document.getElementById('pub-texto')?.value?.trim();
-      if (!cuentaId) { _pubMostrarEstado('Selecciona una cuenta social.', 'warn'); return; }
-      if (!texto || texto.length < 5) { _pubMostrarEstado('Escribe un texto antes de guardar.', 'warn'); return; }
-      window.parent.postMessage({ type: 'wecars-pub-borrador-guardar', datos: {
-        _id: _pubBorradorId || undefined,
-        carroId: _pubAutoActual._id,
-        cuentaSocialId: cuentaId, texto, fotoUrls: _pubFotosSeleccionadas,
-      }}, '*');
-    }
-
-    if (e.target.closest('#pub-publicar-btn')) {
-      if (!_pubAutoActual || _pubPublicando) return;
-      const cuentaId = document.getElementById('pub-cuenta-select')?.value;
-      const texto = document.getElementById('pub-texto')?.value?.trim();
-      if (!cuentaId) { _pubMostrarEstado('Selecciona una cuenta social.', 'warn'); return; }
-      if (!texto || texto.length < 5) { _pubMostrarEstado('Escribe un texto para la publicación.', 'warn'); return; }
-      if (!_pubFotosSeleccionadas.length) { _pubMostrarEstado('Selecciona al menos una foto.', 'warn'); return; }
-      if (!_pubBorradorId) {
-        window.parent.postMessage({ type: 'wecars-pub-borrador-guardar', datos: {
-          carroId: _pubAutoActual._id, cuentaSocialId: cuentaId, texto, fotoUrls: _pubFotosSeleccionadas,
-        }}, '*');
-        _pubPublicando = true;
-      } else {
-        _pubLanzarPublicacion(_pubBorradorId);
-      }
-    }
-
-    if (e.target.closest('#pub-generar-texto-btn') && _pubAutoActual) {
-      const plat = (document.querySelector('input[name="pub-plataforma"]:checked') || {}).value || 'instagram';
-      window.parent.postMessage({ type: 'wecars-pub-texto-generar', carro: _pubAutoActual, plataforma: plat }, '*');
-    }
-
-    if (e.target.closest('#pub-hist-refresh')) _pubCargarHistorial(true);
-  });
-
-  document.addEventListener('change', function(e) {
-    if (e.target.name === 'pub-plataforma') {
-      _pubRenderCuentasSelect();
-      if (_pubAutoActual) window.parent.postMessage({ type: 'wecars-pub-texto-generar', carro: _pubAutoActual, plataforma: e.target.value }, '*');
-    }
-    if (e.target.id === 'pub-hist-filtro-estado') _pubCargarHistorial();
-  });
-
-  document.getElementById('pub-texto')?.addEventListener('input', function() {
-    const chars = document.getElementById('pub-texto-chars');
-    if (chars) chars.textContent = `${this.value.length} caracteres`;
-  });
-
-  // ── Historial ─────────────────────────────────────────────────────
-  window._pubCargarHistorial = function(forzar) {
-    const loading = document.getElementById('pub-hist-loading');
-    const lista = document.getElementById('pub-hist-lista');
-    const vacio = document.getElementById('pub-hist-vacio');
-    if (!loading || !lista) return;
-    const estado = document.getElementById('pub-hist-filtro-estado')?.value || '';
-    loading.style.display = ''; lista.innerHTML = ''; if(vacio)vacio.style.display='none';
-    window.parent.postMessage({ type: 'wecars-pub-historial-solicitar', filtros: { estado } }, '*');
-  };
-
-  // ── Mensajes entrantes ────────────────────────────────────────────
-  window.addEventListener('message', function(e) {
-    const d = e.data;
-    if (!d || !d.type) return;
-
-    if (d.type === 'wecars-pub-cuentas') {
-      _pubCuentas = d.cuentas || [];
-      _pubRenderCuentasSelect();
-    }
-
-    if (d.type === 'wecars-pub-texto-generado') {
-      const ta = document.getElementById('pub-texto');
-      if (ta) {
-        ta.value = d.texto || '';
-        const chars = document.getElementById('pub-texto-chars');
-        if (chars) chars.textContent = `${ta.value.length} caracteres`;
-      }
-    }
-
-    if (d.type === 'wecars-pub-borrador-guardado') {
-      if (d.ok) {
-        _pubBorradorId = d._id;
-        if (_pubPublicando) {
-          _pubPublicando = false;
-          _pubLanzarPublicacion(d._id);
-        } else {
-          _pubMostrarEstado('Borrador guardado.', 'ok');
-        }
-      } else {
-        _pubPublicando = false;
-        _pubMostrarEstado(d.error || 'Error al guardar el borrador.', 'error');
-      }
-    }
-
-    if (d.type === 'wecars-pub-resultado') {
-      const btn = document.getElementById('pub-publicar-btn');
-      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> Publicar ahora'; }
-      _pubPublicando = false;
-      if (d.ok) {
-        _pubMostrarEstado('¡Publicado en ' + (d.plataforma || 'redes sociales') + '!', 'ok');
-      } else if (d.pendiente) {
-        _pubMostrarEstado(d.mensaje || 'Borrador guardado. Se publicará cuando Administración conecte la cuenta.', 'warn');
-      } else {
-        _pubMostrarEstado(d.error || 'Error al publicar.', 'error');
-      }
-    }
-
-    if (d.type === 'wecars-pub-historial') {
-      const loading = document.getElementById('pub-hist-loading');
-      const lista = document.getElementById('pub-hist-lista');
-      const vacio = document.getElementById('pub-hist-vacio');
-      if (loading) loading.style.display = 'none';
-      if (!lista) return;
-      const items = d.items || [];
-      if (!items.length) { if(vacio)vacio.style.display=''; return; }
-      const estadoColor = { publicada:'#1a9e62', borrador:'#2563eb', error:'var(--err)', archivada:'var(--muted)' };
-      const estadoLabel = { publicada:'Publicada', borrador:'Borrador', error:'Error', archivada:'Archivada' };
-      lista.innerHTML = items.map(p => {
-        const fecha = p.fechaPublicacion || p.fechaCreacion;
-        const fStr = fecha ? new Date(fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-        const col = estadoColor[p.estado] || 'var(--muted)';
-        const lbl = estadoLabel[p.estado] || p.estado;
-        return `<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)">
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:700;font-size:.88rem;color:var(--ink);margin-bottom:2px">${p.carroSlug||'—'}</div>
-            <div style="font-size:.77rem;color:var(--muted);margin-bottom:5px"><i class="ti ti-brand-${p.plataforma||'instagram'}"></i> ${p.plataforma||'—'} · ${fStr}</div>
-            <div style="font-size:.8rem;color:var(--ink-2,var(--ink));opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(p.texto||'').slice(0,90)}</div>
-            ${p.errorMensaje?`<div style="font-size:.77rem;color:var(--err);margin-top:4px">${p.errorMensaje}</div>`:''}
-          </div>
-          <span style="flex-shrink:0;padding:3px 9px;border-radius:20px;font-size:.73rem;font-weight:700;background:transparent;color:${col};border:1.5px solid ${col}">${lbl}</span>
-        </div>`;
-      }).join('');
-    }
-  });
-})();
-
-// ══════════════════════════════════════════════════════════
-// CENTRO DE PUBLICACIONES — lógica vendedor
-// ══════════════════════════════════════════════════════════
-(function() {
-  var _pubVehiculos = [];
-  var _pubCuentas   = [];
-  var _pubCarroSel  = null;
-  var _pubBorradorId = null;
-  var _pubPlatforma = 'instagram';
-
-  function _wixUrl(raw) {
-    if (!raw) return '';
-    if (raw.startsWith('wix:image://')) {
-      return 'https://static.wixstatic.com/media/' + raw.replace('wix:image://v1/','').split('/')[0];
-    }
-    return raw;
-  }
-  function _fotoUrl(a) {
-    var raw = a.fotoPrincipal || a.imagenUrl || a.imagen || (Array.isArray(a.fotos) && a.fotos[0]) || '';
-    return _wixUrl(raw);
-  }
-  function _fmt(n) { return n ? '$' + Number(n).toLocaleString('es-MX') : ''; }
-
-  function _renderVehGrid(items) {
-    var grid = document.getElementById('pub-veh-grid');
-    if (!grid) return;
-    if (!items || !items.length) {
-      grid.innerHTML = '';
-      var v = document.getElementById('pub-veh-vacio');
-      if (v) v.style.display = 'block';
-      return;
-    }
-    var v = document.getElementById('pub-veh-vacio');
-    if (v) v.style.display = 'none';
-    grid.innerHTML = items.map(function(a) {
-      var foto  = _fotoUrl(a);
-      var precio = _fmt(a.precioVenta || a.priceNew || a.precio || a.price);
-      var titulo = [a.marca, a.modelo, a.anio || a.año].filter(Boolean).join(' ');
-      return '<div class="pub-veh-card" data-id="'+a._id+'" style="border:1.5px solid var(--line);border-radius:var(--r-sm);overflow:hidden;cursor:pointer" onmouseover="this.style.borderColor=\'var(--lime-dark)\'" onmouseout="this.style.borderColor=\'var(--line)\'">'+
-        (foto ? '<img src="'+foto+'" style="width:100%;height:100px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display=\'none\'">' : '<div style="width:100%;height:100px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--muted)"><i class=\'ti ti-car\' style=\'font-size:2rem\'></i></div>')+
-        '<div style="padding:8px"><div style="font-size:.82rem;font-weight:700;color:var(--ink);line-height:1.2">'+(titulo||'Vehículo')+'</div>'+
-        (precio ? '<div style="font-size:.78rem;color:var(--lime-dark);font-weight:700;margin-top:2px">'+precio+'</div>' : '')+
-        '<div style="font-size:.72rem;color:var(--muted);margin-top:2px">'+(a.estatusVenta||'')+'</div></div></div>';
-    }).join('');
-    grid.querySelectorAll('.pub-veh-card').forEach(function(card) {
-      card.addEventListener('click', function() {
-        _pubCarroSel = _pubVehiculos.find(function(a){ return a._id === card.dataset.id; });
-        if (_pubCarroSel) _mostrarPaso2();
-      });
-    });
-  }
-
-  function _mostrarPaso2() {
-    var a = _pubCarroSel; if (!a) return;
-    document.getElementById('pub-paso1-card').style.display = 'none';
-    document.getElementById('pub-paso2-card').style.display = 'block';
-    var titulo = [a.marca, a.modelo, a.anio || a.año].filter(Boolean).join(' ');
-    var foto   = _fotoUrl(a);
-    var precio = _fmt(a.precioVenta || a.priceNew || a.precio || a.price);
-    var img = document.getElementById('pub-veh-foto');
-    if (foto) { img.src = foto; img.style.display = 'block'; } else { img.style.display = 'none'; }
-    document.getElementById('pub-veh-titulo').textContent = titulo || 'Vehículo';
-    document.getElementById('pub-veh-precio').textContent = precio;
-    document.getElementById('pub-veh-estatus-badge').textContent = a.estatusVenta || '';
-    document.getElementById('pub-accion-msg').style.display = 'none';
-    document.getElementById('pub-texto').value = '';
-    _pubBorradorId = null;
-    _renderCuentasSelect(_pubCuentas, _pubPlatforma);
-  }
-
-  function _mostrarPaso1() {
-    document.getElementById('pub-paso2-card').style.display = 'none';
-    document.getElementById('pub-paso1-card').style.display = 'block';
-    _pubCarroSel = null; _pubBorradorId = null;
-  }
-
-  function _renderCuentasSelect(cuentas, plat) {
-    var sel  = document.getElementById('pub-cuenta-sel');
-    var warn = document.getElementById('pub-sin-cuentas');
-    if (!sel) return;
-    var filtradas = (cuentas || []).filter(function(c){ return c.plataforma === plat && c.estado === 'activa'; });
-    if (!filtradas.length) {
-      sel.innerHTML = '<option value="">Sin cuentas disponibles</option>';
-      if (warn) warn.style.display = 'block';
-    } else {
-      if (warn) warn.style.display = 'none';
-      sel.innerHTML = filtradas.map(function(c){ return '<option value="'+c._id+'">'+(c.paginaNombre||c.plataforma)+'</option>'; }).join('');
-    }
-  }
-
-  function _setMsg(txt, ok) {
-    var el = document.getElementById('pub-accion-msg'); if (!el) return;
-    el.textContent = txt; el.style.display = 'block';
-    el.style.background = ok ? 'rgba(86,169,0,.10)' : '#fee2e2';
-    el.style.color = ok ? '#3d7a00' : '#dc2626';
-  }
-
-  function pubCargar() {
-    var ld = document.getElementById('pub-veh-loading'); if (ld) ld.style.display = 'block';
-    window.parent.postMessage({ type: 'wecars-pub-vehiculos-solicitar' }, '*');
-    window.parent.postMessage({ type: 'wecars-pub-cuentas-solicitar' }, '*');
-    window.parent.postMessage({ type: 'wecars-pub-historial-solicitar', filtros: {} }, '*');
-  }
-  window.pubCargar = pubCargar;
-
-  window.addEventListener('message', function(ev) {
-    var d = ev.data; if (!d || !d.type) return;
-    if (d.type === 'wecars-pub-vehiculos') {
-      _pubVehiculos = d.items || [];
-      var ld = document.getElementById('pub-veh-loading'); if (ld) ld.style.display = 'none';
-      _renderVehGrid(_pubVehiculos);
-    }
-    if (d.type === 'wecars-pub-cuentas') {
-      _pubCuentas = d.cuentas || [];
-      _renderCuentasSelect(_pubCuentas, _pubPlatforma);
-    }
-    if (d.type === 'wecars-pub-texto-generado') {
-      var gl = document.getElementById('pub-gen-loading'); if (gl) gl.style.display = 'none';
-      if (d.texto) document.getElementById('pub-texto').value = d.texto;
-      else _setMsg('No se pudo generar texto. Escríbelo manualmente.', false);
-    }
-    if (d.type === 'wecars-pub-borrador-guardado') {
-      if (d.ok) { _pubBorradorId = d._id; _setMsg('Borrador guardado.', true); }
-      else _setMsg('Error al guardar: ' + (d.error || ''), false);
-    }
-    if (d.type === 'wecars-pub-resultado') {
-      var pb = document.getElementById('pub-publicar-btn'); if (pb) pb.disabled = false;
-      if (d.ok) {
-        _setMsg('¡Publicado exitosamente!', true);
-        setTimeout(function(){ window.parent.postMessage({ type: 'wecars-pub-historial-solicitar', filtros: {} }, '*'); }, 1500);
-      } else { _setMsg('Error al publicar: ' + (d.error || 'Error desconocido'), false); }
-    }
-    if (d.type === 'wecars-pub-historial') { _renderHistorial(d.items || []); }
-  });
-
-  function _renderHistorial(items) {
-    var lista = document.getElementById('pub-hist-lista');
-    var vacio = document.getElementById('pub-hist-vacio');
-    if (!lista) return;
-    if (!items.length) { if (vacio) vacio.style.display = 'block'; lista.innerHTML = ''; return; }
-    if (vacio) vacio.style.display = 'none';
-    var em = { 'publicada':{ lbl:'Publicada',col:'#56a900' }, 'borrador':{ lbl:'Borrador',col:'#d97706' }, 'error':{ lbl:'Error',col:'#dc2626' } };
-    lista.innerHTML = items.map(function(p) {
-      var e = em[p.estado] || { lbl: p.estado || '—', col: '#6b7280' };
-      var fecha = p.fechaPublicacion ? new Date(p.fechaPublicacion).toLocaleDateString('es-MX') : (p.fechaCreacion ? new Date(p.fechaCreacion).toLocaleDateString('es-MX') : '');
-      return '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)">'+
-        '<div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:700;color:var(--ink)">'+(p.carroSlug||'—')+'</div>'+
-        '<div style="font-size:.8rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(p.texto||'')+'</div>'+
-        (fecha ? '<div style="font-size:.75rem;color:var(--muted);margin-top:2px">'+fecha+'</div>' : '')+
-        (p.errorMensaje ? '<div style="font-size:.75rem;color:#dc2626;margin-top:4px">'+p.errorMensaje+'</div>' : '')+
-        '</div><span style="flex-shrink:0;padding:3px 9px;border-radius:20px;font-size:.73rem;font-weight:700;color:'+e.col+';border:1.5px solid '+e.col+'">'+e.lbl+'</span></div>';
-    }).join('');
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    var vehRef = document.getElementById('pub-veh-refresh');
-    if (vehRef) vehRef.addEventListener('click', pubCargar);
-    var backBtn = document.getElementById('pub-back-btn');
-    if (backBtn) backBtn.addEventListener('click', _mostrarPaso1);
-    document.querySelectorAll('.pub-plat-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        _pubPlatforma = this.dataset.plat;
-        document.querySelectorAll('.pub-plat-btn').forEach(function(b){
-          b.style.borderColor='var(--line)'; b.style.color='var(--muted)'; b.style.background='var(--surface)';
-        });
-        this.style.borderColor='var(--lime-dark)'; this.style.color='var(--ink)'; this.style.background='var(--surface-2)';
-        _renderCuentasSelect(_pubCuentas, _pubPlatforma);
-      });
-    });
-    var genBtn = document.getElementById('pub-gen-texto-btn');
-    if (genBtn) genBtn.addEventListener('click', function() {
-      if (!_pubCarroSel) return;
-      var gl = document.getElementById('pub-gen-loading'); if (gl) gl.style.display = 'block';
-      window.parent.postMessage({ type: 'wecars-pub-texto-generar', carro: _pubCarroSel, plataforma: _pubPlatforma }, '*');
-    });
-    var borBtn = document.getElementById('pub-borrador-btn');
-    if (borBtn) borBtn.addEventListener('click', function() {
-      var texto = (document.getElementById('pub-texto').value||'').trim();
-      var cuentaId = document.getElementById('pub-cuenta-sel').value;
-      if (!_pubCarroSel) { _setMsg('Selecciona un vehículo primero.', false); return; }
-      if (!texto) { _setMsg('Escribe un texto para la publicación.', false); return; }
-      var datos = { carroId:_pubCarroSel._id, carroSlug:[_pubCarroSel.marca,_pubCarroSel.modelo,_pubCarroSel.anio||_pubCarroSel.año].filter(Boolean).join(' '), cuentaSocialId:cuentaId||null, plataforma:_pubPlatforma, texto:texto, fotoUrls:JSON.stringify([_fotoUrl(_pubCarroSel)].filter(Boolean)) };
-      if (_pubBorradorId) datos._id = _pubBorradorId;
-      window.parent.postMessage({ type: 'wecars-pub-borrador-guardar', datos: datos }, '*');
-    });
-    var pubBtn = document.getElementById('pub-publicar-btn');
-    if (pubBtn) pubBtn.addEventListener('click', function() {
-      var texto = (document.getElementById('pub-texto').value||'').trim();
-      var cuentaId = document.getElementById('pub-cuenta-sel').value;
-      if (!_pubCarroSel) { _setMsg('Selecciona un vehículo primero.', false); return; }
-      if (!texto) { _setMsg('Escribe un texto para la publicación.', false); return; }
-      if (!cuentaId) { _setMsg('Selecciona una cuenta social.', false); return; }
-      pubBtn.disabled = true;
-      _setMsg('Guardando y publicando…', true);
-      var datos = { carroId:_pubCarroSel._id, carroSlug:[_pubCarroSel.marca,_pubCarroSel.modelo,_pubCarroSel.anio||_pubCarroSel.año].filter(Boolean).join(' '), cuentaSocialId:cuentaId, plataforma:_pubPlatforma, texto:texto, fotoUrls:JSON.stringify([_fotoUrl(_pubCarroSel)].filter(Boolean)) };
-      if (_pubBorradorId) datos._id = _pubBorradorId;
-      window.parent.postMessage({ type: 'wecars-pub-borrador-guardar', datos: datos }, '*');
-      var unsub = function(ev) {
-        var d = ev.data; if (!d || d.type !== 'wecars-pub-borrador-guardado') return;
-        window.removeEventListener('message', unsub);
-        if (!d.ok) { _setMsg('Error al preparar: '+(d.error||''), false); pubBtn.disabled=false; return; }
-        window.parent.postMessage({ type: 'wecars-pub-publicar', publicacionId: d._id }, '*');
-      };
-      window.addEventListener('message', unsub);
-    });
-    var histRef = document.getElementById('pub-hist-refresh');
-    if (histRef) histRef.addEventListener('click', function() {
-      var f = document.getElementById('pub-hist-filtro-estado').value;
-      window.parent.postMessage({ type: 'wecars-pub-historial-solicitar', filtros: f ? { estado:f } : {} }, '*');
-    });
-    var histFiltro = document.getElementById('pub-hist-filtro-estado');
-    if (histFiltro) histFiltro.addEventListener('change', function() {
-      window.parent.postMessage({ type: 'wecars-pub-historial-solicitar', filtros: this.value ? { estado:this.value } : {} }, '*');
-    });
-  });
-
-  var _origMostrar = window.mostrarVista;
-  if (typeof _origMostrar === 'function') {
-    window.mostrarVista = function(vista) {
-      _origMostrar(vista);
-      if (vista === 'pub-historial') pubCargar();
-    };
-  }
-})();
-
-</script>
 
 <!-- ── Sistema de recordatorios de seguimiento ───────────────── -->
 <div id="pv-rem-container" role="region" aria-label="Recordatorios de seguimiento">
