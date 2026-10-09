@@ -421,6 +421,8 @@ body:not(.wc-loading) .wc-main { opacity: 1; transition: opacity .3s; }
 }
 
 .wc-sub-item.active { color: var(--lime); font-weight: 700; background: rgba(86,169,0,.12); }
+/* Ítems top-level (sin grupo padre) — menos sangría */
+#wc-sidebar-nav > .wc-sub-item { padding-left: 16px; font-size: 13px; color: rgba(255,255,255,.75); }
 .wc-sub-item i { font-size: 14px; flex-shrink: 0; }
 .wc-sub-badge { margin-left: auto; background: var(--err); color: #fff; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 6px; flex-shrink: 0; line-height: 1.5; display: none; }
 .wc-sidebar-sublink-tag {
@@ -1843,7 +1845,8 @@ body:not(.wc-loading) .wc-main { opacity: 1; transition: opacity .3s; }
   flex-direction: column;
   gap: var(--sp-3);
 }
-.pv-inline-form.open { display: flex; }
+.pv-inline-form.open,
+.pv-inline-form.show { display: flex; }
 .pv-inline-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -6198,64 +6201,6 @@ section.pv-table-wrap > .shell > #pv-compradores {
       <div id="pv-mensajes-gerencia-list"></div>
     </div>
 
-    <!-- Micro-modal post-WhatsApp -->
-    <div class="pv-wa-modal" id="pv-wa-modal" role="dialog" aria-modal="true" aria-label="Registro de llamada">
-      <div class="pv-wa-modal-box" id="pv-wa-modal-box">
-        <div class="pv-wa-modal-title">¿Cómo te fue con la llamada?</div>
-        <div class="pv-wa-q">¿Contestó?</div>
-        <div class="pv-wa-btns" id="pv-wa-resp-btns">
-          <button class="pv-wa-btn" type="button" data-field="respuesta" data-val="si"><span class="pv-sem pv-sem-low"></span> Sí contestó</button>
-          <button class="pv-wa-btn" type="button" data-field="respuesta" data-val="no"><span class="pv-sem pv-sem-high"></span> No contestó</button>
-          <button class="pv-wa-btn" type="button" data-field="respuesta" data-val="buzon"><span class="pv-sem pv-sem-mid"></span> Buzón</button>
-        </div>
-        <div class="pv-wa-q">Siguiente paso</div>
-        <div class="pv-wa-btns" id="pv-wa-paso-btns">
-          <button class="pv-wa-btn" type="button" data-field="siguientePaso" data-val="cita"><i class="ti ti-calendar-event"></i> Cita agendada</button>
-          <button class="pv-wa-btn" type="button" data-field="siguientePaso" data-val="cotizacion"><i class="ti ti-file-invoice"></i> Cotización</button>
-          <button class="pv-wa-btn" type="button" data-field="siguientePaso" data-val="seguimiento3"><i class="ti ti-refresh"></i> Seguimiento en 3 días</button>
-          <button class="pv-wa-btn" type="button" data-field="siguientePaso" data-val="seguimiento7"><i class="ti ti-refresh"></i> Seguimiento en 7 días</button>
-        </div>
-        <div class="pv-wa-q">Nivel de interés</div>
-        <div class="pv-wa-btns" id="pv-wa-interes-btns">
-          <button class="pv-wa-btn" type="button" data-field="interes" data-val="alto"><span class="pv-sem pv-sem-high"></span> Alto</button>
-          <button class="pv-wa-btn" type="button" data-field="interes" data-val="medio"><span class="pv-sem pv-sem-mid"></span> Medio</button>
-          <button class="pv-wa-btn" type="button" data-field="interes" data-val="bajo"><span class="pv-sem pv-sem-low"></span> Bajo</button>
-        </div>
-        <div class="pv-wa-modal-footer">
-          <button class="pv-wa-skip" type="button" onclick="cerrarWaModal()">Omitir</button>
-          <button class="pv-wa-skip" type="button" onclick="registrarEnvioRapido()" style="color:var(--lime);font-weight:800">Solo registrar envío</button>
-          <button class="pv-wa-save" type="button" onclick="guardarResultadoWa()">Guardar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal próximo paso (al cerrar expediente) -->
-    <div class="pv-prox-overlay" id="pv-prox-overlay">
-      <div class="pv-prox-box">
-        <div class="pv-prox-title"><i class="ti ti-calendar-event"></i> ¿Cuándo es el próximo seguimiento?</div>
-        <div class="pv-prox-sub">Antes de cerrar el expediente, agenda la próxima acción para no perder este lead.</div>
-        <div class="pv-prox-opciones" id="pv-prox-opciones">
-          <button class="pv-prox-opt" type="button" data-dias="1">Mañana</button>
-          <button class="pv-prox-opt" type="button" data-dias="3">En 3 días</button>
-          <button class="pv-prox-opt" type="button" data-dias="7">La próxima semana</button>
-          <button class="pv-prox-opt" type="button" data-dias="0" id="pv-prox-sin-seguimiento">Sin seguimiento</button>
-        </div>
-        <div id="pv-prox-razon-wrap" style="display:none;margin-bottom:12px">
-          <div class="pv-wa-q" style="margin-bottom:8px">¿Por qué?</div>
-          <div class="pv-wa-btns">
-            <button class="pv-wa-btn" type="button" data-field="razonCierre" data-val="perdido"><span class="pv-sem pv-sem-high"></span> Lead perdido</button>
-            <button class="pv-wa-btn" type="button" data-field="razonCierre" data-val="no_interesado"><span class="pv-sem pv-sem-mid"></span> No interesado</button>
-            <button class="pv-wa-btn" type="button" data-field="razonCierre" data-val="ya_compro"><span class="pv-sem pv-sem-low"></span> Ya compró</button>
-          </div>
-        </div>
-        <textarea class="pv-prox-nota" id="pv-prox-nota" rows="2" placeholder="Nota opcional (ej: llamar después de cobro de quincena)"></textarea>
-        <div class="pv-prox-footer">
-          <button class="pv-prox-skip" type="button" onclick="proxPasoOmitir()">Omitir</button>
-          <button class="pv-prox-confirmar" type="button" onclick="proxPasoGuardar()">Guardar y cerrar</button>
-        </div>
-      </div>
-    </div>
-
     <!-- Urgentes — primera prioridad -->
     <div class="pv-dash-card" id="pv-dash-urgentes-card">
       <div class="pv-dash-card-head">
@@ -6412,6 +6357,64 @@ section.pv-table-wrap > .shell > #pv-compradores {
   </div>
 
 </section>
+
+<!-- Micro-modal post-WhatsApp — fuera del dashboard para estar siempre accesible -->
+<div class="pv-wa-modal" id="pv-wa-modal" role="dialog" aria-modal="true" aria-label="Registro de llamada">
+  <div class="pv-wa-modal-box" id="pv-wa-modal-box">
+    <div class="pv-wa-modal-title">¿Cómo te fue con la llamada?</div>
+    <div class="pv-wa-q">¿Contestó?</div>
+    <div class="pv-wa-btns" id="pv-wa-resp-btns">
+      <button class="pv-wa-btn" type="button" data-field="respuesta" data-val="si"><span class="pv-sem pv-sem-low"></span> Sí contestó</button>
+      <button class="pv-wa-btn" type="button" data-field="respuesta" data-val="no"><span class="pv-sem pv-sem-high"></span> No contestó</button>
+      <button class="pv-wa-btn" type="button" data-field="respuesta" data-val="buzon"><span class="pv-sem pv-sem-mid"></span> Buzón</button>
+    </div>
+    <div class="pv-wa-q">Siguiente paso</div>
+    <div class="pv-wa-btns" id="pv-wa-paso-btns">
+      <button class="pv-wa-btn" type="button" data-field="siguientePaso" data-val="cita"><i class="ti ti-calendar-event"></i> Cita agendada</button>
+      <button class="pv-wa-btn" type="button" data-field="siguientePaso" data-val="cotizacion"><i class="ti ti-file-invoice"></i> Cotización</button>
+      <button class="pv-wa-btn" type="button" data-field="siguientePaso" data-val="seguimiento3"><i class="ti ti-refresh"></i> Seguimiento en 3 días</button>
+      <button class="pv-wa-btn" type="button" data-field="siguientePaso" data-val="seguimiento7"><i class="ti ti-refresh"></i> Seguimiento en 7 días</button>
+    </div>
+    <div class="pv-wa-q">Nivel de interés</div>
+    <div class="pv-wa-btns" id="pv-wa-interes-btns">
+      <button class="pv-wa-btn" type="button" data-field="interes" data-val="alto"><span class="pv-sem pv-sem-high"></span> Alto</button>
+      <button class="pv-wa-btn" type="button" data-field="interes" data-val="medio"><span class="pv-sem pv-sem-mid"></span> Medio</button>
+      <button class="pv-wa-btn" type="button" data-field="interes" data-val="bajo"><span class="pv-sem pv-sem-low"></span> Bajo</button>
+    </div>
+    <div class="pv-wa-modal-footer">
+      <button class="pv-wa-skip" type="button" onclick="cerrarWaModal()">Omitir</button>
+      <button class="pv-wa-skip" type="button" onclick="registrarEnvioRapido()" style="color:var(--lime);font-weight:800">Solo registrar envío</button>
+      <button class="pv-wa-save" type="button" onclick="guardarResultadoWa()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal próximo paso — fuera del dashboard para estar siempre accesible -->
+<div class="pv-prox-overlay" id="pv-prox-overlay">
+  <div class="pv-prox-box">
+    <div class="pv-prox-title"><i class="ti ti-calendar-event"></i> ¿Cuándo es el próximo seguimiento?</div>
+    <div class="pv-prox-sub">Antes de cerrar el expediente, agenda la próxima acción para no perder este lead.</div>
+    <div class="pv-prox-opciones" id="pv-prox-opciones">
+      <button class="pv-prox-opt" type="button" data-dias="1">Mañana</button>
+      <button class="pv-prox-opt" type="button" data-dias="3">En 3 días</button>
+      <button class="pv-prox-opt" type="button" data-dias="7">La próxima semana</button>
+      <button class="pv-prox-opt" type="button" data-dias="0" id="pv-prox-sin-seguimiento">Sin seguimiento</button>
+    </div>
+    <div id="pv-prox-razon-wrap" style="display:none;margin-bottom:12px">
+      <div class="pv-wa-q" style="margin-bottom:8px">¿Por qué?</div>
+      <div class="pv-wa-btns">
+        <button class="pv-wa-btn" type="button" data-field="razonCierre" data-val="perdido"><span class="pv-sem pv-sem-high"></span> Lead perdido</button>
+        <button class="pv-wa-btn" type="button" data-field="razonCierre" data-val="no_interesado"><span class="pv-sem pv-sem-mid"></span> No interesado</button>
+        <button class="pv-wa-btn" type="button" data-field="razonCierre" data-val="ya_compro"><span class="pv-sem pv-sem-low"></span> Ya compró</button>
+      </div>
+    </div>
+    <textarea class="pv-prox-nota" id="pv-prox-nota" rows="2" placeholder="Nota opcional (ej: llamar después de cobro de quincena)"></textarea>
+    <div class="pv-prox-footer">
+      <button class="pv-prox-skip" type="button" onclick="proxPasoOmitir()">Omitir</button>
+      <button class="pv-prox-confirmar" type="button" onclick="proxPasoGuardar()">Guardar y cerrar</button>
+    </div>
+  </div>
+</div>
 
 <section class="pv-filters" id="pv-filtros-wrap">
   <div class="shell">
@@ -8018,7 +8021,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
       return`<button class="wc-sub-item${s.id===vista?' active':''}" data-vista="${s.id}" type="button" onclick="mostrarVista('${s.id}')"><i class="ti ${s.icon}"></i>${s.label}${badge}</button>`;
     };
     return VD_GRUPOS.map(g=>{
-      if(!g.subs.length)return`<button class="wc-sidebar-link${g.id===vista?' active':''}" data-vista="${g.id}" type="button" onclick="mostrarVista('${g.id}')"><i class="ti ${g.icon}"></i> ${g.label}</button>`;
+      if(!g.subs.length)return`<button class="wc-sub-item${g.id===vista?' active':''}" data-vista="${g.id}" type="button" onclick="mostrarVista('${g.id}')"><i class="ti ${g.icon}"></i> ${g.label}</button>`;
       const grpActiva=g.subs.some(s=>s.id===vista);
       return`<div class="wc-nav-group"><button class="wc-grupo-btn${grpActiva?' open':''}" id="vd-grp-btn-${g.id}" type="button" onclick="_vdAbrirGrupo('${g.id}')"><i class="ti ${g.icon}"></i>${g.label}<i class="ti ti-chevron-down wc-chev${grpActiva?' open':''}"></i></button><div class="wc-sub-list${grpActiva?' open':''}" id="vd-grp-list-${g.id}">${g.subs.map(_sub).join('')}</div></div>`;
     }).join('');
@@ -8283,7 +8286,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
           icon: 'ti-alert-triangle', iconColor: '#dc2626', bg: '#fef2f2', border: 'rgba(220,38,38,.2)',
           texto: `<strong>${c.nombre || 'Cliente'}</strong> — sin contacto${dias ? ' hace ' + dias + ' día' + (dias>1?'s':'') : ''}`,
           sub: 'Llámale o manda WhatsApp ahora',
-          accion: () => mostrarVista('contactos'),
+          clienteId: c._id,
           label: 'Urgente',
         });
       }
@@ -8299,8 +8302,8 @@ section.pv-table-wrap > .shell > #pv-compradores {
         _items.push({
           icon: 'ti-calendar-event', iconColor: '#2563eb', bg: '#eff6ff', border: 'rgba(37,99,235,.2)',
           texto: `<strong>${c.nombre || 'Seguimiento'}</strong> — programado para hoy`,
-          sub: c.proximoPaso || 'Revisar estado del expediente',
-          accion: () => mostrarVista('contactos'),
+          sub: c.proximoSeguimientoNota || c.proximoPaso || 'Revisar estado del expediente',
+          clienteId: c._id,
           label: 'Hoy',
         });
       }
@@ -8312,14 +8315,14 @@ section.pv-table-wrap > .shell > #pv-compradores {
           icon: 'ti-user-plus', iconColor: '#56a900', bg: '#f0fdf4', border: 'rgba(22,163,74,.2)',
           texto: `<strong>${_nuevos.length} lead${_nuevos.length>1?'s':''} nuevo${_nuevos.length>1?'s':''}</strong> esperan primer contacto`,
           sub: 'El primer contacto en menos de 1 hora aumenta la conversión',
-          accion: () => mostrarVista('leads'),
+          clienteId: _nuevos[0]._id,
           label: 'Nuevo',
         });
       }
 
       if (_items.length) {
-        _hoyLista.innerHTML = _items.slice(0,3).map(item =>
-          `<div onclick="(${item.accion.toString()})()" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:${item.bg};border:1.5px solid ${item.border};border-radius:var(--r-sm);cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        _hoyLista.innerHTML = _items.slice(0,3).map((item, _idx) =>
+          `<div data-hoy-id="${esc(item.clienteId||'')}" onclick="_abrirHoy(this)" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:${item.bg};border:1.5px solid ${item.border};border-radius:var(--r-sm);cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
             <div style="width:30px;height:30px;border-radius:var(--r-sm);background:${item.iconColor}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${item.iconColor}">
               <i class="ti ${item.icon}" style="font-size:15px"></i>
             </div>
@@ -8333,6 +8336,11 @@ section.pv-table-wrap > .shell > #pv-compradores {
       } else {
         _hoyLista.innerHTML = `<div style="padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);font-size:.83rem;color:var(--muted);display:flex;align-items:center;gap:8px"><i class="ti ti-check" style="color:var(--lime-dark)"></i> Todo al corriente — no tienes pendientes urgentes hoy.</div>`;
       }
+      window._abrirHoy = (el) => {
+        const id = el.dataset.hoyId;
+        mostrarVista('contactos');
+        if (id) setTimeout(() => abrirDetalle(id), 350);
+      };
     })();
 
     // KPI rings al final — estadística de resumen, no de acción
@@ -9203,10 +9211,14 @@ section.pv-table-wrap > .shell > #pv-compradores {
     }).join('');
     cont.querySelectorAll('[data-urgente-id]').forEach(btn => {
       btn.addEventListener('click', () => {
+        const _uid = btn.dataset.urgenteId;
         mostrarVista('contactos');
         setTimeout(() => {
-          const row = document.querySelector(`[data-id="${btn.dataset.urgenteId}"]`);
-          if (row) row.click();
+          if (_uid) abrirDetalle(_uid);
+          else {
+            const row = document.querySelector(`[data-id="${_uid}"]`);
+            if (row) row.click();
+          }
         }, 300);
       });
     });
@@ -9332,7 +9344,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
       const _waUrl = c.telefono ? waLink(c) : '';
       const _tel = c.telefono ? telLink(c) : '';
       const accionBtn = libre && !esGte
-        ? `<div class="pv-row-actions"><button class="pv-detail-btn pv-btn-tomar" data-tomar-id="${esc(c._id)}" type="button" onclick="event.stopPropagation()"><i class="ti ti-hand-grab"></i> Tomar</button></div>`
+        ? `<div class="pv-row-actions"><button class="pv-detail-btn pv-btn-tomar" data-tomar-id="${esc(c._id)}" type="button" onclick="event.stopPropagation();tomarLead('${esc(c._id)}')"><i class="ti ti-hand-grab"></i> Tomar</button></div>`
         : `<div class="pv-row-actions" onclick="event.stopPropagation()">
             ${_waUrl ? `<a href="${_waUrl}" class="pv-row-wa-btn" target="_blank" rel="noreferrer" onclick="registrarClickWa('${esc(c._id)}')" title="WhatsApp"><i class="ti ti-brand-whatsapp"></i></a>` : ''}
             ${_tel ? `<a href="${_tel}" class="pv-row-call-btn" title="Llamar" onclick="registrarClickWa('${esc(c._id)}')"><i class="ti ti-phone"></i></a>` : ''}
@@ -9635,12 +9647,11 @@ section.pv-table-wrap > .shell > #pv-compradores {
     waMdClienteId = clienteId;
     waMdRespuestas = {};
     document.querySelectorAll('.pv-wa-btn').forEach(b => b.classList.remove('sel'));
-    const box = document.getElementById('pv-wa-modal-box');
-    box.classList.add('show');
+    document.getElementById('pv-wa-modal').classList.add('open');
   }
 
   function cerrarWaModal() {
-    document.getElementById('pv-wa-modal-box').classList.remove('show');
+    document.getElementById('pv-wa-modal').classList.remove('open');
     waMdClienteId = null;
     clearTimeout(waMdTimer);
   }
@@ -11227,6 +11238,8 @@ section.pv-table-wrap > .shell > #pv-compradores {
   });
 
   document.getElementById('pv-cola').addEventListener('click', e => {
+    const tomarBtn = e.target.closest('[data-tomar-id]');
+    if (tomarBtn) { tomarLead(tomarBtn.dataset.tomarId); return; }
     const marcarBtn = e.target.closest('[data-marcar]');
     if (marcarBtn) { marcarContactado(marcarBtn.dataset.marcar); return; }
     const btn = e.target.closest('[data-id]');
@@ -11425,6 +11438,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
     ov.className = 'wc-confirm-overlay';
     ov.innerHTML = `<div class="wc-confirm-box" role="alertdialog" aria-modal="true"><p class="wc-confirm-msg">${msg}</p><div class="wc-confirm-actions"><button type="button" class="wc-confirm-cancel">Cancelar</button><button type="button" class="wc-confirm-ok">Confirmar</button></div></div>`;
     document.body.appendChild(ov);
+    requestAnimationFrame(() => ov.classList.add('open'));
     ov.querySelector('.wc-confirm-cancel').onclick = () => ov.remove();
     ov.querySelector('.wc-confirm-ok').onclick = () => { ov.remove(); onOk(); };
   }
@@ -11704,7 +11718,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
     document.getElementById('pv-vista-leads').style.display = vista === 'leads' ? '' : 'none';
     document.getElementById('pv-vista-actividad').style.display = vista === 'actividad' ? '' : 'none';
     if (vista === 'cola') renderCola();
-    if (vista === 'leads') renderLeads();
+    if (vista === 'leads') { if (typeof renderLeads === 'function') renderLeads(); else if (typeof window._vdLeadsRender === 'function') window._vdLeadsRender(); }
     if (vista === 'actividad') acCargar();
 
     if (vista === 'tareas') renderTareasVendedor();
