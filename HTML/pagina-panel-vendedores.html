@@ -1982,7 +1982,8 @@ body:not(.wc-loading) .wc-main { opacity: 1; transition: opacity .3s; }
   gap: var(--sp-2);
   align-items: center;
 }
-.pv-doc-linkbox.open { display: flex; }
+.pv-doc-linkbox.open,
+.pv-doc-linkbox.show { display: flex; }
 .pv-doc-linkbox input {
   flex: 1;
   padding: var(--sp-2) var(--sp-3);
@@ -14755,51 +14756,52 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")window.cerrarExpedie
     outer.parentNode.insertBefore(wrap,outer.nextSibling);
   }
 
-  // Genera cards a partir de los datos del tbody
+  // Genera cards a partir del array de datos (DOM tiene 3 columnas, no se puede leer por índice)
   window.wcBuildCards=function(){
     var wrap=document.getElementById('pv-cards-wrap');
     if(!wrap)return;
-    var rows=document.querySelectorAll('#pv-tbody tr');
-    var html=[];
-    rows.forEach(function(tr){
-      var loading=tr.querySelector('.pv-loading,.pv-empty');
-      if(loading){html.push('<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--muted);font-size:13px">'+_esc(loading.textContent)+'</div>');return;}
-      var tds=tr.querySelectorAll('td');
-      if(tds.length<2)return;
-      var nameEl=tr.querySelector('.pv-row-name');
-      var nameText=nameEl?Array.from(nameEl.childNodes).filter(function(n){return n.nodeType===3;}).map(function(n){return n.textContent;}).join('').trim()||nameEl.textContent.trim():'—';
-      var phone=(tr.querySelector('.pv-row-phone')||{}).textContent||'';
-      phone=phone.replace(/[ \s]+/g,' ').trim().split(' ')[0]||'';
-      var estatusEl=tr.querySelector('.pv-badge');
-      var origenEl=tr.querySelector('.pv-badge-origen');
-      var riskEl=tr.querySelector('.pv-risk-badge');
-      var dateText=(tds[5]||{}).textContent||'—';
-      var isUrgent=!!tr.querySelector('.pv-inactivo-dot');
-      var filled=tr.querySelectorAll('.pv-mini-dot.ok,.pv-mini-dot.filled').length;
-      var total=tr.querySelectorAll('.pv-mini-dot').length||8;
-      var pct=Math.round((filled/total)*100);
-      var detailBtn=tr.querySelector('button.pv-detail-btn[data-id]');
-      var expBtn=tr.querySelectorAll('button.pv-detail-btn')[0];
-      var waEl=tr.querySelector('a.pv-contact-btn.wa,a[href*="wa.me"]');
-      var telEl=tr.querySelector('a.pv-contact-btn[href*="tel:"]');
-      html.push(
-        '<div class="pv-ccard'+(isUrgent?' urgent':'')+'">'
-          +'<div class="pv-ccard-top">'
-            +'<div class="pv-ccard-av'+(isUrgent?' urg':'')+'">'+_esc(_ini(nameText))+'</div>'
-            +'<div><div class="pv-ccard-name">'+_esc(nameText)+'</div><div class="pv-ccard-phone">'+_esc(phone)+'</div></div>'
-          +'</div>'
-          +'<div class="pv-ccard-tags">'+(estatusEl?estatusEl.outerHTML:'')+(riskEl?riskEl.outerHTML:'')+'</div>'
-          +'<div class="pv-ccard-prog"><div class="pv-ccard-prog-fill'+(isUrgent?' red':'')+'" style="width:'+pct+'%"></div></div>'
-          +'<div class="pv-ccard-foot">'
-            +'<span class="pv-ccard-meta">'+(origenEl?_esc(origenEl.textContent.trim()):'')+(dateText&&dateText!=='—'?' · '+_esc(dateText):'')+'</span>'
-            +'<div class="pv-ccard-btns">'
-              +(telEl?'<a href="'+_esc(telEl.href)+'" class="pv-ccard-btn" title="Llamar"><i class="ti ti-phone" aria-hidden="true"></i></a>':'')
-              +(waEl?'<a href="'+_esc(waEl.href)+'" target="_blank" class="pv-ccard-btn" title="WhatsApp"><i class="ti ti-brand-whatsapp" aria-hidden="true"></i></a>':'')
-              +(detailBtn?'<button class="pv-ccard-btn" data-id="'+_esc(detailBtn.dataset.id||'')+'" onclick="'+_esc(detailBtn.getAttribute('onclick')||'')+'" title="Ver"><i class="ti ti-eye" aria-hidden="true"></i></button>':'')
-            +'</div>'
+    var shown=typeof filteredClientes==='function'?filteredClientes():[];
+    if(!shown.length){
+      wrap.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted);font-size:13px">Sin contactos que mostrar</div>';
+      return;
+    }
+    var _avColors=['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#10b981'];
+    var html=shown.map(function(c){
+      var nombre=c.nombre||'Sin nombre';
+      var avClr=_avColors[nombre.charCodeAt(0)%_avColors.length];
+      var ini=_ini(nombre);
+      var phone=c.telefono||'';
+      var estatus=c.estatus||'Nuevo';
+      var origen=c.origen||'Web';
+      var r=typeof riesgoInfo==='function'?riesgoInfo(c):{nivel:'ok',label:''};
+      var isUrgent=r.nivel==='vencido'||r.nivel==='urgente';
+      var ua=c.ultimaActividad?new Date(c.ultimaActividad):null;
+      var mins=ua?Math.floor((Date.now()-ua.getTime())/60000):null;
+      var tStr=!ua?'—':mins<60?'Hace '+mins+'m':mins<1440?'Hace '+Math.floor(mins/60)+'h':'Hace '+Math.floor(mins/1440)+'d';
+      var waUrl=c.telefono?('https://wa.me/52'+c.telefono.replace(/\D/g,'').slice(-10)):'';
+      var telUrl=c.telefono?('tel:'+c.telefono):'';
+      var estatusCls=typeof estatusClass==='function'?estatusClass(estatus):'';
+      var pct=0;
+      if(typeof CAMPOS_PERFIL!=='undefined'){var filled=CAMPOS_PERFIL.filter(function(f){return c[f.campo];}).length;pct=Math.round(filled/CAMPOS_PERFIL.length*100);}
+      return '<div class="pv-ccard'+(isUrgent?' urgent':'')+'" style="cursor:pointer" onclick="abrirDetalle(''+_esc(c._id)+'')">'
+        +'<div class="pv-ccard-top">'
+          +'<div class="pv-ccard-av'+(isUrgent?' urg':'')+'" style="background:'+avClr+'">'+_esc(ini)+'</div>'
+          +'<div style="min-width:0"><div class="pv-ccard-name">'+_esc(nombre)+'</div><div class="pv-ccard-phone">'+_esc(phone||'—')+'</div></div>'
+        +'</div>'
+        +'<div class="pv-ccard-tags">'
+          +'<span class="pv-badge '+_esc(estatusCls)+'">'+_esc(estatus)+'</span>'
+          +(isUrgent?'<span style="font-size:.6rem;font-weight:700;color:'+(r.nivel==='vencido'?'#dc2626':'#c2410c')+'">'+_esc(r.label)+'</span>':'')
+        +'</div>'
+        +'<div class="pv-ccard-prog"><div class="pv-ccard-prog-fill'+(isUrgent?' red':'')+'" style="width:'+pct+'%"></div></div>'
+        +'<div class="pv-ccard-foot">'
+          +'<span class="pv-ccard-meta">'+_esc(origen)+' · '+_esc(tStr)+'</span>'
+          +'<div class="pv-ccard-btns" onclick="event.stopPropagation()">'
+            +(telUrl?'<a href="'+_esc(telUrl)+'" class="pv-ccard-btn" title="Llamar"><i class="ti ti-phone" aria-hidden="true"></i></a>':'')
+            +(waUrl?'<a href="'+_esc(waUrl)+'" target="_blank" class="pv-ccard-btn" title="WhatsApp"><i class="ti ti-brand-whatsapp" aria-hidden="true"></i></a>':'')
+            +'<button class="pv-ccard-btn" onclick="event.stopPropagation();abrirDetalle(''+_esc(c._id)+'')" title="Ver expediente"><i class="ti ti-file-text" aria-hidden="true"></i></button>'
           +'</div>'
         +'</div>'
-      );
+      +'</div>';
     });
     wrap.innerHTML=html.join('');
   };
