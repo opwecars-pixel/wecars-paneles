@@ -3838,6 +3838,12 @@ button:focus-visible,.pv-btn-primary:focus-visible,.pv-btn-secondary:focus-visib
   letter-spacing: .04em;
   display: block;
 }
+.ac-kpi-ico {
+  display: block;
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+  line-height: 1;
+}
 
 /* ── Actividad estado del día ───────────────────────────────── */
 #ac-estado-dia {
@@ -4161,10 +4167,14 @@ button:focus-visible,.pv-btn-primary:focus-visible,.pv-btn-secondary:focus-visib
   min-width: 0;
   background: var(--surface);
   border: 1px solid var(--line);
+  border-left-width: 3px;
   border-radius: var(--r-md);
   padding: var(--sp-3) var(--sp-4);
   box-shadow: var(--sh-1);
 }
+.ac-tl-res-positivo { font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:1px 6px;border-radius:var(--r-sm);background:rgba(22,163,74,.12);color:#16a34a;border:1px solid rgba(22,163,74,.25); }
+.ac-tl-res-negativo  { font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:1px 6px;border-radius:var(--r-sm);background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.25); }
+.ac-tl-res-pendiente { font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:1px 6px;border-radius:var(--r-sm);background:rgba(245,158,11,.12);color:#b45309;border:1px solid rgba(245,158,11,.3); }
 .ac-tl-hora {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-size: var(--t-xs);
@@ -6762,10 +6772,12 @@ section.pv-table-wrap > .shell > #pv-compradores {
       </div>
     </div>
 
-    <div id="pv-configuracion" style="display:none">
+    <div id="pv-configuracion" style="display:none;padding-bottom:40px">
+
+      <!-- Mi perfil -->
       <div class="pv-mgr-card">
         <div class="pv-card-head"><span class="pv-card-icon"><i class="ti ti-user-circle"></i></span><h3>Mi perfil</h3></div>
-        <p class="pv-card-sub">Estos datos vienen de tu cuenta — para cambiarlos pídele a Administración que actualice tu registro.</p>
+        <p class="pv-card-sub">Para cambiar estos datos pídele a Administración que actualice tu registro.</p>
         <table class="pv-mgr-table">
           <tr><td style="color:var(--muted);width:160px">Nombre</td><td id="pv-cfg-nombre">—</td></tr>
           <tr><td style="color:var(--muted)">Puesto / antigüedad</td><td id="pv-cfg-puesto">—</td></tr>
@@ -6773,10 +6785,45 @@ section.pv-table-wrap > .shell > #pv-compradores {
           <tr><td style="color:var(--muted)">Correo</td><td id="pv-cfg-email">—</td></tr>
         </table>
       </div>
+
+      <!-- Meta mensual de ventas -->
       <div class="pv-mgr-card">
-        <div class="pv-card-head"><span class="pv-card-icon"><i class="ti ti-bell"></i></span><h3>Notificaciones</h3></div>
-        <label class="pv-check"><input type="checkbox" id="pv-cfg-sonido"> Sonido al recibir notificaciones nuevas</label>
+        <div class="pv-card-head"><span class="pv-card-icon" style="background:rgba(74,169,0,.12);color:var(--lime-dark)"><i class="ti ti-target"></i></span><h3>Mi meta mensual</h3></div>
+        <p class="pv-card-sub">Establece cuántas unidades quieres cerrar este mes. Tu avance se muestra aquí.</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <label style="font-size:.78rem;color:var(--muted);font-weight:700;white-space:nowrap">Unidades meta</label>
+          <input type="number" id="pv-cfg-meta" min="1" max="200" placeholder="10"
+            style="width:80px;padding:7px 10px;border:1.5px solid var(--line);border-radius:var(--r-sm);font-family:inherit;font-size:.9rem;font-weight:700;color:var(--ink);background:var(--bg);text-align:center">
+          <button onclick="_cfgGuardarMeta()" style="background:var(--lime);color:#081102;border:none;border-radius:var(--r-sm);padding:0 16px;font-size:.8rem;font-weight:700;height:34px;cursor:pointer;font-family:inherit"><i class="ti ti-device-floppy"></i> Guardar</button>
+        </div>
+        <!-- Barra de progreso -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <div style="flex:1;height:10px;background:var(--surface);border-radius:999px;overflow:hidden;border:1px solid var(--line)">
+            <div id="pv-cfg-meta-bar" style="height:100%;background:var(--lime);border-radius:999px;transition:width .4s ease;width:0%"></div>
+          </div>
+          <span id="pv-cfg-meta-pct" style="font-size:.75rem;font-weight:800;color:var(--lime-dark);min-width:36px;text-align:right">0%</span>
+        </div>
+        <div style="font-size:.72rem;color:var(--muted)"><span id="pv-cfg-meta-txt">Define tu meta para ver tu avance.</span></div>
       </div>
+
+      <!-- Notificaciones + Apariencia -->
+      <div class="pv-mgr-card">
+        <div class="pv-card-head"><span class="pv-card-icon"><i class="ti ti-settings-2"></i></span><h3>Preferencias</h3></div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <label class="pv-check"><input type="checkbox" id="pv-cfg-sonido"> Sonido al recibir notificaciones nuevas</label>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:10px;border-top:1px solid var(--line)">
+            <div>
+              <div style="font-size:.85rem;font-weight:700;color:var(--ink)">Modo oscuro</div>
+              <div style="font-size:.72rem;color:var(--muted)">Cambia la apariencia del panel</div>
+            </div>
+            <button id="pv-cfg-theme-btn" onclick="_cfgToggleTheme()" style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:.8rem;font-weight:700;color:var(--ink);font-family:inherit;transition:all .12s">
+              <i id="pv-cfg-theme-ico" class="ti ti-moon"></i>
+              <span id="pv-cfg-theme-lbl">Activar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
 <!-- Modal detalle tarea (vendedor) -->
@@ -6922,12 +6969,30 @@ section.pv-table-wrap > .shell > #pv-compradores {
 
       <!-- KPIs del día -->
       <div id="ac-kpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:20px">
-        <div class="ac-kpi-card" id="ackpi-total"><span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Total hoy</span></div>
-        <div class="ac-kpi-card" id="ackpi-clientes"><span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Clientes nuevos</span></div>
-        <div class="ac-kpi-card" id="ackpi-seguimientos"><span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Seguimientos</span></div>
-        <div class="ac-kpi-card" id="ackpi-cotizaciones"><span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Cotizaciones</span></div>
-        <div class="ac-kpi-card" id="ackpi-citas"><span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Citas</span></div>
-        <div class="ac-kpi-card" id="ackpi-ventas"><span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Ventas</span></div>
+        <div class="ac-kpi-card" id="ackpi-total">
+          <span class="ac-kpi-ico" style="color:var(--lime-dark)"><i class="ti ti-activity"></i></span>
+          <span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Total hoy</span>
+        </div>
+        <div class="ac-kpi-card" id="ackpi-clientes">
+          <span class="ac-kpi-ico" style="color:#2563eb"><i class="ti ti-user-plus"></i></span>
+          <span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Clientes nuevos</span>
+        </div>
+        <div class="ac-kpi-card" id="ackpi-seguimientos">
+          <span class="ac-kpi-ico" style="color:#7c3aed"><i class="ti ti-repeat"></i></span>
+          <span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Seguimientos</span>
+        </div>
+        <div class="ac-kpi-card" id="ackpi-cotizaciones">
+          <span class="ac-kpi-ico" style="color:#d97706"><i class="ti ti-file-description"></i></span>
+          <span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Cotizaciones</span>
+        </div>
+        <div class="ac-kpi-card" id="ackpi-citas">
+          <span class="ac-kpi-ico" style="color:#0891b2"><i class="ti ti-calendar-event"></i></span>
+          <span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Citas</span>
+        </div>
+        <div class="ac-kpi-card" id="ackpi-ventas">
+          <span class="ac-kpi-ico" style="color:#16a34a"><i class="ti ti-trophy"></i></span>
+          <span class="ac-kpi-val">—</span><span class="ac-kpi-lbl">Ventas</span>
+        </div>
       </div>
 
       <!-- Filtro de fecha -->
@@ -7503,9 +7568,32 @@ section.pv-table-wrap > .shell > #pv-compradores {
      ══════════════════════════════════════════════════════ -->
 <div id="pv-vista-consignas" style="display:none;padding:20px 0 60px">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-    <div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-weight:900;font-size:1.1rem;color:var(--ink)"><i class="ti ti-steering-wheel" style="color:var(--lime-dark)"></i> Mis Consignas</div>
+    <div>
+      <div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-weight:900;font-size:1.1rem;color:var(--ink)"><i class="ti ti-steering-wheel" style="color:var(--lime-dark)"></i> Mis Consignas</div>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:2px">Vehículos de clientes que te han dejado en consigna</div>
+    </div>
     <button type="button" onclick="window.parent.postMessage({type:'wecars-consignas-solicitar'},'*')" style="background:transparent;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:6px 14px;font-size:.8rem;font-weight:700;cursor:pointer;color:var(--ink);font-family:inherit"><i class="ti ti-refresh"></i> Actualizar</button>
   </div>
+
+  <!-- KPI strip consignas -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+    <div class="pv-dash-card" style="padding:14px 16px;text-align:center">
+      <div style="font-size:1.3rem;margin-bottom:4px"><i class="ti ti-list" style="color:var(--lime-dark)"></i></div>
+      <div id="pvcons-kpi-total" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:1.7rem;font-weight:900;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums">—</div>
+      <div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:4px">Total</div>
+    </div>
+    <div class="pv-dash-card" style="padding:14px 16px;text-align:center">
+      <div style="font-size:1.3rem;margin-bottom:4px"><i class="ti ti-circle-dot" style="color:#2563eb"></i></div>
+      <div id="pvcons-kpi-activas" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:1.7rem;font-weight:900;color:#2563eb;line-height:1;font-variant-numeric:tabular-nums">—</div>
+      <div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:4px">Activas</div>
+    </div>
+    <div class="pv-dash-card" style="padding:14px 16px;text-align:center">
+      <div style="font-size:1.3rem;margin-bottom:4px"><i class="ti ti-circle-check" style="color:#6b7280"></i></div>
+      <div id="pvcons-kpi-cerradas" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:1.7rem;font-weight:900;color:var(--muted);line-height:1;font-variant-numeric:tabular-nums">—</div>
+      <div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:4px">Cerradas</div>
+    </div>
+  </div>
+
   <div id="pv-consignas-lista" style="display:flex;flex-direction:column;gap:12px">
     <div style="color:var(--muted);text-align:center;padding:40px 0;font-size:.9rem"><i class="ti ti-steering-wheel" style="font-size:2rem;opacity:.3;display:block;margin-bottom:10px"></i>No tienes consignas asignadas.</div>
   </div>
@@ -9832,6 +9920,13 @@ section.pv-table-wrap > .shell > #pv-compradores {
     window._pvConsignas = items;
     const el = document.getElementById('pv-consignas-lista');
     if (!el) return;
+    // KPIs strip
+    var activas = (items||[]).filter(function(c){ return c.estatusConsigna==='nueva'||c.estatusConsigna==='asignada'; }).length;
+    var cerradas = (items||[]).filter(function(c){ return c.estatusConsigna==='cerrada'||c.estatusConsigna==='rechazada'; }).length;
+    var setKpi = function(id, v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+    setKpi('pvcons-kpi-total', items ? items.length : 0);
+    setKpi('pvcons-kpi-activas', activas);
+    setKpi('pvcons-kpi-cerradas', cerradas);
     // Badge en sidebar
     const badge = document.getElementById('pv-consignas-badge');
     if (badge) { badge.textContent = items.length || ''; badge.style.display = items.length ? 'inline-flex' : 'none'; }
@@ -11496,11 +11591,83 @@ section.pv-table-wrap > .shell > #pv-compradores {
     document.getElementById('pv-cfg-email').textContent = vendedorActual || '—';
     const sonido = localStorage.getItem('wc-notif-sonido') !== 'off';
     document.getElementById('pv-cfg-sonido').checked = sonido;
+    // Meta mensual
+    var meta = parseInt(localStorage.getItem('wc-meta-mensual') || '0', 10);
+    if (meta > 0) {
+      var inp = document.getElementById('pv-cfg-meta');
+      if (inp) inp.value = meta;
+      _cfgActualizarProgressMeta(meta);
+    }
+    // Theme toggle
+    _cfgActualizarThemeBtn();
   }
-  document.getElementById('pv-cfg-sonido').addEventListener('change', (e) => {
+  document.getElementById('pv-cfg-sonido').addEventListener('change', function(e) {
     localStorage.setItem('wc-notif-sonido', e.target.checked ? 'on' : 'off');
     mostrarToast(e.target.checked ? 'Sonido de notificaciones activado' : 'Sonido de notificaciones desactivado');
   });
+
+  function _cfgGuardarMeta() {
+    var inp = document.getElementById('pv-cfg-meta');
+    if (!inp) return;
+    var val = parseInt(inp.value, 10);
+    if (!val || val < 1) { mostrarToast('Ingresa un número válido de unidades'); return; }
+    localStorage.setItem('wc-meta-mensual', val);
+    _cfgActualizarProgressMeta(val);
+    mostrarToast('Meta guardada: ' + val + ' unidades');
+  }
+
+  function _cfgActualizarProgressMeta(meta) {
+    var hoy = new Date();
+    var inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    var ventas = (ventasComisiones||[]).filter(function(v){
+      var okVend = !vendedorActual || v.vendedorId === vendedorActual;
+      if (!okVend) return false;
+      var f = v.fecha ? new Date(v.fecha) : null;
+      return f && f >= inicioMes;
+    }).length;
+    var pct = meta > 0 ? Math.min(100, Math.round(ventas / meta * 100)) : 0;
+    var bar = document.getElementById('pv-cfg-meta-bar');
+    var pctEl = document.getElementById('pv-cfg-meta-pct');
+    var txt = document.getElementById('pv-cfg-meta-txt');
+    if (bar) bar.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+    if (txt) txt.textContent = ventas + ' de ' + meta + ' unidades cerradas este mes';
+    if (bar) bar.style.background = pct >= 100 ? '#16a34a' : pct >= 60 ? 'var(--lime)' : '#f59e0b';
+    if (pctEl) pctEl.style.color = pct >= 100 ? '#16a34a' : pct >= 60 ? 'var(--lime-dark)' : '#b45309';
+  }
+
+  function _cfgToggleTheme() {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('wc-theme', next); } catch(e){}
+    _cfgActualizarThemeBtn();
+    mostrarToast(next === 'dark' ? 'Modo oscuro activado' : 'Modo claro activado');
+  }
+
+  function _cfgActualizarThemeBtn() {
+    var root = document.documentElement;
+    var isDark = root.getAttribute('data-theme') === 'dark';
+    var ico = document.getElementById('pv-cfg-theme-ico');
+    var lbl = document.getElementById('pv-cfg-theme-lbl');
+    var btn = document.getElementById('pv-cfg-theme-btn');
+    if (ico) ico.className = isDark ? 'ti ti-sun' : 'ti ti-moon';
+    if (lbl) lbl.textContent = isDark ? 'Desactivar' : 'Activar';
+    if (btn) {
+      btn.style.background = isDark ? 'var(--lime)' : 'var(--surface)';
+      btn.style.color = isDark ? '#081102' : 'var(--ink)';
+      btn.style.borderColor = isDark ? 'var(--lime)' : 'var(--line)';
+    }
+  }
+
+  // Restaurar tema guardado al cargar
+  (function(){
+    try {
+      var t = localStorage.getItem('wc-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    } catch(e){}
+  })();
 
   document.getElementById('pv-close').addEventListener('click', _doClose);
   document.getElementById('pv-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) cerrarDetalle(); });
@@ -13159,16 +13326,23 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")window.cerrarExpedie
       var evBtn   = (origen==='automatico' && a.entidadId && a.entidadId !== a.clienteId)
         ? '<button class="ac-tl-evidencia" onclick="acVerEvidencia(\'' + (a.entidadTipo||'') + '\',\'' + (a.entidadId||'') + '\')"><i class="ti ti-external-link" style="font-size:.7rem"></i> Ver evidencia</button>'
         : '';
+      // Borde de color por origen + badge de resultado
+      var borderColor = origen==='automatico' ? '#2563eb' : origen==='incidencia' ? '#b91c1c' : 'var(--lime-dark)';
+      var resBadge = '';
+      if (a.resultado === 'positivo') resBadge = '<span class="ac-tl-res-positivo">Positivo</span>';
+      else if (a.resultado === 'negativo') resBadge = '<span class="ac-tl-res-negativo">Negativo</span>';
+      else if (a.resultado === 'pendiente') resBadge = '<span class="ac-tl-res-pendiente">Pendiente</span>';
       return '<div class="ac-timeline-item">'
         + '<div style="display:flex;flex-direction:column;align-items:center;gap:0">'
           + '<div class="ac-tl-dot ' + dotCls + '"></div>'
           + (i < sorted.length-1 ? '<div style="width:2px;flex:1;background:var(--line);min-height:24px;margin-top:4px"></div>' : '')
         + '</div>'
-        + '<div class="ac-tl-card">'
+        + '<div class="ac-tl-card" style="border-left-color:' + borderColor + '">'
           + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">'
             + '<span class="ac-tl-hora">' + _hora(a.fecha) + '</span>'
             + '<span class="ac-tl-tipo"><i class="ti ' + icono + '" style="margin-right:3px;font-size:.8rem"></i>' + label + '</span>'
             + badge
+            + resBadge
           + '</div>'
           + (desc ? '<div class="ac-tl-desc">' + desc + '</div>' : '')
           + evBtn
