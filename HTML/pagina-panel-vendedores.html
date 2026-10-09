@@ -1300,6 +1300,28 @@ body:not(.wc-loading) .wc-main { opacity: 1; transition: opacity .3s; }
 }
 
 .pv-table tr:last-child td { border-bottom: none; }
+
+/* ── Tabla v2: acción rápida ── */
+.pv-table-v2 td { padding: 10px 14px; }
+.pv-table-v2 th { padding: 8px 14px; }
+.pv-row-actions { display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
+.pv-row-wa-btn, .pv-row-call-btn, .pv-row-exp-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 8px;
+  border: none; cursor: pointer; text-decoration: none;
+  font-size: 15px; transition: background .12s, transform .08s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pv-row-wa-btn   { background: rgba(37,211,102,.12); color: #25d366; }
+.pv-row-call-btn { background: rgba(37,99,235,.10); color: #2563eb; }
+.pv-row-exp-btn  { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+@media (hover: hover) and (pointer: fine) {
+  .pv-row-wa-btn:hover   { background: rgba(37,211,102,.22); transform: scale(1.08); }
+  .pv-row-call-btn:hover { background: rgba(37,99,235,.18); transform: scale(1.08); }
+  .pv-row-exp-btn:hover  { background: var(--surface-2); color: var(--ink); border-color: var(--lime); }
+}
+.pv-btn-tomar { background: var(--lime-bg); color: var(--lime-dark); border: 1.5px solid rgba(86,169,0,.3); padding: 5px 10px; border-radius: 7px; cursor: pointer; font-size: .78rem; font-weight: 700; font-family: inherit; }
+
 .pv-table .pv-cell-name {
   font-weight: 600;
   color: var(--ink);
@@ -6624,21 +6646,16 @@ section.pv-table-wrap > .shell > #pv-compradores {
     </div>
 
     <div class="pv-leads-overflow" id="pv-table-outer" style="display:none">
-    <table class="pv-table" id="pv-table">
+    <table class="pv-table pv-table-v2" id="pv-table">
       <thead>
         <tr>
-          <th scope="col">Cliente</th>
-          <th scope="col" class="col-origen">Origen</th>
-          <th scope="col">Estatus</th>
-          <th scope="col" class="col-vendedor">Vendedor asignado</th>
-          <th scope="col" class="col-progreso">Progreso</th>
-          <th scope="col">Últ. actividad</th>
-          <th scope="col" class="col-riesgo">Riesgo</th>
-          <th scope="col"><span class="sr-only">Acciones</span></th>
+          <th scope="col" style="width:55%">Cliente</th>
+          <th scope="col" style="width:30%">Estado</th>
+          <th scope="col" style="width:15%;text-align:right"><span class="sr-only">Acciones</span></th>
         </tr>
       </thead>
       <tbody id="pv-tbody">
-        <tr><td colspan="8"><div class="pv-loading">Conectando con tus clientes...</div></td></tr>
+        <tr><td colspan="3"><div class="pv-loading">Conectando con tus clientes...</div></td></tr>
       </tbody>
     </table>
     </div>
@@ -9223,7 +9240,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
     }
 
     if (!shown.length) {
-      tbody.innerHTML = `<tr><td colspan="8"><div class="pv-empty"><b>Sin clientes que coincidan</b>Prueba ajustar los filtros de arriba.</div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="3"><div class="pv-empty"><b>Sin clientes que coincidan</b>Prueba ajustar los filtros de arriba.</div></td></tr>`;
       return;
     }
 
@@ -9233,32 +9250,55 @@ section.pv-table-wrap > .shell > #pv-compradores {
       const libre = !c.vendedorAsignado || c.vendedorAsignado.trim() === '';
       const deOtro = !libre && !esMio && !esGte;
       const opActual = oportunidadActualDe(c._id);
+      const r = riesgoInfo(c);
+      // Color izquierdo de fila según urgencia real
+      const _rowBorderClr = (r.nivel === 'vencido') ? '#dc2626' : (r.nivel === 'urgente') ? '#f97316' : (r.nivel === 'atencion') ? '#d97706' : 'transparent';
       const rowClass = libre ? 'pv-lead-libre' : (deOtro ? 'pv-lead-bloqueado' : (esMio ? 'pv-row-mine' : ''));
-      const vendedorCell = libre
-        ? `<span class="pv-badge-libre">⚡ Disponible</span>`
-        : (esMio
-          ? `<span style="font-size:.8rem;font-weight:700">Mío <span class="pv-mine-tag">✓</span></span>`
-          : `<span class="pv-badge-tomado">🔒 ${esc(c.vendedorAsignado)}</span>`);
-      const expBtn = `<button class="pv-detail-btn" onclick="abrirExpediente(${JSON.stringify(c).replace(/</g,'\\x3c').replace(/"/g,'&quot;')},this)" type="button" title="Ver expediente" aria-label="Ver expediente de ${esc(c.nombre||'cliente')}" style="background:#eff6ff;color:#2563eb;border-color:#2563eb;min-width:32px;padding:0 8px"><i class="ti ti-folder-open"></i></button>`;
+      // Avatar con iniciales
+      const _avColors = ['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#10b981'];
+      const _avClr = _avColors[(c.nombre||'?').charCodeAt(0) % _avColors.length];
+      const _ini = (c.nombre||'?').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
+      // Tiempo desde última actividad
+      const _ua = c.ultimaActividad ? new Date(c.ultimaActividad) : null;
+      const _mins = _ua ? Math.floor((Date.now() - _ua.getTime()) / 60000) : null;
+      const _tStr = !_ua ? '—' : _mins < 60 ? 'Hace ' + _mins + 'm' : _mins < 1440 ? 'Hace ' + Math.floor(_mins/60) + 'h' : 'Hace ' + Math.floor(_mins/1440) + 'd';
+      // Urgency badge inline en estado
+      const _urgBadge = (r.nivel === 'vencido' || r.nivel === 'urgente')
+        ? `<span style="display:inline-block;font-size:.58rem;font-weight:800;padding:1px 6px;border-radius:8px;background:${r.nivel==='vencido'?'rgba(220,38,38,.12)':'rgba(249,115,22,.12)'};color:${r.nivel==='vencido'?'#dc2626':'#c2410c'};margin-top:3px;letter-spacing:.03em">${esc(r.label)}</span>`
+        : '';
+      // Acción principal contextual
+      const _waUrl = c.telefono ? waLink(c) : '';
+      const _tel = c.telefono ? telLink(c) : '';
       const accionBtn = libre && !esGte
-        ? `<div style="display:flex;gap:5px">${expBtn}<button class="pv-tomar-btn" data-tomar-id="${esc(c._id)}" type="button" title="Tomar este lead y asignarlo a mi cartera"><i class="ti ti-hand-grab"></i> Tomar</button></div>`
-        : `<div style="display:flex;gap:5px">${expBtn}<button class="pv-detail-btn" data-id="${esc(c._id)}" type="button" ${deOtro ? 'style="opacity:.6"' : ''}>Ver →</button></div>`;
+        ? `<div class="pv-row-actions"><button class="pv-detail-btn pv-btn-tomar" data-tomar-id="${esc(c._id)}" type="button" onclick="event.stopPropagation()"><i class="ti ti-hand-grab"></i> Tomar</button></div>`
+        : `<div class="pv-row-actions" onclick="event.stopPropagation()">
+            ${_waUrl ? `<a href="${_waUrl}" class="pv-row-wa-btn" target="_blank" rel="noreferrer" onclick="registrarClickWa('${esc(c._id)}')" title="WhatsApp"><i class="ti ti-brand-whatsapp"></i></a>` : ''}
+            ${_tel ? `<a href="${_tel}" class="pv-row-call-btn" title="Llamar" onclick="registrarClickWa('${esc(c._id)}')"><i class="ti ti-phone"></i></a>` : ''}
+            <button class="pv-row-exp-btn" data-id="${esc(c._id)}" type="button" title="Ver expediente" onclick="event.stopPropagation();abrirDetalle('${esc(c._id)}')"><i class="ti ti-file-text"></i></button>
+          </div>`;
       return `
-      <tr class="${rowClass}" data-id="${esc(c._id)}" style="cursor:pointer">
-        <td>
-          <div class="pv-row-name">${esc(c.nombre || 'Sin nombre')}${c.inactivo24h ? '<span class="pv-inactivo-dot" title="+24h sin actividad"></span>' : ''}${deOtro ? '' : contactBtns(c)}</div>
-          <div class="pv-row-phone">${esc(c.telefono)}${c.estatusExpediente ? ' ' + (window.estadoBadgeHTML||function(){return'';})(c.estatusExpediente) : ''} ${_tempBadge(c)}</div>
+      <tr class="${rowClass}" data-id="${esc(c._id)}" style="cursor:pointer;border-left:3px solid ${_rowBorderClr}">
+        <td style="padding-left:${_rowBorderClr!=='transparent'?'13px':'var(--sp-4)'}">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:50%;background:${_avClr};color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Plus Jakarta Sans',sans-serif">${esc(_ini)}</div>
+            <div style="min-width:0">
+              <div class="pv-row-name" style="display:flex;align-items:center;gap:5px">${esc(c.nombre || 'Sin nombre')}${c.inactivo24h ? '<span class="pv-inactivo-dot" title="+24h sin actividad"></span>' : ''}</div>
+              <div class="pv-row-phone" style="font-size:.75rem;margin-top:1px">${esc(c.telefono||'—')}${c.notas ? ' · <span style="color:var(--muted);font-style:italic">'+esc(c.notas.slice(0,30))+(c.notas.length>30?'…':'')+'</span>' : ''}</div>
+              <div style="display:flex;align-items:center;gap:5px;margin-top:3px;flex-wrap:wrap">
+                <span class="pv-badge-origen ${origenClass(c.origen)}" style="font-size:.6rem">${esc(c.origen || 'Web')}</span>
+                ${deOtro ? `<span style="font-size:.6rem;color:var(--muted)">🔒 ${esc(c.vendedorAsignado)}</span>` : ''}
+                ${libre ? '<span class="pv-badge-libre" style="font-size:.6rem">⚡ Disponible</span>' : ''}
+              </div>
+            </div>
+          </div>
         </td>
-        <td class="col-origen"><span class="pv-badge-origen ${origenClass(c.origen)}">${esc(c.origen || 'Sitio web')}</span></td>
-        <td><span class="pv-badge ${estatusClass(c.estatus)}">${esc(c.estatus || 'Nuevo')}</span></td>
-        <td class="col-vendedor">${vendedorCell}</td>
-        <td class="col-progreso">
-          <div class="pv-mini-dots">${miniPerfilDots(c)}${_completudBadge(c)}</div>
-          ${opActual ? `<span class="pv-badge-etapa ${etapaClass(opActual.etapa)}" style="margin-top:4px;display:inline-flex">${esc(etapaConEmoji(opActual.etapa))}</span>` : '<span class="pv-row-sin-opp">Sin oportunidad</span>'}
+        <td style="min-width:120px">
+          <span class="pv-badge ${estatusClass(c.estatus)}">${esc(c.estatus || 'Nuevo')}</span>
+          ${_urgBadge}
+          <div style="font-size:.68rem;color:var(--muted);margin-top:4px">${_tStr}</div>
+          ${opActual ? `<div style="font-size:.65rem;color:var(--lime-dark);margin-top:2px;font-weight:600">${esc(etapaConEmoji(opActual.etapa))}</div>` : ''}
         </td>
-        <td>${fmtFecha(c.ultimaActividad)}</td>
-        <td class="col-riesgo">${(() => { const r = riesgoInfo(c); const t = temperaturaInfo(c); return `<span class="pv-risk-badge ${r.nivel}">${esc(r.label)}</span>${t ? `<span class="pv-temp ${t.nivel}" title="${esc(t.title)}" style="display:block;margin-top:4px">${esc(t.label)}</span>` : ''}`; })()}</td>
-        <td>${accionBtn}</td>
+        <td style="white-space:nowrap">${accionBtn}</td>
       </tr>`;
     }).join('');
   }
@@ -12145,7 +12185,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
   ['pv-filter-estatus', 'pv-filter-origen', 'pv-filter-mios', 'pv-sort'].forEach(id => document.getElementById(id).addEventListener('change', filtrosCambiaron));
 
   document.getElementById('pv-refresh').addEventListener('click', () => {
-    document.getElementById('pv-tbody').innerHTML = '<tr><td colspan="8"><div class="pv-loading">Actualizando...</div></td></tr>';
+    document.getElementById('pv-tbody').innerHTML = '<tr><td colspan="3"><div class="pv-loading">Actualizando...</div></td></tr>';
     window.parent.postMessage({ type: 'wecars-panel-ready' }, '*');
   });
 
