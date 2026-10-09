@@ -1068,6 +1068,26 @@ body:not(.wc-loading) .wc-main { opacity: 1; transition: opacity .3s; }
   border-color: var(--lime);
 }
 .pv-chip-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+/* Chips de periodo en Reportes */
+.pv-rep-chip {
+  display: inline-flex; align-items: center;
+  padding: 5px 14px; border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: var(--bg); color: var(--muted);
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+  cursor: pointer; font-family: inherit;
+  transition: all .12s;
+}
+.pv-rep-chip.active {
+  background: var(--lime); color: #081102;
+  border-color: var(--lime);
+}
+/* Embudo de conversión */
+.pv-rep-funnel-row { display: flex; align-items: center; gap: 10px; }
+.pv-rep-funnel-label { font-size: .78rem; font-weight: 600; color: var(--ink); min-width: 90px; }
+.pv-rep-funnel-track { flex: 1; height: 22px; background: var(--surface); border-radius: 4px; overflow: hidden; }
+.pv-rep-funnel-bar { height: 100%; border-radius: 4px; transition: width .4s ease; display: flex; align-items: center; padding-left: 8px; }
+.pv-rep-funnel-count { font-size: .72rem; font-weight: 700; color: #fff; white-space: nowrap; }
 .pv-inv-filter-row {
   display: flex; flex-direction: column; gap: 8px;
 }
@@ -6649,16 +6669,60 @@ section.pv-table-wrap > .shell > #pv-compradores {
       </div>
     </div>
 
-    <div id="pv-reportes" style="display:none">
-      <div class="pv-stats-grid" style="margin-bottom:16px">
-        <div class="pv-stat"><i class="ti ti-trophy pv-stat-icon"></i><b id="pv-rep-ganados">0</b><span>Ganados</span></div>
-        <div class="pv-stat"><i class="ti ti-progress pv-stat-icon"></i><b id="pv-rep-enproceso">0</b><span>En proceso</span></div>
-        <div class="pv-stat"><i class="ti ti-clock pv-stat-icon"></i><b id="pv-rep-tiemporespuesta">—</b><span>Tiempo de respuesta</span></div>
-        <div class="pv-stat"><i class="ti ti-cash pv-stat-icon"></i><b id="pv-rep-comision">$0</b><span>Comisión total</span></div>
+    <div id="pv-reportes" style="display:none;padding:20px 0 60px">
+
+      <!-- Encabezado + chips de periodo -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+        <div>
+          <h2 style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:1.15rem;font-weight:900;color:var(--ink);margin:0">Mis reportes</h2>
+          <p style="font-size:.8rem;color:var(--muted);margin:3px 0 0">Tu rendimiento de ventas por periodo</p>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="pv-rep-periodo-chips">
+          <button class="pv-rep-chip active" data-periodo="mes" type="button">Este mes</button>
+          <button class="pv-rep-chip" data-periodo="semana" type="button">Esta semana</button>
+          <button class="pv-rep-chip" data-periodo="año" type="button">Este año</button>
+          <button class="pv-rep-chip" data-periodo="todo" type="button">Todo</button>
+        </div>
       </div>
-      <div class="pv-mgr-card">
-        <div class="pv-card-head"><span class="pv-card-icon"><i class="ti ti-credit-card"></i></span><h3>Forma de pago de mis clientes</h3></div>
-        <p class="pv-card-sub">Basado en la forma de pago capturada en tus oportunidades.</p>
+
+      <!-- KPI strip principal -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">
+        <div class="pv-dash-card" style="padding:14px 16px;margin:0;text-align:center">
+          <div style="font-size:1.8rem;font-weight:900;color:var(--lime-dark);line-height:1" id="pv-rep-ganados">0</div>
+          <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px">Ganados</div>
+        </div>
+        <div class="pv-dash-card" style="padding:14px 16px;margin:0;text-align:center">
+          <div style="font-size:1.8rem;font-weight:900;color:#2563eb;line-height:1" id="pv-rep-enproceso">0</div>
+          <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px">En proceso</div>
+        </div>
+        <div class="pv-dash-card" style="padding:14px 16px;margin:0;text-align:center">
+          <div style="font-size:1.8rem;font-weight:900;color:var(--ink);line-height:1" id="pv-rep-conversion">—%</div>
+          <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px">Conversión</div>
+        </div>
+        <div class="pv-dash-card" style="padding:14px 16px;margin:0;text-align:center">
+          <div style="font-size:1.5rem;font-weight:900;color:var(--lime-dark);line-height:1" id="pv-rep-comision">$0</div>
+          <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px">Comisión estimada</div>
+        </div>
+        <div class="pv-dash-card" style="padding:14px 16px;margin:0;text-align:center">
+          <div style="font-size:1.5rem;font-weight:900;color:var(--ink);line-height:1" id="pv-rep-tiemporespuesta">—</div>
+          <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px">Tiempo respuesta</div>
+        </div>
+      </div>
+
+      <!-- Embudo de conversión -->
+      <div class="pv-mgr-card" style="margin-bottom:16px">
+        <div class="pv-card-head">
+          <span class="pv-card-icon"><i class="ti ti-filter"></i></span>
+          <h3>Embudo de conversión</h3>
+          <span id="pv-rep-funnel-label" style="margin-left:auto;font-size:.75rem;color:var(--muted);font-weight:600"></span>
+        </div>
+        <div id="pv-rep-funnel" style="display:flex;flex-direction:column;gap:10px;margin-top:4px"></div>
+      </div>
+
+      <!-- Forma de pago -->
+      <div class="pv-mgr-card" style="margin-bottom:16px">
+        <div class="pv-card-head"><span class="pv-card-icon"><i class="ti ti-credit-card"></i></span><h3>Forma de pago</h3></div>
+        <p class="pv-card-sub">De las oportunidades capturadas en el periodo.</p>
         <div class="pv-stats-grid" style="margin-bottom:16px">
           <div class="pv-stat"><i class="ti ti-cash pv-stat-icon"></i><b id="pv-rep-contado">0</b><span>Contado</span></div>
           <div class="pv-stat"><i class="ti ti-credit-card pv-stat-icon"></i><b id="pv-rep-credito">0</b><span>Crédito</span></div>
@@ -6670,12 +6734,13 @@ section.pv-table-wrap > .shell > #pv-compradores {
         </table>
       </div>
 
+      <!-- Ventas cerradas -->
       <div class="pv-mgr-card">
-        <div class="pv-card-head"><span class="pv-card-icon"><i class="ti ti-report-analytics"></i></span><h3>Mis ventas cerradas</h3></div>
+        <div class="pv-card-head"><span class="pv-card-icon"><i class="ti ti-report-analytics"></i></span><h3>Ventas cerradas</h3></div>
         <div class="pv-stats-grid" id="pv-rep-ventas-kpis" style="margin-bottom:14px"></div>
         <table class="pv-mgr-table">
-          <thead><tr><th>Cliente / Vehículo</th><th>Precio venta</th><th>Comisión</th><th>Utilidad</th><th>Fecha / Estatus</th></tr></thead>
-          <tbody id="pv-rep-ventas-body"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px 0">Cargando ventas...</td></tr></tbody>
+          <thead><tr><th>Vehículo</th><th>Precio venta</th><th>Comisión</th><th>Fecha</th></tr></thead>
+          <tbody id="pv-rep-ventas-body"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px 0">Sin ventas en el periodo.</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -11227,64 +11292,150 @@ section.pv-table-wrap > .shell > #pv-compradores {
     'Kuna': 'Financiera', 'Crédito Go': 'Financiera', 'Atria': 'Financiera',
   };
 
-  function renderReportes() {
-    const misClientes = clientes.filter((c) => (c.vendedorAsignado || '').toLowerCase() === vendedorActual.toLowerCase());
-    const ganados = misClientes.filter((c) => _esClienteGanado(c)).length;
-    const enProceso = misClientes.filter((c) => c.estatus === 'En proceso').length;
+  var _repPeriodo = 'mes';
 
-    const idsMisClientes = new Set(misClientes.map((c) => c._id));
-    const misOportunidades = todasOportunidades.filter((o) => idsMisClientes.has(o.clienteId));
-    const contado = misOportunidades.filter((o) => o.formaPago === 'Contado').length;
-    const credito = misOportunidades.filter((o) => o.formaPago === 'Crédito').length;
-    const sinEspecificarPago = misOportunidades.filter((o) => !o.formaPago).length;
+  function _repGetCorte(periodo) {
+    var ahora = new Date(); ahora.setHours(0,0,0,0);
+    if (periodo === 'semana') {
+      var d = new Date(ahora); d.setDate(d.getDate() - d.getDay()); return d;
+    }
+    if (periodo === 'mes') {
+      return new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    }
+    if (periodo === 'año') {
+      return new Date(ahora.getFullYear(), 0, 1);
+    }
+    return null; // todo
+  }
+
+  function _repFiltrarFecha(fechaStr, corte) {
+    if (!corte) return true;
+    if (!fechaStr) return false;
+    var f = new Date(fechaStr);
+    return !isNaN(f) && f >= corte;
+  }
+
+  function renderReportes() {
+    var corte = _repGetCorte(_repPeriodo);
+    var periodoLabels = { semana: 'esta semana', mes: 'este mes', año: 'este año', todo: 'historial completo' };
+
+    var todosLosMios = clientes.filter(function(c) {
+      return (c.vendedorAsignado || '').toLowerCase() === vendedorActual.toLowerCase();
+    });
+    var misClientesPeriodo = todosLosMios.filter(function(c) {
+      return _repFiltrarFecha(c._createdDate, corte);
+    });
+
+    // Funnel stages sobre leads del periodo
+    var total = misClientesPeriodo.length;
+    var contactados = misClientesPeriodo.filter(function(c) { return c.estatus !== 'Nuevo'; }).length;
+    var enProceso = misClientesPeriodo.filter(function(c) { return c.estatus === 'En proceso'; }).length;
+    var ganados = misClientesPeriodo.filter(function(c) { return _esClienteGanado(c); }).length;
+    var conversion = total ? Math.round((ganados / total) * 100) : 0;
+
+    // KPIs de forma de pago (sobre todas sus oportunidades, filtradas por fecha)
+    var idsMios = new Set(todosLosMios.map(function(c) { return c._id; }));
+    var misOportunidades = todasOportunidades.filter(function(o) {
+      return idsMios.has(o.clienteId) && _repFiltrarFecha(o.fechaCreacion || o._createdDate, corte);
+    });
+    var contado = misOportunidades.filter(function(o) { return o.formaPago === 'Contado'; }).length;
+    var credito = misOportunidades.filter(function(o) { return o.formaPago === 'Crédito'; }).length;
+    var sinEspecificarPago = misOportunidades.filter(function(o) { return !o.formaPago; }).length;
+
+    // Tiempo de respuesta
+    var primeraPorCliente = {};
+    todasActividades.forEach(function(a) {
+      if (!a.clienteId || !a.fecha) return;
+      var f = new Date(a.fecha); if (isNaN(f)) return;
+      if (!primeraPorCliente[a.clienteId] || f < primeraPorCliente[a.clienteId]) primeraPorCliente[a.clienteId] = f;
+    });
+    var sumaHoras = 0, cuentaResp = 0;
+    misClientesPeriodo.forEach(function(c) {
+      var primera = primeraPorCliente[c._id];
+      if (!primera || !c._createdDate) return;
+      var horas = (primera.getTime() - new Date(c._createdDate).getTime()) / 3600000;
+      if (horas >= 0) { sumaHoras += horas; cuentaResp++; }
+    });
+
+    // Ventas del periodo
+    var misVentas = ventasComisiones.filter(function(v) {
+      return (v.vendedorId || '').toLowerCase() === vendedorActual.toLowerCase()
+        && _repFiltrarFecha(v.fecha, corte);
+    });
+    var totalComision = misVentas.reduce(function(s, v) { return s + (Number(v.comisionMonto) || 0); }, 0);
+
+    // — Pintar KPIs principales —
+    document.getElementById('pv-rep-ganados').textContent = ganados;
+    document.getElementById('pv-rep-enproceso').textContent = enProceso;
+    document.getElementById('pv-rep-conversion').textContent = total ? conversion + '%' : '—%';
+    document.getElementById('pv-rep-comision').textContent = '$' + Math.round(totalComision).toLocaleString('es-MX');
+    document.getElementById('pv-rep-tiemporespuesta').textContent = cuentaResp ? fmtDuracionHoras(sumaHoras / cuentaResp) : '—';
+
+    // — Pintar embudo —
+    var lbl = document.getElementById('pv-rep-funnel-label');
+    if (lbl) lbl.textContent = total + ' leads ' + (periodoLabels[_repPeriodo] || '');
+    var funnel = document.getElementById('pv-rep-funnel');
+    if (funnel) {
+      var etapas = [
+        { nombre: 'Total leads', valor: total, color: '#64748b' },
+        { nombre: 'Contactados', valor: contactados, color: '#3b82f6' },
+        { nombre: 'En proceso', valor: enProceso, color: '#f59e0b' },
+        { nombre: 'Ganados', valor: ganados, color: '#22c55e' },
+      ];
+      funnel.innerHTML = etapas.map(function(e) {
+        var pct = total ? Math.max(4, Math.round((e.valor / total) * 100)) : 0;
+        var pctLabel = total ? Math.round((e.valor / total) * 100) + '%' : '—';
+        return '<div class="pv-rep-funnel-row">'
+          + '<div class="pv-rep-funnel-label">' + esc(e.nombre) + '</div>'
+          + '<div class="pv-rep-funnel-track">'
+          + '<div class="pv-rep-funnel-bar" style="width:' + pct + '%;background:' + e.color + '">'
+          + '<span class="pv-rep-funnel-count">' + e.valor + '</span>'
+          + '</div></div>'
+          + '<div style="font-size:.72rem;font-weight:700;color:var(--muted);min-width:36px;text-align:right">' + pctLabel + '</div>'
+          + '</div>';
+      }).join('');
+    }
+
+    // — Forma de pago —
     document.getElementById('pv-rep-contado').textContent = contado;
     document.getElementById('pv-rep-credito').textContent = credito;
     document.getElementById('pv-rep-pago-sinespecificar').textContent = sinEspecificarPago;
-    const porInstitucion = {};
-    misOportunidades.forEach((o) => {
+    var porInstitucion = {};
+    misOportunidades.forEach(function(o) {
       if (o.formaPago !== 'Crédito' || !o.institucionFinanciera) return;
       porInstitucion[o.institucionFinanciera] = (porInstitucion[o.institucionFinanciera] || 0) + 1;
     });
-    const filasInstitucion = Object.entries(porInstitucion).sort((a, b) => b[1] - a[1]);
+    var filasInstitucion = Object.entries(porInstitucion).sort(function(a, b) { return b[1] - a[1]; });
     document.getElementById('pv-rep-financiera-body').innerHTML = filasInstitucion.length
-      ? filasInstitucion.map(([nombre, cuenta]) => `<tr><td>${esc(nombre)}</td><td>${esc(INSTITUCIONES_TIPO[nombre] || '—')}</td><td>${cuenta}</td></tr>`).join('')
-      : '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:16px 0">Sin créditos con institución registrada todavía.</td></tr>';
+      ? filasInstitucion.map(function(e) {
+          return '<tr><td>' + esc(e[0]) + '</td><td>' + esc(INSTITUCIONES_TIPO[e[0]] || '—') + '</td><td>' + e[1] + '</td></tr>';
+        }).join('')
+      : '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:16px 0">Sin créditos con institución registrada.</td></tr>';
 
-    const primeraPorCliente = {};
-    todasActividades.forEach((a) => {
-      if (!a.clienteId || !a.fecha) return;
-      const f = new Date(a.fecha);
-      if (isNaN(f)) return;
-      if (!primeraPorCliente[a.clienteId] || f < primeraPorCliente[a.clienteId]) primeraPorCliente[a.clienteId] = f;
-    });
-    let sumaHoras = 0, cuenta = 0;
-    misClientes.forEach((c) => {
-      const primera = primeraPorCliente[c._id];
-      if (!primera || !c._createdDate) return;
-      const horas = (primera.getTime() - new Date(c._createdDate).getTime()) / 3600000;
-      if (horas >= 0) { sumaHoras += horas; cuenta++; }
-    });
-
-    const misVentas = ventasComisiones.filter((v) => (v.vendedorId || '').toLowerCase() === vendedorActual.toLowerCase());
-    const totalComision = misVentas.reduce((sum, v) => sum + (Number(v.comisionMonto) || 0), 0);
-    const totalVendido = misVentas.reduce((sum, v) => sum + (Number(v.precioVenta) || 0), 0);
-
-    document.getElementById('pv-rep-ganados').textContent = ganados;
-    document.getElementById('pv-rep-enproceso').textContent = enProceso;
-    document.getElementById('pv-rep-tiemporespuesta').textContent = cuenta ? fmtDuracionHoras(sumaHoras / cuenta) : '—';
-    document.getElementById('pv-rep-comision').textContent = '$' + Math.round(totalComision).toLocaleString('es-MX');
-
-    const tbody = document.getElementById('pv-rep-ventas-body');
+    // — Ventas cerradas —
+    var tbody = document.getElementById('pv-rep-ventas-body');
     tbody.innerHTML = misVentas.length
-      ? misVentas.map((v) => `
-        <tr>
-          <td>${esc(v.vehiculo || '—')}</td>
-          <td>$${Math.round(Number(v.precioVenta) || 0).toLocaleString('es-MX')}</td>
-          <td>$${Math.round(Number(v.comisionMonto) || 0).toLocaleString('es-MX')}</td>
-          <td>${fmtFecha(v.fecha)}</td>
-        </tr>`).join('')
-      : '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px 0">Sin ventas registradas todavía.</td></tr>';
+      ? misVentas.map(function(v) {
+          return '<tr>'
+            + '<td>' + esc(v.vehiculo || '—') + '</td>'
+            + '<td>$' + Math.round(Number(v.precioVenta) || 0).toLocaleString('es-MX') + '</td>'
+            + '<td>$' + Math.round(Number(v.comisionMonto) || 0).toLocaleString('es-MX') + '</td>'
+            + '<td>' + fmtFecha(v.fecha) + '</td>'
+            + '</tr>';
+        }).join('')
+      : '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px 0">Sin ventas en el periodo.</td></tr>';
   }
+
+  // Wire chips de periodo
+  document.getElementById('pv-rep-periodo-chips').addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-periodo]');
+    if (!btn) return;
+    _repPeriodo = btn.dataset.periodo;
+    document.querySelectorAll('#pv-rep-periodo-chips .pv-rep-chip').forEach(function(b) {
+      b.classList.toggle('active', b === btn);
+    });
+    renderReportes();
+  });
 
   function renderConfiguracion() {
     document.getElementById('pv-cfg-nombre').textContent = document.getElementById('wc-sidebar-name').textContent;
