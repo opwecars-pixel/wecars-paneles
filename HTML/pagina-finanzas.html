@@ -2302,6 +2302,53 @@ canvas { max-width: 100% !important; height: auto !important; }
   .fn-kpi:hover{ box-shadow: var(--sh-2) !important; }
 }
 
+/* ── F-05. ap-baja-overlay — rgba negro → var(--overlay) ─ */
+#ap-baja-overlay { background: var(--overlay) !important; }
+
+/* ── F-06. co-edit-overlay modal — var(--card,#fff) → var(--surface) ─ */
+#co-edit-overlay > div { background: var(--surface) !important; }
+
+/* ── F-07. carta-overlay — rgba negro → var(--overlay) ─ */
+.carta-overlay { background: var(--overlay) !important; }
+
+/* ── F-08. carta-modal wrapper — background:#fff → var(--surface) ─
+   (carta-print sigue blanco: es documento imprimible, intencional) */
+.carta-modal { background: var(--surface) !important; }
+
+/* ── F-09. wc-exp-overlay drawer — overlay rgba → var(--overlay) ─ */
+.wc-exp-overlay { background: var(--overlay) !important; }
+
+/* ── F-10. wc-exp-drawer — background:#fff → var(--surface) ─ */
+.wc-exp-drawer {
+  background: var(--surface) !important;
+}
+:root[data-theme="dark"] .wc-exp-drawer { background: var(--surface) !important; }
+
+/* ── F-11. Drawer textos hardcodeados → tokens DS ─ */
+.wc-exp-field-val,
+.wc-exp-tl-accion { color: var(--ink) !important; }
+.wc-exp-action-btn {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+@media (hover: hover) and (pointer: fine) {
+  .wc-exp-action-btn:hover { background: var(--surface-2, var(--bg)) !important; }
+}
+.wc-exp-comment-input {
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+.wc-exp-comment-input:focus {
+  border-color: var(--lime) !important;
+}
+.wc-exp-tabs { border-bottom-color: var(--line) !important; }
+.wc-exp-tab.active { color: var(--ink) !important; }
+.wc-exp-tl-comment {
+  background: var(--bg) !important;
+  color: var(--muted) !important;
+}
 
 </style>
 
