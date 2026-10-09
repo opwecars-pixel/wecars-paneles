@@ -674,6 +674,11 @@
     button:focus-visible,a.btn:focus-visible,a[class*="btn"]:focus-visible,.btn:focus-visible,.wc-btn:focus-visible,.faq-q:focus-visible,.mob-close:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
     @media(max-width:640px){.btn,.btn.primary,.btn.dark,.wc-btn.primary{min-height:44px}}
+    @media(max-width:480px){
+      .reasons-grid,.steps-grid{grid-template-columns:1fr}
+      .hero-proof{grid-template-columns:1fr;gap:8px}
+      .path-grid{grid-template-columns:1fr}
+    }
 
   </style>
 </head>
