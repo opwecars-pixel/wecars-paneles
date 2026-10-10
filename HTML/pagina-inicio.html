@@ -239,12 +239,12 @@
     .hero-grid{
       position:relative;z-index:1;display:grid;
       grid-template-columns:52% 1fr;
-      min-height:700px;
+      min-height:700px;width:100%;
     }
-    /* Columna izquierda: copy */
+    /* Columna izquierda: copy — padding izquierdo = margen del shell */
     .hero-copy{
       display:flex;flex-direction:column;justify-content:center;
-      padding:88px 56px 88px 0;
+      padding:88px 56px 88px max(20px, calc((100vw - 1280px) / 2 + 20px));
     }
     /* Eyebrow con punto pulsante */
     .hero-eyebrow{
@@ -307,7 +307,7 @@
 
     /* Simulador de mensualidad — flotante en columna visual */
     .sim-card{
-      position:absolute;bottom:28px;left:-28px;right:24px;z-index:2;
+      position:absolute;bottom:28px;left:24px;right:24px;z-index:2;
       background:rgba(14,20,12,.88);border:1px solid rgba(86,169,0,.22);
       border-radius:18px;padding:22px 24px;backdrop-filter:blur(20px);
       -webkit-backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:16px;
@@ -647,9 +647,9 @@
       .menu-toggle{display:block}
       .hero-grid{grid-template-columns:1fr;min-height:auto}
       .hero{min-height:auto}
-      .hero-copy{padding:64px 0 32px}
+      .hero-copy{padding:60px 20px 32px}
       .hero-visual{min-height:420px}
-      .sim-card{position:static;border-radius:0 0 0 0;left:auto;right:auto;bottom:auto;margin:0}
+      .sim-card{position:static;border-radius:0;left:auto;right:auto;bottom:auto;margin:0}
       .hero-copy h1{max-width:720px}
       .finder{max-width:540px}
       .trust{grid-template-columns:1fr 1fr}
@@ -668,7 +668,7 @@
       .wc-nav{height:67px}
       .wc-brand img{width:135px}
       .hero-grid{grid-template-columns:1fr}
-      .hero-copy{max-width:100%;padding:52px 0 28px}
+      .hero-copy{max-width:100%;padding:48px 16px 24px}
       .hero-visual{min-height:360px}
       .sim-card{position:static;border-radius:0;left:auto;right:auto;bottom:auto;margin:0}
       .hero-copy h1{font-size:clamp(2.2rem,7vw,3.18rem)}
@@ -839,7 +839,7 @@
 
   <main>
     <section class="hero" id="inicio">
-      <div class="shell hero-grid">
+      <div class="hero-grid">
 
         <!-- Columna izquierda: copy -->
         <div class="hero-copy">
@@ -864,7 +864,7 @@
 
         <!-- Columna derecha: visual con simulador integrado -->
         <div class="hero-visual">
-          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1400&q=85" alt="" aria-hidden="true" loading="eager">
+          <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1400&q=85" alt="" aria-hidden="true" loading="eager">
 
           <!-- Badge inventario -->
           <div class="hero-inv-badge">
