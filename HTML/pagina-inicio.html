@@ -225,27 +225,20 @@
     .wc-drop-menu a:hover{background:rgba(103,199,0,.12);color:#70cf05}
 
     /* Hero */
-    /* ── Hero 2 columnas ── */
     .hero{
       overflow:hidden;position:relative;color:white;background:var(--ink);
       min-height:700px;display:flex;align-items:stretch;
     }
-    /* Glow ambiental lado izquierdo */
     .hero::before{
-      content:"";position:absolute;width:700px;height:700px;left:-200px;top:50%;
-      transform:translateY(-50%);border-radius:50%;pointer-events:none;z-index:0;
-      background:radial-gradient(ellipse,rgba(86,169,0,.12) 0%,transparent 70%);
+      content:"";position:absolute;inset:0;
+      background:
+        linear-gradient(90deg,rgba(7,10,12,.97) 0%,rgba(7,10,12,.88) 34%,rgba(7,10,12,.38) 68%,rgba(7,10,12,.18) 100%),
+        linear-gradient(0deg,rgba(7,10,12,.72) 0%,transparent 46%),
+        url("https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=2100&q=88") center/cover;
+      transform:scale(1.02);
     }
-    .hero-grid{
-      position:relative;z-index:1;display:grid;
-      grid-template-columns:52% 1fr;
-      min-height:700px;width:100%;
-    }
-    /* Columna izquierda: copy — padding izquierdo = margen del shell */
-    .hero-copy{
-      display:flex;flex-direction:column;justify-content:center;
-      padding:88px 56px 88px max(20px, calc((100vw - 1280px) / 2 + 20px));
-    }
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 400px;gap:48px;align-items:center;padding:88px 0 80px}
+    .hero-copy{max-width:600px}
     /* Eyebrow con punto pulsante */
     .hero-eyebrow{
       display:inline-flex;align-items:center;gap:8px;
@@ -281,23 +274,9 @@
     .hero-proof span{display:flex;align-items:center;gap:7px}
     .check{width:18px;height:18px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(86,169,0,.18);color:var(--lime);font-size:.72rem;flex-shrink:0}
 
-    /* Columna derecha: visual */
-    .hero-visual{
-      position:relative;overflow:hidden;
-    }
-    .hero-visual img{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;
-    }
-    /* Gradientes sobre la imagen */
-    .hero-visual::before{
-      content:"";position:absolute;inset:0;z-index:1;
-      background:
-        linear-gradient(to right,var(--ink) 0%,transparent 22%),
-        linear-gradient(to top,rgba(15,26,15,.85) 0%,transparent 32%);
-    }
     /* Badge inventario */
     .hero-inv-badge{
-      position:absolute;top:28px;right:24px;z-index:2;
+      position:absolute;top:32px;right:28px;z-index:2;
       background:rgba(14,20,12,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
       border:1px solid rgba(86,169,0,.3);border-radius:10px;
       padding:8px 14px;display:flex;align-items:center;gap:8px;
@@ -305,12 +284,11 @@
     .hero-inv-badge .inv-count{font-family:"Manrope",Arial,sans-serif;font-size:1.35rem;font-weight:800;color:var(--lime);line-height:1}
     .hero-inv-badge .inv-label{font-size:.72rem;font-weight:600;color:rgba(255,255,255,.55);line-height:1.3}
 
-    /* Simulador de mensualidad — flotante en columna visual */
+    /* Simulador de mensualidad */
     .sim-card{
-      position:absolute;bottom:28px;left:24px;right:24px;z-index:2;
-      background:rgba(14,20,12,.88);border:1px solid rgba(86,169,0,.22);
-      border-radius:18px;padding:22px 24px;backdrop-filter:blur(20px);
-      -webkit-backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:16px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+      border-radius:var(--radius-md);padding:28px;backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);display:flex;flex-direction:column;gap:20px;
     }
     .sim-card-title{font-family:"Manrope",Arial,sans-serif;font-size:1rem;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:2px}
     .sim-card-sub{font-size:.78rem;color:rgba(255,255,255,.45);line-height:1.45}
@@ -330,18 +308,16 @@
       background:var(--lime);box-shadow:0 0 0 4px rgba(86,169,0,.25);cursor:pointer;
     }
     .sim-range-labels{display:flex;justify-content:space-between;font-size:.68rem;color:rgba(255,255,255,.28);margin-top:2px}
-    .sim-divider{height:1px;background:rgba(255,255,255,.07)}
-    /* resultado inline */
-    .sim-result-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .sim-result-block{flex:1}
-    .sim-result-label{font-size:.72rem;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
-    .sim-result-amount{font-family:"Manrope",Arial,sans-serif;font-size:2rem;font-weight:800;color:var(--lime);letter-spacing:-.04em;line-height:1}
-    .sim-result-unit{font-size:.74rem;color:rgba(255,255,255,.35);margin-top:3px}
-    .sim-disclaimer{font-size:.66rem;color:rgba(255,255,255,.25);line-height:1.4}
+    .sim-divider{height:1px;background:rgba(255,255,255,.08)}
+    .sim-result-block{text-align:center}
+    .sim-result-label{font-size:.76rem;color:rgba(255,255,255,.45);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+    .sim-result-amount{font-family:"Manrope",Arial,sans-serif;font-size:2.4rem;font-weight:800;color:var(--lime);letter-spacing:-.04em;line-height:1}
+    .sim-result-unit{font-size:.82rem;color:rgba(255,255,255,.4);margin-top:4px}
+    .sim-disclaimer{font-size:.7rem;color:rgba(255,255,255,.28);text-align:center;line-height:1.45}
     .sim-cta{
-      display:inline-flex;align-items:center;white-space:nowrap;
-      padding:10px 16px;background:var(--lime);color:#071100;font-weight:800;font-size:.82rem;
-      border-radius:10px;text-decoration:none;transition:background .2s;font-family:inherit;border:none;cursor:pointer;flex-shrink:0;
+      display:block;text-align:center;width:100%;
+      padding:12px 16px;background:var(--lime);color:#071100;font-weight:800;font-size:.9rem;
+      border-radius:999px;text-decoration:none;transition:background .2s ease;font-family:inherit;border:none;cursor:pointer;
     }
     .sim-cta:hover{background:#7fdc00}
 
@@ -645,11 +621,9 @@
     @media (max-width:980px){
       .wc-links{display:none}
       .menu-toggle{display:block}
-      .hero-grid{grid-template-columns:1fr;min-height:auto}
+      .hero-grid{grid-template-columns:1fr;gap:39px;padding:70px 0 76px}
       .hero{min-height:auto}
-      .hero-copy{padding:60px 20px 32px}
-      .hero-visual{min-height:420px}
-      .sim-card{position:static;border-radius:0;left:auto;right:auto;bottom:auto;margin:0}
+      .hero-copy h1{max-width:720px}
       .hero-copy h1{max-width:720px}
       .finder{max-width:540px}
       .trust{grid-template-columns:1fr 1fr}
@@ -667,16 +641,13 @@
       .shell{width:min(var(--max),calc(100% - 28px))}
       .wc-nav{height:67px}
       .wc-brand img{width:135px}
-      .hero-grid{grid-template-columns:1fr}
-      .hero-copy{max-width:100%;padding:48px 16px 24px}
-      .hero-visual{min-height:360px}
-      .sim-card{position:static;border-radius:0;left:auto;right:auto;bottom:auto;margin:0}
+      .hero-grid{grid-template-columns:1fr;padding:56px 0 62px}
+      .hero-copy{max-width:100%}
+      .sim-card{max-width:480px}
       .hero-copy h1{font-size:clamp(2.2rem,7vw,3.18rem)}
       .hero-actions{display:grid;grid-template-columns:1fr}
       .hero-actions .btn{width:100%}
       .hero-proof{display:grid;grid-template-columns:1fr 1fr;gap:11px;font-size:.8rem}
-      .sim-result-row{flex-direction:column;align-items:flex-start;gap:10px}
-      .sim-cta{width:100%;justify-content:center}
       .finder{padding:20px;border-radius:20px}
       .finder-row{grid-template-columns:1fr}
       .trust-wrap{margin-top:-23px}
@@ -839,9 +810,14 @@
 
   <main>
     <section class="hero" id="inicio">
-      <div class="hero-grid">
+      <!-- Badge inventario flotante -->
+      <div class="hero-inv-badge">
+        <span class="inv-count" id="heroInvCount">47</span>
+        <span class="inv-label">unidades<br>disponibles</span>
+      </div>
 
-        <!-- Columna izquierda: copy -->
+      <div class="shell hero-grid">
+
         <div class="hero-copy">
           <div class="hero-eyebrow">
             <span class="pulse-dot" aria-hidden="true"></span>
@@ -862,50 +838,38 @@
           </div>
         </div>
 
-        <!-- Columna derecha: visual con simulador integrado -->
-        <div class="hero-visual">
-          <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1400&q=85" alt="" aria-hidden="true" loading="eager">
-
-          <!-- Badge inventario -->
-          <div class="hero-inv-badge">
-            <span class="inv-count" id="heroInvCount">47</span>
-            <span class="inv-label">unidades<br>disponibles</span>
+        <!-- Simulador de mensualidad -->
+        <div class="sim-card" aria-label="Simulador de mensualidad estimada">
+          <div>
+            <div class="sim-card-title">¿Cuánto pagarías al mes?</div>
+            <div class="sim-card-sub">Mueve los controles y obtén una estimación al instante — sin comprometerte a nada.</div>
           </div>
 
-          <!-- Simulador de mensualidad -->
-          <div class="sim-card" aria-label="Simulador de mensualidad estimada">
-            <div>
-              <div class="sim-card-title">¿Cuánto pagarías al mes?</div>
-              <div class="sim-card-sub">Mueve los controles — estimación al instante, sin comprometerte.</div>
-            </div>
-
-            <div>
-              <div class="sim-row-label">Precio del auto</div>
-              <div class="sim-val"><span id="simCarVal">$350,000</span></div>
-              <input type="range" class="sim-range" id="simCar" min="100000" max="1500000" step="10000" value="350000" oninput="wcsCalcSim()">
-              <div class="sim-range-labels"><span>$100k</span><span>$750k</span><span>$1.5M</span></div>
-            </div>
-
-            <div>
-              <div class="sim-row-label">Enganche — <span id="simEngPct">20</span>%</div>
-              <div class="sim-val"><span class="sim-accent" id="simEngVal">$70,000</span></div>
-              <input type="range" class="sim-range" id="simEng" min="10" max="40" step="5" value="20" oninput="wcsCalcSim()">
-              <div class="sim-range-labels"><span>10%</span><span>25%</span><span>40%</span></div>
-            </div>
-
-            <div class="sim-divider"></div>
-
-            <div class="sim-result-row">
-              <div class="sim-result-block">
-                <div class="sim-result-label">Mensualidad est. · 36 meses</div>
-                <div class="sim-result-amount" id="simResult">$8,230</div>
-                <div class="sim-result-unit">/ mes · tasa ref. 18% anual</div>
-              </div>
-              <a class="sim-cta" href="https://www.wecarsbajio.com/credito" target="_top">Iniciar cotización →</a>
-            </div>
-
-            <div class="sim-disclaimer">Estimación sin compromisos. La tasa real depende de tu perfil crediticio y la institución financiera.</div>
+          <div>
+            <div class="sim-row-label">Precio del auto</div>
+            <div class="sim-val"><span id="simCarVal">$350,000</span></div>
+            <input type="range" class="sim-range" id="simCar" min="100000" max="1500000" step="10000" value="350000" oninput="wcsCalcSim()">
+            <div class="sim-range-labels"><span>$100k</span><span>$750k</span><span>$1.5M</span></div>
           </div>
+
+          <div>
+            <div class="sim-row-label">Enganche — <span id="simEngPct">20</span>%</div>
+            <div class="sim-val"><span class="sim-accent" id="simEngVal">$70,000</span></div>
+            <input type="range" class="sim-range" id="simEng" min="10" max="40" step="5" value="20" oninput="wcsCalcSim()">
+            <div class="sim-range-labels"><span>10%</span><span>25%</span><span>40%</span></div>
+          </div>
+
+          <div class="sim-divider"></div>
+
+          <div class="sim-result-block">
+            <div class="sim-result-label">Mensualidad estimada · 36 meses</div>
+            <div class="sim-result-amount" id="simResult">$8,230</div>
+            <div class="sim-result-unit">/ mes · tasa referencial 18% anual</div>
+          </div>
+
+          <div class="sim-disclaimer">Estimación sin compromisos. La tasa real depende de tu perfil crediticio y la institución financiera.</div>
+
+          <a class="sim-cta" href="https://www.wecarsbajio.com/credito" target="_top">Iniciar cotización formal →</a>
         </div>
 
       </div>
