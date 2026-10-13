@@ -41,6 +41,8 @@ function _broadcast(msg) {
   try { publish(_WC_CHANNEL, msg); } catch(e) {}
 }
 let gerenciaEmail = ''; // A1: se asigna en enviarDatosGerencia() para uso en logs de reasignación
+let _gerenciaVerificado = false;
+function _guardGe() { return _gerenciaVerificado; }
 
 $w.onReady(function () {
   // ── BroadcastChannel + Wix Realtime (cross-device) ─────────────────
@@ -65,6 +67,10 @@ $w.onReady(function () {
     ;(async () => {
     const data = event.data;
     if (!data || !data.type) return;
+
+    // ── Tipos seguros sin requerir rol verificado ─────────────────────
+    const _GE_SAFE = new Set(['wecars-resize','wecars-navegar','wecars-logout','wecars-gerencia-solicitar','wecars-clientes-pagina']);
+    if (!_GE_SAFE.has(data.type) && !_guardGe()) return;
 
     // ── Resize / navegación / logout ─────────────────────────────────
     if (data.type === 'wecars-resize' && data.height > 0) {
@@ -755,6 +761,7 @@ function enviarDatosGerencia() {
         }, base));
         return;
       }
+      _gerenciaVerificado = true; // GAP-I: habilitar handlers de mutación solo tras verificar rol
       return Promise.all([
         fetchDatosGerencia(),
         getErpConfig('meta_ventas_mensual').catch(() => null),

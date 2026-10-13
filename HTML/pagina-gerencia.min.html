@@ -12283,8 +12283,11 @@ window._geMobileCerrar=function(){
   if(fab) fab.style.removeProperty('display');
 };
 
+var _geMobileInited = false;
 function _initGeMobile(){
   if(!_isMobile()) return;
+  if(_geMobileInited) return; /* GAP-L fix */
+  _geMobileInited = true;
   renderGeMobileHome();
   window.addEventListener('message',function(e){
     if(!_isMobile()) return;

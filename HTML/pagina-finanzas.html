@@ -3593,6 +3593,7 @@ document.getElementById('eg-guardar')?.addEventListener('click', () => {
   const monto = Number(document.getElementById('eg-monto').value);
   const fecha = document.getElementById('eg-fecha').value;
   const ref   = document.getElementById('eg-ref').value.trim();
+  if (!desc)  { toast('⚠ Escribe la descripción del egreso'); return; }
   if (!monto) { toast('⚠ Escribe el monto del egreso'); return; }
   const np = {
     tipo: 'Egreso', categoria: cat, descripcion: desc,
@@ -5570,8 +5571,11 @@ window._fnMobileCerrar=function(){
   if(fab) fab.style.removeProperty('display');
 };
 
+var _fnMobileInited = false;
 function _initFnMobile(){
   if(!_isMobile()) return;
+  if(_fnMobileInited) return; /* GAP-L fix */
+  _fnMobileInited = true;
   renderFnMobileHome();
   window.addEventListener('message',function(e){
     if(!_isMobile()) return;

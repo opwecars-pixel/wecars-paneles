@@ -26,6 +26,8 @@ import { registrarPago, actualizarCredito, actualizarClienteFinanzas, liberarCom
 import { cerrarApartado } from 'backend/apartados.jsw';
 
 const HTML_ID = '#htmlFinanzas';
+let _finanzasVerificado = false;
+function _guardFn() { return _finanzasVerificado; }
 
 // ── Broadcast: mismo navegador (BC) + cross-device (Wix Realtime) ────
 const _WC_CHANNEL = { name: 'wecars-erp-v2' };
@@ -57,6 +59,11 @@ $w.onReady(function () {
 
   $w(HTML_ID).onMessage((event) => {
     const data = event.data;
+    if (!data || !data.type) return;
+
+    // ── Tipos seguros sin requerir rol verificado ─────────────────────
+    const _FN_SAFE = new Set(['wecars-resize','wecars-navegar','wecars-logout','wecars-finanzas-solicitar','wecars-leads-solicitar']);
+    if (!_FN_SAFE.has(data.type) && !_guardFn()) return;
 
     if (data.type === 'wecars-resize' && data.height > 0) {
       $w(HTML_ID).height = data.height;
@@ -293,6 +300,7 @@ function enviarDatosFinanzas() {
         $w(HTML_ID).postMessage(Object.assign({ type: 'wecars-finanzas', clientes: [], creditos: [], pagos: [], comisiones: [], facturas: [] }, base));
         return;
       }
+      _finanzasVerificado = true; // GAP-I: habilitar handlers de mutación solo tras verificar rol
       return fetchDatosFinanzas().then((datos) => {
         const clientes = datos.clientes;
         const creditos = datos.creditos;

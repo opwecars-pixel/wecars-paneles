@@ -3435,6 +3435,8 @@ window.addEventListener('message', function(e) {
       nombreActual     = d.nombreActual           || nombreActual;
       puestoActual     = d.puestoActual           || puestoActual;
       fiActual         = d.fechaIngresoActual     || fiActual;
+      /* GAP-H fix: quitar skeleton de carga al recibir datos confirmados */
+      document.body.classList.remove('wc-loading');
       poblarSelectResponsable();
       poblarSelectLeadVendedor();
       if (vistaActual === 'directorio') renderDirectorio();
@@ -6769,8 +6771,11 @@ window._adMobileCerrar=function(){
   if(fab) fab.style.removeProperty('display');
 };
 
+var _adMobileInited = false;
 function _initAdMobile(){
   if(!_isMobile()) return;
+  if(_adMobileInited) return; /* GAP-L fix: evitar registro duplicado si se llama más de una vez */
+  _adMobileInited = true;
   renderAdMobileHome();
   window.addEventListener('message',function(e){
     if(!_isMobile()) return;
