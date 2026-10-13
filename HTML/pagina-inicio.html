@@ -54,17 +54,6 @@
   --radius-md:     16px;
   --radius-lg:     22px;
   --radius-pill:   999px;
-  /* ── Aliases backward-compat (no tocar) ────────────── */
-  --verde:         var(--lime);
-  --verde-dark:    var(--lime-dark);
-  --negro:         var(--ink);
-  --ink-3:         var(--ink-2);
-  --gris:          var(--paper);
-  --gris-borde:    var(--line);
-  --radio:         var(--radius-md);
-  --sombra:        var(--shadow-lg);
-  --borde:         var(--line);
-  --texto:         var(--muted);
   --max:           1280px;
 }
 /* ── Dark mode ──────────────────────────────────────────── */
@@ -2060,33 +2049,15 @@
     });
   </script>
   
-<!-- Verifica tu Auto — tira discreta -->
 <style>
-.vta-strip{display:flex;align-items:center;gap:14px;padding:13px 24px;background:var(--paper,#F5F7F5);border-top:1px solid var(--line,#d8e2e5);border-bottom:1px solid var(--line,#d8e2e5);font-family:'DM Sans',sans-serif;flex-wrap:wrap}
-.vta-strip-dot{width:7px;height:7px;border-radius:50%;background:#56a900;flex-shrink:0;margin-top:1px}
-.vta-strip-text{flex:1;font-size:.82rem;color:var(--muted,#6d7a83);line-height:1.4;min-width:180px;margin:0}
-.vta-strip-text strong{color:var(--ink,#0f1a0f);font-weight:600}
-.vta-strip-link{white-space:nowrap;font-size:.8rem;font-weight:700;color:#56a900;text-decoration:none;padding:5px 14px;border:1.5px solid rgba(86,169,0,.3);border-radius:99px;transition:background .15s,border-color .15s}
-.vta-strip-link:hover{background:rgba(86,169,0,.08);border-color:rgba(86,169,0,.55)}
-@media(max-width:480px){.vta-strip{gap:10px;padding:12px 16px}.vta-strip-text{font-size:.78rem}}
-@media(prefers-color-scheme:dark){.vta-strip{background:var(--white,#1C2416);border-color:var(--line,#2e3d24)}.vta-strip-text strong{color:var(--ink,#e8f0e0)}}
-
 /* ── MOBILE: scroll trap fix + pequeños ajustes ── */
 @media(max-width:640px){
   body{touch-action:pan-y;overscroll-behavior-y:contain}
-  /* Elementos con scroll horizontal propio: no bloquear */
   .mob-filter-bar,.wc-subtoggle,.overflow-x-scroll,[class*="scroll-x"]{touch-action:pan-x}
-  /* Campos de formulario: fáciles de tocar */
   input,select,textarea,button{touch-action:manipulation}
-  /* Padding lateral consistente en mobile */
   .shell{padding-left:16px!important;padding-right:16px!important}
 }
 </style>
-<div class="vta-strip">
-  <div class="vta-strip-dot"></div>
-  <p class="vta-strip-text"><strong>Verifica tu Auto</strong> &mdash; Revisamos factura, INE, tenencia y m&aacute;s antes de que compres. Reporte en 48&nbsp;h desde $189&nbsp;+&nbsp;IVA.</p>
-  <a class="vta-strip-link" href="https://www.wecarsbajio.com/verifica-tu-auto" onclick="event.preventDefault();window.parent.postMessage({type:'wecars-navegar',url:'https://www.wecarsbajio.com/verifica-tu-auto'},'*')">Saber m&aacute;s &rarr;</a>
-</div>
 <script>(function(){var t,retries=0;function send(){var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight,document.body.offsetHeight);window.parent.postMessage({type:"wecars-resize",height:h},"*");}function rh(){clearTimeout(t);t=setTimeout(function(){requestAnimationFrame(send);},150);}function hookImgs(){document.querySelectorAll("img").forEach(function(img){if(!img.dataset.wcResize){img.dataset.wcResize="1";img.addEventListener("load",rh);img.addEventListener("error",rh);}});}window.addEventListener("load",function(){rh();var iv=setInterval(function(){rh();hookImgs();if(++retries>=12)clearInterval(iv);},400);});window.addEventListener("resize",rh);new MutationObserver(function(){rh();hookImgs();}).observe(document.body,{childList:true,subtree:true,attributes:false,characterData:false});hookImgs();rh();})();</script>
 
 <!-- ── BLOQUE MÓVIL: touch targets + fonts + grid fixes ── -->
