@@ -5181,6 +5181,9 @@ document.getElementById('inv-close').addEventListener('click', cerrarModalCarro)
 //  EXPEDIENTE VEHICULAR
 // ══════════════════════════════════════════════════════════════════
 
+// Mover overlay al body para que position:fixed escape cualquier overflow:hidden del shell
+(function(){ const ov=document.getElementById('exp-overlay'); if(ov && ov.parentElement!==document.body) document.body.appendChild(ov); })();
+
 const _EXP_DOCS = [
   { id:'facturaOriginal',   label:'Factura original' },
   { id:'facturaEndosada',   label:'Factura endosada a nombre de la agencia' },
@@ -5195,12 +5198,14 @@ const _EXP_DOCS = [
 
 let _expCarroActual = null;
 let _expDocs = {};
+let _expDocsUrls = {};
 let _expHistorial = [];
 
 function abrirExpediente(c){
   _expCarroActual = c;
   const docs = c.documentos || {};
   _expDocs = Object.assign({}, docs);
+  _expDocsUrls = Object.assign({}, c.documentosUrls||{});
   _expHistorial = Array.isArray(c.historialExp) ? [...c.historialExp] : [];
 
   // Header
@@ -5213,7 +5218,6 @@ function abrirExpediente(c){
   const badgeStyle = INV_ESTATUS_STYLE[est]||'background:#e5e7eb;color:#374151';
   const badgeEl = document.getElementById('exp-badge-estatus');
   badgeEl.textContent = est;
-  badgeEl.setAttribute('style', badgeEl.getAttribute('style').split(';')[0]||'' );
   badgeEl.style.cssText = badgeStyle+';display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:800;flex-shrink:0';
 
   // Foto thumb
@@ -5327,15 +5331,27 @@ function _expRenderDocumentos(){
   const lista = document.getElementById('exp-docs-lista');
   lista.innerHTML = _EXP_DOCS.map(doc=>{
     const estado = _expDocs[doc.id]||'pendiente';
-    return `<div class="exp-doc-row" data-doc-id="${doc.id}">
-      <div class="exp-doc-nombre">${esc(doc.label)}</div>
-      <div class="exp-doc-btns">
+    const url    = _expDocsUrls[doc.id]||'';
+    const verBtn = url ? `<a href="${esc(url)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;padding:4px 8px;border-radius:var(--r-sm);font-size:.68rem;font-weight:700;background:rgba(37,99,235,.1);color:var(--info);border:1.5px solid rgba(37,99,235,.2);text-decoration:none;white-space:nowrap"><i class="ti ti-external-link" style="font-size:12px"></i> Ver</a>` : '';
+    return `<div class="exp-doc-row" data-doc-id="${doc.id}" style="flex-wrap:wrap;gap:6px">
+      <div class="exp-doc-nombre" style="flex-basis:100%;font-size:.8rem">${esc(doc.label)}</div>
+      <div class="exp-doc-btns" style="flex:1">
         <button class="exp-doc-btn ${estado==='entregado'?'estado-entregado':''}" data-estado="entregado" onclick="_expSetDoc('${doc.id}','entregado',this)" type="button">Entregado</button>
         <button class="exp-doc-btn ${estado==='pendiente'?'estado-pendiente':''}" data-estado="pendiente" onclick="_expSetDoc('${doc.id}','pendiente',this)" type="button">Pendiente</button>
         <button class="exp-doc-btn ${estado==='noaplica'?'estado-noaplica':''}" data-estado="noaplica" onclick="_expSetDoc('${doc.id}','noaplica',this)" type="button">N/A</button>
       </div>
+      <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:180px">
+        <input type="url" value="${esc(url)}" placeholder="URL del documento (Drive, PDF…)" data-doc-url="${doc.id}"
+          style="flex:1;min-width:0;padding:4px 8px;border:1.5px solid var(--line);border-radius:var(--r-sm);font-size:.72rem;font-family:inherit;background:var(--bg);color:var(--ink)"
+          oninput="_expSetDocUrl('${doc.id}',this.value)">
+        ${verBtn}
+      </div>
     </div>`;
   }).join('');
+}
+
+function _expSetDocUrl(docId, url){
+  _expDocsUrls[docId] = url.trim();
 }
 
 function _expSetDoc(docId, estado, btn){
@@ -5415,7 +5431,8 @@ function expGuardar(){
     precioVenta:     Number(document.getElementById('exp-precio-lista').value)||0,
     precioMinimo:    Number(document.getElementById('exp-precio-piso').value)||0,
     // Documentos
-    documentos: _expDocs,
+    documentos:     _expDocs,
+    documentosUrls: _expDocsUrls,
     llaves:   Number(document.getElementById('exp-llaves').value)||1,
     manual:   document.getElementById('exp-manual').value,
     holograma:document.getElementById('exp-holograma').value,
