@@ -19769,6 +19769,15 @@ html { background-color: var(--bg) !important; }
 .pv-field input,
 .pv-field select,
 .pv-field textarea { border-width: 1.5px !important; }
+
+/* ── Publicaciones: grid 2-col en mobile, placeholder altura fija ── */
+@media (max-width: 640px) {
+  .pv-pub-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+/* Configuración: campos de perfil más compactos en mobile */
+@media (max-width: 640px) {
+  #pv-configuracion .pv-cfg-row { padding: 10px 14px !important; }
+}
 </style>
 
 <script>
