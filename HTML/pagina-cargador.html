@@ -9,45 +9,49 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css" rel="stylesheet">
 <style>
-/* ── TOKENS (mismo design system que Admin/Finanzas/Gerencia) ── */
+/* ── TOKENS ── */
 :root {
   --lime:       #56a900;
   --lime-dark:  #3d7a00;
+  --lime-mid:   #4a8f00;
   --lime-bg:    rgba(86,169,0,.10);
-  --bg:         #f4f6f5;
+  --lime-glow:  rgba(86,169,0,.20);
+  --bg:         #eef2ee;
   --surface:    #ffffff;
-  --surface-2:  #f8faf9;
+  --surface-2:  #f6faf6;
   --ink:        #0d1a0d;
   --ink-2:      #2c3d2c;
   --muted:      #6b7e6b;
   --faint:      #9aab9a;
-  --line:       #e2eae2;
+  --line:       #dde8dd;
   --line-2:     #cdd8cd;
   --ok:         #56a900;
   --err:        #dc2626;
   --err-bg:     rgba(220,38,38,.10);
   --info:       #2563eb;
-  --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 18px;
+  --warn:       #d97706;
+  --purple:     #7c3aed;
+  --r-xs: 4px; --r-sm: 8px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px;
   --t-xs:.6875rem; --t-sm:.8125rem; --t-base:.875rem; --t-md:1rem; --t-lg:1.125rem;
-  --sh-1: 0 1px 3px rgba(13,26,13,.07);
-  --sh-2: 0 2px 8px rgba(13,26,13,.08), 0 1px 2px rgba(13,26,13,.04);
-  --sh-3: 0 8px 32px rgba(13,26,13,.13);
-  --sidebar-bg: #1a2a19;
-  --sidebar-w: 240px;
+  --sh-1: 0 1px 4px rgba(13,26,13,.06), 0 0 0 1px rgba(13,26,13,.04);
+  --sh-2: 0 4px 16px rgba(13,26,13,.08), 0 1px 3px rgba(13,26,13,.05);
+  --sh-3: 0 12px 40px rgba(13,26,13,.14);
+  --sidebar-bg: #111c10;
+  --sidebar-w:  248px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0f1a0f; --surface: #1a2a1a; --surface-2: #1e2e1e;
-    --ink: #e8f0e8; --ink-2: #b0c4b0; --muted: #7a9a7a; --faint: #4a6a4a;
-    --line: #2a3e2a; --line-2: #344834;
+    --bg: #0c150c; --surface: #152015; --surface-2: #1a281a;
+    --ink: #e2ede2; --ink-2: #a8c0a8; --muted: #6e9a6e; --faint: #3e5e3e;
+    --line: #233623; --line-2: #2c432c;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f1a0f; --surface: #1a2a1a; --surface-2: #1e2e1e;
-  --ink: #e8f0e8; --ink-2: #b0c4b0; --muted: #7a9a7a; --faint: #4a6a4a;
-  --line: #2a3e2a; --line-2: #344834;
+  --bg: #0c150c; --surface: #152015; --surface-2: #1a281a;
+  --ink: #e2ede2; --ink-2: #a8c0a8; --muted: #6e9a6e; --faint: #3e5e3e;
+  --line: #233623; --line-2: #2c432c;
   color-scheme: dark;
 }
 
@@ -56,8 +60,7 @@
 html, body { height: 100%; font-size: 16px; }
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: var(--t-base);
-  color: var(--ink);
+  font-size: var(--t-base); color: var(--ink);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
@@ -68,136 +71,174 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 img { max-width: 100%; }
 *:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; border-radius: var(--r-xs); }
 
-/* ── LOADING ── */
+/* ── LOADING / SPLASH ── */
 body.wc-loading .wc-main { opacity: 0; pointer-events: none; }
 body.wc-loading .wc-splash { display: flex; }
 .wc-splash {
-  display: none; position: fixed; inset: 0; background: var(--sidebar-bg);
-  align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 9999;
+  display: none; position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 60% 30%, #1e3a1a 0%, #0d160d 70%);
+  align-items: center; justify-content: center; flex-direction: column; gap: 18px; z-index: 9999;
 }
-.wc-splash-logo { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--lime); }
-.wc-splash-sub  { color: rgba(255,255,255,.5); font-size: var(--t-sm); }
-.wc-spinner { width: 32px; height: 32px; border: 3px solid rgba(86,169,0,.2); border-top-color: var(--lime); border-radius: 50%; animation: spin .8s linear infinite; }
+.wc-splash-badge {
+  width: 64px; height: 64px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 12px var(--lime-glow);
+}
+.wc-splash-badge i { font-size: 30px; color: #fff; }
+.wc-splash-logo { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.5rem; font-weight: 800; color: #fff; letter-spacing: -.02em; }
+.wc-splash-sub  { color: rgba(255,255,255,.4); font-size: var(--t-sm); }
+.wc-spinner { width: 28px; height: 28px; border: 2.5px solid rgba(86,169,0,.2); border-top-color: var(--lime); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── SHELL ── */
 .wc-shell { display: flex; height: 100vh; overflow: hidden; }
 
-/* ── SIDEBAR ── */
+/* ══ SIDEBAR ══════════════════════════════════════════════════ */
 .wc-sidebar {
   width: var(--sidebar-w); flex-shrink: 0;
-  background: var(--sidebar-bg); color: #fff;
-  padding: 20px 16px 24px;
-  display: flex; flex-direction: column; gap: 0;
+  background: var(--sidebar-bg);
+  display: flex; flex-direction: column;
   overflow-y: auto; overflow-x: hidden;
+  border-right: 1px solid rgba(255,255,255,.04);
 }
-.wc-logo { display: flex; align-items: center; gap: 9px; padding: 4px 0 20px; }
+
+/* Logo / brand */
+.wc-logo {
+  display: flex; align-items: center; gap: 11px;
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
 .wc-logo-badge {
-  width: 34px; height: 34px; border-radius: 9px;
-  background: var(--lime); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--lime) 0%, var(--lime-dark) 100%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(86,169,0,.35);
 }
 .wc-logo-badge i { font-size: 18px; color: #fff; }
-.wc-logo-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: .95rem; line-height: 1.15; color: #fff; }
-.wc-logo-sub  { font-size: .67rem; color: rgba(255,255,255,.45); font-weight: 500; text-transform: uppercase; letter-spacing: .06em; }
+.wc-logo-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: .92rem; color: #fff; line-height: 1.15; }
+.wc-logo-sub  { font-size: .63rem; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
 
-.wc-sb-label { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.3); padding: 14px 6px 4px; }
+/* Nav items */
+.wc-sb-nav { padding: 12px 10px; flex: 1; }
+.wc-sb-label { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.25); padding: 10px 8px 5px; }
 .wc-sb-item {
   display: flex; align-items: center; gap: 10px;
   padding: 9px 10px; border-radius: var(--r-sm);
-  font-size: var(--t-sm); font-weight: 600; color: rgba(255,255,255,.65);
-  cursor: pointer; transition: background .15s, color .15s; margin-bottom: 1px;
+  font-size: var(--t-sm); font-weight: 600; color: rgba(255,255,255,.55);
+  cursor: pointer; transition: background .15s, color .15s;
   border: none; background: none; width: 100%; text-align: left; min-height: 0;
+  margin-bottom: 2px; letter-spacing: -.01em;
 }
-.wc-sb-item i { font-size: 16px; flex-shrink: 0; opacity: .7; }
-.wc-sb-item:hover, .wc-sb-item.active {
-  background: rgba(86,169,0,.18); color: #fff;
-}
+.wc-sb-item i { font-size: 16px; flex-shrink: 0; opacity: .6; transition: opacity .15s; }
+.wc-sb-item:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.9); }
+.wc-sb-item:hover i { opacity: .9; }
+.wc-sb-item.active { background: linear-gradient(90deg, rgba(86,169,0,.22), rgba(86,169,0,.08)); color: #d4f5a0; border-left: 2.5px solid var(--lime); padding-left: 7.5px; }
 .wc-sb-item.active i { opacity: 1; color: var(--lime); }
 
+/* User block */
 .wc-sb-user {
-  margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.08);
+  padding: 12px 14px 16px;
+  border-top: 1px solid rgba(255,255,255,.06);
   display: flex; align-items: center; gap: 10px;
 }
 .wc-sb-avatar {
-  width: 34px; height: 34px; border-radius: 50%; background: var(--lime-bg);
-  display: flex; align-items: center; justify-content: center; font-size: 15px;
-  color: var(--lime); flex-shrink: 0; font-weight: 700;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(86,169,0,.3), rgba(86,169,0,.15));
+  border: 1.5px solid rgba(86,169,0,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #b8f070; font-weight: 800; flex-shrink: 0;
 }
-.wc-sb-user-name { font-size: var(--t-sm); font-weight: 700; color: #fff; }
-.wc-sb-user-role { font-size: .67rem; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .05em; }
+.wc-sb-user-name { font-size: var(--t-sm); font-weight: 700; color: #e8f4e8; line-height: 1.2; }
+.wc-sb-user-role { font-size: .6rem; color: rgba(255,255,255,.3); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
 
-/* ── MAIN ── */
+/* ══ MAIN AREA ════════════════════════════════════════════════ */
 .wc-main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Topbar */
 .wc-topbar {
-  height: 54px; flex-shrink: 0; padding: 0 20px;
-  display: flex; align-items: center; gap: 14px;
-  background: var(--surface); border-bottom: 1px solid var(--line);
+  height: 56px; flex-shrink: 0;
+  padding: 0 22px;
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  box-shadow: var(--sh-1);
 }
-.wc-topbar-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: var(--t-md); }
-.wc-topbar-sub   { font-size: var(--t-xs); color: var(--muted); }
-.wc-content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px; }
+.wc-topbar-icon {
+  width: 34px; height: 34px; border-radius: var(--r-sm); flex-shrink: 0;
+  background: var(--lime-bg); display: flex; align-items: center; justify-content: center;
+}
+.wc-topbar-icon i { font-size: 17px; color: var(--lime-dark); }
+.wc-topbar-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: var(--t-md); letter-spacing: -.02em; }
+.wc-topbar-sub   { font-size: var(--t-xs); color: var(--muted); margin-top: 1px; }
 
-/* ── SECCIÓN: SELECTOR DE AUTO ── */
+/* Content scroll */
+.wc-content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px; background: var(--bg); }
+
+/* ── SELECTOR DE AUTO ── */
 .wc-car-selector {
-  background: var(--surface); border-radius: var(--r-md); border: 1.5px solid var(--line);
-  padding: 16px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;
+  background: var(--surface);
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;
+  box-shadow: var(--sh-1);
 }
-.wc-car-selector label { font-size: var(--t-sm); font-weight: 700; color: var(--muted); display: block; margin-bottom: 4px; }
-.wc-car-selector select, .wc-car-selector input {
+.wc-car-selector label { font-size: var(--t-xs); font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 5px; }
+.wc-car-selector select {
   width: 100%; padding: 9px 12px; border: 1.5px solid var(--line); border-radius: var(--r-sm);
-  background: var(--bg); color: var(--ink); font-size: var(--t-base); min-height: 40px;
+  background: var(--surface-2); color: var(--ink); font-size: var(--t-base); min-height: 42px;
+  transition: border-color .15s;
 }
-.wc-car-selector .wc-field { flex: 1; min-width: 140px; }
-.wc-badge-disp {
-  display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
-  border-radius: 20px; font-size: var(--t-xs); font-weight: 700; background: var(--lime-bg); color: var(--lime-dark);
-}
+.wc-car-selector select:focus { border-color: var(--lime); outline: none; box-shadow: 0 0 0 3px var(--lime-bg); }
+.wc-car-selector .wc-field { flex: 1; min-width: 160px; }
 
-/* ── SECCIÓN INFO AUTO ── */
-.wc-car-info {
-  display: none; background: var(--surface); border-radius: var(--r-md);
-  border: 1.5px solid var(--line); padding: 14px 16px; margin-bottom: 20px;
-  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+/* ── BANNER DEL AUTO SELECCIONADO ── */
+#car-info-bar {
+  background: var(--surface);
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  box-shadow: var(--sh-1);
 }
-.wc-car-info-foto { width: 72px; height: 56px; border-radius: var(--r-sm); object-fit: cover; flex-shrink: 0; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
-.wc-car-info-foto img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--r-sm); }
-.wc-car-info-txt { flex: 1; min-width: 140px; }
-.wc-car-info-nombre { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: var(--t-md); }
-.wc-car-info-meta  { font-size: var(--t-xs); color: var(--muted); margin-top: 2px; }
-.wc-progress-bar { flex: 1; min-width: 200px; }
-.wc-progress-label { font-size: var(--t-xs); color: var(--muted); font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; }
-.wc-progress-track { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
-.wc-progress-fill  { height: 100%; background: var(--lime); border-radius: 99px; transition: width .3s; }
 
 /* ── SECCIÓN FOTOS ── */
-.wc-section { margin-bottom: 24px; }
+.wc-section { margin-bottom: 28px; }
 .wc-section-head {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-  padding-bottom: 8px; border-bottom: 2px solid var(--line);
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
 }
 .wc-section-icon {
-  width: 32px; height: 32px; border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  width: 36px; height: 36px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
   flex-shrink: 0;
 }
-.wc-section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: var(--t-md); }
-.wc-section-sub   { font-size: var(--t-xs); color: var(--muted); }
-.wc-section-cnt   { margin-left: auto; font-size: var(--t-sm); font-weight: 700; color: var(--muted); }
+.wc-section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: var(--t-md); letter-spacing: -.02em; }
+.wc-section-sub   { font-size: var(--t-xs); color: var(--muted); margin-top: 1px; }
+.wc-section-cnt   {
+  margin-left: auto; font-size: var(--t-xs); font-weight: 800;
+  padding: 3px 10px; border-radius: 99px;
+  background: var(--surface); border: 1px solid var(--line); color: var(--muted);
+}
+.wc-section-cnt.done { background: var(--lime-bg); border-color: var(--lime); color: var(--lime-dark); }
 
 /* ── GRID DE SLOTS ── */
 .wc-slots {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 10px;
 }
 .wc-slot {
   aspect-ratio: 4/3; border-radius: var(--r-sm); overflow: hidden; position: relative;
-  border: 2px dashed var(--line); cursor: pointer; background: var(--surface);
-  transition: border-color .15s, background .15s;
+  border: 2px dashed var(--line-2); cursor: pointer; background: var(--surface);
+  transition: border-color .18s, background .18s, box-shadow .18s;
 }
-.wc-slot:hover { border-color: var(--lime); background: var(--lime-bg); }
-.wc-slot.filled { border-style: solid; border-color: var(--lime-dark); cursor: default; }
-.wc-slot.uploading { border-color: var(--info); background: rgba(37,99,235,.05); pointer-events: none; }
+.wc-slot:hover { border-color: var(--lime); background: var(--lime-bg); box-shadow: 0 0 0 3px var(--lime-glow); }
+.wc-slot.filled { border-style: solid; border-color: var(--lime-dark); cursor: default; box-shadow: var(--sh-1); }
+.wc-slot.filled:hover { box-shadow: var(--sh-2); }
+.wc-slot.uploading { border-color: var(--info); background: rgba(37,99,235,.04); pointer-events: none; }
 .wc-slot.error { border-color: var(--err); background: var(--err-bg); }
 .wc-slot input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
 .wc-slot.filled input[type="file"] { pointer-events: none; }
@@ -330,7 +371,7 @@ body.wc-loading .wc-splash { display: flex; }
 
 <!-- Splash de carga -->
 <div class="wc-splash">
-  <div class="wc-logo-badge" style="width:50px;height:50px;border-radius:14px"><i class="ti ti-camera" style="font-size:24px;color:#fff"></i></div>
+  <div class="wc-splash-badge"><i class="ti ti-camera"></i></div>
   <div class="wc-splash-logo">weCars Bajío</div>
   <div class="wc-splash-sub">Cargando panel de fotos…</div>
   <div class="wc-spinner"></div>
@@ -389,13 +430,15 @@ body.wc-loading .wc-splash { display: flex; }
       </div>
     </div>
 
-    <div class="wc-sb-label">Secciones</div>
-    <button class="wc-sb-item active" data-section="fotos" id="sb-fotos">
-      <i class="ti ti-photo"></i> Cargar fotos
-    </button>
-    <button class="wc-sb-item" data-section="inventario" id="sb-inventario">
-      <i class="ti ti-car"></i> Ver inventario
-    </button>
+    <div class="wc-sb-nav">
+      <div class="wc-sb-label">Secciones</div>
+      <button class="wc-sb-item active" data-section="fotos" id="sb-fotos">
+        <i class="ti ti-photo"></i> Cargar fotos
+      </button>
+      <button class="wc-sb-item" data-section="inventario" id="sb-inventario">
+        <i class="ti ti-car"></i> Ver inventario
+      </button>
+    </div>
 
     <div class="wc-sb-user">
       <div class="wc-sb-avatar" id="sb-avatar">?</div>
@@ -411,6 +454,7 @@ body.wc-loading .wc-splash { display: flex; }
 
     <!-- TOPBAR -->
     <div class="wc-topbar">
+      <div class="wc-topbar-icon"><i class="ti ti-camera"></i></div>
       <div>
         <div class="wc-topbar-title" id="topbar-title">Cargar fotos de vehículo</div>
         <div class="wc-topbar-sub" id="topbar-sub">Selecciona un auto del inventario para comenzar</div>
