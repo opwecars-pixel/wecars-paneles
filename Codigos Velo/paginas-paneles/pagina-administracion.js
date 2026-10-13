@@ -18,6 +18,7 @@
 import wixData from 'wix-data';
 import wixUsers from 'wix-users';
 import wixLocation from 'wix-location';
+import { subscribe, publish } from 'wix-realtime';
 import { consultarUsuarios, insertarUsuario, actualizarUsuario, actualizarPerfilUsuario, fetchInventarioCars, fetchDatosAdmin, fetchClientesPaginados } from 'backend/datos.jsw';
 import { obtenerPerfil } from 'backend/permisos.jsw';
 import { avanzarEstado, obtenerHistorial as obtenerHistorialFlujo } from 'backend/flujo.jsw';
@@ -42,6 +43,14 @@ function _guard() {
     console.warn('[Admin] Mensaje rechazado — sesión no verificada como Admin/Gerencia');
   }
   return _adminVerificado;
+}
+
+// ── Broadcast helper: BroadcastChannel (mismo navegador) + Wix Realtime (cross-device)
+const _WC_CHANNEL = { name: 'wecars-erp-v2' };
+let   _wcBCShared = null;
+function _broadcast(msg) {
+  if (_wcBCShared) try { _wcBCShared.postMessage(msg); } catch(e) {}
+  try { publish(_WC_CHANNEL, msg); } catch(e) {}
 }
 
 $w.onReady(function () {
@@ -74,31 +83,35 @@ $w.onReady(function () {
     // uploadFotoBtn es opcional — la página funciona sin él
   }
 
-  // ── BroadcastChannel — sync en tiempo real entre paneles ─────────
-  let _wcBC = null;
+  // ── BroadcastChannel (mismo navegador) + Wix Realtime (cross-device) ─
+  function _manejarEventoExterno(msg) {
+    if (!msg || !msg.type || msg._from === 'administracion') return;
+    if (msg.type === 'wecars-expediente-actualizado' || msg.type === 'wecars-cliente-nuevo') {
+      enviarDatosAdmin();
+    }
+    if (msg.type === 'wecars-cierre-creado' || msg.type === 'wecars-cierre-actualizado') {
+      $w(HTML_ID).postMessage({ type: 'wecars-bc-cierre-update', cierre: msg.cierre });
+    }
+    if (msg.type === 'wecars-inventario-update' || msg.type === 'wecars-inventario-nuevo') {
+      $w(HTML_ID).postMessage({ type: 'wecars-bc-inventario-update' });
+    }
+    if (msg.type === 'credito-nuevo' || msg.type === 'credito-estado-actualizado') {
+      $w(HTML_ID).postMessage({ type: 'wecars-bc-credito-update', ...msg });
+    }
+  }
+  // BroadcastChannel — mismo navegador/pestaña
   try {
-    _wcBC = new BroadcastChannel('wecars-erp-v2');
-    _wcBC.onmessage = function(ev) {
-      const msg = ev.data || {};
-      if (!msg.type || msg._from === 'administracion') return;
-      // Refrescar UI cuando otro panel hace cambios relevantes
-      if (msg.type === 'wecars-expediente-actualizado' || msg.type === 'wecars-cliente-nuevo') {
-        enviarDatosAdmin();
-      }
-      if (msg.type === 'wecars-cierre-creado' || msg.type === 'wecars-cierre-actualizado') {
-        $w(HTML_ID).postMessage({ type: 'wecars-bc-cierre-update', cierre: msg.cierre });
-      }
-      if (msg.type === 'wecars-inventario-update' || msg.type === 'wecars-inventario-nuevo') {
-        // Notificar al HTML para refrescar la lista de autos
-        $w(HTML_ID).postMessage({ type: 'wecars-bc-inventario-update' });
-      }
-      if (msg.type === 'credito-nuevo' || msg.type === 'credito-estado-actualizado') {
-        $w(HTML_ID).postMessage({ type: 'wecars-bc-credito-update', ...msg });
-      }
-    };
+    _wcBCShared = new BroadcastChannel('wecars-erp-v2');
+    _wcBCShared.onmessage = (ev) => _manejarEventoExterno(ev.data || {});
   } catch (e) {
-    _wcBC = null;
+    _wcBCShared = null;
     console.warn('[Admin] BroadcastChannel no disponible:', e);
+  }
+  // Wix Realtime — cross-device (otro celular, otra computadora)
+  try {
+    subscribe(_WC_CHANNEL, (msg) => _manejarEventoExterno(msg.payload || {}));
+  } catch (e) {
+    console.warn('[Admin] wix-realtime no disponible:', e);
   }
 
   // ── Escucha de mensajes del iframe ────────────────────────────────
@@ -157,7 +170,7 @@ $w.onReady(function () {
         .then((resultado) => {
           $w(HTML_ID).postMessage({ type: 'wecars-estado-resultado', ...resultado, clienteId: data.clienteId });
           if (resultado.ok) {
-            try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-estado-update', clienteId: data.clienteId, nuevoEstado: data.nuevoEstado, movimiento: resultado.movimiento }); } catch (e) {}
+            _broadcast({ type: 'wecars-estado-update', clienteId: data.clienteId, nuevoEstado: data.nuevoEstado, movimiento: resultado.movimiento });
           }
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-estado-resultado', ok: false, error: String(e), clienteId: data.clienteId }));
@@ -189,7 +202,7 @@ $w.onReady(function () {
       insertarUsuario(emp)
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-empleado-creado', empleado: item });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-empleado-crear', datos: item }); } catch (e) {}
+          _broadcast({ type: 'wecars-empleado-crear', datos: item });
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-empleado-error', mensaje: String(e) }));
     }
@@ -200,7 +213,7 @@ $w.onReady(function () {
       actualizarUsuario(data.empleadoId, cambios)
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-empleado-actualizado', empleado: item });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-empleado-actualizado', empleado: item }); } catch (e) {}
+          _broadcast({ type: 'wecars-empleado-actualizado', empleado: item });
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-empleado-error', mensaje: String(e) }));
     }
@@ -252,7 +265,7 @@ $w.onReady(function () {
       wixData.insert('Cars', carro, { suppressAuth: true })
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-carro-resultado', ok: true, creado: true, carro: item });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-inventario-update', carro: item }); } catch (e) {}
+          _broadcast({ type: 'wecars-inventario-update', carro: item });
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-carro-resultado', ok: false, error: String(e) }));
     }
@@ -262,7 +275,7 @@ $w.onReady(function () {
         .then((item) => wixData.update('Cars', Object.assign({}, item, data.cambios || {}), { suppressAuth: true }))
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-carro-resultado', ok: true, creado: false, carro: item });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-inventario-update', carro: item }); } catch (e) {}
+          _broadcast({ type: 'wecars-inventario-update', carro: item });
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-carro-resultado', ok: false, error: String(e) }));
     }
@@ -312,7 +325,7 @@ $w.onReady(function () {
             carro:      resultado.carro,
             datos:      resultado.datos,
           });
-          if (resultado.carro) { try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-inventario-update', carro: resultado.carro }); } catch (e) {} }
+          if (resultado.carro) { _broadcast({ type: 'wecars-inventario-update', carro: resultado.carro }); }
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-apartado-error', error: String(e.message || e) }));
     }
@@ -324,7 +337,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-apartado-cerrado-ok', ...resultado });
           // Si se vendió o liberó, notificar inventario
           if (resultado.vehiculoId) {
-            try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-inventario-update' }); } catch (e) {}
+            _broadcast({ type: 'wecars-inventario-update' });
           }
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-apartado-cerrado-error', error: String(e.message || e) }));
@@ -335,7 +348,7 @@ $w.onReady(function () {
       wixData.remove('Cars', data.carroId, { suppressAuth: true })
         .then(() => {
           $w(HTML_ID).postMessage({ type: 'wecars-carro-eliminado', ok: true, carroId: data.carroId });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-inventario-update' }); } catch (e) {}
+          _broadcast({ type: 'wecars-inventario-update' });
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-carro-eliminado', ok: false, error: String(e), carroId: data.carroId }));
     }
@@ -378,7 +391,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-consigna-asignada', consigna: item });
           // Notificar al panel del vendedor asignado via BroadcastChannel
           if (item.vendedorAsignado) {
-            try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-consigna-asignada', consigna: item }); } catch(e) {}
+            _broadcast({ type: 'wecars-consigna-asignada', consigna: item });
           }
         })
         .catch((e) => console.error('[Admin] Error asignando consigna:', e));
@@ -422,7 +435,7 @@ $w.onReady(function () {
               wixData.insert('Cars', carro, { suppressAuth: true })
                 .then((carroInsertado) => {
                   // Avisar a todos los paneles que hay auto nuevo en inventario
-                  try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-inventario-nuevo', carro: carroInsertado }); } catch (e) {}
+                  _broadcast({ type: 'wecars-inventario-nuevo', carro: carroInsertado });
                   $w(HTML_ID).postMessage({ type: 'wecars-carro-resultado', ok: true, creado: true, carro: carroInsertado, desdeConsigna: true });
                   return carroInsertado;
                 })
@@ -459,7 +472,7 @@ $w.onReady(function () {
       wixData.insert('Tasks', tarea, { suppressAuth: true })
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', tarea: item });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-tarea-nueva', tarea: item }); } catch (e) {}
+          _broadcast({ type: 'wecars-tarea-nueva', tarea: item });
         })
         .catch((e) => console.error('[Admin] Error creando tarea:', e));
     }
@@ -480,7 +493,7 @@ $w.onReady(function () {
 
     // ── Tarea interna legacy (broadcast entre paneles) ─────────────────
     if (data.type === 'wecars-tarea' && data.datos) {
-      try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-tarea', ...data.datos }); } catch (e) {}
+      _broadcast({ type: 'wecars-tarea', ...data.datos });
     }
 
     // ── Permisos ERP — validados en backend (CONFIG-RISK-01 corregido) ──
@@ -533,13 +546,13 @@ $w.onReady(function () {
           }
           const item = await wixData.insert('ClientRecords', datosNuevo, { suppressAuth: true });
           $w(HTML_ID).postMessage({ type: 'wecars-cliente-nuevo-ok', cliente: item });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-cliente-nuevo', cliente: item }); } catch(e) {}
+          _broadcast({ type: 'wecars-cliente-nuevo', cliente: item });
           if (data.tareaExtra && data.tareaExtra.asignadoA) {
             const tarea = Object.assign({ col: 'por-hacer', prior: 'media' }, data.tareaExtra);
             delete tarea._id;
             try {
               const tareaItem = await wixData.insert('Tasks', tarea, { suppressAuth: true });
-              try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-tarea-asignada', tarea: tareaItem }); } catch(e) {}
+              _broadcast({ type: 'wecars-tarea-asignada', tarea: tareaItem });
             } catch(e) { console.error('[Admin] Error creando tarea de seguimiento:', e); }
           }
         })
@@ -625,7 +638,7 @@ $w.onReady(function () {
             apartados: JSON.parse(creado.apartados || '[]'),
           });
           $w(HTML_ID).postMessage({ type: 'wecars-cierre-creado', cierre: resultado });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-cierre-creado', cierre: resultado }); } catch(e) {}
+          _broadcast({ type: 'wecars-cierre-creado', cierre: resultado });
         })
         .catch(e => {
           console.error('[Admin] Error creando cierre:', e);
@@ -647,7 +660,7 @@ $w.onReady(function () {
             apartados: JSON.parse(actualizado.apartados || '[]'),
           });
           $w(HTML_ID).postMessage({ type: 'wecars-cierre-actualizado', cierre: resultado });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-cierre-actualizado', cierre: resultado }); } catch(e) {}
+          _broadcast({ type: 'wecars-cierre-actualizado', cierre: resultado });
         })
         .catch(e => {
           console.error('[Admin] Error actualizando cierre:', e);
@@ -742,7 +755,7 @@ $w.onReady(function () {
             .then((result) => {
               $w(HTML_ID).postMessage({ type: 'wecars-credito-avanzado', ...result });
               if (result.ok) {
-                try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'credito-estado-actualizado', creditoId: data.creditoId, estatus: data.nuevoEstado, vendedorEmail: result.credito && result.credito.vendedorEmail }); } catch (e) {}
+                _broadcast({ type: 'credito-estado-actualizado', creditoId: data.creditoId, estatus: data.nuevoEstado, vendedorEmail: result.credito && result.credito.vendedorEmail });
               }
             })
           )

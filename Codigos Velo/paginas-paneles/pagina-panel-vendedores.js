@@ -16,6 +16,7 @@
 import wixData from 'wix-data';
 import wixUsers from 'wix-users';
 import wixLocation from 'wix-location';
+import { subscribe, publish } from 'wix-realtime';
 import { fetchDatosVendedor, fetchInventarioCars } from 'backend/datos.jsw';
 import { obtenerPerfil } from 'backend/permisos.jsw';
 import { avanzarEstado, obtenerHistorial as obtenerHistorialFlujo } from 'backend/flujo.jsw';
@@ -35,6 +36,14 @@ import {
 } from 'backend/publicaciones.jsw';
 
 const HTML_ID        = '#htmlPanelVendedores';
+
+// ── Broadcast: mismo navegador (BC) + cross-device (Wix Realtime) ────
+const _WC_CHANNEL = { name: 'wecars-erp-v2' };
+let   _wcBCShared = null;
+function _broadcast(msg) {
+  if (_wcBCShared) try { _wcBCShared.postMessage(msg); } catch(e) {}
+  try { publish(_WC_CHANNEL, msg); } catch(e) {}
+}
 const UPLOAD_BUTTON_ID = '#uploadButtonExpediente';
 
 let clienteParaSubida        = null;
@@ -52,6 +61,22 @@ $w.onReady(function () {
   enviarComisiones();
   enviarLeadsVendedor();
   enviarConsignasVendedor();
+
+  // ── BroadcastChannel + Wix Realtime (cross-device) ─────────────────
+  function _manejarEventoExterno(msg) {
+    if (!msg || !msg.type || msg._from === 'vendedores') return;
+    if (msg.type === 'wecars-estado-update') enviarClientes();
+    if (msg.type === 'wecars-inventario-update') enviarInventarioPanel();
+    if (msg.type === 'wecars-tarea-asignada' || msg.type === 'wecars-tarea-nueva') { /* notificar */ }
+    if (msg.type === 'ge-nota-vendedor' || msg.type === 'wecars-alerta-vendedor') {
+      $w(HTML_ID).postMessage({ type: 'wecars-notificacion-push', ...msg });
+    }
+  }
+  try {
+    _wcBCShared = new BroadcastChannel('wecars-erp-v2');
+    _wcBCShared.onmessage = (ev) => _manejarEventoExterno(ev.data || {});
+  } catch (e) { _wcBCShared = null; }
+  try { subscribe(_WC_CHANNEL, (m) => _manejarEventoExterno(m.payload || {})); } catch(e) {}
 
   // ── Botón nativo de subida de documentos ──────────────────────────
   try {
@@ -231,7 +256,7 @@ $w.onReady(function () {
         .then((item) => {
           // Retroalimentar HTML con el ID real del CMS para que reemplace el temporal
           $w(HTML_ID).postMessage({ type: 'wecars-cita-creada', cita: item, tempId });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-citas-update', cita: item }); } catch (e) {}
+          _broadcast({ type: 'wecars-citas-update', cita: item });
           registrarActividad({
             tipo: 'cita_agendada',
             clienteId: item.clienteId || '',
@@ -253,7 +278,7 @@ $w.onReady(function () {
         .then((existente) => wixData.update('citas', Object.assign({}, existente, data.datos)))
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-cita-actualizada', cita: item });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-citas-update', cita: item }); } catch (e) {}
+          _broadcast({ type: 'wecars-citas-update', cita: item });
         })
         .catch((e) => {
           console.error('[Panel] Error actualizando cita:', e);
@@ -266,7 +291,7 @@ $w.onReady(function () {
       wixData.remove('citas', data.id)
         .then(() => {
           $w(HTML_ID).postMessage({ type: 'wecars-cita-eliminada', id: data.id });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-citas-update', eliminadaId: data.id }); } catch (e) {}
+          _broadcast({ type: 'wecars-citas-update', eliminadaId: data.id });
         })
         .catch((e) => {
           console.error('[Panel] Error eliminando cita:', e);
@@ -280,7 +305,7 @@ $w.onReady(function () {
       delete sol._id;
       wixData.insert('SolicitudesCompra', sol)
         .then((item) => {
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-solicitud-compra-nueva', solicitud: item }); } catch (e) {}
+          _broadcast({ type: 'wecars-solicitud-compra-nueva', solicitud: item });
         })
         .catch((e) => console.error('[Panel] Error creando solicitud de compra:', e));
     }
@@ -353,7 +378,7 @@ $w.onReady(function () {
         .then((resultado) => {
           $w(HTML_ID).postMessage({ type: 'wecars-estado-resultado', ...resultado, clienteId: data.clienteId });
           if (resultado.ok) {
-            try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-estado-update', clienteId: data.clienteId, nuevoEstado: data.nuevoEstado, movimiento: resultado.movimiento }); } catch (e) {}
+            _broadcast({ type: 'wecars-estado-update', clienteId: data.clienteId, nuevoEstado: data.nuevoEstado, movimiento: resultado.movimiento });
           }
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-estado-resultado', ok: false, error: String(e), clienteId: data.clienteId }));
@@ -501,7 +526,7 @@ $w.onReady(function () {
         .then((result) => {
           $w(HTML_ID).postMessage({ type: 'wecars-credito-creado', ok: result.ok, credito: result.credito, yaExistia: result.yaExistia });
           if (result.ok) {
-            try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'credito-nuevo', creditoId: result.credito._id, vendedorEmail: result.credito.vendedorEmail }); } catch (e) {}
+            _broadcast({ type: 'credito-nuevo', creditoId: result.credito._id, vendedorEmail: result.credito.vendedorEmail });
           }
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-credito-creado', ok: false, error: String(e) }));
@@ -613,7 +638,7 @@ $w.onReady(function () {
         })
         .then((updated) => {
           $w(HTML_ID).postMessage({ type: 'wecars-expediente-actualizado', ok: true, clienteId: updated._id });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-expediente-actualizado', clienteId: updated._id, cambios: data.cambios }); } catch (e) {}
+          _broadcast({ type: 'wecars-expediente-actualizado', clienteId: updated._id, cambios: data.cambios });
         })
         .catch((e) => {
           console.error('[Vendedor] Error actualizando expediente:', e);
@@ -675,7 +700,7 @@ function validarDocumento(documentoId, estatus, motivoRechazo) {
     })))
     .then(() => {
       $w(HTML_ID).postMessage({ type: 'wecars-documento-validado', documentoId });
-      try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-documento-validado', documentoId }); } catch (e) {}
+      _broadcast({ type: 'wecars-documento-validado', documentoId });
     })
     .catch((e) => console.error('[Panel] Error validando documento:', e));
 }
@@ -777,7 +802,7 @@ function actualizarAuto(carId, cambios) {
     .then((auto) => wixData.update('Cars', Object.assign({}, auto, cambios)))
     .then(() => {
       enviarInventarioPanel();
-      try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-inventario-update' }); } catch (e) {}
+      _broadcast({ type: 'wecars-inventario-update' });
     })
     .catch((e) => console.error('[Panel] Error actualizando auto:', e));
 }
@@ -900,7 +925,7 @@ function actualizarCliente(clienteId, cambios) {
       return wixData.update('ClientRecords', actualizado);
     })
     .then((item) => {
-      try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-estado-update', clienteId: item._id }); } catch (e) {}
+      _broadcast({ type: 'wecars-estado-update', clienteId: item._id });
     })
     .catch((e) => console.error('[Panel] Error actualizando cliente:', e));
 }
@@ -931,7 +956,7 @@ function crearCliente(datos) {
         return;
       }
       $w(HTML_ID).postMessage({ type: 'wecars-cliente-creado', cliente: res.cliente });
-      try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-cliente-nuevo', cliente: res.cliente }); } catch (e) {}
+      _broadcast({ type: 'wecars-cliente-nuevo', cliente: res.cliente });
     })
     .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-cliente-crear-error', error: String(e) }));
 }
@@ -940,7 +965,7 @@ function eliminarCliente(clienteId) {
   wixData.remove('ClientRecords', clienteId)
     .then(() => {
       $w(HTML_ID).postMessage({ type: 'wecars-cliente-eliminado', clienteId });
-      try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-cliente-eliminado', clienteId }); } catch (e) {}
+      _broadcast({ type: 'wecars-cliente-eliminado', clienteId });
     })
     .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-cliente-eliminar-error', error: String(e) }));
 }

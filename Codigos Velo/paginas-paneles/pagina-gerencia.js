@@ -18,6 +18,7 @@
 import wixData from 'wix-data';
 import wixUsers from 'wix-users';
 import wixLocation from 'wix-location';
+import { subscribe, publish } from 'wix-realtime';
 import { obtenerPerfil } from 'backend/permisos.jsw';
 import { avanzarEstado, obtenerHistorial as obtenerHistorialFlujo } from 'backend/flujo.jsw';
 import { gm_guardar, gm_obtenerMes, gm_listasMeses, gm_cerrarMesAnterior } from 'backend/gamificacion-cms.jsw';
@@ -31,9 +32,33 @@ import { crearClienteSeguro, eliminarCliente } from 'backend/clientes.jsw';
 import { obtenerHistorial as geObtenerHistorialPub, obtenerTodasLasCuentas as geObtenerCuentasSociales } from 'backend/publicaciones.jsw';
 
 const HTML_ID = '#htmlGerencia';
+
+// ── Broadcast: mismo navegador (BC) + cross-device (Wix Realtime) ────
+const _WC_CHANNEL = { name: 'wecars-erp-v2' };
+let   _wcBCShared = null;
+function _broadcast(msg) {
+  if (_wcBCShared) try { _wcBCShared.postMessage(msg); } catch(e) {}
+  try { publish(_WC_CHANNEL, msg); } catch(e) {}
+}
 let gerenciaEmail = ''; // A1: se asigna en enviarDatosGerencia() para uso en logs de reasignación
 
 $w.onReady(function () {
+  // ── BroadcastChannel + Wix Realtime (cross-device) ─────────────────
+  function _manejarEventoExterno(msg) {
+    if (!msg || !msg.type || msg._from === 'gerencia') return;
+    if (msg.type === 'wecars-expediente-actualizado' || msg.type === 'wecars-cliente-nuevo'
+      || msg.type === 'wecars-estado-update') {
+      enviarDatosGerencia();
+    }
+    if (msg.type === 'wecars-inventario-update') enviarDatosGerencia();
+    if (msg.type === 'wecars-cierre-creado' || msg.type === 'wecars-cierre-actualizado') enviarDatosGerencia();
+  }
+  try {
+    _wcBCShared = new BroadcastChannel('wecars-erp-v2');
+    _wcBCShared.onmessage = (ev) => _manejarEventoExterno(ev.data || {});
+  } catch(e) { _wcBCShared = null; }
+  try { subscribe(_WC_CHANNEL, (m) => _manejarEventoExterno(m.payload || {})); } catch(e) {}
+
   $w(HTML_ID).onMessage((event) => {
     // IIFE async para poder usar await sin que el handler devuelva una Promise al canal de mensajes
     // (si el handler fuera async directamente, Wix lanzaría "message channel closed" en consola)
@@ -153,7 +178,7 @@ $w.onReady(function () {
           return Promise.all(promesas);
         })
         .then(() => {
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-estado-update', clienteId: data.clienteId }); } catch (e) {}
+          _broadcast({ type: 'wecars-estado-update', clienteId: data.clienteId });
         })
         .catch((e) => console.error('[Gerencia] Error actualizando cliente:', e));
     }
@@ -176,13 +201,13 @@ $w.onReady(function () {
           }
           const item = await wixData.insert('ClientRecords', datosNuevo, { suppressAuth: true });
           $w(HTML_ID).postMessage({ type: 'wecars-cliente-nuevo-ok', cliente: item, nombre: item.nombre });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-cliente-nuevo', cliente: item }); } catch (e) {}
+          _broadcast({ type: 'wecars-cliente-nuevo', cliente: item });
           if (data.tareaExtra && data.tareaExtra.asignadoA) {
             const tarea = Object.assign({ col: 'por-hacer', prior: 'media' }, data.tareaExtra);
             delete tarea._id;
             try {
               const tareaItem = await wixData.insert('Tasks', tarea, { suppressAuth: true });
-              try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-tarea-asignada', tarea: tareaItem }); } catch(e) {}
+              _broadcast({ type: 'wecars-tarea-asignada', tarea: tareaItem });
             } catch(e) { console.error('[Gerencia] Error creando tarea de seguimiento:', e); }
           }
         })
@@ -194,7 +219,7 @@ $w.onReady(function () {
       eliminarCliente(data.clienteId)
         .then(() => {
           $w(HTML_ID).postMessage({ type: 'wecars-cliente-eliminado-ge', clienteId: data.clienteId });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-cliente-eliminado', clienteId: data.clienteId }); } catch (e) {}
+          _broadcast({ type: 'wecars-cliente-eliminado', clienteId: data.clienteId });
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-cliente-eliminado-ge', error: String(e), clienteId: data.clienteId }));
     }
@@ -210,10 +235,10 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-estado-resultado', ...resultado, clienteId: data.clienteId });
           if (resultado.ok) {
             const bc = { type: 'wecars-estado-update', clienteId: data.clienteId, nuevoEstado: data.nuevoEstado, movimiento: resultado.movimiento };
-            try { new BroadcastChannel('wecars-erp-v2').postMessage(bc); } catch (e) {}
+            _broadcast(bc);
             // Si se cerró la venta, notificar a todos los paneles con la venta completa
             if (data.nuevoEstado === 'venta_cerrada' && resultado.ventaCerrada) {
-              try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-venta-cerrada', clienteId: data.clienteId, movimiento: resultado.movimiento }); } catch (e) {}
+              _broadcast({ type: 'wecars-venta-cerrada', clienteId: data.clienteId, movimiento: resultado.movimiento });
             }
           }
         })
@@ -243,11 +268,11 @@ $w.onReady(function () {
 
     // ── Alertas y notas a vendedores (broadcast) ─────────────────────
     if (data.type === 'wecars-alerta-vendedor') {
-      try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-alerta-vendedor', ...data }); } catch (e) {}
+      _broadcast({ type: 'wecars-alerta-vendedor', ...data });
     }
 
     if (data.type === 'wecars-nota-vendedor') {
-      try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'ge-nota-vendedor', ...data }); } catch (e) {}
+      _broadcast({ type: 'ge-nota-vendedor', ...data });
     }
 
     if (data.type === 'wecars-gerencia-nota' && data.data && data.data.mensaje) {
@@ -277,7 +302,7 @@ $w.onReady(function () {
       };
       insertarComision(bono)
         .then(() => {
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'bono-puntos', vendedor: data.vendedor, monto: data.monto }); } catch (e) {}
+          _broadcast({ type: 'bono-puntos', vendedor: data.vendedor, monto: data.monto });
           return obtenerBonosHistorial();
         })
         .then((items) => {
@@ -300,7 +325,7 @@ $w.onReady(function () {
       wixData.insert('Usuarios', emp)
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-empleado-creado', empleado: item });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-empleado-crear', datos: item }); } catch (e) {}
+          _broadcast({ type: 'wecars-empleado-crear', datos: item });
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-empleado-error', error: String(e) }));
     }
@@ -417,7 +442,7 @@ $w.onReady(function () {
       wixData.insert('Tasks', tarea, { suppressAuth: true })
         .then(item => {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', tarea: item });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-tarea-asignada', tarea: item }); } catch(e) {}
+          _broadcast({ type: 'wecars-tarea-asignada', tarea: item });
         })
         .catch(e => {
           console.error('[Gerencia] Error creando tarea:', e);
@@ -431,7 +456,7 @@ $w.onReady(function () {
         .then(item => wixData.update('Tasks', Object.assign({}, item, cambios), { suppressAuth: true }))
         .then(item => {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-actualizada', tarea: item });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-tarea-asignada', tarea: item }); } catch(e) {}
+          _broadcast({ type: 'wecars-tarea-asignada', tarea: item });
         })
         .catch(e => console.error('[Gerencia] Error actualizando tarea:', e));
     }
@@ -440,7 +465,7 @@ $w.onReady(function () {
       wixData.remove('Tasks', data.tareaId, { suppressAuth: true })
         .then(() => {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-eliminada', tareaId: data.tareaId });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-tarea-eliminada', tareaId: data.tareaId }); } catch(e) {}
+          _broadcast({ type: 'wecars-tarea-eliminada', tareaId: data.tareaId });
         })
         .catch(e => console.error('[Gerencia] Error eliminando tarea:', e));
     }
@@ -465,7 +490,7 @@ $w.onReady(function () {
         .then(creado => {
           const resultado = Object.assign({}, creado, { apartados: JSON.parse(creado.apartados || '[]') });
           $w(HTML_ID).postMessage({ type: 'wecars-cierre-creado', cierre: resultado });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-cierre-creado', cierre: resultado }); } catch(e) {}
+          _broadcast({ type: 'wecars-cierre-creado', cierre: resultado });
         })
         .catch(e => {
           console.error('[Gerencia] Error creando cierre:', e);
@@ -487,7 +512,7 @@ $w.onReady(function () {
             apartados: JSON.parse(actualizado.apartados || '[]'),
           });
           $w(HTML_ID).postMessage({ type: 'wecars-cierre-actualizado', cierre: resultado });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-cierre-actualizado', cierre: resultado }); } catch(e) {}
+          _broadcast({ type: 'wecars-cierre-actualizado', cierre: resultado });
         })
         .catch(e => {
           console.error('[Gerencia] Error actualizando cierre:', e);

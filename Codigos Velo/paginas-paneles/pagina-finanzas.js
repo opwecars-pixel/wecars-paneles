@@ -16,6 +16,7 @@
 import wixData from 'wix-data';
 import wixUsers from 'wix-users';
 import wixLocation from 'wix-location';
+import { subscribe, publish } from 'wix-realtime';
 import { obtenerPerfil } from 'backend/permisos.jsw';
 import { avanzarEstado, obtenerHistorial as obtenerHistorialFlujo, registrarAccion } from 'backend/flujo.jsw';
 import { avanzarEstadoCredito } from 'backend/creditos.jsw';
@@ -26,7 +27,34 @@ import { cerrarApartado } from 'backend/apartados.jsw';
 
 const HTML_ID = '#htmlFinanzas';
 
+// ── Broadcast: mismo navegador (BC) + cross-device (Wix Realtime) ────
+const _WC_CHANNEL = { name: 'wecars-erp-v2' };
+let   _wcBCShared = null;
+function _broadcast(msg) {
+  if (_wcBCShared) try { _wcBCShared.postMessage(msg); } catch(e) {}
+  try { publish(_WC_CHANNEL, msg); } catch(e) {}
+}
+
 $w.onReady(function () {
+  // ── BroadcastChannel + Wix Realtime (cross-device) ─────────────────
+  function _manejarEventoExterno(msg) {
+    if (!msg || !msg.type || msg._from === 'finanzas') return;
+    if (msg.type === 'wecars-estado-update' || msg.type === 'wecars-expediente-actualizado') {
+      enviarDatosFinanzas();
+    }
+    if (msg.type === 'credito-nuevo' || msg.type === 'credito-estado-actualizado') {
+      $w(HTML_ID).postMessage({ type: 'wecars-bc-credito-update', ...msg });
+    }
+    if (msg.type === 'apartado-cerrado') {
+      $w(HTML_ID).postMessage({ type: 'wecars-bc-credito-update', ...msg });
+    }
+  }
+  try {
+    _wcBCShared = new BroadcastChannel('wecars-erp-v2');
+    _wcBCShared.onmessage = (ev) => _manejarEventoExterno(ev.data || {});
+  } catch(e) { _wcBCShared = null; }
+  try { subscribe(_WC_CHANNEL, (m) => _manejarEventoExterno(m.payload || {})); } catch(e) {}
+
   $w(HTML_ID).onMessage((event) => {
     const data = event.data;
 
@@ -57,7 +85,7 @@ $w.onReady(function () {
           // F-03: usar nombre canónico 'credito-estado-actualizado' — escuchado por
           // Vendedores, Gerencia y Administración (todos los paneles).
           if (result.ok) {
-            try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'credito-estado-actualizado', creditoId: data.creditoId, estatus: data.nuevoEstado }); } catch (e) {}
+            _broadcast({ type: 'credito-estado-actualizado', creditoId: data.creditoId, estatus: data.nuevoEstado });
           }
         })
         .catch((e) => console.error('[Finanzas] Error avanzando crédito:', e));
@@ -88,7 +116,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-comision-pagada' && data.comisionId) {
       pagarComision(data.comisionId)
         .then((result) => {
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-comision-pagada-bc', comisionId: data.comisionId, estatus: 'Pagada', vendedorEmail: result.vendedorEmail, vendedorNombre: result.vendedorNombre, monto: result.monto, concepto: result.concepto }); } catch (e) {}
+          _broadcast({ type: 'wecars-comision-pagada-bc', comisionId: data.comisionId, estatus: 'Pagada', vendedorEmail: result.vendedorEmail, vendedorNombre: result.vendedorNombre, monto: result.monto, concepto: result.concepto });
         })
         .catch((e) => console.error('[Finanzas] Error marcando comisión pagada:', e));
     }
@@ -129,7 +157,7 @@ $w.onReady(function () {
         .then((resultado) => {
           $w(HTML_ID).postMessage({ type: 'wecars-estado-resultado', ...resultado, clienteId: data.clienteId });
           if (resultado.ok) {
-            try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-estado-update', clienteId: data.clienteId, nuevoEstado: data.nuevoEstado, movimiento: resultado.movimiento }); } catch (e) {}
+            _broadcast({ type: 'wecars-estado-update', clienteId: data.clienteId, nuevoEstado: data.nuevoEstado, movimiento: resultado.movimiento });
           }
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-estado-resultado', ok: false, error: String(e), clienteId: data.clienteId }));
@@ -140,7 +168,7 @@ $w.onReady(function () {
       cerrarApartado(data.apartadoId, data.tipoCierre, data.motivo || '')
         .then((resultado) => {
           $w(HTML_ID).postMessage({ type: 'wecars-apartado-cerrado-ok', ...resultado });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'apartado-cerrado', apartadoId: data.apartadoId, tipoCierre: data.tipoCierre, vehiculoId: resultado.vehiculoId }); } catch (e) {}
+          _broadcast({ type: 'apartado-cerrado', apartadoId: data.apartadoId, tipoCierre: data.tipoCierre, vehiculoId: resultado.vehiculoId });
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-apartado-cerrado-error', error: String(e.message || e) }));
     }
@@ -165,7 +193,7 @@ $w.onReady(function () {
           // estatusExpediente='facturado' en CMS. Si avanzarEstado falló
           // (estado terminal, transición inválida, etc.), no engañar a otros paneles.
           if (result.estadoAvanzado) {
-            try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-estado-update', clienteId: data.clienteId, nuevoEstado: 'facturado' }); } catch (e) {}
+            _broadcast({ type: 'wecars-estado-update', clienteId: data.clienteId, nuevoEstado: 'facturado' });
           }
         })
         .catch((e) => {
@@ -190,7 +218,7 @@ $w.onReady(function () {
         }, { suppressAuth: true }))
         .then((pago) => {
           $w(HTML_ID).postMessage({ type: 'wecars-egreso-guardado', ok: true, pagoId: pago._id });
-          try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'egreso-registrado', pagoId: pago._id, monto: pago.monto, categoria: pago.categoria }); } catch (e) {}
+          _broadcast({ type: 'egreso-registrado', pagoId: pago._id, monto: pago.monto, categoria: pago.categoria });
         })
         .catch((e) => console.error('[Finanzas] Error guardando egreso:', e));
     }
@@ -215,7 +243,7 @@ $w.onReady(function () {
 
     // ── Evento global (broadcast entre paneles, sin CMS) ─────────
     if (data.type === 'wecars-evento-global' && data.evento) {
-      try { new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-evento-global', evento: data.evento }); } catch (e) {}
+      _broadcast({ type: 'wecars-evento-global', evento: data.evento });
     }
 
     if (data.type === 'wecars-logout') {
