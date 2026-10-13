@@ -3627,6 +3627,133 @@ window.guardarResultadosVTA = function(){ guardarResultadosVTA(); };
 window.imprimirReporteVTA   = function(){ imprimirReporteVTA(); };
 window.iniciarEditarCierre  = function(){ iniciarEditarCierre(); };
 
+/* ── Créditos Admin ─────────────────────────────────────────── */
+const AD_CR_ESTADOS = {
+  solicitud_enviada:       { label:'Solicitud enviada',       color:'#2a78d6', bg:'#dbeafe' },
+  documentos_pendientes:   { label:'Documentos pendientes',   color:'#d97706', bg:'#fef3c7' },
+  documentos_en_revision:  { label:'En revisión',             color:'#7c3aed', bg:'#f3e8ff' },
+  expediente_completo:     { label:'Expediente completo',     color:'#0284c7', bg:'#e0f2fe' },
+  en_analisis_financiero:  { label:'Análisis financiero',     color:'#9333ea', bg:'#faf5ff' },
+  aprobado:                { label:'Aprobado',                color:'#16a34a', bg:'#dcfce7' },
+  rechazado:               { label:'Rechazado',               color:'#dc2626', bg:'#fee2e2' },
+  asignado_a_vendedor:     { label:'Asignado a vendedor',     color:'#0891b2', bg:'#cffafe' },
+  cerrado:                 { label:'Cerrado',                 color:'#15803d', bg:'#bbf7d0' },
+  cancelado:               { label:'Cancelado',               color:'#6b7280', bg:'#f3f4f6' },
+};
+
+function renderAdmCreditos() {
+  const lista = document.getElementById('ad-cr-lista');
+  if (!lista) return;
+  const todos = window._adCreditos || [];
+  const filtroBtn = document.querySelector('.ad-cr-f-btn.active');
+  const filtro = filtroBtn ? (filtroBtn.dataset.crF || '') : '';
+  const items = filtro ? todos.filter(c => c.estatus === filtro) : todos;
+
+  // KPIs
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('ad-cr-stat-total', todos.length);
+  set('ad-cr-stat-rev',   todos.filter(c => c.estatus === 'documentos_en_revision').length);
+  set('ad-cr-stat-comp',  todos.filter(c => c.estatus === 'expediente_completo').length);
+  set('ad-cr-stat-apr',   todos.filter(c => c.estatus === 'aprobado').length);
+
+  if (!items.length) {
+    lista.innerHTML = `<div style="padding:36px;text-align:center;color:var(--muted);font-size:.88rem">
+      ${todos.length ? 'Sin créditos con ese filtro.' : 'No hay créditos activos.'}</div>`;
+    return;
+  }
+
+  const q = ((document.getElementById('ad-cr-q') || {}).value || '').toLowerCase();
+  const filtrados = q ? items.filter(c =>
+    (c.clienteNombre||'').toLowerCase().includes(q) ||
+    (c.clienteTelefono||'').includes(q) ||
+    (c.folioInterno||'').toLowerCase().includes(q)
+  ) : items;
+
+  lista.innerHTML = filtrados.map(c => {
+    const est = AD_CR_ESTADOS[c.estatus] || { label: c.estatus || 'Sin estado', color:'#6b7280', bg:'#f3f4f6' };
+    const fmt$ = n => n ? '$' + Number(n).toLocaleString('es-MX') : '—';
+    const fmtF = f => f ? new Date(f).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+    return `<div class="ad-cr-row" onclick="adAbrirCredito('${c._id}')" style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s" onmouseover="this.style.background='var(--lime-bg)'" onmouseout="this.style.background=''">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adEsc(c.clienteNombre || 'Sin nombre')}</div>
+        <div style="font-size:.77rem;color:var(--muted);margin-top:2px">${c.folioInterno ? c.folioInterno + ' · ' : ''}${fmtF(c._createdDate)}</div>
+      </div>
+      <div style="min-width:0;flex:0 0 auto;text-align:right">
+        <div style="font-weight:800;font-size:.92rem">${fmt$(c.monto)}</div>
+        <div style="font-size:.74rem;color:var(--muted)">${c.banco || 'Sin banco'}</div>
+      </div>
+      <span style="flex:0 0 auto;padding:4px 10px;border-radius:999px;font-size:.73rem;font-weight:700;background:${est.bg};color:${est.color}">${est.label}</span>
+      <button type="button" onclick="event.stopPropagation();adAvanzarCredito('${c._id}','${c.estatus}')" style="flex:0 0 auto;padding:5px 10px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:#fff;cursor:pointer;font-size:.75rem;font-weight:700;font-family:inherit" title="Cambiar estado"><i class="ti ti-arrow-right"></i></button>
+    </div>`;
+  }).join('') || `<div style="padding:28px;text-align:center;color:var(--muted);font-size:.88rem">Sin resultados para esa búsqueda.</div>`;
+}
+window.renderAdmCreditos = renderAdmCreditos;
+window.adRenderCreditos  = renderAdmCreditos;
+
+function adEsc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function adAbrirCredito(id) {
+  const c = (window._adCreditos || []).find(x => x._id === id);
+  if (!c) return;
+  // Abrir detalle en vista creditos-validar con los datos
+  window._adCreditoDetalle = c;
+  mostrarVista('creditos-validar');
+  renderAdmCreditoDetalle(c);
+}
+
+function renderAdmCreditoDetalle(c) {
+  const wrap = document.getElementById('ad-cr-validar-lista');
+  if (!wrap || !c) return;
+  const est = AD_CR_ESTADOS[c.estatus] || { label: c.estatus, color:'#6b7280', bg:'#f3f4f6' };
+  const fmt$ = n => n ? '$' + Number(n).toLocaleString('es-MX') : '—';
+  const siguientes = (est.siguientes || []);
+  const botones = siguientes.map(s => {
+    const e2 = AD_CR_ESTADOS[s] || { label: s, color:'#6b7280', bg:'#f3f4f6' };
+    return `<button type="button" onclick="adAvanzarCredito('${c._id}','${s}')" style="padding:8px 14px;border:1.5px solid ${e2.color};border-radius:var(--r-sm);background:${e2.bg};color:${e2.color};font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit">${e2.label}</button>`;
+  }).join('');
+  wrap.innerHTML = `<div style="padding:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="ad-card" style="padding:14px"><div style="font-size:.73rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Cliente</div><div style="font-weight:800">${adEsc(c.clienteNombre||'—')}</div><div style="font-size:.8rem;color:var(--muted)">${adEsc(c.clienteTelefono||'')}</div></div>
+      <div class="ad-card" style="padding:14px"><div style="font-size:.73rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Monto</div><div style="font-weight:800">${fmt$(c.monto)}</div><div style="font-size:.8rem;color:var(--muted)">${c.banco||'Sin banco'} · ${c.plazoMeses ? c.plazoMeses + ' meses' : '—'}</div></div>
+      <div class="ad-card" style="padding:14px"><div style="font-size:.73rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Vendedor</div><div style="font-weight:800">${adEsc(c.vendedorNombre||c.vendedorEmail||'—')}</div></div>
+      <div class="ad-card" style="padding:14px"><div style="font-size:.73rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Estado actual</div><span style="padding:4px 10px;border-radius:999px;font-size:.8rem;font-weight:700;background:${est.bg};color:${est.color}">${est.label}</span></div>
+    </div>
+    ${c.notasAdmin ? `<div class="ad-card" style="padding:14px;margin-bottom:12px"><div style="font-size:.73rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Notas</div><div style="font-size:.88rem">${adEsc(c.notasAdmin)}</div></div>` : ''}
+    ${botones ? `<div style="margin-top:4px"><div style="font-size:.77rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:8px">Avanzar a:</div><div style="display:flex;gap:8px;flex-wrap:wrap">${botones}</div></div>` : '<div style="font-size:.84rem;color:var(--muted)">Estado terminal — sin pasos siguientes.</div>'}
+  </div>`;
+}
+
+function adAvanzarCredito(creditoId, nuevoEstado) {
+  if (!creditoId || !nuevoEstado) return;
+  window.parent.postMessage({ type: 'wecars-credito-avanzar', creditoId, nuevoEstado, datos: {} }, '*');
+  // Optimista local
+  const c = (window._adCreditos || []).find(x => x._id === creditoId);
+  if (c) c.estatus = nuevoEstado;
+  renderAdmCreditos();
+  if (document.getElementById('ad-cr-validar-lista') && window._adCreditoDetalle && window._adCreditoDetalle._id === creditoId) {
+    if (c) { window._adCreditoDetalle = c; renderAdmCreditoDetalle(c); }
+  }
+  mostrarToast('Estado actualizado');
+}
+window.adAbrirCredito   = adAbrirCredito;
+window.adAvanzarCredito = adAvanzarCredito;
+
+/* ── Cuentas sociales ─────────────────────────────────────────── */
+function renderCuentasSociales() {
+  const wrap = document.getElementById('ad-vista-cuentas-sociales');
+  if (!wrap) return;
+  const items = window._adCuentasSociales || [];
+  const inner = wrap.querySelector('#cs-lista') || wrap;
+  if (!items.length) {
+    inner.innerHTML = '<div style="padding:28px;text-align:center;color:var(--muted);font-size:.88rem">No hay cuentas sociales registradas.</div>';
+    return;
+  }
+  inner.innerHTML = items.map(c => `<div style="display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line)">
+    <div style="flex:1"><div style="font-weight:700">${adEsc(c.plataforma||'—')}</div><div style="font-size:.8rem;color:var(--muted)">${adEsc(c.usuario||'')}</div></div>
+    <span style="font-size:.77rem;padding:3px 9px;border-radius:999px;font-weight:700;background:${c.activa ? 'var(--lime-bg)' : 'var(--surface-2)'};color:${c.activa ? 'var(--lime-dark)' : 'var(--muted)'}">${c.activa ? 'Activa' : 'Inactiva'}</span>
+  </div>`).join('');
+}
+
 /* ── Pendientes ─────────────────────────────────────────────── */
 function renderPendientes(){
   const cols = ['por-hacer','en-progreso','completado'];
