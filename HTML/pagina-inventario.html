@@ -215,10 +215,8 @@
     .card:hover .image img{transform:scale(1.045)}
     .badge-row{position:absolute;left:11px;right:11px;top:11px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
     .badge{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:20px;background:var(--lime);backdrop-filter:blur(6px);color:#081102;font-size:.64rem;font-weight:900;letter-spacing:.02em;text-transform:uppercase}
-    .badge--pedido{background:rgba(15,26,15,.72);color:#fff;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);text-transform:none;letter-spacing:0}
-    .card--pedido .image::after{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 2px rgba(86,169,0,.35);pointer-events:none}
-    .apartar-btn--pedido{border-color:var(--lime,#56a900)!important;color:var(--lime-dark,#3d7a00)!important}
-    .apartar-btn--pedido:hover{background:rgba(86,169,0,.08)!important}
+    .location--traslado{display:flex;align-items:flex-start;gap:5px;color:var(--lime-dark,#3d7a00);font-weight:700}
+    .location-traslado-tag{color:#7a8890;font-weight:400}
     .photo-count{position:absolute;left:11px;bottom:11px;display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border-radius:8px;background:rgba(10,16,20,.77);backdrop-filter:blur(6px);color:#fff;font-size:.66rem;font-weight:900}
     .card-photo-nav{
       position:absolute;top:50%;z-index:3;display:grid;place-items:center;width:31px;height:31px;
@@ -691,7 +689,7 @@
     <button class="chip" type="button" data-mob-price="0-300">Hasta $300k</button>
     <button class="chip" type="button" data-mob-price="300-700">$300k–$700k</button>
     <div class="bar-sep" aria-hidden="true"></div>
-    <button class="chip chip--pedido" type="button" data-mob-pedido="1">📦 Sobre pedido</button>
+    <button class="chip" type="button" data-mob-pedido="1">Traslado disponible</button>
   </div>
 
 <style>
@@ -1150,23 +1148,19 @@
       const photoTotal = vehicle.images.length;
       const vehicleId = escapeHtml(vehicle.id);
       const detailUrl = `https://www.wecarsbajio.com/detalle?carId=${encodeURIComponent(vehicle.id)}`;
-      const sucursal = (vehicle.sucursal || '').trim().toLowerCase();
-      const LOCAL_SUCURSAL = 'leon';
-      const esSobrePedido = sucursal && sucursal !== LOCAL_SUCURSAL;
-      const sucursalLabel = sucursal ? sucursal.charAt(0).toUpperCase() + sucursal.slice(1) : '';
-      const waTextApartar = encodeURIComponent('Hola, quiero apartar el ' + vehicle.title + '. ¿Cuánto es el depósito para apartarlo?');
-      const waTextTraslado = encodeURIComponent('Hola, me interesa el ' + vehicle.title + ' que está en ' + sucursalLabel + '. ¿Pueden hacer el traslado a León? ¿Cuánto cuesta?');
+      const sucursal = (vehicle.sucursal || '').trim();
+      const esSobrePedido = sucursal && sucursal.toLowerCase() !== 'leon';
+      const sucursalLabel = sucursal ? sucursal.charAt(0).toUpperCase() + sucursal.slice(1).toLowerCase() : '';
+      const waText = encodeURIComponent('Hola, me interesa el ' + vehicle.title + (esSobrePedido ? ' (traslado desde ' + sucursalLabel + ')' : '') + '. ¿Pueden darme más información?');
 
       return `
-        <article class="card ${esSobrePedido ? 'card--pedido' : ''}" data-card-id="${vehicleId}" data-photo-index="0">
+        <article class="card" data-card-id="${vehicleId}" data-photo-index="0">
           <div class="image">
             <a href="${detailUrl}" target="_top" style="display:block;height:100%;">
               <img class="card-photo" data-card-image src="${escapeHtml(vehicle.image)}" alt="${title}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" style="pointer-events:none;">
             </a>
             <div class="badge-row">
-              ${esSobrePedido
-                ? `<span class="badge badge--pedido">📦 Sobre pedido · ${sucursalLabel}</span>`
-                : `<span class="badge">${vehicle.featured ? 'Alta demanda' : 'Disponible'}</span>`}
+              <span class="badge">${vehicle.featured ? 'Alta demanda' : 'Disponible'}</span>
               <button class="heart ${favorite ? 'fav' : ''}" type="button" data-favorite="${vehicleId}" aria-label="Guardar ${title}">${favorite ? '♥' : '♡'}</button>
             </div>
             ${photoTotal > 1 ? `
@@ -1180,16 +1174,18 @@
               <span>${year}</span><span>${escapeHtml(vehicle.transmission)}</span><span>${km}</span>${vehicle.fuel ? `<span>${escapeHtml(vehicle.fuel)}</span>` : ''}
             </div>
             <h3>${title}</h3>
-            <div class="location">⌖ ${escapeHtml(vehicle.city)}</div>
+            <div class="location ${esSobrePedido ? 'location--traslado' : ''}">
+              ${esSobrePedido
+                ? `<svg width="11" height="14" viewBox="0 0 11 14" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M5.5 0C3.015 0 1 2.015 1 4.5c0 3.375 4.5 9 4.5 9s4.5-5.625 4.5-9C10 2.015 7.985 0 5.5 0zm0 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" fill="currentColor"/></svg>${sucursalLabel} <span class="location-traslado-tag">· Traslado ~3–5 días</span>`
+                : `⌖ ${escapeHtml(vehicle.city)}`}
+            </div>
             <div class="price-line">
               <b class="price">${price}</b>
               <span class="monthly">${monthly}</span>
             </div>
             <div class="card-row-actions">
               <a class="detail" href="${detailUrl}" target="_top">Ver detalle</a>
-              ${esSobrePedido
-                ? `<a class="apartar-btn apartar-btn--pedido" href="https://wa.me/${WA}?text=${waTextTraslado}" target="_blank" rel="noreferrer">📦 Solicitar traslado</a>`
-                : `<a class="apartar-btn" href="https://wa.me/${WA}?text=${waTextApartar}" target="_blank" rel="noreferrer">Apartar</a>`}
+              <a class="apartar-btn" href="https://wa.me/${WA}?text=${waText}" target="_blank" rel="noreferrer">${esSobrePedido ? 'Me interesa' : 'Apartar'}</a>
               <button class="share-btn" type="button" data-share-id="${vehicleId}" data-share-title="${title}" data-share-url="${detailUrl}" aria-label="Compartir">↗</button>
               <button class="comp-btn" type="button" data-comp-id="${vehicleId}" aria-label="Comparar ${title}" title="Agregar al comparador">⇌</button>
             </div>
@@ -1419,7 +1415,7 @@
         // Fallback local: filter cards
         document.querySelectorAll('.card').forEach(function(c){
           if(!isActivePed){
-            c.style.display = c.classList.contains('card--pedido') ? '' : 'none';
+            c.style.display = c.querySelector('.location--traslado') ? '' : 'none';
           } else {
             c.style.display = '';
           }
