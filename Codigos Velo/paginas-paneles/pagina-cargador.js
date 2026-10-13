@@ -11,6 +11,7 @@ import {
   getCarroBackend,
   insertarCarroCargador,
   actualizarFotosCarro,
+  generarNumeroInventario,
 } from 'backend/operaciones.jsw';
 
 const HTML_ID = '#htmlCargador';

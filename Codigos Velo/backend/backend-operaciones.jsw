@@ -151,11 +151,42 @@ export async function getCarroBackend(carroId) {
 }
 
 /**
+ * Genera el próximo número de inventario en formato WC-YYYY-NNN.
+ * Busca el mayor número existente y suma 1.
+ */
+export async function generarNumeroInventario() {
+  await requireRolBackend(_ROLES_CARGADOR);
+  const anio = new Date().getFullYear();
+  const prefijo = `WC-${anio}-`;
+
+  const r = await wixData.query('Cars')
+    .startsWith('numeroInventario', prefijo)
+    .descending('numeroInventario')
+    .limit(100)
+    .find(SA);
+
+  let max = 0;
+  (r.items || []).forEach((item) => {
+    const num = parseInt((item.numeroInventario || '').replace(prefijo, ''), 10);
+    if (!isNaN(num) && num > max) max = num;
+  });
+
+  const siguiente = String(max + 1).padStart(3, '0');
+  return { numeroInventario: `${prefijo}${siguiente}` };
+}
+
+/**
  * Insertar vehículo nuevo desde el panel cargador.
+ * Si datos.numeroInventario está vacío, se auto-genera.
  */
 export async function insertarCarroCargador(datos) {
   await requireRolBackend(_ROLES_CARGADOR);
-  return wixData.insert('Cars', datos, SA);
+  let item = Object.assign({}, datos);
+  if (!item.numeroInventario || item.numeroInventario.trim() === '') {
+    const gen = await generarNumeroInventario();
+    item.numeroInventario = gen.numeroInventario;
+  }
+  return wixData.insert('Cars', item, SA);
 }
 
 /**
