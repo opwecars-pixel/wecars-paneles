@@ -10,13 +10,12 @@
 //    ALeads        — para crear el lead con interés y vendedor asignado
 // ───────────────────────────────────────────────────────────────────
 
-import wixData from 'wix-data';
 import { findOrCreateCliente } from 'backend/clientes.jsw';
 import { crearLead }           from 'backend/leads.jsw';
 import { registrarActividad }  from 'backend/actividades.jsw';
+import { queryColeccion }      from 'backend/operaciones.jsw';
 
 const HTML_ID = '#htmlRegistroRapido';
-const SA      = { suppressAuth: true };
 
 $w.onReady(function () {
 
@@ -47,24 +46,25 @@ $w.onReady(function () {
 
 // ─── Enviar lista de vendedores al iframe ──────────────────────────
 function _enviarVendedores() {
-  wixData.query('Usuarios')
-    .contains('rol', 'endedor')   // captura 'Vendedor' y 'vendedor'
-    .limit(100)
-    .find(SA)
-    .then(function (res) {
-      const vendedores = res.items.map(function (u) {
-        return {
-          nombre: u.nombre || u.title || u._id,
-          email:  u.email  || u.loginEmail || '',
-        };
-      }).filter(function (v) { return v.email; })
+  queryColeccion('Usuarios', ['Vendedor', 'Administración', 'Gerencia', 'Finanzas'], [
+    { campo: 'rol', op: 'contains', valor: 'endedor' },
+    { limit: 100 },
+  ])
+    .then(function (items) {
+      const vendedores = items
+        .map(function (u) {
+          return {
+            nombre: u.nombre || u.title || u._id,
+            email:  u.email  || u.loginEmail || '',
+          };
+        })
+        .filter(function (v) { return v.email; })
         .sort(function (a, b) { return a.nombre.localeCompare(b.nombre, 'es'); });
 
       $w(HTML_ID).postMessage({ type: 'wecars-rr-vendedores', vendedores: vendedores });
     })
     .catch(function (err) {
       console.error('[RegistroRapido] Error cargando vendedores:', err);
-      // Enviar lista vacía — el formulario mostrará el select vacío
       $w(HTML_ID).postMessage({ type: 'wecars-rr-vendedores', vendedores: [] });
     });
 }

@@ -102,9 +102,10 @@ export async function getDeColeccion(coleccion, rolesPermitidos, id) {
 }
 
 // ── Cars ──────────────────────────────────────────────────────────
-// Roles permitidos para escritura en inventario: Administración y Gerencia.
+// Roles permitidos para escritura en inventario.
 
-const _ROLES_INVENTARIO = ['Administración', 'Gerencia'];
+const _ROLES_INVENTARIO  = ['Administración', 'Gerencia'];
+const _ROLES_CARGADOR    = ['cargador', 'Administración', 'Gerencia'];
 
 /**
  * Insertar un vehículo al inventario.
@@ -130,6 +131,40 @@ export async function eliminarCarro(carroId) {
   await requireRolBackend(_ROLES_INVENTARIO);
   await wixData.remove('Cars', carroId, SA);
   return { ok: true };
+}
+
+/**
+ * Consultar inventario (solo lectura). Rol: cargador + inventario.
+ */
+export async function queryCarsBackend(limit) {
+  await requireRolBackend(_ROLES_CARGADOR);
+  return wixData.query('Cars').descending('_createdDate').limit(limit || 200).find(SA)
+    .then((r) => r.items);
+}
+
+/**
+ * Obtener un vehículo por ID. Rol: cargador.
+ */
+export async function getCarroBackend(carroId) {
+  await requireRolBackend(_ROLES_CARGADOR);
+  return wixData.get('Cars', carroId, SA);
+}
+
+/**
+ * Insertar vehículo nuevo desde el panel cargador.
+ */
+export async function insertarCarroCargador(datos) {
+  await requireRolBackend(_ROLES_CARGADOR);
+  return wixData.insert('Cars', datos, SA);
+}
+
+/**
+ * Actualizar fotos/video de un vehículo. Rol: cargador.
+ */
+export async function actualizarFotosCarro(carroId, cambios) {
+  await requireRolBackend(_ROLES_CARGADOR);
+  const item = await wixData.get('Cars', carroId, SA);
+  return wixData.update('Cars', Object.assign({}, item, cambios), SA);
 }
 
 // ── ClientRecords ─────────────────────────────────────────────────
