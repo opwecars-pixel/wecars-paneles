@@ -64,7 +64,7 @@ export function fetchDatosVendedor(emailIgnorado) {
         wixData.query('ClientRecords').eq('vendedorAsignado', emailAutenticado).descending('ultimaActividad').limit(200).find(SA).catch(function(){ return { items: [] }; }),
         wixData.query('Opportunities').eq('vendedorEmail', emailAutenticado).descending('fechaCreacion').limit(200).find(SA).catch(function(){ return { items: [] }; }),
         wixData.query('Activities').eq('vendedorEmail', emailAutenticado).descending('fecha').limit(100).find(SA).catch(function(){ return { items: [] }; }),
-        wixData.query('Usuarios').limit(100).find(SA).catch(function(){ return { items: [] }; }),
+        wixData.query('Usuarios').limit(100).find(SA).then(function(r){ return { items: r.items.map(function(u){ return { _id: u._id, nombre: u.nombre, email: u.email, rol: u.rol }; }) }; }).catch(function(){ return { items: [] }; }),
         wixData.query('Creditos').eq('vendedorEmail', emailAutenticado).descending('_createdDate').limit(100).find(SA).catch(function(){ return { items: [] }; }),
       ]).then(function(results) {
         return {

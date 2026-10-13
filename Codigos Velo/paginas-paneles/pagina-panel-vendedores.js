@@ -167,7 +167,7 @@ $w.onReady(function () {
             }).catch(() => {});
           }
         })
-        .catch((e) => console.error('[Panel] Error guardando próximo paso:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-proximo-paso-error', clienteId: data.clienteId, error: String(e) }));
     }
 
     // Visibilidad del botón de upload (controlada por el tab Documentos)
@@ -307,7 +307,7 @@ $w.onReady(function () {
         .then((item) => {
           _broadcast({ type: 'wecars-solicitud-compra-nueva', solicitud: item });
         })
-        .catch((e) => console.error('[Panel] Error creando solicitud de compra:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-solicitud-error', error: String(e) }));
     }
 
     // ── Gamificación ──────────────────────────────────────────────────
@@ -357,7 +357,7 @@ $w.onReady(function () {
           return wixData.insert('Tasks', item);
         })
         .then((saved) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', tarea: saved }))
-        .catch((e) => console.error('[Vendedor] Error creando tarea propia:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', error: String(e) }));
     }
 
     // ── Mover tarea entre columnas ────────────────────────────────────
@@ -365,7 +365,7 @@ $w.onReady(function () {
       wixData.get('Tasks', data.tareaId)
         .then(item => wixData.update('Tasks', Object.assign({}, item, data.cambios || {}), { suppressAuth: true }))
         .then(item => $w(HTML_ID).postMessage({ type: 'wecars-tarea-actualizada', tarea: item }))
-        .catch(e => console.error('[Vendedor] Error actualizando tarea:', e));
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', tareaId: data.tareaId, error: String(e) }));
     }
 
     // ── Avanzar estado del expediente ────────────────────────────────
@@ -804,7 +804,7 @@ function actualizarAuto(carId, cambios) {
       enviarInventarioPanel();
       _broadcast({ type: 'wecars-inventario-update' });
     })
-    .catch((e) => console.error('[Panel] Error actualizando auto:', e));
+    .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-auto-error', carId, error: String(e) }));
 }
 
 // ── Historial de cliente (timeline) ──────────────────────────────────
@@ -927,7 +927,7 @@ function actualizarCliente(clienteId, cambios) {
     .then((item) => {
       _broadcast({ type: 'wecars-estado-update', clienteId: item._id });
     })
-    .catch((e) => console.error('[Panel] Error actualizando cliente:', e));
+    .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-cliente-error', error: String(e) }));
 }
 
 function crearCliente(datos) {

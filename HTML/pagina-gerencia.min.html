@@ -5294,6 +5294,70 @@ const stEl = document.getElementById('ge-ci-save-status') || document.getElement
 if(stEl) stEl.textContent = 'Error: ' + (data.error || 'desconocido');
 mostrarToast('Error al guardar: ' + (data.error || ''));
 }
+/* ── GAP-A Gerencia: handlers faltantes (auditoría transversal) ── */
+if (data.type === 'wecars-citas-gerencia') {
+todasCitas = Array.isArray(data.citas) ? data.citas : [];
+if (_activeView === 'citas' && typeof renderCitasGe === 'function') renderCitasGe();
+}
+if (data.type === 'wecars-config-valor') {
+window._geConfigValor = { key: data.key, value: data.value };
+if (typeof renderConfigGe === 'function') renderConfigGe();
+}
+if (data.type === 'wecars-config-guardada') {
+if (data.ok) mostrarToast('✓ Configuración guardada');
+else mostrarToast('⚠ Error al guardar configuración: ' + (data.error || ''));
+}
+if (data.type === 'wecars-ge-pub-cuentas-datos') {
+window._gePubCuentas = Array.isArray(data.cuentas) ? data.cuentas : [];
+if (_activeView === 'publicaciones' && typeof renderPublicacionesGe === 'function') renderPublicacionesGe();
+}
+if (data.type === 'wecars-gerencia-nota-ok') {
+if (data.ok) mostrarToast('✓ Nota guardada');
+else mostrarToast('⚠ Error al guardar nota: ' + (data.error || ''));
+}
+if (data.type === 'wecars-gm-guardado') {
+if (data.ok) mostrarToast('✓ Gamificación guardada');
+else mostrarToast('⚠ Error al guardar gamificación: ' + (data.error || ''));
+}
+if (data.type === 'wecars-tarea-asignada' && data.tarea) {
+const _tai = (window.tareasGe || []).findIndex(t => t._id === data.tarea._id);
+if (_tai >= 0) tareasGe[_tai] = data.tarea; else { if (!window.tareasGe) window.tareasGe = []; tareasGe.unshift(data.tarea); }
+if (typeof renderTareasGe === 'function') renderTareasGe();
+}
+if (data.type === 'wecars-vta-guardado') {
+if (data.ok) {
+mostrarToast('✓ Verificación guardada');
+if (_activeView === 'verificaciones' && typeof renderVTAGerencia === 'function') renderVTAGerencia();
+} else {
+mostrarToast('⚠ Error al guardar VTA: ' + (data.error || ''));
+}
+}
+if (data.type === 'wecars-empleado-creado' && data.empleado) {
+empleados = empleados.filter(e => e._id !== data.empleado._id);
+empleados.push(data.empleado);
+poblarSelectsEmpleados();
+if (_activeView === 'equipo' && typeof renderEquipoResumen === 'function') renderEquipoResumen();
+mostrarToast('✓ Empleado creado');
+}
+if (data.type === 'wecars-empleado-error') {
+mostrarToast('⚠ Error empleado: ' + (data.mensaje || data.error || ''));
+}
+if (data.type === 'wecars-lead-convertido') {
+if (data.ok) mostrarToast('✓ Lead convertido a cliente' + (data.yaExistia ? ' (ya existía)' : ''));
+else mostrarToast('⚠ Error al convertir: ' + (data.error || ''));
+}
+if (data.type === 'wecars-credito-avanzado') {
+if (data.ok) {
+if (data.credito) {
+const _gci = (window._geCreditos || []).findIndex(c => c._id === data.credito._id);
+if (_gci >= 0) window._geCreditos[_gci] = data.credito; else if (window._geCreditos) window._geCreditos.unshift(data.credito);
+if (_activeView === 'creditos-ge' && typeof geRenderCreditos === 'function') geRenderCreditos();
+}
+mostrarToast('✓ Crédito avanzado');
+} else {
+mostrarToast('⚠ Error al avanzar crédito: ' + (data.error || ''));
+}
+}
 });
 // ── Rentabilidad — variables y funciones ──────────────────────
 let cierresGe = [];

@@ -10940,7 +10940,8 @@ section.pv-table-wrap > .shell > #pv-compradores {
   function loadCitas() { citas = []; window.parent.postMessage({type:'wecars-citas-solicitar'},'*'); }
   function saveCitas() {
     try {
-      new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-citas-update', citas, vendedorId: vendedorActual || 'demo' });
+      if (window._wcBC) window._wcBC.emit('wecars-citas-update', { citas, vendedorId: vendedorActual || 'demo' });
+      else new BroadcastChannel('wecars-erp-v2').postMessage({ type: 'wecars-citas-update', citas, vendedorId: vendedorActual || 'demo' });
     } catch(e) {}
   }
   loadCitas();

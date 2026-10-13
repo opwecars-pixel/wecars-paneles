@@ -3565,6 +3565,267 @@ window.addEventListener('message', function(e) {
     case 'wecars-facturas-datos':
       window._adFacturas = Array.isArray(d.items) ? d.items : [];
       break;
+
+    /* ── GAP-A nuevos (auditoría transversal) ─────────────────────── */
+
+    case 'wecars-foto-resultado':
+      if (d.ok) {
+        toast('Foto actualizada correctamente');
+        if (d.carro) {
+          inventario = inventario.map(function(c){ return c._id === d.carro._id ? d.carro : c; });
+          window._inventarioAdmin = inventario;
+          if (vistaActual === 'inventario') renderInventario();
+        }
+      } else {
+        toast('Error al subir foto: ' + (d.error || ''));
+      }
+      break;
+
+    case 'wecars-expedientes-datos':
+      window._adExpedientes = { enRevision: d.enRevision || [], pagoConfirmado: d.pagoConfirmado || [] };
+      if (vistaActual === 'expedientes' && typeof renderExpedientes === 'function') renderExpedientes();
+      break;
+
+    case 'wecars-historial-datos':
+      window._adHistorialPorCliente = window._adHistorialPorCliente || {};
+      if (d.clienteId) window._adHistorialPorCliente[d.clienteId] = d.historial || [];
+      if (typeof renderHistorialDrawer === 'function') renderHistorialDrawer(d.clienteId);
+      break;
+
+    case 'wecars-estado-resultado':
+      if (d.ok) {
+        toast('Estado actualizado');
+        if (d.clienteId) {
+          var _clIdx = (window._adClientes || []).findIndex(function(c){ return c._id === d.clienteId; });
+          if (_clIdx >= 0 && d.movimiento) window._adClientes[_clIdx] = Object.assign({}, window._adClientes[_clIdx], { estatusExpediente: d.movimiento.nuevoEstado });
+        }
+        if (d.movimiento && window._adExpedientes) {
+          window._adExpedientes.enRevision = (window._adExpedientes.enRevision || []).filter(function(c){ return c._id !== d.clienteId; });
+          window._adExpedientes.pagoConfirmado = (window._adExpedientes.pagoConfirmado || []).filter(function(c){ return c._id !== d.clienteId; });
+        }
+        if (vistaActual === 'expedientes' && typeof renderExpedientes === 'function') renderExpedientes();
+      } else {
+        toast('Error al cambiar estado: ' + (d.error || ''));
+      }
+      break;
+
+    case 'wecars-empleado-creado':
+      if (d.empleado) {
+        empleados = empleados.filter(function(e){ return e._id !== d.empleado._id; });
+        empleados.push(d.empleado);
+        poblarSelectResponsable();
+        if (vistaActual === 'directorio') renderDirectorio();
+        toast('Empleado creado');
+      }
+      break;
+
+    case 'wecars-empleado-actualizado':
+      if (d.empleado) {
+        empleados = empleados.map(function(e){ return e._id === d.empleado._id ? d.empleado : e; });
+        poblarSelectResponsable();
+        if (vistaActual === 'directorio') renderDirectorio();
+        toast('Empleado actualizado');
+      }
+      break;
+
+    case 'wecars-empleado-error':
+      toast('Error empleado: ' + (d.mensaje || d.error || ''));
+      break;
+
+    case 'wecars-pub-cuentas-datos':
+      window._adPubCuentas = Array.isArray(d.cuentas) ? d.cuentas : [];
+      if (vistaActual === 'publicaciones' && typeof renderPublicaciones === 'function') renderPublicaciones();
+      break;
+
+    case 'wecars-pub-conectar-resultado':
+      if (d.ok) toast('Cuenta conectada: ' + (d.paginaNombre || ''));
+      else toast('Error al conectar: ' + (d.error || ''));
+      break;
+
+    case 'wecars-clientes-todos-datos':
+      window._adClientesTodos = Array.isArray(d.items) ? d.items : [];
+      if (typeof poblarSelectClienteApartado === 'function') poblarSelectClienteApartado();
+      break;
+
+    case 'wecars-clientes-resultado':
+      window._adClientesBusqueda = Array.isArray(d.items) ? d.items : [];
+      if (typeof renderClientesBusqueda === 'function') renderClientesBusqueda();
+      break;
+
+    case 'wecars-apartados-datos':
+      window._adApartados = Array.isArray(d.items) ? d.items : [];
+      if (vistaActual === 'apartados' && typeof renderApartados === 'function') renderApartados();
+      break;
+
+    case 'wecars-apartado-ok':
+      toast('Apartado creado — folio ' + (d.folio || ''));
+      if (typeof renderApartados === 'function') window.parent.postMessage({ type: 'wecars-apartados-solicitar' }, '*');
+      break;
+
+    case 'wecars-apartado-error':
+      toast('Error en apartado: ' + (d.error || ''));
+      break;
+
+    case 'wecars-apartado-cerrado-ok':
+      toast('Apartado cerrado');
+      window.parent.postMessage({ type: 'wecars-apartados-solicitar' }, '*');
+      break;
+
+    case 'wecars-apartado-cerrado-error':
+      toast('Error al cerrar apartado: ' + (d.error || ''));
+      break;
+
+    case 'wecars-carro-resultado':
+      if (d.ok) {
+        if (d.creado) {
+          inventario = inventario.filter(function(c){ return c._id !== d.carro._id; });
+          inventario.unshift(d.carro);
+        } else {
+          inventario = inventario.map(function(c){ return c._id === d.carro._id ? d.carro : c; });
+        }
+        window._inventarioAdmin = inventario;
+        if (vistaActual === 'inventario') renderInventario();
+        if (!d.desdeConsigna) toast(d.creado ? 'Vehículo creado' : 'Vehículo actualizado');
+      } else {
+        toast('Error en inventario: ' + (d.error || ''));
+      }
+      break;
+
+    case 'wecars-carro-eliminado':
+      if (d.ok) {
+        inventario = inventario.filter(function(c){ return c._id !== d.carroId; });
+        window._inventarioAdmin = inventario;
+        if (vistaActual === 'inventario') renderInventario();
+        toast('Vehículo eliminado');
+      } else {
+        toast('Error al eliminar: ' + (d.error || ''));
+      }
+      break;
+
+    case 'wecars-consigna-asignada':
+      if (d.consigna) {
+        consignas = consignas.map(function(c){ return c._id === d.consigna._id ? d.consigna : c; });
+        if (vistaActual === 'consignas') renderConsignas();
+        toast('Consigna asignada');
+      }
+      break;
+
+    case 'wecars-consigna-cerrada':
+      consignas = consignas.map(function(c){ return c._id === d.consignaId ? Object.assign({}, c, { estatusConsigna: 'cerrada' }) : c; });
+      if (vistaActual === 'consignas') renderConsignas();
+      toast('Consigna cerrada — auto ingresado al inventario');
+      break;
+
+    case 'wecars-consigna-error':
+      toast('Error en consigna: ' + (d.error || ''));
+      break;
+
+    case 'wecars-tarea-asignada':
+      if (d.tarea) {
+        tareas = tareas.filter(function(t){ return (t._id || t.id) !== (d.tarea._id || d.tarea.id); });
+        tareas.push(d.tarea);
+        renderPendientes();
+      }
+      break;
+
+    case 'wecars-gm-mes-datos':
+      window._adGmMesDatos = { mes: d.mes, items: d.items || [] };
+      if (vistaActual === 'gamificacion' && typeof renderGamificacion === 'function') renderGamificacion();
+      break;
+
+    case 'wecars-gm-meses-respuesta':
+      window._adGmMeses = d.meses || [];
+      if (vistaActual === 'gamificacion' && typeof renderGamificacion === 'function') renderGamificacion();
+      break;
+
+    case 'wecars-cliente-nuevo-ok':
+      if (d.yaExistia) {
+        toast(d.mensaje || 'Cliente ya registrado');
+      } else {
+        toast('Cliente creado correctamente');
+        if (d.cliente) {
+          window._adClientes = window._adClientes || [];
+          window._adClientes.unshift(d.cliente);
+        }
+      }
+      if (typeof cerrarModalNuevoCliente === 'function') cerrarModalNuevoCliente();
+      break;
+
+    case 'wecars-cliente-nuevo-error':
+      toast('Error al crear cliente: ' + (d.error || ''));
+      break;
+
+    case 'wecars-vta-guardado':
+      if (d.ok) {
+        if (d.item) {
+          vtaRecords = vtaRecords.map(function(v){ return v._id === d.id ? d.item : v; });
+          if (vistaActual === 'verificaciones') renderVerificaciones();
+        }
+        toast('Verificación guardada');
+      } else {
+        toast('Error al guardar VTA: ' + (d.error || ''));
+      }
+      break;
+
+    case 'wecars-cierre-creado':
+      if (d.cierre) {
+        cierres = cierres.filter(function(c){ return c._id !== d.cierre._id; });
+        cierres.unshift(d.cierre);
+        if (vistaActual === 'cierres') renderCierres();
+        toast('Cierre creado');
+      }
+      break;
+
+    case 'wecars-cierre-actualizado':
+      if (d.cierre) {
+        cierres = cierres.map(function(c){ return c._id === d.cierre._id ? d.cierre : c; });
+        if (vistaActual === 'cierres') renderCierres();
+        toast('Cierre actualizado');
+      }
+      break;
+
+    case 'wecars-cierre-error':
+      toast('Error en cierre: ' + (d.error || ''));
+      break;
+
+    case 'wecars-lead-convertido':
+      if (d.ok) {
+        toast('Lead convertido a cliente' + (d.yaExistia ? ' (ya existía)' : ''));
+      } else {
+        toast('Error al convertir lead: ' + (d.error || ''));
+      }
+      break;
+
+    case 'wecars-credito-avanzado':
+      if (d.ok) {
+        if (d.credito) {
+          window._adCreditos = (window._adCreditos || []).map(function(c){ return c._id === d.credito._id ? d.credito : c; });
+          if (typeof renderAdmCreditos === 'function') renderAdmCreditos();
+        }
+        toast('Crédito avanzado');
+      } else {
+        toast('Error al avanzar crédito: ' + (d.error || ''));
+      }
+      break;
+
+    case 'wecars-perfil-guardado':
+      if (d.ok) {
+        if (d.usuario && d.usuario.nombre) nombreActual = d.usuario.nombre;
+        toast('Perfil guardado');
+      } else {
+        toast('Error al guardar perfil: ' + (d.error || ''));
+      }
+      break;
+
+    case 'wecars-permisos-guardados':
+      if (d.ok) toast('Permisos guardados');
+      else toast('Error al guardar permisos: ' + (d.error || ''));
+      break;
+
+    case 'wecars-lead-creado':
+      if (d.ok) toast('Lead creado');
+      else toast('Error al crear lead: ' + (d.error || ''));
+      break;
   }
 });
 

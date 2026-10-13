@@ -3183,6 +3183,44 @@ window.addEventListener('message',ev=>{
       toast('⚠ '+(d.error||'Error al crear factura — intenta de nuevo'));
     }
   }
+  /* ── GAP-A Finanzas: handlers faltantes ─────────────────────── */
+  if(d.type==='wecars-credito-avanzar-resultado'){
+    if(d.ok){
+      if(d.credito){const ci=creditos.findIndex(c=>c._id===d.credito._id);if(ci>=0)creditos[ci]=d.credito;else creditos.unshift(d.credito);if(vistaActual==='creditos')renderCreditos();}
+      toast('✓ Crédito avanzado');
+    }else{toast('⚠ Error al avanzar crédito: '+(d.error||''));}
+  }
+  if(d.type==='wecars-egreso-guardado'){
+    if(d.ok){toast('✓ Egreso registrado');if(vistaActual==='pagos'||vistaActual==='egresos')window.parent.postMessage({type:'wecars-finanzas-solicitar'},'*');}
+    else{toast('⚠ Error al guardar egreso: '+(d.error||''));}
+  }
+  if(d.type==='wecars-finanza-guardada'){
+    if(d.ok){toast('✓ Movimiento guardado');}
+    else{toast('⚠ Error al guardar: '+(d.error||''));}
+  }
+  if(d.type==='wecars-pago-resultado'){
+    if(!d.ok)toast('⚠ Error al registrar pago: '+(d.error||''));
+  }
+  if(d.type==='wecars-comision-liberada-resultado'){
+    if(!d.ok)toast('⚠ Error al liberar comisión: '+(d.error||''));
+  }
+  if(d.type==='wecars-comision-pagada-resultado'){
+    if(!d.ok)toast('⚠ Error al marcar comisión pagada: '+(d.error||''));
+  }
+  if(d.type==='wecars-comision-nueva-resultado'){
+    if(d.ok){if(d.comision&&!comisiones.find(c=>c._id===d.comision._id))comisiones.unshift(d.comision);if(vistaActual==='comisiones')renderComisiones();}
+    else{toast('⚠ Error al registrar comisión: '+(d.error||''));}
+  }
+  if(d.type==='wecars-comision-editada'){
+    if(d.ok&&d.comision){const ci=comisiones.findIndex(c=>c._id===d.comision._id);if(ci>=0)comisiones[ci]=d.comision;if(vistaActual==='comisiones')renderComisiones();}
+    else if(!d.ok){toast('⚠ Error al editar comisión: '+(d.error||''));}
+  }
+  if(d.type==='wecars-credito-actualizado'){
+    if(!d.ok)toast('⚠ Error al actualizar crédito: '+(d.error||''));
+  }
+  if(d.type==='wecars-cliente-actualizado-fin'){
+    if(!d.ok)toast('⚠ Error al actualizar cliente: '+(d.error||''));
+  }
 });
 
 /* ── Solicitar datos al cargar ───────────────────── */

@@ -394,7 +394,7 @@ $w.onReady(function () {
             _broadcast({ type: 'wecars-consigna-asignada', consigna: item });
           }
         })
-        .catch((e) => console.error('[Admin] Error asignando consigna:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-consigna-error', error: String(e) }));
     }
 
     // ── Consigna cerrada → entra al inventario (Cars) ─────────────────
@@ -455,7 +455,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-solicitud-compra-actualizar' && data.solicitudId) {
       wixData.get('SolicitudesCompra', data.solicitudId)
         .then((item) => wixData.update('SolicitudesCompra', Object.assign({}, item, data.cambios || {})))
-        .catch((e) => console.error('[Admin] Error actualizando solicitud de compra:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-solicitud-error', solicitudId: data.solicitudId, error: String(e) }));
     }
 
     // ── Tareas / Pendientes (colección Tasks en CMS) ──────────────────
@@ -474,7 +474,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', tarea: item });
           _broadcast({ type: 'wecars-tarea-nueva', tarea: item });
         })
-        .catch((e) => console.error('[Admin] Error creando tarea:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', error: String(e) }));
     }
 
     if (data.type === 'wecars-tarea-actualizar' && data.tareaId) {
@@ -482,13 +482,13 @@ $w.onReady(function () {
       wixData.get('Tasks', data.tareaId)
         .then((item) => wixData.update('Tasks', Object.assign({}, item, cambios), { suppressAuth: true }))
         .then((item) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-actualizada', tarea: item }))
-        .catch((e) => console.error('[Admin] Error actualizando tarea:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', tareaId: data.tareaId, error: String(e) }));
     }
 
     if (data.type === 'wecars-tarea-eliminar' && data.tareaId) {
       wixData.remove('Tasks', data.tareaId, { suppressAuth: true })
         .then(() => $w(HTML_ID).postMessage({ type: 'wecars-tarea-eliminada', tareaId: data.tareaId }))
-        .catch((e) => console.error('[Admin] Error eliminando tarea:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', tareaId: data.tareaId, error: String(e) }));
     }
 
     // ── Tarea interna legacy (broadcast entre paneles) ─────────────────
@@ -698,11 +698,11 @@ $w.onReady(function () {
       // registrarActividad se hace dentro de asignarLead (backend) — solo refrescar UI
       asignarLead(data.leadId, data.vendedorEmail || '', data.vendedorNombre || '')
         .then(() => enviarLeadsAdmin())
-        .catch((e) => console.error('[Admin] Error asignando lead:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-leads-datos', items: [], error: String(e) }));
     }
     if (data.type === 'wecars-lead-estatus' && data.leadId) {
       actualizarEstatusLead(data.leadId, data.nuevoEstatus)
-        .catch((e) => console.error('[Admin] Error estatus lead:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-lead-estatus-error', leadId: data.leadId, error: String(e) }));
     }
     if (data.type === 'wecars-lead-nota' && data.leadId) {
       wixUsers.currentUser.getEmail()
@@ -715,7 +715,7 @@ $w.onReady(function () {
             vendedorNombre: p.nombre || email,
             descripcion: data.nota || '',
           })))
-        .catch((e) => console.error('[Admin] Error nota lead:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-lead-nota-error', leadId: data.leadId, error: String(e) }));
     }
     if (data.type === 'wecars-lead-convertir' && data.leadId && data.lead) {
       const l = data.lead;

@@ -71,7 +71,8 @@ $w.onReady(function () {
       const pago = Object.assign({}, data.pago);
       delete pago._id;
       registrarPago(pago)
-        .catch((e) => console.error('[Finanzas] Error guardando pago:', e));
+        .then((item) => $w(HTML_ID).postMessage({ type: 'wecars-pago-resultado', ok: true, pago: item }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-pago-resultado', ok: false, error: String(e) }));
     }
 
     // ── Avanzar estado crédito (flujo nuevo) ─────────────────────
@@ -88,19 +89,21 @@ $w.onReady(function () {
             _broadcast({ type: 'credito-estado-actualizado', creditoId: data.creditoId, estatus: data.nuevoEstado });
           }
         })
-        .catch((e) => console.error('[Finanzas] Error avanzando crédito:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-credito-avanzar-resultado', ok: false, error: String(e) }));
     }
 
     // ── Actualizar crédito (campos simples sin cambio de estado) ─
     if (data.type === 'wecars-credito-actualizar' && data.creditoId) {
       actualizarCredito(data.creditoId, data.cambios || {})
-        .catch((e) => console.error('[Finanzas] Error actualizando crédito:', e));
+        .then((item) => $w(HTML_ID).postMessage({ type: 'wecars-credito-actualizado', ok: true, credito: item }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-credito-actualizado', ok: false, error: String(e) }));
     }
 
     // ── Actualizar cliente (estatus financiero, notas) ────────────
     if (data.type === 'wecars-cliente-actualizar' && data.clienteId) {
       actualizarClienteFinanzas(data.clienteId, data.cambios || {})
-        .catch((e) => console.error('[Finanzas] Error actualizando cliente:', e));
+        .then((item) => $w(HTML_ID).postMessage({ type: 'wecars-cliente-actualizado-fin', ok: true, cliente: item }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-cliente-actualizado-fin', ok: false, error: String(e) }));
     }
 
     // ── Liberar comisión ──────────────────────────────────────────
@@ -109,7 +112,8 @@ $w.onReady(function () {
       // este postMessage (señal optimista). El Velo NO re-emite BC para evitar
       // el doble-toast en Vendedores y Gerencia.
       liberarComision(data.comisionId)
-        .catch((e) => console.error('[Finanzas] Error liberando comisión:', e));
+        .then(() => $w(HTML_ID).postMessage({ type: 'wecars-comision-liberada-resultado', ok: true, comisionId: data.comisionId }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-comision-liberada-resultado', ok: false, comisionId: data.comisionId, error: String(e) }));
     }
 
     // ── Marcar comisión pagada ────────────────────────────────────
@@ -118,7 +122,7 @@ $w.onReady(function () {
         .then((result) => {
           _broadcast({ type: 'wecars-comision-pagada-bc', comisionId: data.comisionId, estatus: 'Pagada', vendedorEmail: result.vendedorEmail, vendedorNombre: result.vendedorNombre, monto: result.monto, concepto: result.concepto });
         })
-        .catch((e) => console.error('[Finanzas] Error marcando comisión pagada:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-comision-pagada-resultado', ok: false, comisionId: data.comisionId, error: String(e) }));
     }
 
     // ── Registrar nueva comisión ──────────────────────────────────
@@ -126,13 +130,15 @@ $w.onReady(function () {
       const co = Object.assign({}, data.comision);
       delete co._id;
       insertarComision(co)
-        .catch((e) => console.error('[Finanzas] Error registrando comisión:', e));
+        .then((item) => $w(HTML_ID).postMessage({ type: 'wecars-comision-nueva-resultado', ok: true, comision: item }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-comision-nueva-resultado', ok: false, error: String(e) }));
     }
 
     // ── Editar comisión (monto, concepto, etc.) ───────────────────
     if (data.type === 'wecars-comision-editar' && data.comisionId) {
       editarComision(data.comisionId, data.cambios || {})
-        .catch((e) => console.error('[Finanzas] Error editando comisión:', e));
+        .then((item) => $w(HTML_ID).postMessage({ type: 'wecars-comision-editada', ok: true, comision: item }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-comision-editada', ok: false, comisionId: data.comisionId, error: String(e) }));
     }
 
     // ── Emitir factura ────────────────────────────────────────────
@@ -220,7 +226,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-egreso-guardado', ok: true, pagoId: pago._id });
           _broadcast({ type: 'egreso-registrado', pagoId: pago._id, monto: pago.monto, categoria: pago.categoria });
         })
-        .catch((e) => console.error('[Finanzas] Error guardando egreso:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-egreso-guardado', ok: false, error: String(e) }));
     }
 
     // ── Registrar ingreso/egreso rápido desde mobile ──────────────
@@ -238,7 +244,7 @@ $w.onReady(function () {
         .then((pago) => {
           $w(HTML_ID).postMessage({ type: 'wecars-finanza-guardada', ok: true, pagoId: pago._id });
         })
-        .catch((e) => console.error('[Finanzas] Error guardando finanza mobile:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-finanza-guardada', ok: false, error: String(e) }));
     }
 
     // ── Evento global (broadcast entre paneles, sin CMS) ─────────

@@ -180,7 +180,7 @@ $w.onReady(function () {
         .then(() => {
           _broadcast({ type: 'wecars-estado-update', clienteId: data.clienteId });
         })
-        .catch((e) => console.error('[Gerencia] Error actualizando cliente:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-cliente-actualizado-ge', ok: false, error: String(e) }));
     }
 
     // ── Crear prospecto nuevo (con anti-duplicado por teléfono) ──────
@@ -308,7 +308,7 @@ $w.onReady(function () {
         .then((items) => {
           $w(HTML_ID).postMessage({ type: 'wecars-bonos-historial', items });
         })
-        .catch((e) => console.error('[Gerencia] Error registrando bono:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-bono-error', error: String(e) }));
     }
 
     // ── Solicitar historial de bonos desde CMS ─────────────────────────
@@ -393,7 +393,7 @@ $w.onReady(function () {
           return wixData.query('Activities').eq('tipo', 'mensaje-gerencia').descending('fecha').limit(30).find({ suppressAuth: true });
         })
         .then((r) => $w(HTML_ID).postMessage({ type: 'wecars-mensajes-historial', items: r.items }))
-        .catch((e) => console.error('[Gerencia] Error guardando mensaje:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-mensaje-error', error: String(e) }));
     }
 
     // ── Registrar acción en Historial (notas privadas, etc.) ──────────
@@ -458,7 +458,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-actualizada', tarea: item });
           _broadcast({ type: 'wecars-tarea-asignada', tarea: item });
         })
-        .catch(e => console.error('[Gerencia] Error actualizando tarea:', e));
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', error: String(e) }));
     }
 
     if (data.type === 'wecars-tarea-eliminar' && data.tareaId) {
@@ -467,7 +467,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-eliminada', tareaId: data.tareaId });
           _broadcast({ type: 'wecars-tarea-eliminada', tareaId: data.tareaId });
         })
-        .catch(e => console.error('[Gerencia] Error eliminando tarea:', e));
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', error: String(e) }));
     }
 
     // ── Cierres de Operación (Rentabilidad) ──────────────────────────
