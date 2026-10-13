@@ -226,11 +226,17 @@ body.wc-loading .wc-splash { display: flex; }
 
 .wc-slot-spinner {
   position: absolute; inset: 0; display: none;
-  align-items: center; justify-content: center; pointer-events: none;
-  background: rgba(255,255,255,.7);
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; pointer-events: none; background: rgba(0,0,0,.45);
 }
 .wc-slot.uploading .wc-slot-spinner { display: flex; }
-.wc-mini-spinner { width: 24px; height: 24px; border: 3px solid rgba(37,99,235,.2); border-top-color: var(--info); border-radius: 50%; animation: spin .7s linear infinite; }
+.wc-mini-spinner { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+.wc-slot-progress-wrap { width: 70%; height: 4px; background: rgba(255,255,255,.25); border-radius: 99px; overflow: hidden; }
+.wc-slot-progress-bar { height: 100%; width: 0%; background: var(--lime); border-radius: 99px; transition: width .2s ease; }
+.wc-slot-progress-pct { font-size: .65rem; font-weight: 800; color: #fff; }
+
+/* Preview thumbnail mientras sube */
+.wc-slot.uploading .wc-slot-img { display: block; opacity: .45; }
 
 .wc-slot-error-msg { position: absolute; bottom: 4px; left: 4px; right: 4px; font-size: .6rem; color: var(--err); text-align: center; font-weight: 700; pointer-events: none; }
 
@@ -631,12 +637,16 @@ function renderSlots(cat) {
       });
     } else {
       div.innerHTML = `
-        <input type="file" accept="image/jpeg,image/png,image/webp" data-cat="${cat}" data-slot="${def.slot}" data-label="${esc(def.label)}">
+        <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" data-cat="${cat}" data-slot="${def.slot}" data-label="${esc(def.label)}">
         <div class="wc-slot-empty">
           <i class="ti ti-camera"></i>
           <div class="wc-slot-label">${esc(def.label)}</div>
         </div>
-        <div class="wc-slot-spinner"><div class="wc-mini-spinner"></div></div>
+        <div class="wc-slot-spinner">
+          <div class="wc-mini-spinner"></div>
+          <div class="wc-slot-progress-wrap"><div class="wc-slot-progress-bar"></div></div>
+          <div class="wc-slot-progress-pct">0%</div>
+        </div>
         <div class="wc-slot-error-msg"></div>`;
       div.querySelector('input').addEventListener('change', function(e){
         var file = e.target.files[0];
@@ -682,32 +692,95 @@ function renderTodosLosSlots() {
   actualizarProgreso();
 }
 
+// ── Compresión de imagen (calidad máxima 0.95, solo normaliza a JPEG) ──
+function _comprimirImagen(file, callback) {
+  var url = URL.createObjectURL(file);
+  var img = new Image();
+  img.onload = function() {
+    URL.revokeObjectURL(url);
+    var canvas = document.createElement('canvas');
+    // Máximo 4096px en el lado más largo — preserva calidad full para pantallas 4K
+    var max = 4096;
+    var w = img.naturalWidth, h = img.naturalHeight;
+    if (w > max || h > max) {
+      if (w >= h) { h = Math.round(h * max / w); w = max; }
+      else        { w = Math.round(w * max / h); h = max; }
+    }
+    canvas.width = w; canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    // Calidad 0.95 = máxima calidad sin artefactos visibles
+    canvas.toBlob(function(blob) {
+      var reader = new FileReader();
+      reader.onload = function(ev) { callback(ev.target.result, blob.size); };
+      reader.readAsDataURL(blob);
+    }, 'image/jpeg', 0.95);
+  };
+  img.onerror = function() {
+    URL.revokeObjectURL(url);
+    // Fallback: enviar sin comprimir
+    var reader = new FileReader();
+    reader.onload = function(ev) { callback(ev.target.result, file.size); };
+    reader.readAsDataURL(file);
+  };
+  img.src = url;
+}
+
+// ── Actualizar barra de progreso del slot ──────────────────────────────
+function _setSlotProgress(slotEl, pct) {
+  var bar = slotEl.querySelector('.wc-slot-progress-bar');
+  var txt = slotEl.querySelector('.wc-slot-progress-pct');
+  if (bar) bar.style.width = pct + '%';
+  if (txt) txt.textContent = pct + '%';
+}
+
 // ── Subir foto ─────────────────────────────────────────────────────────
 function subirFoto(file, cat, slot, label, slotEl) {
   if (!carroActual) return;
-  if (file.size > 15 * 1024 * 1024) { toast('⚠ Imagen demasiado grande (máx 15 MB)'); return; }
+  if (file.size > 25 * 1024 * 1024) { toast('⚠ Imagen demasiado grande (máx 25 MB)'); return; }
 
   slotEl.classList.add('uploading');
   slotEl.classList.remove('error');
   var errEl = slotEl.querySelector('.wc-slot-error-msg');
   if (errEl) errEl.textContent = '';
+  _setSlotProgress(slotEl, 0);
   uploadQueue++;
 
-  var reader = new FileReader();
-  reader.onload = function(ev) {
-    var base64 = ev.target.result.split(',')[1];
+  // 1. Mostrar preview inmediato con la foto original
+  var previewUrl = URL.createObjectURL(file);
+  var imgEl = slotEl.querySelector('.wc-slot-img');
+  if (!imgEl) {
+    imgEl = document.createElement('img');
+    imgEl.className = 'wc-slot-img';
+    imgEl.alt = label;
+    slotEl.insertBefore(imgEl, slotEl.firstChild);
+  }
+  imgEl.src = previewUrl;
+  _setSlotProgress(slotEl, 15);
+
+  // 2. Comprimir a JPEG calidad 0.95
+  _comprimirImagen(file, function(dataUrl, finalSize) {
+    URL.revokeObjectURL(previewUrl);
+    _setSlotProgress(slotEl, 40);
+    var base64 = dataUrl.split(',')[1];
+    var kb = Math.round(finalSize / 1024);
+    // Mostrar tamaño en el label del progreso
+    var txt = slotEl.querySelector('.wc-slot-progress-pct');
+    if (txt) txt.textContent = kb + ' KB';
+
+    // 3. Enviar a Velo
     window.parent.postMessage({
       type: 'wecars-cargador-foto',
       carroId: carroActual._id,
       base64: base64,
-      fileName: file.name,
-      mimeType: file.type,
+      fileName: file.name.replace(/\.[^.]+$/, '.jpg'),
+      mimeType: 'image/jpeg',
       categoria: cat,
       slot: slot,
       label: label,
     }, '*');
-  };
-  reader.readAsDataURL(file);
+    _setSlotProgress(slotEl, 70);
+  });
 }
 
 // ── Subir video ────────────────────────────────────────────────────────
@@ -832,18 +905,33 @@ window.addEventListener('message', function(ev) {
     uploadQueue = Math.max(0, uploadQueue - 1);
     if (d.carroId === (carroActual && carroActual._id)) {
       if (d.ok) {
-        // Actualizar datos locales
+        // Barra al 100% momentáneamente antes de re-renderizar
+        var slotOk = document.querySelector('.wc-slot.uploading[data-cat]') ||
+          document.querySelector('.wc-slots [data-cat="'+d.categoria+'"]');
+        // Buscar por slot
+        var allSlots = document.querySelectorAll('.wc-slot.uploading');
+        allSlots.forEach(function(s){
+          var inp = s.querySelector('input[data-slot="'+d.slot+'"]');
+          if (inp) { _setSlotProgress(s, 100); }
+        });
+
         if (d.carro) {
           carroActual = d.carro;
           var idx = inventario.findIndex(function(c){ return c._id === d.carroId; });
           if (idx >= 0) inventario[idx] = d.carro;
         }
-        renderSlots(d.categoria);
-        actualizarProgreso();
+        setTimeout(function() {
+          renderSlots(d.categoria);
+          actualizarProgreso();
+        }, 300);
         toast('✅ ' + (d.categoria === 'exterior' ? 'Exterior' : d.categoria === 'interior' ? 'Interior' : 'Extra') + ' guardado');
       } else {
-        // Marcar slot con error
-        var slotEl = document.querySelector('[data-cat="'+d.categoria+'"][data-slot="'+d.slot+'"]');
+        var slotEl = document.querySelector('.wc-slot.uploading');
+        if (!slotEl) {
+          // Buscar por data-slot dentro de los slots del contenedor
+          var inp2 = document.querySelector('input[data-slot="'+d.slot+'"][data-cat="'+d.categoria+'"]');
+          if (inp2) slotEl = inp2.closest('.wc-slot');
+        }
         if (slotEl) {
           slotEl.classList.remove('uploading');
           slotEl.classList.add('error');
