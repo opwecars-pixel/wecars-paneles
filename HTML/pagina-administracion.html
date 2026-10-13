@@ -3521,6 +3521,37 @@ window.addEventListener('message', function(e) {
       actualizarBadgesAd();
       if (vistaActual === 'leads') adRenderLeads();
       break;
+
+    /* ── GAP-2 Fix: BC relay types ──────────────────────────────── */
+    case 'wecars-bc-inventario-update':
+      window.parent.postMessage({ type: 'wecars-inventario-solicitar' }, '*');
+      break;
+
+    case 'wecars-bc-cierre-update':
+      if (typeof renderCierres === 'function' && vistaActual === 'cierres')
+        window.parent.postMessage({ type: 'wecars-cierres-solicitar' }, '*');
+      break;
+
+    case 'wecars-bc-credito-update':
+      window.parent.postMessage({ type: 'wecars-creditos-solicitar' }, '*');
+      break;
+
+    /* ── GAP-3 Fix: datos enviados por enviarDatosAdmin() sin handler */
+    case 'wecars-clientes-datos':
+      window._adClientes = Array.isArray(d.items) ? d.items : [];
+      break;
+
+    case 'wecars-ventas-datos':
+      window._adVentas = Array.isArray(d.items) ? d.items : [];
+      break;
+
+    case 'wecars-comisiones-datos':
+      window._adComisiones = Array.isArray(d.items) ? d.items : [];
+      break;
+
+    case 'wecars-facturas-datos':
+      window._adFacturas = Array.isArray(d.items) ? d.items : [];
+      break;
   }
 });
 
@@ -3811,7 +3842,7 @@ function renderPendientes(){
     zone.addEventListener('drop',e=>{
       e.preventDefault();
       const id = e.dataTransfer.getData('text/plain');
-      const tarea = tareas.find(t=>t.id===id);
+      const tarea = tareas.find(t=>(t._id||t.id)===id);
       if(tarea && tarea.col!==col){
         tarea.col=col;
         window.parent.postMessage({ type:'wecars-tarea-actualizar', tareaId:tarea._id||tarea.id, cambios:{col} }, '*');
@@ -3825,7 +3856,7 @@ function renderPendientes(){
     let _touchId=null, _touchCard=null, _ghost=null;
     let _longPressTimer=null;
     function _moverTarea(id, col){
-      const tarea=tareas.find(t=>t.id===id);
+      const tarea=tareas.find(t=>(t._id||t.id)===id);
       if(tarea&&col&&tarea.col!==col){
         tarea.col=col;
         window.parent.postMessage({type:'wecars-tarea-actualizar',tareaId:tarea._id||tarea.id,cambios:{col}},'*');

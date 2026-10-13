@@ -843,7 +843,7 @@ function enviarLeadsAdmin() {
       .sort((a, b) => new Date(b.fecha || b._createdDate || 0) - new Date(a.fecha || a._createdDate || 0));
 
     $w(HTML_ID).postMessage({
-      type:       'wecars-leads',
+      type:       'wecars-leads-datos',
       leads:      todos,
       vendedores: usuariosR.items.map(u => ({ email: u.email || u.correo || '', nombre: u.nombre || u.name || '' })),
       rolActual:  'Administracion',
@@ -852,6 +852,6 @@ function enviarLeadsAdmin() {
   })
   .catch((e) => {
     console.error('[Admin] Error enviando leads:', e);
-    $w(HTML_ID).postMessage({ type: 'wecars-leads', leads: [], vendedores: [], rolActual: 'Administracion', emailActual: '' });
+    $w(HTML_ID).postMessage({ type: 'wecars-leads-datos', leads: [], vendedores: [], rolActual: 'Administracion', emailActual: '' });
   });
 }
