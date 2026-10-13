@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Cargador de Fotos · weCars Bajío</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css" rel="stylesheet">
+<style>
+/* ── TOKENS (mismo design system que Admin/Finanzas/Gerencia) ── */
+:root {
+  --lime:       #56a900;
+  --lime-dark:  #3d7a00;
+  --lime-bg:    rgba(86,169,0,.10);
+  --bg:         #f4f6f5;
+  --surface:    #ffffff;
+  --surface-2:  #f8faf9;
+  --ink:        #0d1a0d;
+  --ink-2:      #2c3d2c;
+  --muted:      #6b7e6b;
+  --faint:      #9aab9a;
+  --line:       #e2eae2;
+  --line-2:     #cdd8cd;
+  --ok:         #56a900;
+  --err:        #dc2626;
+  --err-bg:     rgba(220,38,38,.10);
+  --info:       #2563eb;
+  --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 18px;
+  --t-xs:.6875rem; --t-sm:.8125rem; --t-base:.875rem; --t-md:1rem; --t-lg:1.125rem;
+  --sh-1: 0 1px 3px rgba(13,26,13,.07);
+  --sh-2: 0 2px 8px rgba(13,26,13,.08), 0 1px 2px rgba(13,26,13,.04);
+  --sh-3: 0 8px 32px rgba(13,26,13,.13);
+  --sidebar-bg: #1a2a19;
+  --sidebar-w: 240px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1a0f; --surface: #1a2a1a; --surface-2: #1e2e1e;
+    --ink: #e8f0e8; --ink-2: #b0c4b0; --muted: #7a9a7a; --faint: #4a6a4a;
+    --line: #2a3e2a; --line-2: #344834;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1a0f; --surface: #1a2a1a; --surface-2: #1e2e1e;
+  --ink: #e8f0e8; --ink-2: #b0c4b0; --muted: #7a9a7a; --faint: #4a6a4a;
+  --line: #2a3e2a; --line-2: #344834;
+  color-scheme: dark;
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; font-size: 16px; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: var(--t-base);
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+button { font-family: inherit; cursor: pointer; touch-action: manipulation; min-height: 44px; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+img { max-width: 100%; }
+*:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; border-radius: var(--r-xs); }
+
+/* ── LOADING ── */
+body.wc-loading .wc-main { opacity: 0; pointer-events: none; }
+body.wc-loading .wc-splash { display: flex; }
+.wc-splash {
+  display: none; position: fixed; inset: 0; background: var(--sidebar-bg);
+  align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 9999;
+}
+.wc-splash-logo { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--lime); }
+.wc-splash-sub  { color: rgba(255,255,255,.5); font-size: var(--t-sm); }
+.wc-spinner { width: 32px; height: 32px; border: 3px solid rgba(86,169,0,.2); border-top-color: var(--lime); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── SHELL ── */
+.wc-shell { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.wc-sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--sidebar-bg); color: #fff;
+  padding: 20px 16px 24px;
+  display: flex; flex-direction: column; gap: 0;
+  overflow-y: auto; overflow-x: hidden;
+}
+.wc-logo { display: flex; align-items: center; gap: 9px; padding: 4px 0 20px; }
+.wc-logo-badge {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: var(--lime); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.wc-logo-badge i { font-size: 18px; color: #fff; }
+.wc-logo-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: .95rem; line-height: 1.15; color: #fff; }
+.wc-logo-sub  { font-size: .67rem; color: rgba(255,255,255,.45); font-weight: 500; text-transform: uppercase; letter-spacing: .06em; }
+
+.wc-sb-label { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.3); padding: 14px 6px 4px; }
+.wc-sb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: var(--r-sm);
+  font-size: var(--t-sm); font-weight: 600; color: rgba(255,255,255,.65);
+  cursor: pointer; transition: background .15s, color .15s; margin-bottom: 1px;
+  border: none; background: none; width: 100%; text-align: left; min-height: 0;
+}
+.wc-sb-item i { font-size: 16px; flex-shrink: 0; opacity: .7; }
+.wc-sb-item:hover, .wc-sb-item.active {
+  background: rgba(86,169,0,.18); color: #fff;
+}
+.wc-sb-item.active i { opacity: 1; color: var(--lime); }
+
+.wc-sb-user {
+  margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; gap: 10px;
+}
+.wc-sb-avatar {
+  width: 34px; height: 34px; border-radius: 50%; background: var(--lime-bg);
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+  color: var(--lime); flex-shrink: 0; font-weight: 700;
+}
+.wc-sb-user-name { font-size: var(--t-sm); font-weight: 700; color: #fff; }
+.wc-sb-user-role { font-size: .67rem; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .05em; }
+
+/* ── MAIN ── */
+.wc-main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+.wc-topbar {
+  height: 54px; flex-shrink: 0; padding: 0 20px;
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.wc-topbar-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: var(--t-md); }
+.wc-topbar-sub   { font-size: var(--t-xs); color: var(--muted); }
+.wc-content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px; }
+
+/* ── SECCIÓN: SELECTOR DE AUTO ── */
+.wc-car-selector {
+  background: var(--surface); border-radius: var(--r-md); border: 1.5px solid var(--line);
+  padding: 16px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;
+}
+.wc-car-selector label { font-size: var(--t-sm); font-weight: 700; color: var(--muted); display: block; margin-bottom: 4px; }
+.wc-car-selector select, .wc-car-selector input {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--line); border-radius: var(--r-sm);
+  background: var(--bg); color: var(--ink); font-size: var(--t-base); min-height: 40px;
+}
+.wc-car-selector .wc-field { flex: 1; min-width: 140px; }
+.wc-badge-disp {
+  display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+  border-radius: 20px; font-size: var(--t-xs); font-weight: 700; background: var(--lime-bg); color: var(--lime-dark);
+}
+
+/* ── SECCIÓN INFO AUTO ── */
+.wc-car-info {
+  display: none; background: var(--surface); border-radius: var(--r-md);
+  border: 1.5px solid var(--line); padding: 14px 16px; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+.wc-car-info-foto { width: 72px; height: 56px; border-radius: var(--r-sm); object-fit: cover; flex-shrink: 0; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
+.wc-car-info-foto img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--r-sm); }
+.wc-car-info-txt { flex: 1; min-width: 140px; }
+.wc-car-info-nombre { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: var(--t-md); }
+.wc-car-info-meta  { font-size: var(--t-xs); color: var(--muted); margin-top: 2px; }
+.wc-progress-bar { flex: 1; min-width: 200px; }
+.wc-progress-label { font-size: var(--t-xs); color: var(--muted); font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; }
+.wc-progress-track { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.wc-progress-fill  { height: 100%; background: var(--lime); border-radius: 99px; transition: width .3s; }
+
+/* ── SECCIÓN FOTOS ── */
+.wc-section { margin-bottom: 24px; }
+.wc-section-head {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  padding-bottom: 8px; border-bottom: 2px solid var(--line);
+}
+.wc-section-icon {
+  width: 32px; height: 32px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  flex-shrink: 0;
+}
+.wc-section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: var(--t-md); }
+.wc-section-sub   { font-size: var(--t-xs); color: var(--muted); }
+.wc-section-cnt   { margin-left: auto; font-size: var(--t-sm); font-weight: 700; color: var(--muted); }
+
+/* ── GRID DE SLOTS ── */
+.wc-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.wc-slot {
+  aspect-ratio: 4/3; border-radius: var(--r-sm); overflow: hidden; position: relative;
+  border: 2px dashed var(--line); cursor: pointer; background: var(--surface);
+  transition: border-color .15s, background .15s;
+}
+.wc-slot:hover { border-color: var(--lime); background: var(--lime-bg); }
+.wc-slot.filled { border-style: solid; border-color: var(--lime-dark); cursor: default; }
+.wc-slot.uploading { border-color: var(--info); background: rgba(37,99,235,.05); pointer-events: none; }
+.wc-slot.error { border-color: var(--err); background: var(--err-bg); }
+.wc-slot input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.wc-slot.filled input[type="file"] { pointer-events: none; }
+
+.wc-slot-empty {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px; pointer-events: none;
+}
+.wc-slot-empty i { font-size: 22px; color: var(--faint); }
+.wc-slot-label { font-size: var(--t-xs); font-weight: 700; color: var(--muted); text-align: center; padding: 0 6px; }
+
+.wc-slot-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+.wc-slot.filled .wc-slot-img { display: block; }
+.wc-slot.filled .wc-slot-empty { display: none; }
+
+.wc-slot-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,.5);
+  display: none; align-items: center; justify-content: center;
+}
+.wc-slot.filled:hover .wc-slot-overlay { display: flex; }
+.wc-slot-del {
+  width: 32px; height: 32px; border-radius: 50%; background: #dc2626;
+  border: none; color: #fff; font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; min-height: 0;
+}
+
+.wc-slot-spinner {
+  position: absolute; inset: 0; display: none;
+  align-items: center; justify-content: center; pointer-events: none;
+  background: rgba(255,255,255,.7);
+}
+.wc-slot.uploading .wc-slot-spinner { display: flex; }
+.wc-mini-spinner { width: 24px; height: 24px; border: 3px solid rgba(37,99,235,.2); border-top-color: var(--info); border-radius: 50%; animation: spin .7s linear infinite; }
+
+.wc-slot-error-msg { position: absolute; bottom: 4px; left: 4px; right: 4px; font-size: .6rem; color: var(--err); text-align: center; font-weight: 700; pointer-events: none; }
+
+/* ── SLOT VIDEO ── */
+.wc-video-slot {
+  border-radius: var(--r-sm); border: 2px dashed var(--line);
+  background: var(--surface); overflow: hidden; position: relative;
+  min-height: 120px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: border-color .15s, background .15s;
+}
+.wc-video-slot:hover { border-color: var(--lime); background: var(--lime-bg); }
+.wc-video-slot.filled { border-style: solid; border-color: #7c3aed; }
+.wc-video-slot.uploading { border-color: var(--info); pointer-events: none; }
+.wc-video-slot input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.wc-video-slot.filled input[type="file"] { pointer-events: none; }
+.wc-video-inner { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px; pointer-events: none; }
+.wc-video-inner i { font-size: 32px; color: var(--faint); }
+.wc-video-inner.filled i { color: #7c3aed; }
+.wc-video-name { font-size: var(--t-sm); font-weight: 700; color: var(--ink); text-align: center; }
+.wc-video-status { font-size: var(--t-xs); color: var(--muted); }
+.wc-video-del {
+  position: absolute; top: 8px; right: 8px;
+  width: 28px; height: 28px; border-radius: 50%; background: #dc2626;
+  border: none; color: #fff; font-size: 14px; cursor: pointer;
+  display: none; align-items: center; justify-content: center; min-height: 0;
+}
+.wc-video-slot.filled .wc-video-del { display: flex; }
+
+/* ── BTN CREAR NUEVO ── */
+.wc-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border: none; border-radius: var(--r-sm); font-family: inherit; font-weight: 700; font-size: var(--t-sm); cursor: pointer; min-height: 40px; transition: opacity .15s; }
+.wc-btn:disabled { opacity: .45; pointer-events: none; }
+.wc-btn-primary { background: var(--lime); color: #fff; }
+.wc-btn-primary:hover { background: var(--lime-dark); }
+.wc-btn-outline { background: none; border: 1.5px solid var(--line); color: var(--ink); }
+.wc-btn-outline:hover { border-color: var(--lime-dark); color: var(--lime-dark); }
+
+/* ── TOAST ── */
+.wc-toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--sidebar-bg); color: #fff; padding: 10px 20px; border-radius: 30px;
+  font-size: var(--t-sm); font-weight: 600; z-index: 9999;
+  transition: transform .25s ease, opacity .25s;
+  opacity: 0; pointer-events: none; white-space: nowrap;
+}
+.wc-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ── NO ACCESO ── */
+.wc-noaccess {
+  display: none; position: fixed; inset: 0; background: var(--sidebar-bg);
+  align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+  color: #fff; text-align: center; padding: 24px;
+}
+.wc-noaccess i { font-size: 48px; color: var(--err); }
+.wc-noaccess h2 { font-family: 'Plus Jakarta Sans', sans-serif; }
+.wc-noaccess p { color: rgba(255,255,255,.5); font-size: var(--t-sm); }
+
+/* ── MODAL NUEVO AUTO ── */
+.wc-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55);
+  align-items: center; justify-content: center; z-index: 9900; padding: 16px;
+}
+.wc-modal {
+  background: var(--surface); border-radius: var(--r-lg); width: 100%; max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden;
+}
+.wc-modal-head {
+  background: var(--lime-dark); color: #fff;
+  padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+}
+.wc-modal-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: var(--t-md); }
+.wc-modal-close { background: none; border: none; color: rgba(255,255,255,.7); font-size: 18px; cursor: pointer; min-height: 0; padding: 4px; }
+.wc-modal-close:hover { color: #fff; }
+.wc-modal-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.wc-modal-foot { padding: 12px 18px 16px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--line); }
+.wc-field label { display: block; font-size: var(--t-sm); font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+.wc-field input, .wc-field select {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--line); border-radius: var(--r-sm);
+  background: var(--bg); color: var(--ink); font-size: var(--t-base); min-height: 40px;
+}
+.wc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .wc-sidebar { display: none; }
+  .wc-slots { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+  .wc-content { padding: 12px; }
+}
+</style>
+</head>
+<body class="wc-loading">
+
+<!-- Splash de carga -->
+<div class="wc-splash">
+  <div class="wc-logo-badge" style="width:50px;height:50px;border-radius:14px"><i class="ti ti-camera" style="font-size:24px;color:#fff"></i></div>
+  <div class="wc-splash-logo">weCars Bajío</div>
+  <div class="wc-splash-sub">Cargando panel de fotos…</div>
+  <div class="wc-spinner"></div>
+</div>
+
+<!-- Sin acceso -->
+<div class="wc-noaccess" id="wc-noaccess">
+  <i class="ti ti-lock"></i>
+  <h2>Sin acceso</h2>
+  <p>Tu cuenta no tiene el rol de Cargador.<br>Contacta a Administración.</p>
+</div>
+
+<!-- Toast -->
+<div class="wc-toast" id="wc-toast">Listo</div>
+
+<!-- Modal nuevo auto -->
+<div class="wc-overlay" id="ov-nuevo-auto">
+  <div class="wc-modal">
+    <div class="wc-modal-head">
+      <div class="wc-modal-title"><i class="ti ti-car"></i> Registrar nuevo auto</div>
+      <button class="wc-modal-close" id="nuevo-close"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="wc-modal-body">
+      <div class="wc-grid-2">
+        <div class="wc-field"><label>Marca *</label><input type="text" id="n-marca" placeholder="Ej. Toyota"></div>
+        <div class="wc-field"><label>Modelo *</label><input type="text" id="n-modelo" placeholder="Ej. Corolla"></div>
+      </div>
+      <div class="wc-grid-2">
+        <div class="wc-field"><label>Año</label><input type="number" id="n-anio" placeholder="2022" min="1990" max="2030"></div>
+        <div class="wc-field"><label>Color</label><input type="text" id="n-color" placeholder="Blanco"></div>
+      </div>
+      <div class="wc-grid-2">
+        <div class="wc-field"><label>Versión / Trim</label><input type="text" id="n-version" placeholder="LE, SR, XLE…"></div>
+        <div class="wc-field"><label>Km</label><input type="number" id="n-km" placeholder="0" min="0"></div>
+      </div>
+      <div class="wc-field"><label>No. de inventario</label><input type="text" id="n-numinv" placeholder="Ej. W-2024-001"></div>
+      <div id="nuevo-status" style="font-size:var(--t-xs);color:var(--err);min-height:14px"></div>
+    </div>
+    <div class="wc-modal-foot">
+      <button class="wc-btn wc-btn-outline" id="nuevo-cancel">Cancelar</button>
+      <button class="wc-btn wc-btn-primary" id="nuevo-guardar"><i class="ti ti-device-floppy"></i> Crear auto</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHELL PRINCIPAL -->
+<div class="wc-shell wc-main" id="wc-main">
+
+  <!-- SIDEBAR -->
+  <nav class="wc-sidebar">
+    <div class="wc-logo">
+      <div class="wc-logo-badge"><i class="ti ti-camera"></i></div>
+      <div>
+        <div class="wc-logo-name">weCars Bajío</div>
+        <div class="wc-logo-sub">Cargador · Fotos</div>
+      </div>
+    </div>
+
+    <div class="wc-sb-label">Secciones</div>
+    <button class="wc-sb-item active" data-section="fotos" id="sb-fotos">
+      <i class="ti ti-photo"></i> Cargar fotos
+    </button>
+    <button class="wc-sb-item" data-section="inventario" id="sb-inventario">
+      <i class="ti ti-car"></i> Ver inventario
+    </button>
+
+    <div class="wc-sb-user">
+      <div class="wc-sb-avatar" id="sb-avatar">?</div>
+      <div>
+        <div class="wc-sb-user-name" id="sb-nombre">—</div>
+        <div class="wc-sb-user-role">Cargador</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="wc-main" style="flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden">
+
+    <!-- TOPBAR -->
+    <div class="wc-topbar">
+      <div>
+        <div class="wc-topbar-title" id="topbar-title">Cargar fotos de vehículo</div>
+        <div class="wc-topbar-sub" id="topbar-sub">Selecciona un auto del inventario para comenzar</div>
+      </div>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="wc-content" id="wc-content">
+
+      <!-- Selector de auto -->
+      <div class="wc-car-selector">
+        <div class="wc-field" style="flex:2;min-width:200px">
+          <label>Auto a fotografiar</label>
+          <select id="car-select">
+            <option value="">— Selecciona del inventario —</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:var(--t-sm);font-weight:700;color:var(--muted)">¿Auto nuevo?</label>
+          <button class="wc-btn wc-btn-outline" id="btn-nuevo-auto" style="min-height:40px">
+            <i class="ti ti-plus"></i> Registrar auto
+          </button>
+        </div>
+      </div>
+
+      <!-- Info del auto seleccionado -->
+      <div id="car-info-bar" style="display:none;background:var(--surface);border-radius:var(--r-md);border:1.5px solid var(--line);padding:14px 16px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div id="car-info-foto-wrap" style="width:64px;height:50px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--surface-2);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--faint)">
+            <i class="ti ti-car" style="font-size:20px"></i>
+          </div>
+          <div style="flex:1;min-width:140px">
+            <div id="car-info-nombre" style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:var(--t-md)">—</div>
+            <div id="car-info-meta" style="font-size:var(--t-xs);color:var(--muted)"></div>
+          </div>
+          <div style="flex:1;min-width:180px">
+            <div style="font-size:var(--t-xs);font-weight:700;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between">
+              <span>Progreso de fotos</span>
+              <span id="car-prog-txt">0/21</span>
+            </div>
+            <div style="height:8px;background:var(--line);border-radius:99px;overflow:hidden">
+              <div id="car-prog-bar" style="height:100%;background:var(--lime);border-radius:99px;transition:width .3s;width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder cuando no hay auto seleccionado -->
+      <div id="no-car-msg" style="text-align:center;padding:60px 20px;color:var(--muted)">
+        <i class="ti ti-camera-off" style="font-size:48px;opacity:.3;display:block;margin-bottom:12px"></i>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:var(--t-lg)">Selecciona un auto</div>
+        <div style="font-size:var(--t-sm);margin-top:4px">Elige un vehículo del selector de arriba para empezar a cargar sus fotos</div>
+      </div>
+
+      <!-- Secciones de fotos (ocultas hasta seleccionar auto) -->
+      <div id="foto-sections" style="display:none">
+
+        <!-- ── EXTERIOR (8 slots) ── -->
+        <div class="wc-section">
+          <div class="wc-section-head">
+            <div class="wc-section-icon" style="background:rgba(86,169,0,.12);color:var(--lime-dark)"><i class="ti ti-360-view"></i></div>
+            <div>
+              <div class="wc-section-title">Exterior</div>
+              <div class="wc-section-sub">8 tomas — todos los ángulos del vehículo</div>
+            </div>
+            <div class="wc-section-cnt" id="cnt-exterior">0/8</div>
+          </div>
+          <div class="wc-slots" id="slots-exterior"></div>
+        </div>
+
+        <!-- ── INTERIOR (8 slots) ── -->
+        <div class="wc-section">
+          <div class="wc-section-head">
+            <div class="wc-section-icon" style="background:rgba(37,99,235,.1);color:var(--info)"><i class="ti ti-steering-wheel"></i></div>
+            <div>
+              <div class="wc-section-title">Interior</div>
+              <div class="wc-section-sub">8 tomas — cabina y detalles interiores</div>
+            </div>
+            <div class="wc-section-cnt" id="cnt-interior">0/8</div>
+          </div>
+          <div class="wc-slots" id="slots-interior"></div>
+        </div>
+
+        <!-- ── EXTRAS (4 slots) ── -->
+        <div class="wc-section">
+          <div class="wc-section-head">
+            <div class="wc-section-icon" style="background:rgba(217,119,6,.1);color:#d97706"><i class="ti ti-camera-plus"></i></div>
+            <div>
+              <div class="wc-section-title">Extras</div>
+              <div class="wc-section-sub">4 fotos adicionales — detalles, documentos, daños</div>
+            </div>
+            <div class="wc-section-cnt" id="cnt-extras">0/4</div>
+          </div>
+          <div class="wc-slots" id="slots-extras"></div>
+        </div>
+
+        <!-- ── VIDEO (1 slot) ── -->
+        <div class="wc-section">
+          <div class="wc-section-head">
+            <div class="wc-section-icon" style="background:rgba(124,58,237,.1);color:#7c3aed"><i class="ti ti-video"></i></div>
+            <div>
+              <div class="wc-section-title">Video</div>
+              <div class="wc-section-sub">1 video — walk-around completo del vehículo</div>
+            </div>
+            <div class="wc-section-cnt" id="cnt-video">0/1</div>
+          </div>
+          <div id="slot-video-wrap"></div>
+        </div>
+
+      </div><!-- /foto-sections -->
+
+    </div><!-- /wc-content -->
+  </div><!-- /wc-main inner -->
+</div><!-- /wc-shell -->
+
+<script>
+// ── Datos ──────────────────────────────────────────────────────────────
+var inventario = [];
+var carroActual = null;
+var uploadQueue = 0; // contador de uploads en curso
+
+// ── Definición de slots ────────────────────────────────────────────────
+var SLOTS = {
+  exterior: [
+    { slot: 0, label: 'Frente' },
+    { slot: 1, label: 'Lateral derecho' },
+    { slot: 2, label: 'Lateral izquierdo' },
+    { slot: 3, label: 'Trasero' },
+    { slot: 4, label: 'Motor' },
+    { slot: 5, label: 'Cajuela' },
+    { slot: 6, label: 'Rin / Llanta' },
+    { slot: 7, label: 'Detalle exterior' },
+  ],
+  interior: [
+    { slot: 0, label: 'Tablero' },
+    { slot: 1, label: 'Asientos delanteros' },
+    { slot: 2, label: 'Asientos traseros' },
+    { slot: 3, label: 'Consola central' },
+    { slot: 4, label: 'Volante' },
+    { slot: 5, label: 'Pantalla / Radio' },
+    { slot: 6, label: 'Cajuela interior' },
+    { slot: 7, label: 'Detalle interior' },
+  ],
+  extras: [
+    { slot: 0, label: 'Extra 1' },
+    { slot: 1, label: 'Extra 2' },
+    { slot: 2, label: 'Extra 3' },
+    { slot: 3, label: 'Extra 4' },
+  ],
+};
+
+// ── Utilidades ─────────────────────────────────────────────────────────
+function toast(msg) {
+  var t = document.getElementById('wc-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function resolveWixImg(u) {
+  if (!u) return '';
+  if (u.startsWith('wix:image://')) {
+    var m = u.replace('wix:image://v1/','').split('/')[0];
+    return 'https://static.wixstatic.com/media/' + m;
+  }
+  return u;
+}
+
+function fotosPorCategoria(cat) {
+  if (!carroActual) return [];
+  var cats = carroActual.fotosCategorias || {};
+  return Array.isArray(cats[cat]) ? cats[cat] : [];
+}
+
+function totalFotos() {
+  if (!carroActual) return 0;
+  var ext = fotosPorCategoria('exterior').length;
+  var intr = fotosPorCategoria('interior').length;
+  var extr = fotosPorCategoria('extras').length;
+  var vid = carroActual.video ? 1 : 0;
+  return ext + intr + extr + vid;
+}
+
+function actualizarProgreso() {
+  var total = totalFotos();
+  var max = 21; // 8+8+4+1
+  document.getElementById('car-prog-txt').textContent = total + '/' + max;
+  document.getElementById('car-prog-bar').style.width = Math.min(100, Math.round(total/max*100)) + '%';
+  // contadores por sección
+  document.getElementById('cnt-exterior').textContent = fotosPorCategoria('exterior').length + '/8';
+  document.getElementById('cnt-interior').textContent = fotosPorCategoria('interior').length + '/8';
+  document.getElementById('cnt-extras').textContent = fotosPorCategoria('extras').length + '/4';
+  document.getElementById('cnt-video').textContent = (carroActual && carroActual.video ? '1' : '0') + '/1';
+}
+
+// ── Render slots ───────────────────────────────────────────────────────
+function renderSlots(cat) {
+  var container = document.getElementById('slots-' + cat);
+  var defs = SLOTS[cat];
+  var fotos = fotosPorCategoria(cat);
+
+  container.innerHTML = '';
+  defs.forEach(function(def) {
+    var existing = fotos.find(function(f){ return f.slot === def.slot; });
+    var div = document.createElement('div');
+    div.className = 'wc-slot' + (existing ? ' filled' : '');
+    div.dataset.cat = cat;
+    div.dataset.slot = def.slot;
+    div.dataset.label = def.label;
+
+    if (existing) {
+      div.innerHTML = `
+        <img class="wc-slot-img" src="${esc(resolveWixImg(existing.url))}" alt="${esc(def.label)}" loading="lazy">
+        <div class="wc-slot-overlay">
+          <button class="wc-slot-del" title="Eliminar foto"><i class="ti ti-trash"></i></button>
+        </div>
+        <div class="wc-slot-spinner"><div class="wc-mini-spinner"></div></div>`;
+      div.querySelector('.wc-slot-del').addEventListener('click', function(e){
+        e.stopPropagation();
+        eliminarFoto(cat, def.slot, existing.url, div);
+      });
+    } else {
+      div.innerHTML = `
+        <input type="file" accept="image/jpeg,image/png,image/webp" data-cat="${cat}" data-slot="${def.slot}" data-label="${esc(def.label)}">
+        <div class="wc-slot-empty">
+          <i class="ti ti-camera"></i>
+          <div class="wc-slot-label">${esc(def.label)}</div>
+        </div>
+        <div class="wc-slot-spinner"><div class="wc-mini-spinner"></div></div>
+        <div class="wc-slot-error-msg"></div>`;
+      div.querySelector('input').addEventListener('change', function(e){
+        var file = e.target.files[0];
+        if (file) subirFoto(file, cat, def.slot, def.label, div);
+      });
+    }
+    container.appendChild(div);
+  });
+}
+
+function renderVideoSlot() {
+  var wrap = document.getElementById('slot-video-wrap');
+  var tieneVideo = carroActual && carroActual.video;
+  wrap.innerHTML = `
+    <div class="wc-video-slot${tieneVideo ? ' filled' : ''}" id="video-slot">
+      ${!tieneVideo ? '<input type="file" accept="video/mp4,video/quicktime,video/webm" id="video-input">' : ''}
+      <div class="wc-video-inner${tieneVideo ? ' filled' : ''}">
+        <i class="ti ti-${tieneVideo ? 'circle-check' : 'video'}"></i>
+        <div class="wc-video-name" id="video-name">${tieneVideo ? 'Video cargado ✓' : 'Selecciona un video'}</div>
+        <div class="wc-video-status" id="video-status">${tieneVideo ? 'En Wix Media Manager' : 'MP4, MOV o WebM · máx 200 MB'}</div>
+      </div>
+      <div class="wc-slot-spinner"><div class="wc-mini-spinner"></div></div>
+      ${tieneVideo ? '<button class="wc-video-del" id="video-del" title="Eliminar video"><i class="ti ti-trash"></i></button>' : ''}
+    </div>`;
+
+  if (!tieneVideo) {
+    document.getElementById('video-input').addEventListener('change', function(e){
+      var file = e.target.files[0];
+      if (file) subirVideo(file);
+    });
+  } else {
+    document.getElementById('video-del').addEventListener('click', function(){
+      eliminarVideo();
+    });
+  }
+}
+
+function renderTodosLosSlots() {
+  renderSlots('exterior');
+  renderSlots('interior');
+  renderSlots('extras');
+  renderVideoSlot();
+  actualizarProgreso();
+}
+
+// ── Subir foto ─────────────────────────────────────────────────────────
+function subirFoto(file, cat, slot, label, slotEl) {
+  if (!carroActual) return;
+  if (file.size > 15 * 1024 * 1024) { toast('⚠ Imagen demasiado grande (máx 15 MB)'); return; }
+
+  slotEl.classList.add('uploading');
+  slotEl.classList.remove('error');
+  var errEl = slotEl.querySelector('.wc-slot-error-msg');
+  if (errEl) errEl.textContent = '';
+  uploadQueue++;
+
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var base64 = ev.target.result.split(',')[1];
+    window.parent.postMessage({
+      type: 'wecars-cargador-foto',
+      carroId: carroActual._id,
+      base64: base64,
+      fileName: file.name,
+      mimeType: file.type,
+      categoria: cat,
+      slot: slot,
+      label: label,
+    }, '*');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Subir video ────────────────────────────────────────────────────────
+function subirVideo(file) {
+  if (!carroActual) return;
+  if (file.size > 200 * 1024 * 1024) { toast('⚠ Video demasiado grande (máx 200 MB)'); return; }
+
+  var slot = document.getElementById('video-slot');
+  slot.classList.add('uploading');
+  document.getElementById('video-name').textContent = 'Subiendo ' + file.name + '…';
+  document.getElementById('video-status').textContent = 'Espera, esto puede tardar un momento';
+  uploadQueue++;
+
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var base64 = ev.target.result.split(',')[1];
+    window.parent.postMessage({
+      type: 'wecars-cargador-video',
+      carroId: carroActual._id,
+      base64: base64,
+      fileName: file.name,
+      mimeType: file.type,
+    }, '*');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Eliminar foto ──────────────────────────────────────────────────────
+function eliminarFoto(cat, slot, url, slotEl) {
+  if (!carroActual || !confirm('¿Eliminar esta foto?')) return;
+  slotEl.classList.add('uploading');
+  window.parent.postMessage({
+    type: 'wecars-cargador-foto-eliminar',
+    carroId: carroActual._id,
+    url: url,
+    categoria: cat,
+    slot: slot,
+  }, '*');
+}
+
+function eliminarVideo() {
+  if (!carroActual || !confirm('¿Eliminar el video?')) return;
+  carroActual.video = '';
+  carroActual.videoUrl = '';
+  renderVideoSlot();
+  actualizarProgreso();
+  // Opcional: postMessage para limpiar en CMS también
+  window.parent.postMessage({
+    type: 'wecars-cargador-foto-eliminar',
+    carroId: carroActual._id,
+    url: carroActual.video || '__video__',
+    categoria: 'video',
+    slot: 0,
+  }, '*');
+}
+
+// ── Seleccionar auto ───────────────────────────────────────────────────
+function seleccionarAuto(id) {
+  carroActual = id ? inventario.find(function(c){ return c._id === id; }) : null;
+
+  var infoBar = document.getElementById('car-info-bar');
+  var noMsg = document.getElementById('no-car-msg');
+  var secciones = document.getElementById('foto-sections');
+
+  if (!carroActual) {
+    infoBar.style.display = 'none';
+    noMsg.style.display = '';
+    secciones.style.display = 'none';
+    return;
+  }
+
+  // Info bar
+  infoBar.style.display = '';
+  noMsg.style.display = 'none';
+  secciones.style.display = '';
+
+  var nombre = [carroActual.año||carroActual.anio||carroActual.year, carroActual.marca||carroActual.brand, carroActual.modelo||carroActual.version||carroActual.title].filter(Boolean).join(' ');
+  document.getElementById('car-info-nombre').textContent = nombre || 'Vehículo sin nombre';
+  var meta = [carroActual.color, carroActual.kilometraje ? Number(carroActual.kilometraje).toLocaleString('es-MX')+' km' : '', carroActual.numeroInventario ? '#'+carroActual.numeroInventario : ''].filter(Boolean).join(' · ');
+  document.getElementById('car-info-meta').textContent = meta;
+
+  var fotoUrl = resolveWixImg(carroActual.fotoPrincipal || carroActual.imagenUrl || (Array.isArray(carroActual.fotos) && carroActual.fotos[0]) || '');
+  var fotoWrap = document.getElementById('car-info-foto-wrap');
+  if (fotoUrl) {
+    fotoWrap.innerHTML = '<img src="'+esc(fotoUrl)+'" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display=\'none\'">';
+  } else {
+    fotoWrap.innerHTML = '<i class="ti ti-car" style="font-size:20px"></i>';
+  }
+
+  renderTodosLosSlots();
+}
+
+// ── Mensajes desde Velo ────────────────────────────────────────────────
+window.addEventListener('message', function(ev) {
+  var d = ev.data;
+  if (!d || !d.type) return;
+
+  // Datos iniciales
+  if (d.type === 'wecars-cargador-datos') {
+    document.body.classList.remove('wc-loading');
+    if (!d.ok) {
+      document.getElementById('wc-noaccess').style.display = 'flex';
+      document.getElementById('wc-main').style.display = 'none';
+      return;
+    }
+    inventario = d.inventario || [];
+    document.getElementById('sb-nombre').textContent = d.nombre || d.email || '—';
+    document.getElementById('sb-avatar').textContent = (d.nombre || d.email || '?')[0].toUpperCase();
+
+    // Poblar select
+    var sel = document.getElementById('car-select');
+    sel.innerHTML = '<option value="">— Selecciona del inventario —</option>' +
+      inventario.map(function(c){
+        var nombre = [c.año||c.anio||c.year, c.marca||c.brand, c.modelo||c.version||c.title].filter(Boolean).join(' ');
+        var sinFoto = !(c.fotoPrincipal||c.imagenUrl||(Array.isArray(c.fotos)&&c.fotos[0]));
+        return '<option value="'+esc(c._id)+'">'+(sinFoto ? '📷 ' : '✅ ')+esc(nombre||'Sin nombre')+(c.numeroInventario?' (#'+esc(c.numeroInventario)+')':'')+'</option>';
+      }).join('');
+  }
+
+  // Foto subida OK
+  if (d.type === 'wecars-cargador-foto-ok') {
+    uploadQueue = Math.max(0, uploadQueue - 1);
+    if (d.carroId === (carroActual && carroActual._id)) {
+      if (d.ok) {
+        // Actualizar datos locales
+        if (d.carro) {
+          carroActual = d.carro;
+          var idx = inventario.findIndex(function(c){ return c._id === d.carroId; });
+          if (idx >= 0) inventario[idx] = d.carro;
+        }
+        renderSlots(d.categoria);
+        actualizarProgreso();
+        toast('✅ ' + (d.categoria === 'exterior' ? 'Exterior' : d.categoria === 'interior' ? 'Interior' : 'Extra') + ' guardado');
+      } else {
+        // Marcar slot con error
+        var slotEl = document.querySelector('[data-cat="'+d.categoria+'"][data-slot="'+d.slot+'"]');
+        if (slotEl) {
+          slotEl.classList.remove('uploading');
+          slotEl.classList.add('error');
+          var errEl = slotEl.querySelector('.wc-slot-error-msg');
+          if (errEl) errEl.textContent = 'Error al subir';
+        }
+        toast('⚠ Error al subir foto: ' + (d.error || ''));
+      }
+    }
+  }
+
+  // Video subido OK
+  if (d.type === 'wecars-cargador-video-ok') {
+    uploadQueue = Math.max(0, uploadQueue - 1);
+    if (d.carroId === (carroActual && carroActual._id)) {
+      if (d.ok && d.carro) {
+        carroActual = d.carro;
+        var idx = inventario.findIndex(function(c){ return c._id === d.carroId; });
+        if (idx >= 0) inventario[idx] = d.carro;
+      }
+      renderVideoSlot();
+      actualizarProgreso();
+      if (d.ok) toast('✅ Video cargado correctamente');
+      else toast('⚠ Error al subir video: ' + (d.error || ''));
+    }
+  }
+
+  // Foto eliminada
+  if (d.type === 'wecars-cargador-foto-eliminada') {
+    if (d.ok && d.carro && d.carroId === (carroActual && carroActual._id)) {
+      carroActual = d.carro;
+      var idx = inventario.findIndex(function(c){ return c._id === d.carroId; });
+      if (idx >= 0) inventario[idx] = d.carro;
+      renderTodosLosSlots();
+      toast('🗑 Foto eliminada');
+    } else if (!d.ok) {
+      toast('⚠ Error al eliminar: ' + (d.error || ''));
+    }
+  }
+
+  // Auto creado
+  if (d.type === 'wecars-cargador-auto-creado') {
+    document.getElementById('nuevo-guardar').disabled = false;
+    document.getElementById('nuevo-status').textContent = '';
+    if (d.ok && d.carro) {
+      inventario.unshift(d.carro);
+      var nombre = [d.carro.año||d.carro.anio||d.carro.year, d.carro.marca||d.carro.brand, d.carro.modelo||d.carro.version||d.carro.title].filter(Boolean).join(' ');
+      var opt = document.createElement('option');
+      opt.value = d.carro._id;
+      opt.textContent = '📷 ' + (nombre || 'Sin nombre');
+      var sel = document.getElementById('car-select');
+      sel.insertBefore(opt, sel.options[1]);
+      sel.value = d.carro._id;
+      document.getElementById('ov-nuevo-auto').style.display = 'none';
+      seleccionarAuto(d.carro._id);
+      toast('🚗 Auto registrado correctamente');
+    } else {
+      document.getElementById('nuevo-status').textContent = d.error || 'Error al crear auto';
+    }
+  }
+});
+
+// ── Selector de auto ───────────────────────────────────────────────────
+document.getElementById('car-select').addEventListener('change', function(){
+  seleccionarAuto(this.value);
+});
+
+// ── Modal nuevo auto ───────────────────────────────────────────────────
+document.getElementById('btn-nuevo-auto').addEventListener('click', function(){
+  document.getElementById('n-marca').value = '';
+  document.getElementById('n-modelo').value = '';
+  document.getElementById('n-anio').value = '';
+  document.getElementById('n-color').value = '';
+  document.getElementById('n-version').value = '';
+  document.getElementById('n-km').value = '';
+  document.getElementById('n-numinv').value = '';
+  document.getElementById('nuevo-status').textContent = '';
+  document.getElementById('ov-nuevo-auto').style.display = 'flex';
+});
+document.getElementById('nuevo-close').addEventListener('click', function(){ document.getElementById('ov-nuevo-auto').style.display = 'none'; });
+document.getElementById('nuevo-cancel').addEventListener('click', function(){ document.getElementById('ov-nuevo-auto').style.display = 'none'; });
+document.getElementById('ov-nuevo-auto').addEventListener('click', function(e){ if (e.target === this) this.style.display = 'none'; });
+
+document.getElementById('nuevo-guardar').addEventListener('click', function(){
+  var marca  = document.getElementById('n-marca').value.trim();
+  var modelo = document.getElementById('n-modelo').value.trim();
+  var anio   = parseInt(document.getElementById('n-anio').value) || null;
+  var color  = document.getElementById('n-color').value.trim();
+  var version= document.getElementById('n-version').value.trim();
+  var km     = parseInt(document.getElementById('n-km').value) || 0;
+  var numinv = document.getElementById('n-numinv').value.trim();
+  if (!marca || !modelo) { document.getElementById('nuevo-status').textContent = 'Marca y modelo son requeridos'; return; }
+  var title = [anio, marca, modelo, version].filter(Boolean).join(' ');
+  document.getElementById('nuevo-guardar').disabled = true;
+  document.getElementById('nuevo-status').textContent = 'Guardando…';
+  window.parent.postMessage({
+    type: 'wecars-cargador-crear-auto',
+    datos: { marca, brand: marca, modelo, version, title, año: anio, year: anio, color, kilometraje: km, numeroInventario: numinv, fotos: [], fotosCategorias: { exterior: [], interior: [], extras: [] } }
+  }, '*');
+});
+
+// ── Solicitar datos al cargar ──────────────────────────────────────────
+window.parent.postMessage({ type: 'wecars-cargador-solicitar' }, '*');
+
+// Fallback: quitar loading si Velo no responde en 5s
+setTimeout(function(){
+  if (document.body.classList.contains('wc-loading')) {
+    document.body.classList.remove('wc-loading');
+    document.getElementById('wc-noaccess').style.display = 'flex';
+    document.getElementById('wc-main').style.display = 'none';
+  }
+}, 5000);
+</script>
+</body>
+</html>

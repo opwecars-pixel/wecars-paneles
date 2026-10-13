@@ -200,9 +200,10 @@ export async function marcarClienteFacturado(clienteId) {
 //   - Folio secuencial WCB-YYYY-NNNN generado desde el máximo actual en Facturas.
 //   - Actualiza ClientRecords como efecto secundario no bloqueante.
 // Roles: Finanzas, Gerencia, Administración.
-export async function crearFacturaDesdeCliente(clienteId) {
+export async function crearFacturaDesdeCliente(clienteId, datosExtra) {
   const { email, perfil } = await _requireRol(ROLES_FINANZAS);
   if (!clienteId) throw new Error('clienteId requerido');
+  const _extra = datosExtra || {};
 
   // Idempotencia: si ya existe factura no cancelada para este cliente, devolver la existente
   const existing = await wixData.query('Facturas')
@@ -214,9 +215,9 @@ export async function crearFacturaDesdeCliente(clienteId) {
     return { ok: true, factura: existing.items[0], folio: existing.items[0].folio, yaExistia: true };
   }
 
-  // Obtener datos del cliente
+  // Obtener datos del cliente; datosExtra puede proveer valores del formulario manual
   const cliente = await wixData.get('ClientRecords', clienteId, SA);
-  const total = Number(cliente.precioVenta) || 0;
+  const total = Number(_extra.total) || Number(cliente.precioVenta) || 0;
   if (total <= 0) throw new Error('precioVenta del cliente debe ser mayor a 0');
 
   // Folio secuencial con contador en ConfigERP (_id: 'folio_facturas').
@@ -245,26 +246,28 @@ export async function crearFacturaDesdeCliente(clienteId) {
   const anio = new Date().getFullYear();
   const folio = 'WCB-' + anio + '-' + String(nextNum).padStart(4, '0');
 
-  // Calcular subtotal e IVA (16% estándar México)
-  const subtotal = Math.round(total / 1.16);
-  const iva = total - subtotal;
+  // Subtotal e IVA — usar valores del formulario si se proveyeron, sino calcular de total
+  const subtotal = Number(_extra.subtotal) || Math.round(total / 1.16);
+  const iva = Number(_extra.iva) || (total - subtotal);
 
-  // Descripción del vehículo
+  // Descripción del vehículo — formulario tiene prioridad
   const veh = cliente.vehiculoInfo || {};
-  const vehiculo = veh.marca
+  const vehiculo = _extra.vehiculo || (veh.marca
     ? ((veh.marca + ' ' + (veh.modelo || '')).trim() + (veh.año ? ' ' + veh.año : ''))
-    : (cliente.vehiculoInteres || '');
+    : (cliente.vehiculoInteres || ''));
 
   // Insertar en Facturas
   const factura = await wixData.insert('Facturas', {
     folio,
     clienteId,
-    clienteNombre: cliente.nombre || '',
-    vendedor: cliente.vendedorAsignado || '',
+    clienteNombre: _extra.clienteNombre || cliente.nombre || '',
+    vendedor: _extra.vendedor || cliente.vendedorAsignado || '',
     vehiculo,
     subtotal,
     iva,
     total,
+    razonSocial: _extra.razonSocial || cliente.nombre || '',
+    rfc: _extra.rfc || '',
     estatus: 'Pendiente',
     creadaPor: email,
   }, SA);

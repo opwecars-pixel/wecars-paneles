@@ -162,7 +162,8 @@ $w.onReady(function () {
 
     // ── Crear factura manual ──────────────────────────────────────────
     if (data.type === 'wecars-factura-crear' && data.datos) {
-      crearFacturaDesdeCliente(data.datos)
+      // crearFacturaDesdeCliente espera un clienteId string, no el objeto completo
+      crearFacturaDesdeCliente(data.datos.clienteId, data.datos)
         .then((factura) => $w(HTML_ID).postMessage({ type: 'wecars-factura-creada', ok: true, factura }))
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-factura-creada', ok: false, error: String(e) }));
     }

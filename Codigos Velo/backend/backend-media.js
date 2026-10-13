@@ -71,6 +71,24 @@ export function resolveVideoUrl(uri) {
   });
 }
 
+// Sube un video (base64) al Media Manager y regresa la URL wix:video://
+export function subirVideoCarroBackend(base64, fileName, mimeType) {
+  try {
+    const buffer = Buffer.from(base64, 'base64');
+    return mediaManager.upload(
+      '/wecars/carros/videos',
+      buffer,
+      fileName,
+      { mimeType: mimeType || 'video/mp4', mediaOptions: { isPrivate: false } }
+    ).then((result) => {
+      const wixUrl = result.fileUrl || result.url || '';
+      return { ok: true, wixUrl, url: wixUrl };
+    });
+  } catch (e) {
+    return Promise.resolve({ ok: false, error: String(e), wixUrl: '', url: '' });
+  }
+}
+
 // Lo mismo que resolveVideoUrl pero para documentos del Expediente Digital
 // (INE, facturas, etc.), que Wix guarda como "wix:document://v1/FILEID/...".
 // Si la uri no se reconoce o ningún método resuelve, regresamos la uri tal
