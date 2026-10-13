@@ -30,6 +30,7 @@ import { fetchCreditosPorRol as fetchCreditosGerencia } from 'backend/creditos.j
 import { insertarComision, obtenerBonosHistorial } from 'backend/finanzas.jsw';
 import { crearClienteSeguro, eliminarCliente } from 'backend/clientes.jsw';
 import { obtenerHistorial as geObtenerHistorialPub, obtenerTodasLasCuentas as geObtenerCuentasSociales } from 'backend/publicaciones.jsw';
+import { queryColeccion, insertarEnColeccion, actualizarEnColeccion, guardarItem, eliminarDeColeccion, getDeColeccion } from 'backend/operaciones.jsw';
 
 const HTML_ID = '#htmlGerencia';
 
@@ -100,10 +101,10 @@ $w.onReady(function () {
     // ── Solicitar lista de empleados directamente del CMS ─────────────
     if (data.type === 'wecars-empleados-solicitar') {
       try {
-        const r = await wixData.query('Usuarios').limit(100).find({ suppressAuth: true });
+        const empleadosItems = await queryColeccion('Usuarios', ['Gerencia', 'Administración'], [{limit:100}]);
         $w(HTML_ID).postMessage({
           type: 'wecars-empleados-lista',
-          empleados: r.items.map(u => ({
+          empleados: empleadosItems.map(u => ({
             _id:    u._id,
             nombre: u.nombre  || u.name || '',
             email:  u.email   || u.correo || '',
@@ -135,7 +136,7 @@ $w.onReady(function () {
           // A1: capturar vendedor anterior antes de sobrescribir
           const vendedorAnterior = item.vendedorAsignado || '';
           const vendedorNuevo = _cambiosFiltrados.vendedorAsignado;
-          return wixData.update('ClientRecords', Object.assign({}, item, _cambiosFiltrados, { ultimaActividad: new Date() }), { suppressAuth: true })
+          return guardarItem('ClientRecords', ['Gerencia', 'Administración'], Object.assign({}, item, _cambiosFiltrados, { ultimaActividad: new Date() }))
             .then(() => ({ vendedorAnterior, vendedorNuevo, item }));
         })
         .then(({ vendedorAnterior, vendedorNuevo, item }) => {
@@ -153,7 +154,7 @@ $w.onReady(function () {
               }).catch(() => {})
             );
             promesas.push(
-              wixData.insert('Historial', {
+              insertarEnColeccion('Historial', ['Gerencia', 'Administración'], {
                 clienteId: data.clienteId,
                 tipo: 'reasignacion',
                 descripcion: `Reasignado de ${vendedorAnterior || 'sin asignar'} → ${vendedorNuevo}`,
@@ -161,22 +162,20 @@ $w.onReady(function () {
                 estadoNuevo: vendedorNuevo,
                 realizadoPor: gerenciaEmail || '',
                 fecha: new Date(),
-              }, { suppressAuth: true }).catch(() => {})
+              }).catch(() => {})
             );
           }
 
           // Sincronizar ALeads para que las vistas sin asignar no muestren stale data
           if (data.cambios && data.cambios.vendedorAsignado) {
             promesas.push(
-              wixData.query('ALeads')
-                .eq('clienteId', data.clienteId)
-                .find({ suppressAuth: true })
-                .then((r) => Promise.all(r.items.map((l) =>
-                  wixData.update('ALeads', Object.assign({}, l, {
+              queryColeccion('ALeads', ['Gerencia', 'Administración'], [{campo:'clienteId', op:'eq', valor:data.clienteId}])
+                .then((leads) => Promise.all(leads.map((l) =>
+                  guardarItem('ALeads', ['Gerencia', 'Administración'], Object.assign({}, l, {
                     vendedorAsignado: data.cambios.vendedorAsignado,
                     vendedorNombre: data.cambios.vendedorNombre || data.cambios.vendedorAsignado,
                     estatusLead: l.estatusLead === 'sin_asignar' || !l.estatusLead ? 'asignado' : l.estatusLead
-                  }), { suppressAuth: true })
+                  }))
                 ))).catch((e) => console.warn('[Gerencia] No se pudo sincronizar ALeads:', e))
             );
           }
@@ -197,22 +196,22 @@ $w.onReady(function () {
       const tel = String(datosNuevo.telefono || '').replace(/\D/g, '');
       const vars = [tel];
       if (tel.length === 10) { vars.push('52' + tel); vars.push('521' + tel); }
-      wixData.query('ClientRecords').hasSome('telefono', vars).limit(1).find({ suppressAuth: true })
-        .then(async (r) => {
-          if (r.items.length) {
-            const ex = r.items[0];
+      queryColeccion('ClientRecords', ['Gerencia', 'Administración'], [{campo:'telefono', op:'hasSome', valor:vars}, {limit:1}])
+        .then(async (items) => {
+          if (items.length) {
+            const ex = items[0];
             const msg = 'Este teléfono ya está registrado' + (ex.vendedorAsignado ? ' — cliente de ' + (ex.vendedorNombre || ex.vendedorAsignado) : '');
             $w(HTML_ID).postMessage({ type: 'wecars-cliente-nuevo-ok', cliente: ex, nombre: ex.nombre, yaExistia: true, mensaje: msg });
             return;
           }
-          const item = await wixData.insert('ClientRecords', datosNuevo, { suppressAuth: true });
+          const item = await insertarEnColeccion('ClientRecords', ['Gerencia', 'Administración'], datosNuevo);
           $w(HTML_ID).postMessage({ type: 'wecars-cliente-nuevo-ok', cliente: item, nombre: item.nombre });
           _broadcast({ type: 'wecars-cliente-nuevo', cliente: item });
           if (data.tareaExtra && data.tareaExtra.asignadoA) {
             const tarea = Object.assign({ col: 'por-hacer', prior: 'media' }, data.tareaExtra);
             delete tarea._id;
             try {
-              const tareaItem = await wixData.insert('Tasks', tarea, { suppressAuth: true });
+              const tareaItem = await insertarEnColeccion('Tasks', ['Gerencia', 'Administración'], tarea);
               _broadcast({ type: 'wecars-tarea-asignada', tarea: tareaItem });
             } catch(e) { console.error('[Gerencia] Error creando tarea de seguimiento:', e); }
           }
@@ -354,14 +353,14 @@ $w.onReady(function () {
 
     // ── Verifica tu Auto — Gerencia (solo lectura) ───────────────────
     if (data.type === 'wecars-vta-solicitar') {
-      wixData.query('VerificaAuto').descending('_createdDate').limit(200).find({ suppressAuth: true })
-        .then(r  => $w(HTML_ID).postMessage({ type: 'wecars-vta-datos', items: r.items }))
+      queryColeccion('VerificaAuto', ['Gerencia', 'Administración'], [{sort:'desc', campo:'_createdDate'}, {limit:200}])
+        .then(items => $w(HTML_ID).postMessage({ type: 'wecars-vta-datos', items }))
         .catch(() => $w(HTML_ID).postMessage({ type: 'wecars-vta-datos', items: [] }));
     }
 
     // ── Verifica tu Auto — guardar links de documentos (Gerencia) ───
     if (data.type === 'wecars-vta-guardar' && data.id) {
-      wixData.get('VerificaAuto', data.id, { suppressAuth: true })
+      getDeColeccion('VerificaAuto', ['Gerencia', 'Administración'], data.id)
         .then(async (actual) => {
           const actualizado = Object.assign({}, actual, {
             facturaDoc:            data.facturaDoc            !== undefined ? (data.facturaDoc || null)            : actual.facturaDoc,
@@ -370,7 +369,7 @@ $w.onReady(function () {
             tarjetaCirculacionDoc: data.tarjetaCirculacionDoc !== undefined ? (data.tarjetaCirculacionDoc || null) : actual.tarjetaCirculacionDoc,
             otrosDoc:              data.otrosDoc              !== undefined ? (data.otrosDoc || null)              : actual.otrosDoc,
           });
-          const guardado = await wixData.update('VerificaAuto', actualizado, { suppressAuth: true });
+          const guardado = await guardarItem('VerificaAuto', ['Gerencia', 'Administración'], actualizado);
           $w(HTML_ID).postMessage({ type: 'wecars-vta-guardado', ok: true, id: data.id, item: guardado });
         })
         .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-vta-guardado', ok: false, id: data.id, error: String(e) }));
@@ -396,9 +395,9 @@ $w.onReady(function () {
         ))
         .then(() => {
           // Devolver historial actualizado de mensajes
-          return wixData.query('Activities').eq('tipo', 'mensaje-gerencia').descending('fecha').limit(30).find({ suppressAuth: true });
+          return queryColeccion('Activities', ['Gerencia', 'Administración'], [{campo:'tipo', op:'eq', valor:'mensaje-gerencia'}, {sort:'desc', campo:'fecha'}, {limit:30}]);
         })
-        .then((r) => $w(HTML_ID).postMessage({ type: 'wecars-mensajes-historial', items: r.items }))
+        .then((items) => $w(HTML_ID).postMessage({ type: 'wecars-mensajes-historial', items }))
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-mensaje-error', error: String(e) }));
     }
 
@@ -406,7 +405,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-accion-registrar' && data.clienteId) {
       wixUsers.currentUser.getEmail()
         .then((email) => obtenerPerfil(email).catch(() => ({ nombre: email })).then((p) =>
-          wixData.insert('Historial', {
+          insertarEnColeccion('Historial', ['Gerencia', 'Administración'], {
             clienteId:    data.clienteId,
             accion:       data.accion || 'Nota',
             estadoAnterior: '',
@@ -415,37 +414,36 @@ $w.onReady(function () {
             usuarioNombre: p.nombre || email,
             comentario:   data.comentario || '',
             timestamp:    new Date(),
-          }, { suppressAuth: true })
+          })
         ))
         .catch((e) => console.error('[Gerencia] Error registrando acción:', e));
     }
 
     // ── Solicitar historial de mensajes ────────────────────────────────
     if (data.type === 'wecars-mensajes-solicitar') {
-      wixData.query('Activities').eq('tipo', 'mensaje-gerencia').descending('fecha').limit(30).find({ suppressAuth: true })
-        .then((r) => $w(HTML_ID).postMessage({ type: 'wecars-mensajes-historial', items: r.items }))
+      queryColeccion('Activities', ['Gerencia', 'Administración'], [{campo:'tipo', op:'eq', valor:'mensaje-gerencia'}, {sort:'desc', campo:'fecha'}, {limit:30}])
+        .then((items) => $w(HTML_ID).postMessage({ type: 'wecars-mensajes-historial', items }))
         .catch(() => $w(HTML_ID).postMessage({ type: 'wecars-mensajes-historial', items: [] }));
     }
 
     // ── Solicitar citas de todos los vendedores (agenda gerencia) ──────
     if (data.type === 'wecars-citas-gerencia-solicitar') {
-      wixData.query('citas').descending('_createdDate').limit(300).find({ suppressAuth: true })
-        .then((r) => $w(HTML_ID).postMessage({ type: 'wecars-citas-gerencia', items: r.items }))
+      queryColeccion('citas', ['Gerencia', 'Administración'], [{sort:'desc', campo:'_createdDate'}, {limit:300}])
+        .then((items) => $w(HTML_ID).postMessage({ type: 'wecars-citas-gerencia', items }))
         .catch(() => $w(HTML_ID).postMessage({ type: 'wecars-citas-gerencia', items: [] }));
     }
 
     // ── Tareas del equipo ─────────────────────────────────────────────
     if (data.type === 'wecars-tareas-solicitar') {
-      wixData.query('Tasks').descending('_createdDate').limit(200).find({ suppressAuth: true })
-        .catch(() => ({ items: [] }))
-        .then(r => $w(HTML_ID).postMessage({ type: 'wecars-tareas-datos', items: r.items }))
+      queryColeccion('Tasks', ['Gerencia', 'Administración'], [{sort:'desc', campo:'_createdDate'}, {limit:200}])
+        .then(items => $w(HTML_ID).postMessage({ type: 'wecars-tareas-datos', items }))
         .catch(e => console.error('[Gerencia] Error cargando tareas:', e));
     }
 
     if (data.type === 'wecars-tarea-crear' && data.datos) {
       const tarea = Object.assign({ col: 'por-hacer', prior: 'media' }, data.datos);
       delete tarea._id;
-      wixData.insert('Tasks', tarea, { suppressAuth: true })
+      insertarEnColeccion('Tasks', ['Gerencia', 'Administración'], tarea)
         .then(item => {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', tarea: item });
           _broadcast({ type: 'wecars-tarea-asignada', tarea: item });
@@ -459,7 +457,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-tarea-actualizar' && data.tareaId) {
       const cambios = data.cambios || {};
       wixData.get('Tasks', data.tareaId)
-        .then(item => wixData.update('Tasks', Object.assign({}, item, cambios), { suppressAuth: true }))
+        .then(item => guardarItem('Tasks', ['Gerencia', 'Administración'], Object.assign({}, item, cambios)))
         .then(item => {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-actualizada', tarea: item });
           _broadcast({ type: 'wecars-tarea-asignada', tarea: item });
@@ -468,7 +466,7 @@ $w.onReady(function () {
     }
 
     if (data.type === 'wecars-tarea-eliminar' && data.tareaId) {
-      wixData.remove('Tasks', data.tareaId, { suppressAuth: true })
+      eliminarDeColeccion('Tasks', ['Gerencia', 'Administración'], data.tareaId)
         .then(() => {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-eliminada', tareaId: data.tareaId });
           _broadcast({ type: 'wecars-tarea-eliminada', tareaId: data.tareaId });
@@ -478,8 +476,8 @@ $w.onReady(function () {
 
     // ── Cierres de Operación (Rentabilidad) ──────────────────────────
     if (data.type === 'wecars-cierres-solicitar') {
-      wixData.query('CierreOperacion').descending('_createdDate').limit(500).find({ suppressAuth: true })
-        .then(r => $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items: r.items }))
+      queryColeccion('CierreOperacion', ['Gerencia', 'Administración'], [{sort:'desc', campo:'_createdDate'}, {limit:500}])
+        .then(items => $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items }))
         .catch(e => {
           console.error('[Gerencia] Error cargando cierres:', e);
           $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items: [] });
@@ -492,7 +490,7 @@ $w.onReady(function () {
         apartados: Array.isArray(apartados) ? JSON.stringify(apartados) : '[]',
       });
       delete item._id;
-      wixData.insert('CierreOperacion', item, { suppressAuth: true })
+      insertarEnColeccion('CierreOperacion', ['Gerencia', 'Administración'], item)
         .then(creado => {
           const resultado = Object.assign({}, creado, { apartados: JSON.parse(creado.apartados || '[]') });
           $w(HTML_ID).postMessage({ type: 'wecars-cierre-creado', cierre: resultado });
@@ -505,13 +503,13 @@ $w.onReady(function () {
     }
 
     if (data.type === 'wecars-cierre-actualizar' && data.datos && data.datos._id) {
-      wixData.get('CierreOperacion', data.datos._id, { suppressAuth: true })
+      getDeColeccion('CierreOperacion', ['Gerencia', 'Administración'], data.datos._id)
         .then(existente => {
           const { apartados, ...resto } = data.datos;
           const item = Object.assign({}, existente, resto, {
             apartados: Array.isArray(apartados) ? JSON.stringify(apartados) : existente.apartados || '[]',
           });
-          return wixData.update('CierreOperacion', item, { suppressAuth: true });
+          return guardarItem('CierreOperacion', ['Gerencia', 'Administración'], item);
         })
         .then(actualizado => {
           const resultado = Object.assign({}, actualizado, {
@@ -663,17 +661,22 @@ $w.onReady(function () {
 
 // ── Leads — consulta todas las fuentes ────────────────────────────────
 function enviarLeadsGerencia() {
+  const _rolesLdGe = ['Gerencia', 'Administración'];
   Promise.all([
     // ALeads: leads de inventario, prueba, crédito (excluimos consigna para usar Consignas directamente)
-    wixData.query('ALeads').descending('fecha').limit(500).find({ suppressAuth: true }).catch(() => ({ items: [] })),
+    queryColeccion('ALeads', _rolesLdGe, [{sort:'desc', campo:'fecha'}, {limit:500}]).catch(() => []),
     // Consignas directamente (fuente canónica)
-    wixData.query('Consignas').descending('_createdDate').limit(200).find({ suppressAuth: true }).catch(() => ({ items: [] })),
+    queryColeccion('Consignas', _rolesLdGe, [{sort:'desc', campo:'_createdDate'}, {limit:200}]).catch(() => []),
     // VerificaAuto directamente
-    wixData.query('VerificaAuto').descending('fechaSolicitud').limit(200).find({ suppressAuth: true }).catch(() => ({ items: [] })),
+    queryColeccion('VerificaAuto', _rolesLdGe, [{sort:'desc', campo:'fechaSolicitud'}, {limit:200}]).catch(() => []),
     // Vendedores
-    wixData.query('Usuarios').limit(100).find({ suppressAuth: true }).catch(() => ({ items: [] })),
+    queryColeccion('Usuarios', _rolesLdGe, [{limit:100}]).catch(() => []),
   ])
-  .then(([aleadsR, consignasR, vtaR, usuariosR]) => {
+  .then(([aleadsItems, consignasItems, vtaItems, usuariosItems]) => {
+    const aleadsR   = { items: aleadsItems };
+    const consignasR = { items: consignasItems };
+    const vtaR      = { items: vtaItems };
+    const usuariosR = { items: usuariosItems };
     // — ALeads: excluir tipo='consigna' (los manejamos desde Consignas)
     const aleads = aleadsR.items.filter(l => l.tipo !== 'consigna');
 

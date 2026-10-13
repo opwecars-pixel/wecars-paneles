@@ -1,0 +1,147 @@
+// ───────────────────────────────────────────────────────────────────
+//  ARCHIVO DE BACKEND: backend/operaciones.jsw
+//  Funciones genéricas de acceso a datos con validación de rol.
+//  REGLA: este es el ÚNICO lugar donde suppressAuth:true puede usarse
+//  para las colecciones de negocio. Nunca en page-code.
+//
+//  filtros: array de objetos para construir una query dinámica.
+//    { campo, op, valor }     op = 'eq'|'ne'|'contains'|'hasSome'|'lt'|'gt'|'lte'|'gte'
+//    { sort: 'asc'|'desc', campo }
+//    { limit: N }
+//    { skip: N }
+// ───────────────────────────────────────────────────────────────────
+
+import wixData from 'wix-data';
+import { requireRolBackend } from 'backend/permisos.jsw';
+
+const SA = { suppressAuth: true };
+
+// ── Helpers internos ──────────────────────────────────────────────
+
+function _construirQuery(coleccion, filtros) {
+  let q = wixData.query(coleccion);
+  (filtros || []).forEach((f) => {
+    if (f.limit  !== undefined) { q = q.limit(f.limit);  return; }
+    if (f.skip   !== undefined) { q = q.skip(f.skip);    return; }
+    if (f.sort   !== undefined) {
+      q = f.sort === 'asc' ? q.ascending(f.campo) : q.descending(f.campo);
+      return;
+    }
+    const op = f.op || 'eq';
+    if      (op === 'eq')       q = q.eq(f.campo, f.valor);
+    else if (op === 'ne')       q = q.ne(f.campo, f.valor);
+    else if (op === 'contains') q = q.contains(f.campo, f.valor);
+    else if (op === 'hasSome')  q = q.hasSome(f.campo, f.valor);
+    else if (op === 'lt')       q = q.lt(f.campo, f.valor);
+    else if (op === 'gt')       q = q.gt(f.campo, f.valor);
+    else if (op === 'lte')      q = q.le(f.campo, f.valor);
+    else if (op === 'gte')      q = q.ge(f.campo, f.valor);
+  });
+  return q;
+}
+
+// ── Funciones genéricas (todas validan rol en backend) ────────────
+
+/**
+ * Query genérico con filtros dinámicos.
+ * Retorna items[] de la coleccion.
+ */
+export async function queryColeccion(coleccion, rolesPermitidos, filtros) {
+  await requireRolBackend(rolesPermitidos);
+  const q = _construirQuery(coleccion, filtros);
+  const r = await q.find(SA);
+  return r.items;
+}
+
+/**
+ * Insertar un documento nuevo.
+ * Retorna el item insertado.
+ */
+export async function insertarEnColeccion(coleccion, rolesPermitidos, datos) {
+  await requireRolBackend(rolesPermitidos);
+  return wixData.insert(coleccion, datos, SA);
+}
+
+/**
+ * Actualizar un documento (get + merge + update).
+ * Retorna el item actualizado.
+ */
+export async function actualizarEnColeccion(coleccion, rolesPermitidos, id, cambios) {
+  await requireRolBackend(rolesPermitidos);
+  const item = await wixData.get(coleccion, id, SA);
+  return wixData.update(coleccion, Object.assign({}, item, cambios), SA);
+}
+
+/**
+ * Guardar un item completo (update directo sin get previo).
+ * Útil cuando el item ya está en memoria y se modificó antes de llamar aquí.
+ * Retorna el item actualizado.
+ */
+export async function guardarItem(coleccion, rolesPermitidos, item) {
+  await requireRolBackend(rolesPermitidos);
+  return wixData.update(coleccion, item, SA);
+}
+
+/**
+ * Eliminar un documento por id.
+ * Retorna { ok: true }.
+ */
+export async function eliminarDeColeccion(coleccion, rolesPermitidos, id) {
+  await requireRolBackend(rolesPermitidos);
+  await wixData.remove(coleccion, id, SA);
+  return { ok: true };
+}
+
+/**
+ * Obtener un documento por id.
+ * Retorna el item.
+ */
+export async function getDeColeccion(coleccion, rolesPermitidos, id) {
+  await requireRolBackend(rolesPermitidos);
+  return wixData.get(coleccion, id, SA);
+}
+
+// ── Cars ──────────────────────────────────────────────────────────
+// Roles permitidos para escritura en inventario: Administración y Gerencia.
+
+const _ROLES_INVENTARIO = ['Administración', 'Gerencia'];
+
+/**
+ * Insertar un vehículo al inventario.
+ */
+export async function insertarCarro(datos) {
+  await requireRolBackend(_ROLES_INVENTARIO);
+  return wixData.insert('Cars', datos, SA);
+}
+
+/**
+ * Actualizar un vehículo del inventario (get + merge + update).
+ */
+export async function actualizarCarro(carroId, cambios) {
+  await requireRolBackend(_ROLES_INVENTARIO);
+  const item = await wixData.get('Cars', carroId, SA);
+  return wixData.update('Cars', Object.assign({}, item, cambios), SA);
+}
+
+/**
+ * Eliminar un vehículo del inventario.
+ */
+export async function eliminarCarro(carroId) {
+  await requireRolBackend(_ROLES_INVENTARIO);
+  await wixData.remove('Cars', carroId, SA);
+  return { ok: true };
+}
+
+// ── ClientRecords ─────────────────────────────────────────────────
+
+const _ROLES_CLIENTES_DEFAULT = ['Administración', 'Gerencia', 'Finanzas', 'Vendedor'];
+
+/**
+ * Actualizar un cliente (get + merge + update).
+ * rolesPermitidos puede sobreescribirse — default: todos los paneles.
+ */
+export async function actualizarClienteSeguro(clienteId, cambios, rolesPermitidos) {
+  await requireRolBackend(rolesPermitidos || _ROLES_CLIENTES_DEFAULT);
+  const item = await wixData.get('ClientRecords', clienteId, SA);
+  return wixData.update('ClientRecords', Object.assign({}, item, cambios), SA);
+}

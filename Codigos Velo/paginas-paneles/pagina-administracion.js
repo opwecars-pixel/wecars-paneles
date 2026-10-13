@@ -30,6 +30,7 @@ import { crearApartado, cerrarApartado } from 'backend/apartados';
 import { gm_obtenerMes, gm_listasMeses } from 'backend/gamificacion-cms.jsw';
 import { conectarCuenta, desconectarCuenta, actualizarAutorizados, obtenerTodasLasCuentas } from 'backend/publicaciones.jsw';
 import { getPermisosERP, setPermisosERP } from 'backend/siteConfig.jsw';
+import { insertarCarro, actualizarCarro, eliminarCarro, queryColeccion, insertarEnColeccion, actualizarEnColeccion, guardarItem, eliminarDeColeccion, getDeColeccion } from 'backend/operaciones.jsw';
 
 const HTML_ID   = '#htmlAdministracion';
 const UPLOAD_ID = '#uploadFotoBtn'; // botón nativo de Wix para fotos de vehículos
@@ -263,7 +264,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-carro-crear' && data.datos) {
       const carro = Object.assign({ estatusVenta: 'Disponible' }, data.datos);
       delete carro._id;
-      wixData.insert('Cars', carro, { suppressAuth: true })
+      insertarCarro(carro)
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-carro-resultado', ok: true, creado: true, carro: item });
           _broadcast({ type: 'wecars-inventario-update', carro: item });
@@ -272,8 +273,7 @@ $w.onReady(function () {
     }
 
     if (data.type === 'wecars-carro-actualizar' && data.carroId) {
-      wixData.get('Cars', data.carroId)
-        .then((item) => wixData.update('Cars', Object.assign({}, item, data.cambios || {}), { suppressAuth: true }))
+      actualizarCarro(data.carroId, data.cambios || {})
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-carro-resultado', ok: true, creado: false, carro: item });
           _broadcast({ type: 'wecars-inventario-update', carro: item });
@@ -283,16 +283,16 @@ $w.onReady(function () {
 
     // ── Listar apartados activos ──────────────────────────────────────
     if (data.type === 'wecars-apartados-solicitar') {
-      wixData.query('Apartados').eq('estatusApartado', 'activo').descending('fechaApartado').find({ suppressAuth: true })
-        .then(r => $w(HTML_ID).postMessage({ type: 'wecars-apartados-datos', items: r.items }))
+      queryColeccion('Apartados', ['Administración', 'Gerencia'], [{campo:'estatusApartado', op:'eq', valor:'activo'}, {sort:'desc', campo:'fechaApartado'}, {limit:200}])
+        .then(items => $w(HTML_ID).postMessage({ type: 'wecars-apartados-datos', items }))
         .catch(e => console.error('[Admin] Error cargando apartados:', e));
     }
 
     // ── Cargar todos los clientes (para vista Apartados) ─────────────
     if (data.type === 'wecars-clientes-todos') {
-      wixData.query('ClientRecords').limit(500).find({ suppressAuth: true })
-        .then(r => {
-          const items = (r.items || []).sort((a, b) => (a.nombre || '').localeCompare(b.nombre || '', 'es'));
+      queryColeccion('ClientRecords', ['Administración', 'Gerencia'], [{limit:500}])
+        .then(items => {
+          items = (items || []).sort((a, b) => (a.nombre || '').localeCompare(b.nombre || '', 'es'));
           $w(HTML_ID).postMessage({ type: 'wecars-clientes-todos-datos', items });
         })
         .catch(e => {
@@ -304,13 +304,14 @@ $w.onReady(function () {
     // ── Buscar clientes por nombre, teléfono o correo ─────────────────
     if (data.type === 'wecars-clientes-buscar' && data.query) {
       const q = data.query.trim();
+      const _rolesB = ['Administración', 'Gerencia'];
       Promise.all([
-        wixData.query('ClientRecords').contains('nombre', q).limit(20).find({ suppressAuth: true }),
-        wixData.query('ClientRecords').contains('telefono', q).limit(20).find({ suppressAuth: true }),
-        wixData.query('ClientRecords').contains('correo', q).limit(20).find({ suppressAuth: true }),
-      ]).then(([r1, r2, r3]) => {
+        queryColeccion('ClientRecords', _rolesB, [{campo:'nombre', op:'contains', valor:q}, {limit:20}]),
+        queryColeccion('ClientRecords', _rolesB, [{campo:'telefono', op:'contains', valor:q}, {limit:20}]),
+        queryColeccion('ClientRecords', _rolesB, [{campo:'correo', op:'contains', valor:q}, {limit:20}]),
+      ]).then(([i1, i2, i3]) => {
         const seen = new Set();
-        const items = [...r1.items, ...r2.items, ...r3.items].filter(c => { if (seen.has(c._id)) return false; seen.add(c._id); return true; });
+        const items = [...i1, ...i2, ...i3].filter(c => { if (seen.has(c._id)) return false; seen.add(c._id); return true; });
         $w(HTML_ID).postMessage({ type: 'wecars-clientes-resultado', items });
       }).catch(e => console.error('[Admin] Error buscando clientes:', e));
     }
@@ -346,7 +347,7 @@ $w.onReady(function () {
 
     // ── Eliminar vehículo del inventario ──────────────────────────────
     if (data.type === 'wecars-carro-eliminar' && data.carroId) {
-      wixData.remove('Cars', data.carroId, { suppressAuth: true })
+      eliminarCarro(data.carroId)
         .then(() => {
           $w(HTML_ID).postMessage({ type: 'wecars-carro-eliminado', ok: true, carroId: data.carroId });
           _broadcast({ type: 'wecars-inventario-update' });
@@ -385,12 +386,11 @@ $w.onReady(function () {
     }
 
     if (data.type === 'wecars-consigna-asignar' && data.consignaId) {
-      wixData.get('Consignas', data.consignaId)
-        .then((item) => wixData.update('Consignas', Object.assign({}, item, {
+      actualizarEnColeccion('Consignas', ['Administración', 'Gerencia'], data.consignaId, {
           vendedorAsignado: data.vendedorEmail  || '',
           vendedorNombre:   data.vendedorNombre || '',
           estatusConsigna:  data.vendedorEmail ? 'asignada' : 'nueva',
-        }), { suppressAuth: true }))
+        })
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-consigna-asignada', consigna: item });
           // Notificar al panel del vendedor asignado via BroadcastChannel
@@ -406,11 +406,11 @@ $w.onReady(function () {
       wixData.get('Consignas', data.consignaId)
         .then((consigna) => {
           const updates = [
-            wixData.update('Consignas', Object.assign({}, consigna, {
+            guardarItem('Consignas', ['Administración', 'Gerencia'], Object.assign({}, consigna, {
               estatusConsigna: 'cerrada',
               fechaCierre:     new Date(),
               notasCierre:     data.notas || '',
-            }), { suppressAuth: true }),
+            })),
           ];
           // Si la consigna aún no tiene auto en Cars, insertarlo
           if (!consigna.carId) {
@@ -436,7 +436,7 @@ $w.onReady(function () {
               fechaIngreso:   new Date(),
             };
             updates.push(
-              wixData.insert('Cars', carro, { suppressAuth: true })
+              insertarCarro(carro)
                 .then((carroInsertado) => {
                   // Avisar a todos los paneles que hay auto nuevo en inventario
                   _broadcast({ type: 'wecars-inventario-nuevo', carro: carroInsertado });
@@ -473,7 +473,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-tarea-crear' && data.datos) {
       const tarea = Object.assign({ col: 'por-hacer', prior: 'media' }, data.datos);
       delete tarea._id;
-      wixData.insert('Tasks', tarea, { suppressAuth: true })
+      insertarEnColeccion('Tasks', ['Administración', 'Gerencia'], tarea)
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', tarea: item });
           _broadcast({ type: 'wecars-tarea-nueva', tarea: item });
@@ -483,14 +483,13 @@ $w.onReady(function () {
 
     if (data.type === 'wecars-tarea-actualizar' && data.tareaId) {
       const cambios = data.cambios || {};
-      wixData.get('Tasks', data.tareaId)
-        .then((item) => wixData.update('Tasks', Object.assign({}, item, cambios), { suppressAuth: true }))
+      actualizarEnColeccion('Tasks', ['Administración', 'Gerencia'], data.tareaId, cambios)
         .then((item) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-actualizada', tarea: item }))
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', tareaId: data.tareaId, error: String(e) }));
     }
 
     if (data.type === 'wecars-tarea-eliminar' && data.tareaId) {
-      wixData.remove('Tasks', data.tareaId, { suppressAuth: true })
+      eliminarDeColeccion('Tasks', ['Administración', 'Gerencia'], data.tareaId)
         .then(() => $w(HTML_ID).postMessage({ type: 'wecars-tarea-eliminada', tareaId: data.tareaId }))
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', tareaId: data.tareaId, error: String(e) }));
     }
@@ -540,22 +539,23 @@ $w.onReady(function () {
       const tel = String(datosNuevo.telefono || '').replace(/\D/g, '');
       const vars = [tel];
       if (tel.length === 10) { vars.push('52' + tel); vars.push('521' + tel); }
-      wixData.query('ClientRecords').hasSome('telefono', vars).limit(1).find({ suppressAuth: true })
-        .then(async result => {
+      queryColeccion('ClientRecords', ['Administración', 'Gerencia'], [{campo:'telefono', op:'hasSome', valor:vars}, {limit:1}])
+        .then(async items => {
+          const result = { items };
           if (result.items.length) {
             const ex = result.items[0];
             const msg = 'Este teléfono ya está registrado' + (ex.vendedorAsignado ? ' — cliente de ' + (ex.vendedorNombre || ex.vendedorAsignado) : '');
             $w(HTML_ID).postMessage({ type: 'wecars-cliente-nuevo-ok', cliente: ex, yaExistia: true, mensaje: msg });
             return;
           }
-          const item = await wixData.insert('ClientRecords', datosNuevo, { suppressAuth: true });
+          const item = await insertarEnColeccion('ClientRecords', ['Administración', 'Gerencia'], datosNuevo);
           $w(HTML_ID).postMessage({ type: 'wecars-cliente-nuevo-ok', cliente: item });
           _broadcast({ type: 'wecars-cliente-nuevo', cliente: item });
           if (data.tareaExtra && data.tareaExtra.asignadoA) {
             const tarea = Object.assign({ col: 'por-hacer', prior: 'media' }, data.tareaExtra);
             delete tarea._id;
             try {
-              const tareaItem = await wixData.insert('Tasks', tarea, { suppressAuth: true });
+              const tareaItem = await insertarEnColeccion('Tasks', ['Administración', 'Gerencia'], tarea);
               _broadcast({ type: 'wecars-tarea-asignada', tarea: tareaItem });
             } catch(e) { console.error('[Admin] Error creando tarea de seguimiento:', e); }
           }
@@ -568,13 +568,13 @@ $w.onReady(function () {
 
     // ── Verifica tu Auto ─────────────────────────────────────────────
     if (data.type === 'wecars-vta-solicitar') {
-      wixData.query('VerificaAuto').descending('_createdDate').limit(200).find({ suppressAuth: true })
-        .then(r  => $w(HTML_ID).postMessage({ type: 'wecars-vta-datos', items: r.items }))
+      queryColeccion('VerificaAuto', ['Administración', 'Gerencia'], [{sort:'desc', campo:'_createdDate'}, {limit:200}])
+        .then(items => $w(HTML_ID).postMessage({ type: 'wecars-vta-datos', items }))
         .catch(() => $w(HTML_ID).postMessage({ type: 'wecars-vta-datos', items: [] }));
     }
 
     if (data.type === 'wecars-vta-guardar' && data.id) {
-      wixData.get('VerificaAuto', data.id, { suppressAuth: true })
+      getDeColeccion('VerificaAuto', ['Administración', 'Gerencia'], data.id)
         .then(async (actual) => {
           const actualizado = Object.assign({}, actual, {
             status:            data.status            ?? actual.status,
@@ -614,7 +614,7 @@ $w.onReady(function () {
             otrosDoc:          data.otrosDoc          !== undefined ? (data.otrosDoc || null)   : actual.otrosDoc,
             fechaEntrega:      data.status === 'Listo' && !actual.fechaEntrega ? new Date() : actual.fechaEntrega,
           });
-          const guardado = await wixData.update('VerificaAuto', actualizado, { suppressAuth: true });
+          const guardado = await guardarItem('VerificaAuto', ['Administración', 'Gerencia'], actualizado);
           $w(HTML_ID).postMessage({ type: 'wecars-vta-guardado', ok: true, id: data.id, item: guardado });
         })
         .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-vta-guardado', ok: false, id: data.id, error: String(e) }));
@@ -622,8 +622,8 @@ $w.onReady(function () {
 
     // ── Cierres de Operación ──────────────────────────────────────────
     if (data.type === 'wecars-cierres-solicitar') {
-      wixData.query('CierreOperacion').descending('_createdDate').limit(500).find({ suppressAuth: true })
-        .then(r => $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items: r.items }))
+      queryColeccion('CierreOperacion', ['Administración', 'Gerencia'], [{sort:'desc', campo:'_createdDate'}, {limit:500}])
+        .then(items => $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items }))
         .catch(e => {
           console.error('[Admin] Error cargando cierres:', e);
           $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items: [] });
@@ -636,7 +636,7 @@ $w.onReady(function () {
         apartados: Array.isArray(apartados) ? JSON.stringify(apartados) : '[]',
       });
       delete item._id;
-      wixData.insert('CierreOperacion', item, { suppressAuth: true })
+      insertarEnColeccion('CierreOperacion', ['Administración', 'Gerencia'], item)
         .then(creado => {
           const resultado = Object.assign({}, creado, {
             apartados: JSON.parse(creado.apartados || '[]'),
@@ -651,13 +651,13 @@ $w.onReady(function () {
     }
 
     if (data.type === 'wecars-cierre-actualizar' && data.datos && data.datos._id) {
-      wixData.get('CierreOperacion', data.datos._id, { suppressAuth: true })
+      getDeColeccion('CierreOperacion', ['Administración', 'Gerencia'], data.datos._id)
         .then(existente => {
           const { apartados, ...resto } = data.datos;
           const item = Object.assign({}, existente, resto, {
             apartados: Array.isArray(apartados) ? JSON.stringify(apartados) : existente.apartados || '[]',
           });
-          return wixData.update('CierreOperacion', item, { suppressAuth: true });
+          return guardarItem('CierreOperacion', ['Administración', 'Gerencia'], item);
         })
         .then(actualizado => {
           const resultado = Object.assign({}, actualizado, {
@@ -677,13 +677,13 @@ $w.onReady(function () {
       const ld = data.data;
       wixUsers.currentUser.getEmail()
         .then((email) => obtenerPerfil(email).catch(() => ({ nombre: email }))
-          .then((p) => wixData.insert('ALeads', Object.assign({}, ld, {
+          .then((p) => insertarEnColeccion('ALeads', ['Administración', 'Gerencia'], Object.assign({}, ld, {
             vendedorAsignado: ld.vendedorAsignado || email,
             vendedorNombre:   ld.vendedorNombre   || p.nombre || email,
             fechaRegistro:    ld.fechaRegistro    || new Date(),
             estatus:          ld.estatus          || 'nuevo_lead',
             origen:           ld.pagina           || ld.origen || 'Panel Admin',
-          }), { suppressAuth: true }))
+          })))
         )
         .then((lead) => {
           $w(HTML_ID).postMessage({ type: 'wecars-lead-creado', ok: true, leadId: lead._id });
@@ -726,13 +726,13 @@ $w.onReady(function () {
       const telL = String(l.telefono || '').replace(/\D/g, '');
       const varsL = [telL];
       if (telL.length === 10) { varsL.push('52' + telL); varsL.push('521' + telL); }
-      wixData.query('ClientRecords').hasSome('telefono', varsL).limit(1).find({ suppressAuth: true })
-        .then((r) => {
-          if (r.items.length) {
-            return { clienteId: r.items[0]._id, yaExiste: true };
+      queryColeccion('ClientRecords', ['Administración', 'Gerencia'], [{campo:'telefono', op:'hasSome', valor:varsL}, {limit:1}])
+        .then(async (items) => {
+          if (items.length) {
+            return { clienteId: items[0]._id, yaExiste: true };
           }
-          return wixData.insert('ClientRecords', { nombre: l.nombre||'', telefono: telL, correo: l.correo||'', origen: l.origen||'Sitio web', estatusExpediente: 'nuevo_lead', vendedorAsignado: l.vendedorAsignado||'', vendedorNombre: l.vendedorNombre||'', ultimaActividad: new Date(), leadId: l._id }, { suppressAuth: true })
-            .then((c) => ({ clienteId: c._id, yaExiste: false }));
+          const c = await insertarEnColeccion('ClientRecords', ['Administración', 'Gerencia'], { nombre: l.nombre||'', telefono: telL, correo: l.correo||'', origen: l.origen||'Sitio web', estatusExpediente: 'nuevo_lead', vendedorAsignado: l.vendedorAsignado||'', vendedorNombre: l.vendedorNombre||'', ultimaActividad: new Date(), leadId: l._id });
+          return { clienteId: c._id, yaExiste: false };
         })
         .then((res) => {
           $w(HTML_ID).postMessage({ type: 'wecars-lead-convertido', ok: true, clienteId: res.clienteId, leadId: data.leadId, yaExistia: res.yaExiste });
@@ -843,13 +843,18 @@ function enviarDatosAdmin() {
 
 // ── Leads: enviar al panel de administración ─────────────────────────
 function enviarLeadsAdmin() {
+  const _rolesLd = ['Administración', 'Gerencia'];
   Promise.all([
-    wixData.query('ALeads').descending('fecha').limit(500).find({ suppressAuth: true }).catch(() => ({ items: [] })),
-    wixData.query('Consignas').descending('_createdDate').limit(200).find({ suppressAuth: true }).catch(() => ({ items: [] })),
-    wixData.query('VerificaAuto').descending('fechaSolicitud').limit(200).find({ suppressAuth: true }).catch(() => ({ items: [] })),
-    wixData.query('Usuarios').limit(100).find({ suppressAuth: true }).catch(() => ({ items: [] })),
+    queryColeccion('ALeads', _rolesLd, [{sort:'desc', campo:'fecha'}, {limit:500}]).catch(() => []),
+    queryColeccion('Consignas', _rolesLd, [{sort:'desc', campo:'_createdDate'}, {limit:200}]).catch(() => []),
+    queryColeccion('VerificaAuto', _rolesLd, [{sort:'desc', campo:'fechaSolicitud'}, {limit:200}]).catch(() => []),
+    queryColeccion('Usuarios', _rolesLd, [{limit:100}]).catch(() => []),
   ])
-  .then(([aleadsR, consignasR, vtaR, usuariosR]) => {
+  .then(([aleadsItems, consignasItems, vtaItems, usuariosItems]) => {
+    const aleadsR   = { items: aleadsItems };
+    const consignasR = { items: consignasItems };
+    const vtaR      = { items: vtaItems };
+    const usuariosR = { items: usuariosItems };
     const aleads = aleadsR.items.filter(l => l.tipo !== 'consigna');
 
     const consLeads = consignasR.items.map(c => {

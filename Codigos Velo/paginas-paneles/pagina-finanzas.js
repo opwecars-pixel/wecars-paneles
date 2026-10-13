@@ -24,6 +24,7 @@ import { fetchDatosFinanzas } from 'backend/datos.jsw';
 import { fetchLeads } from 'backend/leads.jsw';
 import { registrarPago, actualizarCredito, actualizarClienteFinanzas, liberarComision, pagarComision, insertarComision, editarComision, emitirFactura, marcarClienteFacturado, crearFacturaDesdeCliente } from 'backend/finanzas.jsw';
 import { cerrarApartado } from 'backend/apartados.jsw';
+import { insertarEnColeccion } from 'backend/operaciones.jsw';
 
 const HTML_ID = '#htmlFinanzas';
 let _finanzasVerificado = false;
@@ -227,7 +228,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-egreso-registrado' && data.egreso) {
       const eg = data.egreso;
       wixUsers.currentUser.getEmail()
-        .then((email) => wixData.insert('Pagos', {
+        .then((email) => insertarEnColeccion('Pagos', ['Finanzas', 'Gerencia', 'Administración'], {
           tipo:        'Egreso',
           categoria:   eg.categoria || 'General',
           descripcion: eg.descripcion || '',
@@ -236,7 +237,7 @@ $w.onReady(function () {
           fecha:       eg.fecha ? new Date(eg.fecha) : new Date(),
           registradoPor: email,
           area:        'Finanzas',
-        }, { suppressAuth: true }))
+        }))
         .then((pago) => {
           $w(HTML_ID).postMessage({ type: 'wecars-egreso-guardado', ok: true, pagoId: pago._id });
           _broadcast({ type: 'egreso-registrado', pagoId: pago._id, monto: pago.monto, categoria: pago.categoria });
@@ -248,14 +249,14 @@ $w.onReady(function () {
     if (data.type === 'wecars-finanza' && data.data) {
       const fn = data.data;
       wixUsers.currentUser.getEmail()
-        .then((email) => wixData.insert('Pagos', {
+        .then((email) => insertarEnColeccion('Pagos', ['Finanzas', 'Gerencia', 'Administración'], {
           tipo:        fn.tipo === 'egreso' ? 'Egreso' : 'Ingreso',
           descripcion: fn.concepto || '',
           monto:       Number(fn.monto) || 0,
           fecha:       fn.fecha ? new Date(fn.fecha) : new Date(),
           registradoPor: email,
           area:        'Finanzas',
-        }, { suppressAuth: true }))
+        }))
         .then((pago) => {
           $w(HTML_ID).postMessage({ type: 'wecars-finanza-guardada', ok: true, pagoId: pago._id });
         })

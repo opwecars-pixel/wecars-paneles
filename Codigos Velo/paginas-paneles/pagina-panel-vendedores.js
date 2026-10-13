@@ -26,6 +26,7 @@ import { fetchLeads, reclamarLead, actualizarEstatusLead } from 'backend/leads.j
 import { registrarActividad, fetchActividadesVendedor } from 'backend/actividades.jsw';
 import { crearCredito } from 'backend/creditos.jsw';
 import { crearClienteSeguro } from 'backend/clientes.jsw';
+import { queryColeccion, insertarEnColeccion, actualizarEnColeccion, guardarItem, getDeColeccion } from 'backend/operaciones.jsw';
 import {
   obtenerVehiculos as pubObtenerVehiculos,
   obtenerCuentasAutorizadas as pubObtenerCuentas,
@@ -239,8 +240,8 @@ $w.onReady(function () {
     // Citas / Agenda — Solicitar citas existentes del CMS
     if (data.type === 'wecars-citas-solicitar') {
       wixUsers.currentUser.getEmail()
-        .then((email) => wixData.query('citas').eq('vendedorId', email).descending('_createdDate').limit(100).find({ suppressAuth: true }))
-        .then((r) => $w(HTML_ID).postMessage({ type: 'wecars-citas-datos', items: r.items }))
+        .then((email) => queryColeccion('citas', ['Vendedor', 'Administración', 'Gerencia'], [{campo:'vendedorId', op:'eq', valor:email}, {sort:'desc', campo:'_createdDate'}, {limit:100}]))
+        .then((items) => $w(HTML_ID).postMessage({ type: 'wecars-citas-datos', items }))
         .catch((e) => {
           console.error('[Panel] Error cargando citas:', e);
           $w(HTML_ID).postMessage({ type: 'wecars-citas-datos', items: [] });
@@ -362,8 +363,7 @@ $w.onReady(function () {
 
     // ── Mover tarea entre columnas ────────────────────────────────────
     if (data.type === 'wecars-tarea-actualizar' && data.tareaId) {
-      wixData.get('Tasks', data.tareaId)
-        .then(item => wixData.update('Tasks', Object.assign({}, item, data.cambios || {}), { suppressAuth: true }))
+      actualizarEnColeccion('Tasks', ['Vendedor', 'Administración', 'Gerencia'], data.tareaId, data.cambios || {})
         .then(item => $w(HTML_ID).postMessage({ type: 'wecars-tarea-actualizada', tarea: item }))
         .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', tareaId: data.tareaId, error: String(e) }));
     }
@@ -467,10 +467,12 @@ $w.onReady(function () {
       const l = data.lead;
       const tel = String(l.telefono || '').replace(/\D/g, '');
       // Dedup: buscar si ya existe un ClientRecord de este lead (por teléfono o leadId)
+      const _rolesV = ['Vendedor', 'Administración', 'Gerencia'];
       const buscarDup = tel
-        ? wixData.query('ClientRecords').hasSome('telefono', [tel, '52'+tel, '521'+tel]).limit(1).find({ suppressAuth: true }).catch(() => ({ items: [] }))
-        : wixData.query('ClientRecords').eq('leadId', data.leadId).limit(1).find({ suppressAuth: true }).catch(() => ({ items: [] }));
-      buscarDup.then((dupR) => {
+        ? queryColeccion('ClientRecords', _rolesV, [{campo:'telefono', op:'hasSome', valor:[tel, '52'+tel, '521'+tel]}, {limit:1}]).catch(() => [])
+        : queryColeccion('ClientRecords', _rolesV, [{campo:'leadId', op:'eq', valor:data.leadId}, {limit:1}]).catch(() => []);
+      buscarDup.then((dupItems) => {
+        const dupR = { items: dupItems };
         if (dupR.items.length) {
           // Ya existe — solo cerrar el lead
           const c = dupR.items[0];
@@ -496,7 +498,7 @@ $w.onReady(function () {
           leadId:            l._id,
           departamentoActual: 'Vendedor',
         };
-        return wixData.insert('ClientRecords', cliente, { suppressAuth: true })
+        return insertarEnColeccion('ClientRecords', ['Vendedor', 'Administración', 'Gerencia'], cliente)
           .then((c) => {
             $w(HTML_ID).postMessage({ type: 'wecars-lead-convertido', ok: true, clienteId: c._id, leadId: data.leadId });
             return actualizarEstatusLead(data.leadId, 'convertido');
@@ -575,13 +577,13 @@ $w.onReady(function () {
       const ld = data.data;
       wixUsers.currentUser.getEmail()
         .then((email) => obtenerPerfil(email).catch(() => ({ nombre: email }))
-          .then((p) => wixData.insert('ALeads', Object.assign({}, ld, {
+          .then((p) => insertarEnColeccion('ALeads', ['Vendedor', 'Administración', 'Gerencia'], Object.assign({}, ld, {
             vendedorAsignado: ld.vendedorAsignado || email,
             vendedorNombre:   ld.vendedorNombre   || p.nombre || email,
             fechaRegistro:    ld.fechaRegistro    || new Date(),
             estatus:          ld.estatus          || 'nuevo_lead',
             origen:           ld.pagina           || ld.origen || 'Panel Vendedor',
-          }), { suppressAuth: true }))
+          })))
         )
         .then((lead) => {
           $w(HTML_ID).postMessage({ type: 'wecars-lead-creado', ok: true, leadId: lead._id });
@@ -601,40 +603,40 @@ $w.onReady(function () {
     }
     if (data.type === 'wecars-nueva-cita' && data.datos) {
       const d = data.datos;
-      wixData.insert('citas', {
+      insertarEnColeccion('citas', ['Vendedor', 'Administración', 'Gerencia'], {
         clienteNombre: d.cliente, fecha: d.fecha ? new Date(d.fecha + 'T' + (d.hora || '10:00')) : new Date(),
         tipo: d.tipo || 'Cita', vehiculo: d.vehiculo || '', notas: d.notas || '',
         origenPanel: 'vendedores',
-      }, { suppressAuth: true })
+      })
         .then((cita) => $w(HTML_ID).postMessage({ type: 'wecars-cita-creada', ok: true, citaId: cita._id }))
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-cita-creada', ok: false, error: String(e) }));
     }
     if (data.type === 'wecars-nueva-tarea' && data.datos) {
       const t = data.datos;
-      wixData.insert('Tasks', {
+      insertarEnColeccion('Tasks', ['Vendedor', 'Administración', 'Gerencia'], {
         descripcion: t.desc, clienteNombre: t.cliente || '', fechaVencimiento: t.fecha ? new Date(t.fecha) : null,
         prioridad: t.prioridad || 'Media', estatus: 'pendiente', origenPanel: 'vendedores',
-      }, { suppressAuth: true })
+      })
         .then((task) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', ok: true, tareaId: task._id }))
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', ok: false, error: String(e) }));
     }
     if (data.type === 'wecars-solicitud-vehiculo' && data.datos) {
       const v = data.datos;
-      wixData.insert('VehicleRequests', {
+      insertarEnColeccion('VehicleRequests', ['Vendedor', 'Administración', 'Gerencia'], {
         clienteNombre: v.cliente || '', descripcion: v.desc, precioMax: v.precio || '',
         plazo: v.plazo || '', urgencia: v.urgencia || '', notas: v.notas || '',
         origenPanel: 'vendedores', fechaSolicitud: new Date(),
-      }, { suppressAuth: true })
+      })
         .then((req) => $w(HTML_ID).postMessage({ type: 'wecars-solicitud-vehiculo-guardada', ok: true, reqId: req._id }))
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-solicitud-vehiculo-guardada', ok: false, error: String(e) }));
     }
 
     // ── Actualizar etapa de expediente ──────────────────────────────────
     if (data.type === 'wecars-expediente-actualizar' && data.clienteId && data.cambios) {
-      wixData.get('ClientRecords', data.clienteId, { suppressAuth: true })
+      getDeColeccion('ClientRecords', ['Vendedor', 'Administración', 'Gerencia'], data.clienteId)
         .then((rec) => {
           if (!rec) throw new Error('Cliente no encontrado: ' + data.clienteId);
-          return wixData.update('ClientRecords', Object.assign({}, rec, data.cambios), { suppressAuth: true });
+          return guardarItem('ClientRecords', ['Vendedor', 'Administración', 'Gerencia'], Object.assign({}, rec, data.cambios));
         })
         .then((updated) => {
           $w(HTML_ID).postMessage({ type: 'wecars-expediente-actualizado', ok: true, clienteId: updated._id });
@@ -1070,13 +1072,8 @@ function enviarLeadsVendedor() {
       return obtenerPerfil(email).catch(() => ({ rol: 'Vendedor', nombre: email }))
         .then((p) => fetchLeads(p.rol || 'Vendedor', email)
           .then((leads) => Promise.all(leads.map((l) =>
-            wixData.query('Activities')
-              .eq('clienteId', l._id)
-              .eq('tipo', 'nota_lead')
-              .ascending('fecha')
-              .limit(50)
-              .find({ suppressAuth: true })
-              .then((r) => Object.assign({}, l, { _notas: r.items }))
+            queryColeccion('Activities', ['Vendedor', 'Administración', 'Gerencia'], [{campo:'clienteId', op:'eq', valor:l._id}, {campo:'tipo', op:'eq', valor:'nota_lead'}, {sort:'asc', campo:'fecha'}, {limit:50}])
+              .then((items) => Object.assign({}, l, { _notas: items }))
               .catch(() => Object.assign({}, l, { _notas: [] }))
           )))
           .then((leadsConNotas) => {
@@ -1100,13 +1097,9 @@ function enviarConsignasVendedor() {
   wixUsers.currentUser.getEmail()
     .then((email) => {
       if (!email) return;
-      return wixData.query('Consignas')
-        .eq('vendedorAsignado', email)
-        .descending('_createdDate')
-        .limit(50)
-        .find({ suppressAuth: true })
-        .then((r) => {
-          $w(HTML_ID).postMessage({ type: 'wecars-consignas-vendedor', items: r.items, emailActual: email });
+      return queryColeccion('Consignas', ['Vendedor', 'Administración', 'Gerencia'], [{campo:'vendedorAsignado', op:'eq', valor:email}, {sort:'desc', campo:'_createdDate'}, {limit:50}])
+        .then((items) => {
+          $w(HTML_ID).postMessage({ type: 'wecars-consignas-vendedor', items, emailActual: email });
         });
     })
     .catch((e) => {
