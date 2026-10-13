@@ -113,8 +113,7 @@ $w.onReady(function () {
           })),
         });
       } catch (e) {
-        console.error('[Gerencia] Error cargando empleados:', e);
-        $w(HTML_ID).postMessage({ type: 'wecars-empleados-lista', empleados: [] });
+        $w(HTML_ID).postMessage({ type: 'wecars-empleados-lista', empleados: [], error: String(e) });
       }
     }
 
@@ -213,7 +212,7 @@ $w.onReady(function () {
             try {
               const tareaItem = await insertarEnColeccion('Tasks', ['Gerencia', 'Administración'], tarea);
               _broadcast({ type: 'wecars-tarea-asignada', tarea: tareaItem });
-            } catch(e) { console.error('[Gerencia] Error creando tarea de seguimiento:', e); }
+            } catch(e) { $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', error: String(e) }); }
           }
         })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-cliente-nuevo-error', error: String(e) }));
@@ -254,7 +253,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-historial-obtener' && data.clienteId) {
       obtenerHistorialFlujo(data.clienteId)
         .then((items) => $w(HTML_ID).postMessage({ type: 'wecars-historial-datos', clienteId: data.clienteId, historial: items }))
-        .catch((e) => console.error('[Gerencia] Error cargando historial:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-historial-datos', clienteId: data.clienteId, historial: [], error: String(e) }));
     }
 
     // ── Publicaciones: historial global (Gerencia) ───────────────────
@@ -288,10 +287,7 @@ $w.onReady(function () {
         autor:     'Gerencia',
       })
         .then(() => $w(HTML_ID).postMessage({ type: 'wecars-gerencia-nota-ok' }))
-        .catch((e) => {
-          console.error('[Gerencia] Error guardando nota:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-gerencia-nota-ok' });
-        });
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-gerencia-nota-ok', ok: false, error: String(e) }));
     }
 
     // ── Registrar bono ────────────────────────────────────────────────
@@ -416,7 +412,8 @@ $w.onReady(function () {
             timestamp:    new Date(),
           })
         ))
-        .catch((e) => console.error('[Gerencia] Error registrando acción:', e));
+        .then(() => $w(HTML_ID).postMessage({ type: 'wecars-accion-registrada', clienteId: data.clienteId }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-accion-registrada', ok: false, clienteId: data.clienteId, error: String(e) }));
     }
 
     // ── Solicitar historial de mensajes ────────────────────────────────
@@ -437,7 +434,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-tareas-solicitar') {
       queryColeccion('Tasks', ['Gerencia', 'Administración'], [{sort:'desc', campo:'_createdDate'}, {limit:200}])
         .then(items => $w(HTML_ID).postMessage({ type: 'wecars-tareas-datos', items }))
-        .catch(e => console.error('[Gerencia] Error cargando tareas:', e));
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-tareas-datos', items: [], error: String(e) }));
     }
 
     if (data.type === 'wecars-tarea-crear' && data.datos) {
@@ -448,10 +445,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-tarea-creada', tarea: item });
           _broadcast({ type: 'wecars-tarea-asignada', tarea: item });
         })
-        .catch(e => {
-          console.error('[Gerencia] Error creando tarea:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', error: String(e) });
-        });
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', error: String(e) }));
     }
 
     if (data.type === 'wecars-tarea-actualizar' && data.tareaId) {
@@ -478,10 +472,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-cierres-solicitar') {
       queryColeccion('CierreOperacion', ['Gerencia', 'Administración'], [{sort:'desc', campo:'_createdDate'}, {limit:500}])
         .then(items => $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items }))
-        .catch(e => {
-          console.error('[Gerencia] Error cargando cierres:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items: [] });
-        });
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items: [], error: String(e) }));
     }
 
     if (data.type === 'wecars-cierre-crear' && data.datos) {
@@ -496,10 +487,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-cierre-creado', cierre: resultado });
           _broadcast({ type: 'wecars-cierre-creado', cierre: resultado });
         })
-        .catch(e => {
-          console.error('[Gerencia] Error creando cierre:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-cierre-error', error: String(e) });
-        });
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-cierre-error', error: String(e) }));
     }
 
     if (data.type === 'wecars-cierre-actualizar' && data.datos && data.datos._id) {
@@ -518,10 +506,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-cierre-actualizado', cierre: resultado });
           _broadcast({ type: 'wecars-cierre-actualizado', cierre: resultado });
         })
-        .catch(e => {
-          console.error('[Gerencia] Error actualizando cierre:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-cierre-error', error: String(e) });
-        });
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-cierre-error', error: String(e) }));
     }
 
     // ── Gamificación ──────────────────────────────────────────────────
@@ -565,12 +550,13 @@ $w.onReady(function () {
       // registrarActividad se hace dentro de asignarLead (backend) — solo refrescar UI
       asignarLead(data.leadId, data.vendedorEmail || '', data.vendedorNombre || '')
         .then(() => enviarLeadsGerencia())
-        .catch((e) => console.error('[Gerencia] Error asignando lead:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-leads-datos', items: [], error: String(e) }));
     }
 
     if (data.type === 'wecars-lead-estatus' && data.leadId) {
       actualizarEstatusLead(data.leadId, data.nuevoEstatus)
-        .catch((e) => console.error('[Gerencia] Error actualizando estatus lead:', e));
+        .then(() => $w(HTML_ID).postMessage({ type: 'wecars-lead-estatus-ok', leadId: data.leadId }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-lead-estatus-ok', ok: false, leadId: data.leadId, error: String(e) }));
     }
 
     if (data.type === 'wecars-lead-nota' && data.leadId) {
@@ -584,7 +570,8 @@ $w.onReady(function () {
             vendedorNombre: p.nombre || email,
             descripcion: data.texto || data.nota || '',
           })))
-        .catch((e) => console.error('[Gerencia] Error guardando nota lead:', e));
+        .then(() => $w(HTML_ID).postMessage({ type: 'wecars-lead-nota-ok', leadId: data.leadId }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-lead-nota-ok', ok: false, leadId: data.leadId, error: String(e) }));
     }
 
     if (data.type === 'wecars-lead-convertir' && data.leadId && data.lead) {
@@ -617,10 +604,7 @@ $w.onReady(function () {
           return vincularClienteALead(data.leadId, res.clienteId);
         })
         .then(() => enviarLeadsGerencia())
-        .catch((e) => {
-          console.error('[Gerencia] Error convirtiendo lead:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-lead-convertido', ok: false, error: String(e), leadId: data.leadId });
-        });
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-lead-convertido', ok: false, error: String(e), leadId: data.leadId }));
     }
 
     // ── Centro de Supervisión Comercial (Fase 4) ──────────────────────

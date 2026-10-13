@@ -155,10 +155,7 @@ $w.onReady(function () {
         .then((item) => {
           $w(HTML_ID).postMessage({ type: 'wecars-factura-resultado', ok: true, facturaId: data.facturaId, factura: item });
         })
-        .catch((e) => {
-          console.error('[Finanzas] Error emitiendo factura:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-factura-resultado', ok: false, facturaId: data.facturaId, error: String(e) });
-        });
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-factura-resultado', ok: false, facturaId: data.facturaId, error: String(e) }));
     }
 
     // ── Crear factura manual ──────────────────────────────────────────
@@ -218,10 +215,7 @@ $w.onReady(function () {
             _broadcast({ type: 'wecars-estado-update', clienteId: data.clienteId, nuevoEstado: 'facturado' });
           }
         })
-        .catch((e) => {
-          console.error('[Finanzas] Error creando factura:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-cliente-facturado-resultado', ok: false, clienteId: data.clienteId, error: String(e) });
-        });
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-cliente-facturado-resultado', ok: false, clienteId: data.clienteId, error: String(e) }));
     }
 
     // ── Registrar egreso en CMS ───────────────────────────────────
