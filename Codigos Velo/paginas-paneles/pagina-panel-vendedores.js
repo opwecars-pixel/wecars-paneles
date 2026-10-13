@@ -576,7 +576,7 @@ $w.onReady(function () {
     }
     if (data.type === 'wecars-nueva-cita' && data.datos) {
       const d = data.datos;
-      wixData.insert('Appointments', {
+      wixData.insert('citas', {
         clienteNombre: d.cliente, fecha: d.fecha ? new Date(d.fecha + 'T' + (d.hora || '10:00')) : new Date(),
         tipo: d.tipo || 'Cita', vehiculo: d.vehiculo || '', notas: d.notas || '',
         origenPanel: 'vendedores',

@@ -22,7 +22,7 @@ import { obtenerPerfil } from 'backend/permisos.jsw';
 import { avanzarEstado, obtenerHistorial as obtenerHistorialFlujo } from 'backend/flujo.jsw';
 import { gm_guardar, gm_obtenerMes, gm_listasMeses, gm_cerrarMesAnterior } from 'backend/gamificacion-cms.jsw';
 import { getErpConfig, setErpConfig } from 'backend/siteConfig.jsw';
-import { fetchDatosGerencia } from 'backend/datos.jsw';
+import { fetchDatosGerencia, fetchClientesPaginados } from 'backend/datos.jsw';
 import { fetchLeads, asignarLead, actualizarEstatusLead, vincularClienteALead } from 'backend/leads.jsw';
 import { registrarActividad, fetchResumenEquipo, fetchTimelineVendedor, fetchEvidencia } from 'backend/actividades.jsw';
 import { fetchCreditosPorRol as fetchCreditosGerencia } from 'backend/creditos.jsw';
@@ -57,6 +57,13 @@ $w.onReady(function () {
     // ── Recargar datos completos de gerencia ──────────────────────────
     if (data.type === 'wecars-gerencia-solicitar') {
       enviarDatosGerencia();
+    }
+
+    // ── Clientes paginados (GAP-8) ────────────────────────────────────
+    if (data.type === 'wecars-clientes-pagina') {
+      fetchClientesPaginados(data.skip || 0, data.limit || 100)
+        .then((r) => $w(HTML_ID).postMessage({ type: 'wecars-clientes-pagina-datos', ...r }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-clientes-pagina-datos', items: [], total: 0, error: String(e) }));
     }
 
     // ── Solicitar lista de empleados directamente del CMS ─────────────

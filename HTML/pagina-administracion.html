@@ -3522,6 +3522,19 @@ window.addEventListener('message', function(e) {
       if (vistaActual === 'leads') adRenderLeads();
       break;
 
+    /* ── GAP-8: clientes paginados ──────────────────────────────── */
+    case 'wecars-clientes-pagina-datos':
+      if (Array.isArray(d.items) && d.items.length) {
+        // Merge evitando duplicados por _id
+        const ids = new Set((window._adClientes || []).map(c => c._id));
+        (window._adClientes = window._adClientes || []).push(...d.items.filter(c => !ids.has(c._id)));
+      }
+      // Si hay más páginas, solicitarlas automáticamente
+      if (d.total && (d.skip + d.limit) < d.total) {
+        window.parent.postMessage({ type: 'wecars-clientes-pagina', skip: d.skip + d.limit, limit: d.limit }, '*');
+      }
+      break;
+
     /* ── GAP-2 Fix: BC relay types ──────────────────────────────── */
     case 'wecars-bc-inventario-update':
       window.parent.postMessage({ type: 'wecars-inventario-solicitar' }, '*');

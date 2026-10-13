@@ -18,7 +18,7 @@
 import wixData from 'wix-data';
 import wixUsers from 'wix-users';
 import wixLocation from 'wix-location';
-import { consultarUsuarios, insertarUsuario, actualizarUsuario, actualizarPerfilUsuario, fetchInventarioCars, fetchDatosAdmin } from 'backend/datos.jsw';
+import { consultarUsuarios, insertarUsuario, actualizarUsuario, actualizarPerfilUsuario, fetchInventarioCars, fetchDatosAdmin, fetchClientesPaginados } from 'backend/datos.jsw';
 import { obtenerPerfil } from 'backend/permisos.jsw';
 import { avanzarEstado, obtenerHistorial as obtenerHistorialFlujo } from 'backend/flujo.jsw';
 import { fetchCreditosPorRol, avanzarEstadoCredito } from 'backend/creditos.jsw';
@@ -33,7 +33,16 @@ import { getPermisosERP, setPermisosERP } from 'backend/siteConfig.jsw';
 const HTML_ID   = '#htmlAdministracion';
 const UPLOAD_ID = '#uploadFotoBtn'; // botón nativo de Wix para fotos de vehículos
 
-let _fotoContext = null; // { carroId }
+let _fotoContext    = null; // { carroId }
+let _adminVerificado = false; // true después de que enviarDatosAdmin() confirma el rol
+
+// Guard: devuelve true si la sesión ya fue verificada como Admin/Gerencia
+function _guard() {
+  if (!_adminVerificado) {
+    console.warn('[Admin] Mensaje rechazado — sesión no verificada como Admin/Gerencia');
+  }
+  return _adminVerificado;
+}
 
 $w.onReady(function () {
 
@@ -97,6 +106,14 @@ $w.onReady(function () {
     ;(async () => {
     const data = event.data;
     if (!data || !data.type) return;
+
+    // ── Tipos de solo lectura/navegación — no requieren rol verificado ─
+    const _SAFE_TYPES = new Set([
+      'wecars-resize','wecars-navegar','wecars-logout',
+      'wecars-admin-solicitar','wecars-tareas-solicitar',
+    ]);
+    // Mutaciones y queries sensibles: bloquear si la sesión no fue verificada
+    if (!_SAFE_TYPES.has(data.type) && !_guard()) return;
 
     // ── Resize / navegación / logout ─────────────────────────────────
     if (data.type === 'wecars-resize' && data.height > 0) {
@@ -213,6 +230,13 @@ $w.onReady(function () {
     if (data.type === 'wecars-pub-autorizar' && data.cuentaId && data.emails) {
       actualizarAutorizados(data.cuentaId, data.emails)
         .catch((e) => console.error('[Admin] Error actualizando autorizados:', e));
+    }
+
+    // ── Clientes paginados (GAP-8) ────────────────────────────────────
+    if (data.type === 'wecars-clientes-pagina') {
+      fetchClientesPaginados(data.skip || 0, data.limit || 100)
+        .then((r) => $w(HTML_ID).postMessage({ type: 'wecars-clientes-pagina-datos', ...r }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-clientes-pagina-datos', items: [], total: 0, error: String(e) }));
     }
 
     // El HTML espera wecars-inventario-datos con items[]
@@ -762,6 +786,7 @@ function enviarDatosAdmin() {
         });
         return;
       }
+      _adminVerificado = true; // sesión confirmada — habilita handlers de mutación
       const perfilBase = {
         rolActual:          perfil.rol         || 'Administración',
         emailActual:        email,

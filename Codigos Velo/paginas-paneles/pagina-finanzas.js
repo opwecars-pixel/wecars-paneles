@@ -147,7 +147,8 @@ $w.onReady(function () {
 
     if (data.type === 'wecars-historial-obtener' && data.clienteId) {
       obtenerHistorialFlujo(data.clienteId)
-        .then((items) => $w(HTML_ID).postMessage({ type: 'wecars-historial-datos', clienteId: data.clienteId, historial: items }));
+        .then((items) => $w(HTML_ID).postMessage({ type: 'wecars-historial-datos', clienteId: data.clienteId, historial: items }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-historial-datos', clienteId: data.clienteId, historial: [], error: String(e) }));
     }
 
     if (data.type === 'wecars-accion-registrar' && data.clienteId) {

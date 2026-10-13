@@ -63,7 +63,7 @@ export function fetchDatosVendedor(emailIgnorado) {
       return Promise.all([
         wixData.query('ClientRecords').eq('vendedorAsignado', emailAutenticado).descending('ultimaActividad').limit(200).find(SA).catch(function(){ return { items: [] }; }),
         wixData.query('Opportunities').eq('vendedorEmail', emailAutenticado).descending('fechaCreacion').limit(200).find(SA).catch(function(){ return { items: [] }; }),
-        wixData.query('Activities').descending('fecha').limit(300).find(SA).catch(function(){ return { items: [] }; }),
+        wixData.query('Activities').eq('vendedorEmail', emailAutenticado).descending('fecha').limit(100).find(SA).catch(function(){ return { items: [] }; }),
         wixData.query('Usuarios').limit(100).find(SA).catch(function(){ return { items: [] }; }),
         wixData.query('Creditos').eq('vendedorEmail', emailAutenticado).descending('_createdDate').limit(100).find(SA).catch(function(){ return { items: [] }; }),
       ]).then(function(results) {
@@ -114,6 +114,22 @@ export function fetchDatosAdmin() {
     tareas:      tareasR.items,
     creditos:    creditosR.items,
   }));
+}
+
+// ── Paginación: clientes para Admin/Gerencia ─────────────────────────
+// Permite cargar clientes en páginas de 100 para no truncar en colecciones grandes.
+// skip: número de registros a saltar (0 = primera página)
+// limit: registros por página (máximo 200 en Wix)
+export function fetchClientesPaginados(skip, limit) {
+  const _skip  = Number(skip)  || 0;
+  const _limit = Math.min(Number(limit) || 100, 200);
+  return wixData.query('ClientRecords')
+    .descending('_createdDate')
+    .skip(_skip)
+    .limit(_limit)
+    .find(SA)
+    .then((r) => ({ items: r.items, total: r.totalCount, skip: _skip, limit: _limit }))
+    .catch(() => ({ items: [], total: 0, skip: _skip, limit: _limit }));
 }
 
 // ── Funciones públicas: Cars y Consignas (SA obligatorio para visitantes anónimos) ─
