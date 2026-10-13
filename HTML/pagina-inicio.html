@@ -1017,6 +1017,189 @@
       </div>
     </section>
 
+    <!-- ══ TESTIMONIOS ══════════════════════════════════════════ -->
+    <section class="testimonios" id="testimonios">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow light"><span class="dot"></span> Lo que dicen nuestros clientes</div>
+            <h2 class="section-title">+500 familias en Bajío<br>ya encontraron su auto.</h2>
+          </div>
+          <p class="section-copy">Reseñas reales de clientes que compraron, vendieron o financiaron con weCars Bajío.</p>
+        </div>
+        <div class="tes-grid">
+          <div class="tes-card">
+            <div class="tes-stars">★★★★★</div>
+            <p class="tes-text">"Me ayudaron a conseguir crédito cuando dos bancos me lo habían negado. El proceso fue claro, sin sorpresas, y el auto llegó en perfectas condiciones."</p>
+            <div class="tes-author">
+              <div class="tes-avatar" style="background:#56a900">MR</div>
+              <div>
+                <strong>Mario R.</strong>
+                <span>Toyota Camry 2021 · León, Gto.</span>
+              </div>
+            </div>
+          </div>
+          <div class="tes-card">
+            <div class="tes-stars">★★★★★</div>
+            <p class="tes-text">"Vendí mi Jetta en menos de una semana a buen precio. Me dieron opciones: venta directa o consigna. Al final decidí consignarlo y fue facilísimo."</p>
+            <div class="tes-author">
+              <div class="tes-avatar" style="background:#0284c7">AL</div>
+              <div>
+                <strong>Ana Laura P.</strong>
+                <span>Consigna · Silao, Gto.</span>
+              </div>
+            </div>
+          </div>
+          <div class="tes-card">
+            <div class="tes-stars">★★★★★</div>
+            <p class="tes-text">"Lo que más me gustó fue la transparencia. Me mostraron el historial del auto, me explicaron cada costo y nunca sentí que me estaban presionando a comprar."</p>
+            <div class="tes-author">
+              <div class="tes-avatar" style="background:#7c3aed">JH</div>
+              <div>
+                <strong>Jorge H.</strong>
+                <span>Honda CR-V 2020 · Irapuato, Gto.</span>
+              </div>
+            </div>
+          </div>
+          <div class="tes-card">
+            <div class="tes-stars">★★★★★</div>
+            <p class="tes-text">"Llevé mi auto a verificar antes de comprarlo. Me salvé de un problema que no hubiera detectado solo. Vale totalmente la pena el servicio de verificación."</p>
+            <div class="tes-author">
+              <div class="tes-avatar" style="background:#d97706">CR</div>
+              <div>
+                <strong>Carlos R.</strong>
+                <span>Verificación · León, Gto.</span>
+              </div>
+            </div>
+          </div>
+          <div class="tes-card">
+            <div class="tes-stars">★★★★★</div>
+            <p class="tes-text">"Desde el primer WhatsApp hasta la entrega del auto, todo fue profesional. El asesor me contestó siempre rápido y resolvió todas mis dudas sin presión."</p>
+            <div class="tes-author">
+              <div class="tes-avatar" style="background:#dc2626">SV</div>
+              <div>
+                <strong>Sandra V.</strong>
+                <span>Nissan Sentra 2022 · León, Gto.</span>
+              </div>
+            </div>
+          </div>
+          <div class="tes-card tes-card--cta">
+            <div class="tes-cta-icon">💬</div>
+            <p class="tes-cta-text">¿Ya compraste con nosotros?<br><strong>Cuéntanos tu experiencia.</strong></p>
+            <a class="btn primary" style="margin-top:16px;text-decoration:none;display:inline-block" href="https://wa.me/524771234567?text=Hola%2C%20quiero%20dejar%20una%20reseña" target="_blank" onclick="event.preventDefault();window.parent.postMessage({type:'wecars-wa-resena'},'*')">Escribir reseña en WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ VALUACIÓN RÁPIDA ══════════════════════════════════════ -->
+    <section class="valuacion" id="vende">
+      <div class="shell">
+        <div class="val-wrap">
+          <div class="val-copy">
+            <div class="eyebrow light"><span class="dot"></span> ¿Tienes un auto para vender?</div>
+            <h2 class="section-title" style="color:#fff">¿Cuánto vale<br>tu auto?</h2>
+            <p class="section-copy" style="color:rgba(255,255,255,.72)">Cotiza en 2 minutos. Sin salir de casa, sin compromisos. Si el precio te convence, agendamos la inspección gratis.</p>
+            <ul class="val-list">
+              <li><i class="ti ti-check"></i> Cotización en menos de 24 h</li>
+              <li><i class="ti ti-check"></i> Inspección gratuita en tu domicilio</li>
+              <li><i class="ti ti-check"></i> Pago seguro y rápido</li>
+            </ul>
+          </div>
+          <div class="val-form-wrap">
+            <form class="val-form" id="valForm" onsubmit="wcsValEnviar(event)">
+              <h3 class="val-form-title">Cotiza tu auto ahora</h3>
+              <div class="val-row">
+                <div class="val-field">
+                  <label>Marca</label>
+                  <select id="valMarca" required>
+                    <option value="">Selecciona marca</option>
+                    <option>Toyota</option><option>Nissan</option><option>Honda</option>
+                    <option>Volkswagen</option><option>Chevrolet</option><option>Kia</option>
+                    <option>Mazda</option><option>Ford</option><option>Hyundai</option>
+                    <option>SEAT</option><option>Otra</option>
+                  </select>
+                </div>
+                <div class="val-field">
+                  <label>Año</label>
+                  <select id="valAnio" required>
+                    <option value="">Año</option>
+                    <option>2025</option><option>2024</option><option>2023</option><option>2022</option>
+                    <option>2021</option><option>2020</option><option>2019</option><option>2018</option>
+                    <option>2017</option><option>2016</option><option>2015 o anterior</option>
+                  </select>
+                </div>
+              </div>
+              <div class="val-field">
+                <label>Modelo</label>
+                <input type="text" id="valModelo" placeholder="Ej. Sentra, Camry, CR-V…" required>
+              </div>
+              <div class="val-row">
+                <div class="val-field">
+                  <label>Kilometraje aproximado</label>
+                  <select id="valKm" required>
+                    <option value="">Kilometraje</option>
+                    <option>Menos de 20,000 km</option><option>20,000 – 50,000 km</option>
+                    <option>50,000 – 100,000 km</option><option>Más de 100,000 km</option>
+                  </select>
+                </div>
+                <div class="val-field">
+                  <label>Tu WhatsApp</label>
+                  <input type="tel" id="valWA" placeholder="+52 477 000 0000" required>
+                </div>
+              </div>
+              <button type="submit" class="btn primary" style="width:100%;justify-content:center;margin-top:4px" id="valBtn">
+                <i class="ti ti-send"></i> Quiero mi cotización gratis
+              </button>
+              <p style="font-size:.72rem;color:var(--muted);margin-top:8px;text-align:center">Sin spam. Te contactamos solo para darte tu cotización.</p>
+              <div id="valExito" style="display:none;text-align:center;padding:20px 0">
+                <div style="font-size:2rem;margin-bottom:8px">✅</div>
+                <strong style="font-size:1rem;color:var(--ink)">¡Listo! Te contactamos pronto.</strong>
+                <p style="font-size:.84rem;color:var(--muted);margin-top:4px">Un asesor revisará tu información y te enviará una cotización por WhatsApp.</p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+<style>
+/* ══ TESTIMONIOS ═══════════════════════════════════════════ */
+.testimonios { background: var(--ink); }
+.testimonios .eyebrow { color: var(--lime); }
+.testimonios .section-title,.testimonios .section-copy { color: #fff; }
+.testimonios .section-copy { color: rgba(255,255,255,.65); }
+.tes-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 48px; }
+.tes-card { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: var(--r-lg); padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+.tes-stars { color: #f59e0b; font-size: 1rem; letter-spacing: 2px; }
+.tes-text { font-size: .88rem; color: rgba(255,255,255,.78); line-height: 1.65; flex: 1; font-style: italic; margin: 0; }
+.tes-author { display: flex; align-items: center; gap: 12px; }
+.tes-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .78rem; color: #fff; flex-shrink: 0; }
+.tes-author strong { display: block; font-size: .85rem; color: #fff; }
+.tes-author span { font-size: .72rem; color: rgba(255,255,255,.45); }
+.tes-card--cta { background: rgba(86,169,0,.1); border-color: rgba(86,169,0,.3); align-items: center; text-align: center; justify-content: center; }
+.tes-cta-icon { font-size: 2rem; }
+.tes-cta-text { font-size: .9rem; color: rgba(255,255,255,.78); line-height: 1.5; margin: 0; }
+@media(max-width:900px) { .tes-grid { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:600px) { .tes-grid { grid-template-columns: 1fr; } .tes-card--cta { display: none; } }
+
+/* ══ VALUACIÓN ══════════════════════════════════════════════ */
+.valuacion { background: linear-gradient(135deg, #0d1f0d 0%, #1a3a1a 100%); }
+.val-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+.val-list { list-style: none; padding: 0; margin: 20px 0 0; display: flex; flex-direction: column; gap: 10px; }
+.val-list li { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.75); font-size: .88rem; }
+.val-list li i { color: var(--lime); font-size: 1rem; flex-shrink: 0; }
+.val-form-wrap { background: var(--paper); border-radius: var(--r-lg); padding: 32px; box-shadow: 0 24px 64px rgba(0,0,0,.35); }
+.val-form-title { font-size: 1.1rem; font-weight: 800; color: var(--ink); margin: 0 0 20px; }
+.val-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.val-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.val-field label { font-size: .75rem; font-weight: 700; color: var(--ink); text-transform: uppercase; letter-spacing: .05em; }
+.val-field input,.val-field select { border: 1.5px solid var(--line); border-radius: var(--r-sm); padding: 9px 12px; font-size: .88rem; font-family: inherit; color: var(--ink); background: var(--paper); outline: none; transition: border-color .15s; appearance: none; -webkit-appearance: none; }
+.val-field input:focus,.val-field select:focus { border-color: var(--lime); }
+@media(max-width:900px) { .val-wrap { grid-template-columns: 1fr; gap: 40px; } }
+@media(max-width:600px) { .val-row { grid-template-columns: 1fr; } .val-form-wrap { padding: 22px; } }
+</style>
+
 <style>
 .vta-promo-wrap{padding:0 0 48px}
 .vta-promo{background:var(--ink-2,#1a2e1a);border-radius:18px;display:flex;align-items:center;justify-content:space-between;gap:32px;padding:36px 40px;flex-wrap:wrap}
@@ -1919,5 +2102,29 @@
   .vehicle-cta button{padding:10px 16px!important;min-height:44px!important}
 }
 </style>
+
+<script>
+function wcsValEnviar(e){
+  e.preventDefault();
+  var btn=document.getElementById('valBtn');
+  var marca=document.getElementById('valMarca').value;
+  var modelo=document.getElementById('valModelo').value;
+  var anio=document.getElementById('valAnio').value;
+  var km=document.getElementById('valKm').value;
+  var wa=document.getElementById('valWA').value;
+  if(!marca||!modelo||!anio||!km||!wa)return;
+  btn.disabled=true;
+  btn.textContent='Enviando…';
+  window.parent.postMessage({
+    type:'wecars-lead-valuacion',
+    marca:marca, modelo:modelo, anio:anio, km:km, whatsapp:wa
+  },'*');
+  setTimeout(function(){
+    document.getElementById('valForm').querySelector('.val-form-title').style.display='none';
+    document.getElementById('valForm').querySelectorAll('.val-row,.val-field,button,p').forEach(function(el){el.style.display='none';});
+    document.getElementById('valExito').style.display='block';
+  },600);
+}
+</script>
 </body>
 </html>

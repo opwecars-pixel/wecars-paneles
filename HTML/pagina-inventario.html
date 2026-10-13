@@ -410,6 +410,17 @@
     .wa-float svg{width:26px;height:26px;fill:#fff}
 
     /* ── QUICK FILTER BAR (desktop + mobile) ── */
+    /* ── BUSCADOR MOBILE ── */
+    .mob-search-wrap{display:none;background:var(--white);border-bottom:1px solid var(--line);padding:10px 16px;position:sticky;top:var(--nav-h);z-index:40}
+    @media(max-width:680px){.mob-search-wrap{display:block}}
+    .mob-search-inner{display:flex;align-items:center;gap:8px;background:var(--paper,#F5F7F5);border:1.5px solid var(--line);border-radius:99px;padding:0 14px;transition:border-color .15s}
+    .mob-search-inner:focus-within{border-color:var(--lime,#56a900)}
+    .mob-search-icon{font-size:1rem;line-height:1;flex-shrink:0;opacity:.55}
+    .mob-search-input{flex:1;border:none;background:transparent;font-size:.9rem;font-family:inherit;color:var(--ink);padding:10px 0;outline:none;min-width:0}
+    .mob-search-input::placeholder{color:var(--muted)}
+    .mob-search-clear{border:none;background:none;cursor:pointer;color:var(--muted);font-size:.85rem;padding:0 2px;line-height:1;flex-shrink:0}
+    @media(prefers-color-scheme:dark){.mob-search-wrap{background:var(--white)}.mob-search-inner{background:rgba(255,255,255,.05)}}
+
     .mob-filter-bar{display:flex;overflow-x:auto;gap:6px;padding:10px 24px 10px;background:var(--white);border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:var(--nav-h);z-index:39;align-items:center}
     .mob-filter-bar::-webkit-scrollbar{display:none}
     .mob-filter-bar .chip{white-space:nowrap;flex-shrink:0;padding:8px 14px;font-size:.80rem;font-weight:600}
@@ -679,6 +690,19 @@
       </div>
     </div>
   </section>
+
+  <!-- Buscador prominente — solo visible en móvil ≤680px -->
+  <div class="mob-search-wrap" id="mobSearchWrap">
+    <div class="mob-search-inner">
+      <span class="mob-search-icon">🔍</span>
+      <input type="search" class="mob-search-input" id="mobSearchInput"
+             placeholder="¿Qué auto buscas? Marca, modelo…"
+             autocomplete="off" inputmode="search"
+             oninput="wcsMobSearch(this.value)"
+             onsearch="wcsMobSearch(this.value)">
+      <button class="mob-search-clear" id="mobSearchClear" onclick="wcsMobSearchClear()" aria-label="Limpiar" hidden>✕</button>
+    </div>
+  </div>
 
   <!-- Barra de filtros rápidos — solo visible en móvil -->
   <div class="mob-filter-bar" id="mobFilterBar">
@@ -1960,7 +1984,37 @@
   }
   /* Imágenes de historial lazy */
   .hist-card img{loading:lazy}
+  /* Buscador mobile: ajuste cuando está sticky y la barra de filtros también lo está */
+  .mob-filter-bar{top:calc(var(--nav-h) + 53px)}
 }
 </style>
+
+<script>
+(function(){
+  var _searchTimer;
+  window.wcsMobSearch = function(val){
+    val = (val||'').trim().toLowerCase();
+    var clearBtn = document.getElementById('mobSearchClear');
+    if(clearBtn) clearBtn.hidden = !val;
+    clearTimeout(_searchTimer);
+    _searchTimer = setTimeout(function(){
+      window.parent.postMessage({type:'wecars-inv-search', q: val}, '*');
+      // Fallback: filter visible cards locally if postMessage doesn't produce results
+      var cards = document.querySelectorAll('.car-card,[data-car-id]');
+      if(cards.length){
+        cards.forEach(function(c){
+          var txt = (c.textContent||'').toLowerCase();
+          c.style.display = (!val || txt.indexOf(val)>-1) ? '' : 'none';
+        });
+      }
+    }, 280);
+  };
+  window.wcsMobSearchClear = function(){
+    var inp = document.getElementById('mobSearchInput');
+    if(inp){ inp.value=''; inp.focus(); }
+    window.wcsMobSearch('');
+  };
+})();
+</script>
 </body>
 </html>
