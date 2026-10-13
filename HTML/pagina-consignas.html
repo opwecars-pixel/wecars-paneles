@@ -243,12 +243,12 @@
     }
 
     /* ══ BARRA CONFIANZA ════════════════════════════════ */
-    #confianza-bar { background: var(--negro); border-top: 1px solid #2a2a2a; padding: 0; }
+    #confianza-bar { background: var(--paper,#F5F7F5); border-top: 1px solid var(--line,#d8e2e5); border-bottom: 1px solid var(--line,#d8e2e5); padding: 0; }
     .conf-inner { display: flex; align-items: stretch; }
     .conf-item {
       display: flex; align-items: center; gap: 12px;
       padding: 18px 28px; flex: 1;
-      border-right: 1px solid #2a2a2a; color: #fff;
+      border-right: 1px solid var(--line,#d8e2e5); color: var(--ink,#0f1a0f);
     }
     .conf-item:last-child { border-right: none; }
     .conf-icono {
@@ -608,7 +608,7 @@
       .proceso-paso { flex-direction: row; text-align: left; gap: 14px; }
       .proceso-num { margin-bottom: 0; flex-shrink: 0; }
       .conf-inner { flex-direction: column; }
-      .conf-item { border-right: none; border-bottom: 1px solid #2a2a2a; }
+      .conf-item { border-right: none; border-bottom: 1px solid var(--line,#d8e2e5); }
       section { padding: 36px 0; }
       .container { padding: 0 16px; }
       .sec-titulo { font-size: 22px; }
@@ -677,11 +677,6 @@
 <!-- ══ NAV COMPARTIDA ══════════════════════════════════════ -->
 <style>
   .shell{width:min(1320px,calc(100% - 42px));margin:0 auto}
-  .wc-announcement{color:#cbd8de;background:#091015;border-bottom:1px solid rgba(255,255,255,.07);font-size:.78rem}
-  .wc-announcement .shell{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0}
-  .wc-announcement strong{color:#fff}
-  .wc-announcement a{color:#c5fb91;font-weight:800}
-  .wc-announcement .bar{width:1px;height:12px;background:rgba(255,255,255,.24)}
   .wc-header{position:sticky;top:0;z-index:50;background:rgba(11,16,20,.94);backdrop-filter:blur(15px);border-bottom:1px solid rgba(255,255,255,.08)}
   .wc-nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
   .wc-brand img{width:148px;height:auto;display:block}
@@ -733,16 +728,8 @@
   .wc-foot img{width:136px}
   .wc-foot a{color:#d5e4e8;text-decoration:none}
   .wc-foot a:hover{color:#c5fb91}
-  @media(max-width:1000px){.wc-announcement{display:none}.wc-links{display:none}.wc-btn.ghost{display:none}.wc-foot{flex-direction:column;align-items:flex-start}.wc-foot-grid{grid-template-columns:1fr}.wc-foot-bottom{flex-direction:column;align-items:flex-start;gap:8px}.wc-menu-btn{display:flex!important}.menu-toggle{display:block!important}.wc-header{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(11,16,20,.97);transform:translateZ(0)}.mob-overlay{backdrop-filter:none;-webkit-backdrop-filter:none}}
+  @media(max-width:1000px){.wc-links{display:none}.wc-btn.ghost{display:none}.wc-foot{flex-direction:column;align-items:flex-start}.wc-foot-grid{grid-template-columns:1fr}.wc-foot-bottom{flex-direction:column;align-items:flex-start;gap:8px}.wc-menu-btn{display:flex!important}.menu-toggle{display:block!important}.wc-header{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(11,16,20,.97);transform:translateZ(0)}.mob-overlay{backdrop-filter:none;-webkit-backdrop-filter:none}}
 </style>
-<div class="wc-announcement">
-  <div class="shell">
-    <strong>Atención personalizada en León, Gto.</strong>
-    <span class="bar"></span>
-    <span>Compra, vende o financia tu próximo auto con weCars Bajío.</span>
-    <a href="https://www.wecarsbajio.com/" target="_top">Ir al inicio →</a>
-  </div>
-</div>
 <header class="wc-header">
   <div class="shell wc-nav">
     <a class="wc-brand" href="https://www.wecarsbajio.com/" target="_top">
@@ -1310,6 +1297,56 @@
 </section>
 
 <!-- ══ FAQ ═══════════════════════════════════════════ -->
+<!-- ══ TESTIMONIOS CONSIGNA ════════════════════════════ -->
+<section id="testimonios-consigna" style="background:var(--paper,#F5F7F5);padding:72px 0">
+  <div class="container">
+    <span class="etiqueta">Lo que dicen quienes vendieron con nosotros</span>
+    <h2 class="sec-titulo" style="margin-bottom:40px">Vendedores reales,<br>resultados reales.</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+
+      <div style="background:#fff;border:1px solid var(--line,#d8e2e5);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px">
+        <div style="color:#f59e0b;font-size:1rem;letter-spacing:2px">★★★★★</div>
+        <p style="font-size:.88rem;color:#374151;line-height:1.65;font-style:italic;margin:0">"Intenté vender mi Jetta solo durante 2 meses y nada. Lo entregué a weCars y en 18 días ya tenía el dinero en mi cuenta. Sin regateos, sin citas raras, sin estrés."</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:auto">
+          <div style="width:40px;height:40px;border-radius:50%;background:#0284c7;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.78rem;color:#fff;flex-shrink:0">RM</div>
+          <div>
+            <strong style="display:block;font-size:.85rem;color:#0f1a0f">Roberto M.</strong>
+            <span style="font-size:.72rem;color:#6d7a83">Volkswagen Jetta 2019 · León, Gto.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid var(--line,#d8e2e5);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px">
+        <div style="color:#f59e0b;font-size:1rem;letter-spacing:2px">★★★★★</div>
+        <p style="font-size:.88rem;color:#374151;line-height:1.65;font-style:italic;margin:0">"Lo que más me gustó es que ellos fijaron el precio con base en el mercado real, no me dejaron ponerlo demasiado bajo. Vendieron mi Tucson $30,000 más caro de lo que yo pensaba pedir."</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:auto">
+          <div style="width:40px;height:40px;border-radius:50%;background:#56a900;display:flex;align-items:center;justify-content:font-weight:800;font-size:.78rem;color:#fff;flex-shrink:0;align-items:center;justify-content:center">LP</div>
+          <div>
+            <strong style="display:block;font-size:.85rem;color:#0f1a0f">Laura P.</strong>
+            <span style="font-size:.72rem;color:#6d7a83">Hyundai Tucson 2021 · Silao, Gto.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid var(--line,#d8e2e5);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px">
+        <div style="color:#f59e0b;font-size:1rem;letter-spacing:2px">★★★★★</div>
+        <p style="font-size:.88rem;color:#374151;line-height:1.65;font-style:italic;margin:0">"Mi auto todavía tenía crédito y pensé que eso iba a complicarlo todo. weCars lo manejó completamente, liquidaron el adeudo y me entregaron el resto. Muy profesionales."</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:auto">
+          <div style="width:40px;height:40px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.78rem;color:#fff;flex-shrink:0">FG</div>
+          <div>
+            <strong style="display:block;font-size:.85rem;color:#0f1a0f">Fernando G.</strong>
+            <span style="font-size:.72rem;color:#6d7a83">Nissan X-Trail 2020 · Irapuato, Gto.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<style>
+@media(max-width:768px){#testimonios-consigna .container>div[style*="grid"]{grid-template-columns:1fr!important}}
+</style>
+
 <section id="faq">
   <div class="container">
     <span class="etiqueta">Preguntas frecuentes</span>
