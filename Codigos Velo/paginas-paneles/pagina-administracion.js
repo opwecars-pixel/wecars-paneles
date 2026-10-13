@@ -154,13 +154,13 @@ $w.onReady(function () {
           const pagoConfirmado  = r.items.filter((c) => c.estatusExpediente === 'pago_confirmado');
           $w(HTML_ID).postMessage({ type: 'wecars-expedientes-datos', enRevision, pagoConfirmado });
         })
-        .catch((e) => console.error('[Admin] Error cargando expedientes:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-expedientes-datos', enRevision: [], pagoConfirmado: [], error: String(e) }));
     }
 
     if (data.type === 'wecars-historial-obtener' && data.clienteId) {
       obtenerHistorialFlujo(data.clienteId)
         .then((items) => $w(HTML_ID).postMessage({ type: 'wecars-historial-datos', clienteId: data.clienteId, historial: items }))
-        .catch((e) => console.error('[Admin] Error cargando historial:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-historial-datos', clienteId: data.clienteId, historial: [], error: String(e) }));
     }
 
     if (data.type === 'wecars-estado-avanzar' && data.clienteId && data.nuevoEstado) {
@@ -195,7 +195,7 @@ $w.onReady(function () {
               fechaIngresoActual: perfil.fechaIngreso  || null,
             }))
         )
-        .catch((e) => console.error('[Admin] Error cargando empleados:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-empleados', items: [], rolActual: '', emailActual: '', nombreActual: '', puestoActual: '', fechaIngresoActual: null, error: String(e) }));
     }
 
     if (data.type === 'wecars-empleado-crear' && data.datos) {
@@ -240,11 +240,12 @@ $w.onReady(function () {
       desconectarCuenta(data.cuentaId)
         .then(() => obtenerTodasLasCuentas())
         .then((cuentas) => $w(HTML_ID).postMessage({ type: 'wecars-pub-cuentas-datos', cuentas }))
-        .catch((e) => console.error('[Admin] Error desconectando cuenta:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-pub-cuentas-datos', cuentas: [], error: String(e) }));
     }
     if (data.type === 'wecars-pub-autorizar' && data.cuentaId && data.emails) {
       actualizarAutorizados(data.cuentaId, data.emails)
-        .catch((e) => console.error('[Admin] Error actualizando autorizados:', e));
+        .then(() => $w(HTML_ID).postMessage({ type: 'wecars-pub-autorizados-ok', cuentaId: data.cuentaId }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-pub-autorizados-ok', ok: false, error: String(e) }));
     }
 
     // ── Clientes paginados (GAP-8) ────────────────────────────────────
@@ -258,7 +259,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-inventario-solicitar') {
       fetchInventarioCars()
         .then((items) => $w(HTML_ID).postMessage({ type: 'wecars-inventario-datos', items }))
-        .catch((e) => console.error('[Admin] Error cargando inventario:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-inventario-datos', items: [], error: String(e) }));
     }
 
     if (data.type === 'wecars-carro-crear' && data.datos) {
@@ -285,7 +286,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-apartados-solicitar') {
       queryColeccion('Apartados', ['Administración', 'Gerencia'], [{campo:'estatusApartado', op:'eq', valor:'activo'}, {sort:'desc', campo:'fechaApartado'}, {limit:200}])
         .then(items => $w(HTML_ID).postMessage({ type: 'wecars-apartados-datos', items }))
-        .catch(e => console.error('[Admin] Error cargando apartados:', e));
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-apartados-datos', items: [], error: String(e) }));
     }
 
     // ── Cargar todos los clientes (para vista Apartados) ─────────────
@@ -295,10 +296,7 @@ $w.onReady(function () {
           items = (items || []).sort((a, b) => (a.nombre || '').localeCompare(b.nombre || '', 'es'));
           $w(HTML_ID).postMessage({ type: 'wecars-clientes-todos-datos', items });
         })
-        .catch(e => {
-          console.error('[Admin] Error cargando clientes:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-clientes-todos-datos', items: [], error: String(e) });
-        });
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-clientes-todos-datos', items: [], error: String(e) }));
     }
 
     // ── Buscar clientes por nombre, teléfono o correo ─────────────────
@@ -313,7 +311,7 @@ $w.onReady(function () {
         const seen = new Set();
         const items = [...i1, ...i2, ...i3].filter(c => { if (seen.has(c._id)) return false; seen.add(c._id); return true; });
         $w(HTML_ID).postMessage({ type: 'wecars-clientes-resultado', items });
-      }).catch(e => console.error('[Admin] Error buscando clientes:', e));
+      }).catch(e => $w(HTML_ID).postMessage({ type: 'wecars-clientes-resultado', items: [], error: String(e) }));
     }
 
     // ── Crear apartado de vehículo ────────────────────────────────────
@@ -382,7 +380,7 @@ $w.onReady(function () {
       wixData.query('Consignas').descending('_createdDate').limit(100).find()
         .catch(() => ({ items: [] }))
         .then((r) => $w(HTML_ID).postMessage({ type: 'wecars-consignas-datos', items: r.items }))
-        .catch((e) => console.error('[Admin] Error cargando consignas:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-consignas-datos', items: [], error: String(e) }));
     }
 
     if (data.type === 'wecars-consigna-asignar' && data.consignaId) {
@@ -449,7 +447,6 @@ $w.onReady(function () {
         })
         .then(() => $w(HTML_ID).postMessage({ type: 'wecars-consigna-cerrada', consignaId: data.consignaId }))
         .catch((e) => {
-          console.error('[Admin] Error cerrando consigna:', e);
           $w(HTML_ID).postMessage({ type: 'wecars-consigna-error', error: String(e) });
         });
     }
@@ -467,7 +464,7 @@ $w.onReady(function () {
       wixData.query('Tasks').descending('_createdDate').limit(200).find()
         .catch(() => ({ items: [] }))
         .then((r) => $w(HTML_ID).postMessage({ type: 'wecars-tareas-datos', items: r.items }))
-        .catch((e) => console.error('[Admin] Error cargando tareas:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-tareas-datos', items: [], error: String(e) }));
     }
 
     if (data.type === 'wecars-tarea-crear' && data.datos) {
@@ -557,13 +554,10 @@ $w.onReady(function () {
             try {
               const tareaItem = await insertarEnColeccion('Tasks', ['Administración', 'Gerencia'], tarea);
               _broadcast({ type: 'wecars-tarea-asignada', tarea: tareaItem });
-            } catch(e) { console.error('[Admin] Error creando tarea de seguimiento:', e); }
+            } catch(e) { $w(HTML_ID).postMessage({ type: 'wecars-tarea-error', error: String(e) }); }
           }
         })
-        .catch(e => {
-          console.error('[Admin] Error creando lead:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-cliente-nuevo-error', error: String(e) });
-        });
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-cliente-nuevo-error', error: String(e) }));
     }
 
     // ── Verifica tu Auto ─────────────────────────────────────────────
@@ -624,10 +618,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-cierres-solicitar') {
       queryColeccion('CierreOperacion', ['Administración', 'Gerencia'], [{sort:'desc', campo:'_createdDate'}, {limit:500}])
         .then(items => $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items }))
-        .catch(e => {
-          console.error('[Admin] Error cargando cierres:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items: [] });
-        });
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-cierres-datos', items: [], error: String(e) }));
     }
 
     if (data.type === 'wecars-cierre-crear' && data.datos) {
@@ -644,10 +635,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-cierre-creado', cierre: resultado });
           _broadcast({ type: 'wecars-cierre-creado', cierre: resultado });
         })
-        .catch(e => {
-          console.error('[Admin] Error creando cierre:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-cierre-error', error: String(e) });
-        });
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-cierre-error', error: String(e) }));
     }
 
     if (data.type === 'wecars-cierre-actualizar' && data.datos && data.datos._id) {
@@ -666,10 +654,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-cierre-actualizado', cierre: resultado });
           _broadcast({ type: 'wecars-cierre-actualizado', cierre: resultado });
         })
-        .catch(e => {
-          console.error('[Admin] Error actualizando cierre:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-cierre-error', error: String(e) });
-        });
+        .catch(e => $w(HTML_ID).postMessage({ type: 'wecars-cierre-error', error: String(e) }));
     }
 
     // ── Alta rápida de lead desde Admin ─────────────────────────────
@@ -689,10 +674,7 @@ $w.onReady(function () {
           $w(HTML_ID).postMessage({ type: 'wecars-lead-creado', ok: true, leadId: lead._id });
           enviarLeadsAdmin();
         })
-        .catch((e) => {
-          console.error('[Admin] Error creando lead:', e);
-          $w(HTML_ID).postMessage({ type: 'wecars-lead-creado', ok: false, error: String(e) });
-        });
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-lead-creado', ok: false, error: String(e) }));
     }
 
     // ── Leads ────────────────────────────────────────────────────────

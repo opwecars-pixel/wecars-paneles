@@ -403,7 +403,7 @@ $w.onReady(function () {
     if (data.type === 'wecars-historial-obtener' && data.clienteId) {
       obtenerHistorialFlujo(data.clienteId)
         .then((items) => $w(HTML_ID).postMessage({ type: 'wecars-historial-datos', clienteId: data.clienteId, historial: items }))
-        .catch((e) => console.error('[Panel] Error cargando historial flujo:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-historial-datos', clienteId: data.clienteId, historial: [], error: String(e) }));
     }
 
     // ── Actividad Comercial ───────────────────────────────────────────
@@ -424,7 +424,7 @@ $w.onReady(function () {
           })))
         )
         .then(() => $w(HTML_ID).postMessage({ type: 'wecars-actividad-manual-ok' }))
-        .catch((e) => console.error('[Panel] Error guardando actividad manual:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-actividad-manual-ok', error: String(e) }));
     }
 
     // ── Refrescar clientes (pedido por el HTML tras actualizaciones BC) ─
@@ -455,12 +455,13 @@ $w.onReady(function () {
             if (r.cliente) { enviarClientes(); }
           }
         })
-        .catch((e) => console.error('[Vendedor] Error reclamando lead:', e));
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-lead-reclamar-resultado', ok: false, leadId: data.leadId, error: String(e) }));
     }
 
     if (data.type === 'wecars-lead-estatus' && data.leadId) {
       actualizarEstatusLead(data.leadId, data.nuevoEstatus)
-        .catch((e) => console.error('[Vendedor] Error actualizando estatus lead:', e));
+        .then(() => $w(HTML_ID).postMessage({ type: 'wecars-lead-estatus-ok', leadId: data.leadId, nuevoEstatus: data.nuevoEstatus }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-lead-estatus-ok', ok: false, leadId: data.leadId, error: String(e) }));
     }
 
     if (data.type === 'wecars-lead-nota' && data.leadId) {
@@ -474,7 +475,8 @@ $w.onReady(function () {
             vendedorNombre: p.nombre || email,
             descripcion: data.nota || '',
           })))
-        .catch((e) => console.error('[Vendedor] Error guardando nota lead:', e));
+        .then(() => $w(HTML_ID).postMessage({ type: 'wecars-lead-nota-ok', leadId: data.leadId }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-lead-nota-ok', ok: false, leadId: data.leadId, error: String(e) }));
     }
 
     // ── Convertir lead a cliente ──────────────────────────────────────
