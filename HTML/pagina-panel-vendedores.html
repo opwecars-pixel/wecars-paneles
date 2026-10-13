@@ -7727,6 +7727,19 @@ section.pv-table-wrap > .shell > #pv-compradores {
 </div>
 
 <script>
+  // ── Dispatcher central de mensajes ───────────────────────────────────
+  // Todos los módulos en IIFEs separados usan window._wcMsgHandlers.push(fn)
+  // en lugar de window.addEventListener('message', fn) propio.
+  // Un único listener despacha a todos los handlers registrados.
+  window._wcMsgHandlers = [];
+  window.addEventListener('message', function(ev) {
+    var _h = window._wcMsgHandlers;
+    for (var _i = 0; _i < _h.length; _i++) {
+      try { _h[_i](ev); } catch(e) { console.error('[WC dispatcher]', e); }
+    }
+  });
+</script>
+<script>
   // Fallback: si wecars-clientes no llega en 6s, quitar wc-loading para que el panel sea visible
   (function() {
     var _timeout = setTimeout(function() {
@@ -12245,8 +12258,8 @@ section.pv-table-wrap > .shell > #pv-compradores {
     window.parent.postMessage({ type: 'wecars-panel-ready' }, '*');
   });
 
-  // Recepción de datos desde Velo
-  window.addEventListener('message', event => {
+  // Recepción de datos desde Velo — registrado en dispatcher central
+  window._wcMsgHandlers.push(function(event) {
     let data = event.data;
     if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) { return; } }
     if (!data || !data.type) return;
@@ -12825,7 +12838,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
 
   // Interceptar cuando llegan datos para detectar nuevos clientes
   const _origMsgHandler = window.__panelMsgHandler;
-  window.addEventListener('message', function(event) {
+  window._wcMsgHandlers.push(function(event) {
     let data = event.data;
     if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { return; } }
     if (!data || data.type !== 'wecars-clientes') return;
@@ -13033,7 +13046,7 @@ section.pv-table-wrap > .shell > #pv-compradores {
   };
 
   // Recibir datos desde Velo
-  window.addEventListener('message', function(ev) {
+  window._wcMsgHandlers.push(function(ev) {
     let d = ev.data;
     if (typeof d === 'string') { try { d = JSON.parse(d); } catch(e) { return; } }
     if (!d) return;
@@ -13337,7 +13350,7 @@ function _renderAcciones(body){
   });
 }
 
-window.addEventListener("message",function(e){
+window._wcMsgHandlers.push(function(e){
   const d=e.data;if(!d||!d.type)return;
   if(d.type==="wecars-historial-datos"&&_expCliente&&d.clienteId===_expCliente._id){
     _expHistorial=d.historial||[];
@@ -13696,7 +13709,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")window.cerrarExpedie
   };
 
   // Escuchar respuesta del Velo con actividades
-  window.addEventListener('message', function(ev) {
+  window._wcMsgHandlers.push(function(ev) {
     var d = ev.data;
     if (!d || !d.type) return;
     if (d.type === 'wecars-actividades-datos') {
@@ -20703,7 +20716,7 @@ body.pv-mobile-home-active #pv-filtros-wrap { display: none !important; }
     // Render inicial
     renderMobileHome();
     // Actualizar cada vez que llegan datos
-    window.addEventListener('message', function(e) {
+    window._wcMsgHandlers.push(function(e) {
       if (!_isMobile()) return;
       var t = (e.data||{}).type||'';
       if (t === 'wecars-clientes-datos' || t === 'wecars-leads-datos' || t === 'wecars-actividades-datos') {
