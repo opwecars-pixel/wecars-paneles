@@ -160,6 +160,13 @@ $w.onReady(function () {
         });
     }
 
+    // ── Crear factura manual ──────────────────────────────────────────
+    if (data.type === 'wecars-factura-crear' && data.datos) {
+      crearFacturaDesdeCliente(data.datos)
+        .then((factura) => $w(HTML_ID).postMessage({ type: 'wecars-factura-creada', ok: true, factura }))
+        .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-factura-creada', ok: false, error: String(e) }));
+    }
+
     // ── Motor de estados del expediente ──────────────────────────────
     if (data.type === 'wecars-estado-avanzar' && data.clienteId && data.nuevoEstado) {
       wixUsers.currentUser.getEmail()

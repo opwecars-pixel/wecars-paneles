@@ -3107,7 +3107,110 @@ document.getElementById('ft-tbody').addEventListener('click',e=>{
     }
   }
 });
-document.getElementById('ft-nueva-btn')?.addEventListener('click',()=>toast('Módulo de generación disponible próximamente.'));
+/* ── Nueva Factura ──────────────────────────────────── */
+(function(){
+  const overlay = document.getElementById('ov-nueva-factura');
+  const btnAbrir = document.getElementById('ft-nueva-btn');
+  const selCliente = document.getElementById('nf-cliente');
+  const inpSub = document.getElementById('nf-subtotal');
+  const selIva = document.getElementById('nf-iva');
+  const statusEl = document.getElementById('nf-status');
+  const totalPreview = document.getElementById('nf-total-preview');
+  const totalVal = document.getElementById('nf-total-val');
+
+  // Abrir modal
+  btnAbrir.style.opacity = '';
+  btnAbrir.style.cursor = '';
+  btnAbrir.removeAttribute('title');
+  btnAbrir.addEventListener('click', () => {
+    // Poblar clientes
+    selCliente.innerHTML = '<option value="">— Selecciona cliente —</option>' +
+      clientes.map(c => `<option value="${c._id}">${c.nombre || '—'}${c.vehiculo ? ' · ' + c.vehiculo : ''}</option>`).join('');
+    document.getElementById('nf-vehiculo').value = '';
+    document.getElementById('nf-razon').value = '';
+    document.getElementById('nf-rfc').value = '';
+    inpSub.value = '';
+    statusEl.textContent = '';
+    totalPreview.style.display = 'none';
+    overlay.style.display = 'flex';
+  });
+
+  // Auto-completar vehículo al elegir cliente
+  selCliente.addEventListener('change', () => {
+    const c = clientes.find(x => x._id === selCliente.value);
+    if (c && c.vehiculo) document.getElementById('nf-vehiculo').value = c.vehiculo;
+    recalcTotal();
+  });
+
+  // Preview de total en tiempo real
+  function recalcTotal() {
+    const sub = Number(inpSub.value) || 0;
+    const iva = Number(selIva.value) / 100;
+    const total = sub + sub * iva;
+    if (sub > 0) {
+      totalVal.textContent = '$' + total.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      totalPreview.style.display = '';
+    } else {
+      totalPreview.style.display = 'none';
+    }
+  }
+  inpSub.addEventListener('input', recalcTotal);
+  selIva.addEventListener('change', recalcTotal);
+
+  // RFC a mayúsculas
+  document.getElementById('nf-rfc').addEventListener('input', function(){ this.value = this.value.toUpperCase(); });
+
+  // Guardar
+  document.getElementById('nf-guardar').addEventListener('click', () => {
+    const clienteId = selCliente.value;
+    const vehiculo  = document.getElementById('nf-vehiculo').value.trim();
+    const subtotal  = Number(inpSub.value);
+    const ivaPct    = Number(selIva.value);
+    const razon     = document.getElementById('nf-razon').value.trim();
+    const rfc       = document.getElementById('nf-rfc').value.trim();
+    statusEl.style.color = '#d64545';
+    if (!clienteId) { statusEl.textContent = 'Selecciona un cliente.'; return; }
+    if (!vehiculo)  { statusEl.textContent = 'Escribe el vehículo.'; return; }
+    if (!subtotal || subtotal <= 0) { statusEl.textContent = 'Escribe el subtotal.'; return; }
+    const cliente = clientes.find(c => c._id === clienteId);
+    const iva = Math.round(subtotal * ivaPct / 100 * 100) / 100;
+    const total = Math.round((subtotal + iva) * 100) / 100;
+    statusEl.style.color = 'var(--muted)';
+    statusEl.textContent = 'Guardando...';
+    document.getElementById('nf-guardar').disabled = true;
+    window.parent.postMessage({
+      type: 'wecars-factura-crear',
+      datos: {
+        clienteId, clienteNombre: cliente ? cliente.nombre : '',
+        vendedor: cliente ? (cliente.vendedorNombre || cliente.vendedorAsignado || '') : '',
+        vehiculo, subtotal, iva, total,
+        razonSocial: razon || (cliente ? cliente.nombre : ''),
+        rfc: rfc || '',
+        estatus: 'Pendiente',
+      }
+    }, '*');
+  });
+
+  // Respuesta del Velo
+  window.addEventListener('message', function(ev) {
+    if (!ev.data || ev.data.type !== 'wecars-factura-creada') return;
+    document.getElementById('nf-guardar').disabled = false;
+    if (ev.data.ok) {
+      if (ev.data.factura) facturas.unshift(ev.data.factura);
+      if (typeof renderFacturacion === 'function') renderFacturacion();
+      overlay.style.display = 'none';
+      toast('✓ Factura creada como pendiente');
+    } else {
+      statusEl.style.color = '#d64545';
+      statusEl.textContent = 'Error: ' + (ev.data.error || 'Intenta de nuevo');
+    }
+  });
+
+  // Cerrar
+  document.getElementById('nf-close').addEventListener('click', () => { overlay.style.display = 'none'; });
+  document.getElementById('nf-cancel').addEventListener('click', () => { overlay.style.display = 'none'; });
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.style.display = 'none'; });
+})();
 
 /* ── Export ─────────────────────────────────────── */
 document.getElementById('fn-export-btn').addEventListener('click',()=>{
@@ -4246,6 +4349,60 @@ document.getElementById("wc-exp-close").addEventListener("click",window.cerrarEx
           Folio: <span id="carta-folio">—</span> · weCars Bajío · León, Gto.
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nueva Factura -->
+<div class="fn-overlay" id="ov-nueva-factura" style="display:none;align-items:center;justify-content:center">
+  <div class="fn-modal" style="max-width:460px">
+    <div class="fn-modal-head" style="background:var(--c-blue,#2563eb)">
+      <div>
+        <div class="fn-modal-title" style="color:#fff"><i class="ti ti-receipt"></i> Nueva factura</div>
+        <div class="fn-modal-sub" style="color:rgba(255,255,255,.8)">Crear pre-factura manual</div>
+      </div>
+      <button class="fn-modal-close" id="nf-close" type="button"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="fn-modal-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="fn-field">
+        <label>Cliente *</label>
+        <select id="nf-cliente" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:var(--t-base)">
+          <option value="">— Selecciona cliente —</option>
+        </select>
+      </div>
+      <div class="fn-field">
+        <label>Vehículo *</label>
+        <input type="text" id="nf-vehiculo" placeholder="Ej. Toyota Corolla 2022" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:var(--t-base);box-sizing:border-box">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fn-field">
+          <label>Subtotal *</label>
+          <input type="number" id="nf-subtotal" placeholder="0.00" min="0" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:var(--t-base);box-sizing:border-box">
+        </div>
+        <div class="fn-field">
+          <label>IVA %</label>
+          <select id="nf-iva" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:var(--t-base)">
+            <option value="0">Sin IVA (0%)</option>
+            <option value="16" selected>IVA 16%</option>
+          </select>
+        </div>
+      </div>
+      <div class="fn-field">
+        <label>Razón social del cliente</label>
+        <input type="text" id="nf-razon" placeholder="Ej. Juan García López" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:var(--t-base);box-sizing:border-box">
+      </div>
+      <div class="fn-field">
+        <label>RFC</label>
+        <input type="text" id="nf-rfc" placeholder="GACJ800101XXX" maxlength="13" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:var(--t-base);font-family:monospace;text-transform:uppercase;box-sizing:border-box">
+      </div>
+      <div id="nf-total-preview" style="background:var(--lime-bg,rgba(86,169,0,.08));border:1.5px solid var(--lime-dark,#2e7d1e);border-radius:10px;padding:10px 14px;font-size:.85rem;color:var(--ink);display:none">
+        <span style="font-weight:700">Total: </span><span id="nf-total-val"></span>
+      </div>
+      <div id="nf-status" style="font-size:.78rem;color:#d64545;min-height:16px"></div>
+    </div>
+    <div class="fn-modal-foot" style="display:flex;gap:10px;justify-content:flex-end;padding:14px 18px;border-top:1px solid var(--line)">
+      <button id="nf-cancel" type="button" class="fn-btn" style="background:var(--surface-2);color:var(--ink)">Cancelar</button>
+      <button id="nf-guardar" type="button" class="fn-btn fn-btn-blue"><i class="ti ti-device-floppy"></i> Crear factura</button>
     </div>
   </div>
 </div>

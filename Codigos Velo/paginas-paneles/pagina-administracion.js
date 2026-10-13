@@ -72,6 +72,7 @@ $w.onReady(function () {
           fotoPrincipal: carro.fotoPrincipal || result.url,
         }));
         $w(HTML_ID).postMessage({ type: 'wecars-foto-resultado', ok: true, carro: actualizado });
+        _broadcast({ type: 'wecars-inventario-update', carro: actualizado });
         _fotoContext = null;
         $w(UPLOAD_ID).hide();
         $w(UPLOAD_ID).reset();
@@ -368,7 +369,10 @@ $w.onReady(function () {
             }));
           });
         })
-        .then((carro) => $w(HTML_ID).postMessage({ type: 'wecars-foto-resultado', ok: true, carro }))
+        .then((carro) => {
+          $w(HTML_ID).postMessage({ type: 'wecars-foto-resultado', ok: true, carro });
+          _broadcast({ type: 'wecars-inventario-update', carro });
+        })
         .catch((e) => $w(HTML_ID).postMessage({ type: 'wecars-foto-resultado', ok: false, error: String(e) }));
     }
 

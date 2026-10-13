@@ -7686,6 +7686,43 @@ section.pv-table-wrap > .shell > #pv-compradores {
 
 <div class="pv-toast" id="pv-toast" role="status" aria-live="polite" aria-atomic="true">Listo</div>
 
+<!-- ── Modal Compartir Inventario ─────────────────────────────── -->
+<div id="pv-share-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9900;align-items:center;justify-content:center;padding:16px;box-sizing:border-box">
+  <div style="background:var(--paper,#fff);border-radius:16px;width:100%;max-width:380px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <!-- Foto del auto -->
+    <div id="pv-share-foto" style="width:100%;height:180px;object-fit:cover;background:var(--surface-2,#f1f5f9);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
+      <i class="ti ti-car" style="font-size:48px;color:var(--muted)"></i>
+    </div>
+    <!-- Info -->
+    <div style="padding:16px 18px 8px">
+      <div id="pv-share-nombre" style="font-size:1.05rem;font-weight:800;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--ink)">—</div>
+      <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap">
+        <span id="pv-share-precio" style="font-size:1.1rem;font-weight:900;color:var(--lime-dark,#2e7d1e)">—</span>
+        <span id="pv-share-financ" style="font-size:.78rem;background:rgba(30,64,175,.1);color:#1e40af;padding:2px 8px;border-radius:20px;font-weight:700;align-self:center"></span>
+      </div>
+      <div id="pv-share-km" style="font-size:.78rem;color:var(--muted);margin-top:2px"></div>
+    </div>
+    <!-- Botones de compartir -->
+    <div style="padding:10px 18px 6px;display:flex;flex-direction:column;gap:8px">
+      <button id="pv-share-wa" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;border:none;border-radius:10px;background:#25D366;color:#fff;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit">
+        <i class="ti ti-brand-whatsapp" style="font-size:18px"></i> Enviar por WhatsApp
+      </button>
+      <button id="pv-share-fb" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;border:none;border-radius:10px;background:#1877F2;color:#fff;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit">
+        <i class="ti ti-brand-facebook" style="font-size:18px"></i> Compartir en Facebook
+      </button>
+      <button id="pv-share-ig" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;border:1.5px solid var(--line);border-radius:10px;background:transparent;color:var(--ink);font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit">
+        <i class="ti ti-brand-instagram" style="font-size:18px;color:#E1306C"></i> Copiar texto para Instagram
+      </button>
+      <button id="pv-share-link" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;border:1.5px solid var(--line);border-radius:10px;background:transparent;color:var(--ink);font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit">
+        <i class="ti ti-link" style="font-size:18px;color:var(--muted)"></i> Copiar mensaje
+      </button>
+    </div>
+    <div style="padding:10px 18px 16px">
+      <button onclick="document.getElementById('pv-share-overlay').style.display='none'" style="width:100%;padding:9px;border:none;border-radius:10px;background:var(--surface-2,#f1f5f9);color:var(--muted);font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit">Cerrar</button>
+    </div>
+  </div>
+</div>
+
   </div>
 </div>
 
@@ -10317,9 +10354,69 @@ section.pv-table-wrap > .shell > #pv-compradores {
       btn.addEventListener('click', () => {
         const id = btn.dataset.carId;
         const auto = inventarioAutos.find(a => a.id === id);
+        if (auto) abrirShareAuto(auto);
       });
     });
   }
+
+  function abrirShareAuto(auto) {
+    const overlay = document.getElementById('pv-share-overlay');
+    const nombre  = auto.title || auto.brand || 'Vehículo';
+    const anio    = auto.año || auto.anio || auto.year || '';
+    const km      = auto.kilometraje != null ? Number(auto.kilometraje).toLocaleString('es-MX') + ' km' : '';
+    const precio  = auto.precioVenta ? '$' + Math.round(auto.precioVenta).toLocaleString('es-MX') : '';
+    const eng     = auto.enganche ? 'Desde $' + Math.round(auto.enganche).toLocaleString('es-MX') + ' de enganche' : '';
+    const colorAuto = auto.color || '';
+    const fotoRaw = auto.fotoPrincipal || auto.imagenUrl || auto.imagen || (Array.isArray(auto.fotos) && auto.fotos[0]) || '';
+    const fotoUrl = fotoRaw.startsWith('wix:image://') ? 'https://static.wixstatic.com/media/' + fotoRaw.replace('wix:image://v1/', '').split('/')[0] : fotoRaw;
+
+    // Actualizar modal
+    const fotoDiv = document.getElementById('pv-share-foto');
+    fotoDiv.innerHTML = fotoUrl
+      ? `<img src="${fotoUrl}" style="width:100%;height:180px;object-fit:cover;display:block" onerror="this.style.display='none'">`
+      : `<i class="ti ti-car" style="font-size:48px;color:var(--muted)"></i>`;
+    document.getElementById('pv-share-nombre').textContent = [anio, nombre, colorAuto].filter(Boolean).join(' ');
+    document.getElementById('pv-share-precio').textContent = precio || '—';
+    const financEl = document.getElementById('pv-share-financ');
+    financEl.textContent = eng;
+    financEl.style.display = eng ? '' : 'none';
+    document.getElementById('pv-share-km').textContent = km ? km + ' · ' + (auto.combustible || '') : (auto.combustible || '');
+
+    // Texto del mensaje
+    const lineas = [
+      `🚗 *${[anio, nombre].filter(Boolean).join(' ')}*`,
+      precio ? `💰 Precio: *${precio}*` : '',
+      eng    ? `📋 ${eng}` : '',
+      km     ? `🛣 ${km}` : '',
+      colorAuto ? `🎨 Color: ${colorAuto}` : '',
+      '',
+      '¿Te interesa? ¡Escríbenos para más info!',
+    ].filter(l => l !== undefined).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+
+    const msgEncoded = encodeURIComponent(lineas);
+    const pageUrl = encodeURIComponent(window.location.href.split('?')[0]);
+
+    document.getElementById('pv-share-wa').onclick = () => {
+      window.open('https://wa.me/?text=' + msgEncoded, '_blank', 'noopener');
+    };
+    document.getElementById('pv-share-fb').onclick = () => {
+      window.open('https://www.facebook.com/sharer/sharer.php?u=' + pageUrl + '&quote=' + msgEncoded, '_blank', 'noopener');
+    };
+    document.getElementById('pv-share-ig').onclick = () => {
+      const texto = lineas + '\n\n#autos #seminuevos #weCars';
+      navigator.clipboard.writeText(texto).then(() => mostrarToast('✅ Texto copiado — pégalo en Instagram')).catch(() => mostrarToast('Copia el texto manualmente'));
+    };
+    document.getElementById('pv-share-link').onclick = () => {
+      navigator.clipboard.writeText(lineas).then(() => mostrarToast('✅ Mensaje copiado')).catch(() => mostrarToast('No se pudo copiar'));
+    };
+
+    overlay.style.display = 'flex';
+  }
+  // Cerrar modal al hacer clic en el overlay (fuera del card)
+  document.getElementById('pv-share-overlay').addEventListener('click', function(e) {
+    if (e.target === this) this.style.display = 'none';
+  });
+
   ['pv-inv-search', 'pv-inv-filter-estatus', 'pv-inv-sort'].forEach(id => {
     document.getElementById(id).addEventListener(id === 'pv-inv-search' ? 'input' : 'change', renderInventarioTabla);
   });
@@ -12644,6 +12741,13 @@ section.pv-table-wrap > .shell > #pv-compradores {
           }, 1800);
         }
         window.parent.postMessage({ type: 'wecars-clientes-solicitar' }, '*');
+      }
+      // ── Auto actualizado (foto subida desde Admin) ───────────────────
+      if (msg.type === 'wecars-inventario-update' && msg.carro) {
+        const idx = inventarioAutos.findIndex(a => a._id === msg.carro._id || a.id === msg.carro._id);
+        if (idx >= 0) inventarioAutos[idx] = Object.assign(inventarioAutos[idx], msg.carro);
+        else inventarioAutos.unshift(msg.carro);
+        if (vistaActual === 'inventario') { renderInventario(); renderInventarioTabla(); }
       }
       // ── Tarea asignada desde Gerencia / Administración ───────────────
       if (msg.type === 'wecars-tarea-asignada' && msg.tarea && msg.tarea.asignadoA === vendedorActual) {
