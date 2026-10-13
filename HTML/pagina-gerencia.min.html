@@ -2643,6 +2643,17 @@ z-index: 60;
   </div>
 </div></div>
 <script>
+  // ── Dispatcher central de mensajes ───────────────────────────────────
+  window._wcMsgHandlers = [];
+  window.addEventListener('message', function(ev) {
+    var _h = window._wcMsgHandlers;
+    for (var _i = 0; _i < _h.length; _i++) {
+      try { _h[_i](ev); } catch(e) { console.error('[WC dispatcher]', e); }
+    }
+  });
+</script>
+
+<script>
 (function () {var t;
 const ESTATUS_LIST = ['Nuevo', 'Contactado', 'En proceso', 'Ganado', 'Perdido'];
 const ESTATUS_VENTA_OPCIONES = ['Disponible', 'Apartado', 'Vendido'];
@@ -5097,7 +5108,7 @@ mostrarToast('✓ Exportando 3 archivos CSV — ábrelos en Excel');
 (function(){var _el=document.getElementById('ge-refresh');if(_el)_el.addEventListener('click', () => {
 window.parent.postMessage({ type: 'wecars-gerencia-solicitar' }, '*');
 });})();
-window.addEventListener('message', (event) => {
+window._wcMsgHandlers.push(function(event) {
 const data = event.data;
 if (!data || !data.type) return;
 if (data.type === 'wecars-gerencia-datos') {
@@ -7420,7 +7431,7 @@ document.body.removeChild(ta);
 /* ── Conectar con datos cuando llegan ───────── */
 // Escuchar el mensaje de datos de gerencia para guardar referencias
 const _origMsg = window.onmessage;
-window.addEventListener('message', function(ev) {
+window._wcMsgHandlers.push(function(ev) {
 const d = ev.data;
 if (!d) return;
 if (d.type === 'wecars-gerencia-datos') {
@@ -7775,7 +7786,7 @@ if(l){l._notas=l._notas||[];l._notas.push({autor:_leads_email,descripcion:texto,
 inp.value='';
 geRenderLeads();
 };
-window.addEventListener('message',function(ev){
+window._wcMsgHandlers.push(function(ev){
 var d=ev.data;
 if(!d||!d.type)return;
 if(d.type==='wecars-leads'){
@@ -8410,7 +8421,7 @@ window.renderMetasKpis = renderMetasKpis;
     }
 window.renderTendenciaForecast = renderTendenciaForecast;
 
-    window.addEventListener('message', function(ev) {
+    window._wcMsgHandlers.push(function(ev) {
 var d = ev.data;
 if (!d||!d.type) return;
 if (d.type==='wecars-supervision-datos') {
@@ -8931,7 +8942,7 @@ window.geEliminarContacto = function(clienteId) {
   window.parent.postMessage({ type: 'wecars-cliente-eliminar-ge', clienteId: clienteId }, '*');
 };
 // Manejar respuesta de eliminación
-window.addEventListener('message', function(ev) {
+window._wcMsgHandlers.push(function(ev) {
   var d = ev.data || {};
   if (d.type === 'wecars-cliente-eliminado-ge') {
     if (d.error) {
@@ -10382,7 +10393,7 @@ function renderVisionRapida() {
 
 // Ejecutar cuando lleguen datos y cuando se active el dashboard
 window._renderVisionRapida = renderVisionRapida;
-window.addEventListener('message', function(ev) {
+window._wcMsgHandlers.push(function(ev) {
   var d = ev.data;
   if (!d) return;
   if (d.type === 'wecars-gerencia-datos' || d.type === 'wecars-creditos-datos') {
@@ -11096,7 +11107,7 @@ if (typeof _origShowView === 'function') {
   };
 
   // Escuchar respuesta del backend
-  window.addEventListener('message', function(ev) {
+  window._wcMsgHandlers.push(function(ev) {
     if (!ev.data || !ev.data.type) return;
     if (ev.data.type === 'wecars-ge-pub-historial-datos') {
       _gePubDatos = Array.isArray(ev.data.items) ? ev.data.items : [];
@@ -12289,7 +12300,7 @@ function _initGeMobile(){
   if(_geMobileInited) return; /* GAP-L fix */
   _geMobileInited = true;
   renderGeMobileHome();
-  window.addEventListener('message',function(e){
+  window._wcMsgHandlers.push(function(e){
     if(!_isMobile()) return;
     var t=(e.data||{}).type||'';
     if(t.indexOf('vendedor')!==-1||t.indexOf('venta')!==-1||t.indexOf('pipeline')!==-1){

@@ -3045,6 +3045,17 @@ html { overscroll-behavior: none !important; background-color: var(--bg) !import
 </style>
 
 <script>
+  // ── Dispatcher central de mensajes ───────────────────────────────────
+  window._wcMsgHandlers = [];
+  window.addEventListener('message', function(ev) {
+    var _h = window._wcMsgHandlers;
+    for (var _i = 0; _i < _h.length; _i++) {
+      try { _h[_i](ev); } catch(e) { console.error('[WC dispatcher]', e); }
+    }
+  });
+</script>
+
+<script>
 (function(){
 'use strict';
 
@@ -3423,7 +3434,7 @@ function poblarSelectLeadVendedor() {
    Velo envía wecars-tareas-datos automáticamente en $w.onReady()
    (vía enviarDatosAdmin) y bajo demanda (respuesta a wecars-tareas-
    solicitar). Campo del payload: items (no tareas). */
-window.addEventListener('message', function(e) {
+window._wcMsgHandlers.push(function(e) {
   var d = e.data;
   if (!d || typeof d !== 'object' || !d.type) return;
   switch (d.type) {
@@ -6777,7 +6788,7 @@ function _initAdMobile(){
   if(_adMobileInited) return; /* GAP-L fix: evitar registro duplicado si se llama más de una vez */
   _adMobileInited = true;
   renderAdMobileHome();
-  window.addEventListener('message',function(e){
+  window._wcMsgHandlers.push(function(e){
     if(!_isMobile()) return;
     var t=(e.data||{}).type||'';
     if(t==='wecars-leads-datos'||t==='wecars-empleados-datos'||t==='wecars-inventario-datos'){

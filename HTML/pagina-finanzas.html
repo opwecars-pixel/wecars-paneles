@@ -2429,6 +2429,17 @@ canvas { max-width: 100% !important; height: auto !important; }
 </div>
 
 <script>
+  // ── Dispatcher central de mensajes ───────────────────────────────────
+  window._wcMsgHandlers = [];
+  window.addEventListener('message', function(ev) {
+    var _h = window._wcMsgHandlers;
+    for (var _i = 0; _i < _h.length; _i++) {
+      try { _h[_i](ev); } catch(e) { console.error('[WC dispatcher]', e); }
+    }
+  });
+</script>
+
+<script>
 (function(){
 'use strict';
 let rolActual='',emailActual='',nombreActual='',puestoActual='';
@@ -3192,7 +3203,7 @@ document.getElementById('ft-tbody').addEventListener('click',e=>{
   });
 
   // Respuesta del Velo
-  window.addEventListener('message', function(ev) {
+  window._wcMsgHandlers.push(function(ev) {
     if (!ev.data || ev.data.type !== 'wecars-factura-creada') return;
     document.getElementById('nf-guardar').disabled = false;
     if (ev.data.ok) {
@@ -3223,7 +3234,7 @@ document.getElementById('fn-export-btn').addEventListener('click',()=>{
 });
 
 /* ── Mensajes Velo ──────────────────────────────── */
-window.addEventListener('message',ev=>{
+window._wcMsgHandlers.push(function(ev){
   const d=ev.data;if(!d?.type)return;
   if(d.type==='wecars-finanzas'){
     rolActual=d.rolActual||'';window._wcRol=rolActual;emailActual=d.emailActual||'';nombreActual=d.nombreActual||'';puestoActual=d.puestoActual||'';
@@ -3630,7 +3641,7 @@ document.getElementById('ap-baja-confirm')?.addEventListener('click',()=>{
   status.textContent='Guardando…';status.style.color='var(--muted)';
   window.parent.postMessage({type:'wecars-apartado-cerrar',apartadoId:_apBajaId,tipoCierre:radio.value,motivo},'*');
 });
-window.addEventListener('message',function(e){
+window._wcMsgHandlers.push(function(e){
   if(!e.data||typeof e.data!=='object')return;
   if(e.data.type==='wecars-apartado-cerrado-ok'){
     const idx=apartados.findIndex(a=>a._id===_apBajaId);
@@ -4262,7 +4273,7 @@ document.getElementById("wc-exp-close").addEventListener("click",window.cerrarEx
     fnRenderLeads();
   };
 
-  window.addEventListener('message',function(ev){
+  window._wcMsgHandlers.push(function(ev){
     var d=ev.data;
     if(d&&d.type==='wecars-leads'){
       _leads=d.leads||[];
@@ -5734,7 +5745,7 @@ function _initFnMobile(){
   if(_fnMobileInited) return; /* GAP-L fix */
   _fnMobileInited = true;
   renderFnMobileHome();
-  window.addEventListener('message',function(e){
+  window._wcMsgHandlers.push(function(e){
     if(!_isMobile()) return;
     var t=(e.data||{}).type||'';
     if(t.indexOf('finanz')!==-1||t.indexOf('apartad')!==-1){
