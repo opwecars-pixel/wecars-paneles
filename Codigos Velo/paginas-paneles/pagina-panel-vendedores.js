@@ -340,6 +340,21 @@ $w.onReady(function () {
         });
     }
 
+    // ── Meta mensual del vendedor (persistencia CMS cross-device) ────
+    if (data.type === 'wecars-meta-guardar' && data.meta) {
+      wixUsers.currentUser.getEmail()
+        .then((email) => wixData.query('Usuarios').eq('email', email).limit(1).find())
+        .then((r) => {
+          if (!r.items[0]) throw new Error('Usuario no encontrado');
+          return wixData.update('Usuarios', Object.assign({}, r.items[0], { metaMensual: Number(data.meta) }));
+        })
+        .then(() => $w(HTML_ID).postMessage({ type: 'wecars-meta-guardada', ok: true, meta: data.meta }))
+        .catch((e) => {
+          console.error('[Panel Vendedores] Error guardando meta:', e);
+          $w(HTML_ID).postMessage({ type: 'wecars-meta-guardada', ok: false, error: String(e) });
+        });
+    }
+
     // ── Crear tarea propia del vendedor ──────────────────────────────
     if (data.type === 'wecars-tarea-crear' && data.tarea) {
       wixUsers.currentUser.getEmail()
@@ -718,7 +733,7 @@ function enviarClientes() {
       var listaVendedores = (datos.usuarios || [])
         .map(function(v) { return { email: v.email || v.correo || '', nombre: v.nombre || '', rol: v.rol || '' }; })
         .filter(function(v) { return v.email; });
-      var usuarioActual = listaVendedores.find(function(v) { return v.email === vendedorEmailActual; }) || {};
+      var usuarioActual = (datos.usuarios || []).find(function(v) { return (v.email || v.correo || '') === vendedorEmailActual; }) || {};
       $w(HTML_ID).postMessage({
         type:               'wecars-clientes',
         items:              datos.clientes      || [],
@@ -732,6 +747,7 @@ function enviarClientes() {
         puestoActual:       '',
         fechaIngresoActual: null,
         listaVendedores:    listaVendedores,
+        metaMensual:        usuarioActual.metaMensual || 0,
       });
     })
     .catch(function(err) {

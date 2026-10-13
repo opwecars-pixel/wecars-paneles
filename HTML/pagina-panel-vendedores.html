@@ -11797,9 +11797,11 @@ section.pv-table-wrap > .shell > #pv-compradores {
     if (!inp) return;
     var val = parseInt(inp.value, 10);
     if (!val || val < 1) { mostrarToast('Ingresa un número válido de unidades'); return; }
-    localStorage.setItem('wc-meta-mensual', val);
+    localStorage.setItem('wc-meta-mensual', val); // caché offline
     _cfgActualizarProgressMeta(val);
-    mostrarToast('Meta guardada: ' + val + ' unidades');
+    // Persistir en CMS (Usuarios.metaMensual) para que sea cross-device
+    window.parent.postMessage({ type: 'wecars-meta-guardar', meta: val }, '*');
+    mostrarToast('⏳ Guardando meta…');
   }
 
   function _cfgActualizarProgressMeta(meta) {
@@ -12294,6 +12296,19 @@ section.pv-table-wrap > .shell > #pv-compradores {
       setTimeout(pvRemVerificar, 1200);
       // Re-verificar cada 20 minutos mientras el panel esté abierto
       if (!window._pvRemInterval) window._pvRemInterval = setInterval(pvRemVerificar, 20 * 60 * 1000);
+      // Meta mensual desde CMS (fuente de verdad; localStorage como caché offline)
+      if (data.metaMensual && data.metaMensual > 0) {
+        localStorage.setItem('wc-meta-mensual', data.metaMensual);
+        var _inpMeta = document.getElementById('pv-cfg-meta');
+        if (_inpMeta) _inpMeta.value = data.metaMensual;
+        _cfgActualizarProgressMeta(data.metaMensual);
+      }
+    }
+
+    // Confirmación de meta guardada en CMS
+    if (data.type === 'wecars-meta-guardada') {
+      if (data.ok) mostrarToast('✅ Meta guardada: ' + data.meta + ' unidades');
+      else mostrarToast('⚠ No se pudo guardar la meta en el servidor');
     }
 
     if (data.type === 'wecars-creditos-actualizados') {
