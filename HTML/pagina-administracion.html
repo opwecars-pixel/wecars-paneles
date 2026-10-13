@@ -2230,6 +2230,283 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
         </div>
       </div>
 
+      <!-- ══ EXPEDIENTE VEHICULAR — overlay drawer ══════════════════════ -->
+      <div id="exp-overlay" style="display:none;position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.45);backdrop-filter:blur(3px)">
+        <div id="exp-drawer" style="position:absolute;top:0;right:0;bottom:0;width:min(780px,100%);background:var(--surface);display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.18);transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)">
+
+          <!-- header -->
+          <div style="display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1.5px solid var(--line);flex-shrink:0;background:var(--surface)">
+            <div id="exp-foto-thumb" style="width:54px;height:40px;border-radius:var(--r-sm);background:var(--paper);border:1.5px solid var(--line);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--muted)">
+              <i class="ti ti-car" style="font-size:18px"></i>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div id="exp-titulo" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-weight:900;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Expediente</div>
+              <div id="exp-subtitulo" style="font-size:.72rem;color:var(--muted)"></div>
+            </div>
+            <div id="exp-badge-estatus" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:800;background:#dcfce7;color:#065f46;flex-shrink:0"></div>
+            <button type="button" onclick="cerrarExpediente()" style="flex-shrink:0;width:32px;height:32px;border:none;background:var(--paper);border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:18px"><i class="ti ti-x"></i></button>
+          </div>
+
+          <!-- tabs -->
+          <div style="display:flex;gap:0;border-bottom:1.5px solid var(--line);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch">
+            <button class="exp-tab active" data-tab="resumen" onclick="expCambiarTab(this)" type="button"><i class="ti ti-file-description"></i> Resumen</button>
+            <button class="exp-tab" data-tab="financiero" onclick="expCambiarTab(this)" type="button"><i class="ti ti-coin"></i> Financiero</button>
+            <button class="exp-tab" data-tab="documentos" onclick="expCambiarTab(this)" type="button"><i class="ti ti-files"></i> Documentos</button>
+            <button class="exp-tab" data-tab="historial" onclick="expCambiarTab(this)" type="button"><i class="ti ti-timeline"></i> Historial</button>
+            <button class="exp-tab exp-tab-consigna" data-tab="consigna" onclick="expCambiarTab(this)" type="button" style="display:none"><i class="ti ti-handshake"></i> Consigna</button>
+          </div>
+
+          <!-- body scrollable -->
+          <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch">
+
+            <!-- TAB: Resumen -->
+            <div class="exp-panel active" id="exp-panel-resumen" style="padding:20px;display:flex;flex-direction:column;gap:18px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="exp-field-group" style="grid-column:1/-1">
+                  <label class="exp-label">Número de inventario</label>
+                  <div id="exp-num-inv" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:1.1rem;font-weight:900;color:var(--lime-dark);letter-spacing:.03em"></div>
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Estatus de venta</label>
+                  <select id="exp-estatus" class="exp-input">
+                    <option value="Disponible">Disponible</option>
+                    <option value="Apartado">Apartado</option>
+                    <option value="Reservado">Reservado</option>
+                    <option value="Vendido">Vendido</option>
+                    <option value="Consigna">Consigna</option>
+                  </select>
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Tipo de adquisición</label>
+                  <select id="exp-tipo-adq" class="exp-input" onchange="expToggleConsignaTab()">
+                    <option value="propio">Compra directa (propio)</option>
+                    <option value="consigna">Consigna</option>
+                    <option value="subasta">Subasta</option>
+                    <option value="intercambio">Intercambio</option>
+                  </select>
+                </div>
+                <div class="exp-field-group" style="grid-column:1/-1">
+                  <label class="exp-label">Notas internas</label>
+                  <textarea id="exp-notas" class="exp-input" rows="3" placeholder="Observaciones, detalles del vehículo, condición de entrega…" style="resize:vertical"></textarea>
+                </div>
+              </div>
+              <div class="exp-section-title"><i class="ti ti-car"></i> Datos del vehículo</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="exp-field-group">
+                  <label class="exp-label">Marca</label>
+                  <input type="text" id="exp-marca" class="exp-input" placeholder="Ej. Nissan">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Modelo / Versión</label>
+                  <input type="text" id="exp-modelo" class="exp-input" placeholder="Ej. Versa Advance">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Año</label>
+                  <input type="number" id="exp-anio" class="exp-input" min="1990" max="2030">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Color</label>
+                  <input type="text" id="exp-color" class="exp-input" placeholder="Ej. Blanco perla">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Kilometraje</label>
+                  <input type="number" id="exp-km" class="exp-input" placeholder="0">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Transmisión</label>
+                  <select id="exp-trans" class="exp-input">
+                    <option value="">—</option>
+                    <option value="Automático">Automático</option>
+                    <option value="Manual">Manual</option>
+                    <option value="CVT">CVT</option>
+                  </select>
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Combustible</label>
+                  <select id="exp-combustible" class="exp-input">
+                    <option value="">—</option>
+                    <option value="Gasolina">Gasolina</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Eléctrico">Eléctrico</option>
+                    <option value="Híbrido">Híbrido</option>
+                  </select>
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Tipo de carrocería</label>
+                  <select id="exp-tipo-carr" class="exp-input">
+                    <option value="">—</option>
+                    <option value="Sedán">Sedán</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Pickup">Pickup</option>
+                    <option value="Hatchback">Hatchback</option>
+                    <option value="Van">Van</option>
+                    <option value="Convertible">Convertible</option>
+                  </select>
+                </div>
+                <div class="exp-field-group" style="grid-column:1/-1">
+                  <label class="exp-label">VIN / Número de serie</label>
+                  <input type="text" id="exp-vin" class="exp-input" placeholder="17 caracteres" style="text-transform:uppercase;letter-spacing:.06em;font-size:.82rem">
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB: Financiero -->
+            <div class="exp-panel" id="exp-panel-financiero" style="padding:20px;display:none;flex-direction:column;gap:18px">
+              <div class="exp-section-title"><i class="ti ti-receipt"></i> Costos de adquisición</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="exp-field-group">
+                  <label class="exp-label">Costo de compra</label>
+                  <input type="number" id="exp-costo-compra" class="exp-input" placeholder="0.00" oninput="expCalcMargen()">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Gastos de entrada</label>
+                  <input type="number" id="exp-gastos-entrada" class="exp-input" placeholder="0.00" oninput="expCalcMargen()" title="Mecánico, detallado, placas, otros…">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Detalle gastos de entrada</label>
+                  <input type="text" id="exp-gastos-detalle" class="exp-input" placeholder="Mecánico $800, detallado $500…" style="grid-column:1/-1">
+                </div>
+              </div>
+              <div class="exp-section-title"><i class="ti ti-tag"></i> Precios de venta</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="exp-field-group">
+                  <label class="exp-label">Precio de lista</label>
+                  <input type="number" id="exp-precio-lista" class="exp-input" placeholder="0.00" oninput="expCalcMargen()">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Precio mínimo (piso)</label>
+                  <input type="number" id="exp-precio-piso" class="exp-input" placeholder="0.00" title="Mínimo aceptable — no vender por debajo de este precio">
+                </div>
+              </div>
+              <!-- Margen calculado -->
+              <div id="exp-margen-card" style="background:var(--lime-bg);border:1.5px solid rgba(86,169,0,.25);border-radius:var(--r-md);padding:16px 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+                <div style="text-align:center">
+                  <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px">Costo total</div>
+                  <div id="exp-mg-costo" style="font-size:1.1rem;font-weight:900;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--ink);font-variant-numeric:tabular-nums">—</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px">Margen bruto</div>
+                  <div id="exp-mg-margen" style="font-size:1.1rem;font-weight:900;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-variant-numeric:tabular-nums">—</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px">Margen %</div>
+                  <div id="exp-mg-pct" style="font-size:1.1rem;font-weight:900;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-variant-numeric:tabular-nums">—</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB: Documentos -->
+            <div class="exp-panel" id="exp-panel-documentos" style="padding:20px;display:none;flex-direction:column;gap:16px">
+              <div style="font-size:.78rem;color:var(--muted)">Marca el estado de cada documento del expediente físico del vehículo.</div>
+              <div id="exp-docs-lista" style="display:flex;flex-direction:column;gap:2px"></div>
+              <div class="exp-section-title" style="margin-top:8px"><i class="ti ti-key"></i> Llaves y accesorios</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="exp-field-group">
+                  <label class="exp-label">Cantidad de llaves</label>
+                  <input type="number" id="exp-llaves" class="exp-input" min="0" max="10" value="1">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Manual del propietario</label>
+                  <select id="exp-manual" class="exp-input">
+                    <option value="si">Sí incluye</option>
+                    <option value="no">No incluye</option>
+                  </select>
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Hologramas verificación</label>
+                  <select id="exp-holograma" class="exp-input">
+                    <option value="0">Holograma 0 (exento)</option>
+                    <option value="00">Holograma 00 (exento)</option>
+                    <option value="1">Holograma 1</option>
+                    <option value="2">Holograma 2</option>
+                    <option value="na">No aplica</option>
+                  </select>
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Carpeta o sobre de documentos</label>
+                  <select id="exp-carpeta" class="exp-input">
+                    <option value="si">Sí tiene</option>
+                    <option value="no">No tiene</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB: Historial -->
+            <div class="exp-panel" id="exp-panel-historial" style="padding:20px;display:none;flex-direction:column;gap:16px">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <input type="text" id="exp-hist-nota" class="exp-input" placeholder="Agregar nota al historial…" style="flex:1;min-width:180px">
+                <button class="pend-save-btn" type="button" onclick="expAgregarHistorial()" style="white-space:nowrap;padding:8px 14px;font-size:.8rem"><i class="ti ti-plus"></i> Agregar</button>
+              </div>
+              <div id="exp-historial-lista" style="display:flex;flex-direction:column;gap:0"></div>
+            </div>
+
+            <!-- TAB: Consigna -->
+            <div class="exp-panel" id="exp-panel-consigna" style="padding:20px;display:none;flex-direction:column;gap:18px">
+              <div style="background:rgba(37,99,235,.08);border:1.5px solid rgba(37,99,235,.2);border-radius:var(--r-sm);padding:10px 14px;font-size:.78rem;color:var(--info)">
+                <i class="ti ti-info-circle"></i> Este vehículo está en <strong>consigna</strong> — es propiedad de un tercero. No lo vendas por debajo del precio mínimo acordado.
+              </div>
+              <div class="exp-section-title"><i class="ti ti-user"></i> Datos del propietario</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="exp-field-group" style="grid-column:1/-1">
+                  <label class="exp-label">Nombre completo del propietario</label>
+                  <input type="text" id="exp-cs-propietario" class="exp-input" placeholder="Nombre y apellidos">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Teléfono</label>
+                  <input type="tel" id="exp-cs-tel" class="exp-input" placeholder="477 000 0000">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Correo electrónico</label>
+                  <input type="email" id="exp-cs-email" class="exp-input" placeholder="correo@ejemplo.com">
+                </div>
+              </div>
+              <div class="exp-section-title"><i class="ti ti-file-dollar"></i> Condiciones del contrato</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="exp-field-group">
+                  <label class="exp-label">Precio mínimo al propietario</label>
+                  <input type="number" id="exp-cs-precio-min" class="exp-input" placeholder="0.00">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Comisión de la agencia (%)</label>
+                  <input type="number" id="exp-cs-comision" class="exp-input" placeholder="5" min="0" max="100">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Fecha inicio contrato</label>
+                  <input type="date" id="exp-cs-fecha-inicio" class="exp-input">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Fecha vencimiento</label>
+                  <input type="date" id="exp-cs-fecha-fin" class="exp-input">
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Estado del contrato</label>
+                  <select id="exp-cs-estado" class="exp-input">
+                    <option value="activo">Activo</option>
+                    <option value="vencido">Vencido</option>
+                    <option value="cerrado">Cerrado / vendido</option>
+                    <option value="cancelado">Cancelado</option>
+                  </select>
+                </div>
+                <div class="exp-field-group" style="grid-column:1/-1">
+                  <label class="exp-label">Notas del contrato</label>
+                  <textarea id="exp-cs-notas" class="exp-input" rows="3" placeholder="Condiciones especiales, acuerdos, etc." style="resize:vertical"></textarea>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /body scrollable -->
+
+          <!-- footer -->
+          <div style="padding:14px 20px;border-top:1.5px solid var(--line);flex-shrink:0;display:flex;align-items:center;gap:10px;background:var(--surface)">
+            <div id="exp-save-status" style="flex:1;font-size:.78rem;color:var(--muted)"></div>
+            <button class="pend-cancel-btn" type="button" onclick="cerrarExpediente()" style="min-height:38px">Cancelar</button>
+            <button class="pend-save-btn" type="button" onclick="expGuardar()" id="exp-guardar-btn" style="min-height:38px"><i class="ti ti-device-floppy"></i> Guardar expediente</button>
+          </div>
+
+        </div><!-- /drawer -->
+      </div><!-- /exp-overlay -->
+
       <!-- ── VISTA PERMISOS ─────────────────── -->
       <div id="ad-vista-permisos" class="ad-vista">
         <div class="ad-card">
@@ -3042,6 +3319,119 @@ html { overscroll-behavior: none !important; background-color: var(--bg) !import
 [class*="-badge"],
 [class*="-pill"],
 [class*="-tag"] { border-radius: var(--r-xs) !important; }
+
+/* ── Expediente vehicular ──────────────────────────────────────── */
+.exp-tab {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  font-size: .78rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  transition: color .15s, border-color .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.exp-tab:hover { color: var(--ink); }
+.exp-tab.active { color: var(--lime-dark); border-bottom-color: var(--lime-dark); }
+.exp-panel { flex-direction: column; }
+.exp-panel.active { display: flex !important; }
+.exp-label {
+  display: block;
+  font-size: .68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.exp-field-group { display: flex; flex-direction: column; }
+.exp-input {
+  padding: 8px 10px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
+  font-size: .84rem;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--ink);
+  transition: border-color .15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.exp-input:focus { border-color: var(--lime-dark); outline: none; }
+.exp-section-title {
+  font-size: .68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--lime-dark);
+  padding-bottom: 6px;
+  border-bottom: 1.5px solid var(--line-2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.exp-doc-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.exp-doc-row:last-child { border-bottom: none; }
+.exp-doc-nombre {
+  flex: 1;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 0;
+}
+.exp-doc-btns { display: flex; gap: 4px; flex-shrink: 0; }
+.exp-doc-btn {
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  font-size: .68rem;
+  font-weight: 700;
+  font-family: inherit;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+  white-space: nowrap;
+}
+.exp-doc-btn:hover { border-color: var(--ink-2); color: var(--ink); }
+.exp-doc-btn.estado-entregado { background: #dcfce7; color: #065f46; border-color: #bbf7d0; }
+.exp-doc-btn.estado-pendiente { background: #fef9c3; color: #854d0e; border-color: #fde047; }
+.exp-doc-btn.estado-noaplica  { background: var(--paper); color: var(--muted); border-color: var(--line); }
+.exp-hist-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.exp-hist-item:last-child { border-bottom: none; }
+.exp-hist-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--lime-dark);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.exp-hist-meta { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+@media (max-width: 640px) {
+  #exp-drawer { width: 100% !important; }
+  #exp-panel-resumen > div,
+  #exp-panel-financiero > div,
+  #exp-panel-consigna > div { grid-template-columns: 1fr !important; }
+  .exp-doc-btns { flex-wrap: wrap; }
+}
 </style>
 
 <script>
@@ -4706,8 +5096,11 @@ function renderInventario(){
       <td style="padding:8px 12px;text-align:center"><span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:800;${estStyle}">${esc(est)}</span></td>
       <td style="padding:8px 12px;text-align:center">
         <div style="display:flex;gap:6px;justify-content:center">
-          <button class="pend-cancel-btn inv-editar-btn" data-inv-id="${esc(c._id)}" type="button" style="padding:5px 10px;font-size:.75rem;min-height:34px">
-            <i class="ti ti-edit" style="font-size:13px"></i> Editar
+          <button class="pend-save-btn inv-exp-btn" data-inv-id="${esc(c._id)}" type="button" style="padding:5px 10px;font-size:.75rem;min-height:34px;gap:4px" title="Abrir expediente">
+            <i class="ti ti-file-description" style="font-size:13px"></i> Expediente
+          </button>
+          <button class="pend-cancel-btn inv-editar-btn" data-inv-id="${esc(c._id)}" type="button" style="padding:5px 10px;font-size:.75rem;min-height:34px" title="Editar datos">
+            <i class="ti ti-edit" style="font-size:13px"></i>
           </button>
           <button class="pend-cancel-btn inv-eliminar-btn" data-inv-id="${esc(c._id)}" data-inv-nombre="${esc(marca+' '+modelo)}" type="button" style="padding:5px 10px;font-size:.75rem;min-height:34px;border-color:var(--c-red);color:var(--c-red)" title="Eliminar">
             <i class="ti ti-trash" style="font-size:13px"></i>
@@ -4783,11 +5176,297 @@ document.getElementById('inv-foto-btn').addEventListener('click', function(){
 
 function cerrarModalCarro(){ document.getElementById('inv-overlay').style.display='none'; carroEditandoId=null; }
 document.getElementById('inv-close').addEventListener('click', cerrarModalCarro);
+
+// ══════════════════════════════════════════════════════════════════
+//  EXPEDIENTE VEHICULAR
+// ══════════════════════════════════════════════════════════════════
+
+const _EXP_DOCS = [
+  { id:'facturaOriginal',   label:'Factura original' },
+  { id:'facturaEndosada',   label:'Factura endosada a nombre de la agencia' },
+  { id:'tarjetaCirculacion',label:'Tarjeta de circulación vigente' },
+  { id:'tenencia',          label:'Tenencia pagada (año en curso)' },
+  { id:'verificacion',      label:'Verificación vehicular vigente' },
+  { id:'repuve',            label:'Reporte REPUVE / No robo' },
+  { id:'pedimento',         label:'Pedimento de importación' },
+  { id:'permisoCirculacion',label:'Permiso de circulación temporal' },
+  { id:'polizaSeguro',      label:'Póliza de seguro vigente' },
+];
+
+let _expCarroActual = null;
+let _expDocs = {};
+let _expHistorial = [];
+
+function abrirExpediente(c){
+  _expCarroActual = c;
+  const docs = c.documentos || {};
+  _expDocs = Object.assign({}, docs);
+  _expHistorial = Array.isArray(c.historialExp) ? [...c.historialExp] : [];
+
+  // Header
+  const marca   = c.marca||c.brand||'';
+  const modelo  = c.modelo||c.version||c.nombre||c.nombreCarro||c.title||'Sin nombre';
+  const anio    = c.año||c.anio||c.year||'';
+  document.getElementById('exp-titulo').textContent = [marca, modelo, anio].filter(Boolean).join(' ');
+  document.getElementById('exp-subtitulo').textContent = c.numeroInventario||c._id||'';
+  const est = c.estatusVenta||'Disponible';
+  const badgeStyle = INV_ESTATUS_STYLE[est]||'background:#e5e7eb;color:#374151';
+  const badgeEl = document.getElementById('exp-badge-estatus');
+  badgeEl.textContent = est;
+  badgeEl.setAttribute('style', badgeEl.getAttribute('style').split(';')[0]||'' );
+  badgeEl.style.cssText = badgeStyle+';display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:800;flex-shrink:0';
+
+  // Foto thumb
+  const fotoUrl = resolveWixImg(c.fotoPrincipal||c.imagenUrl||c.imagen||c.image||c.imageUrl||(Array.isArray(c.fotos)&&c.fotos[0])||'');
+  const thumb = document.getElementById('exp-foto-thumb');
+  if(fotoUrl){
+    thumb.innerHTML = `<img src="${esc(fotoUrl)}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.innerHTML='<i class=\\'ti ti-car\\' style=\\'font-size:18px\\'></i>'">`;
+  }
+
+  // Número inventario
+  document.getElementById('exp-num-inv').textContent = c.numeroInventario||'(sin número)';
+
+  // Resumen fields
+  document.getElementById('exp-estatus').value        = est;
+  document.getElementById('exp-tipo-adq').value       = c.tipoAdquisicion||'propio';
+  document.getElementById('exp-notas').value          = c.notasInternas||c.notas||'';
+  document.getElementById('exp-marca').value          = marca;
+  document.getElementById('exp-modelo').value         = modelo;
+  document.getElementById('exp-anio').value           = anio;
+  document.getElementById('exp-color').value          = c.color||'';
+  document.getElementById('exp-km').value             = c.km||c.kilometraje||'';
+  document.getElementById('exp-trans').value          = c.transmision||'';
+  document.getElementById('exp-combustible').value    = c.combustible||'';
+  document.getElementById('exp-tipo-carr').value      = c.tipo||c.carroceria||'';
+  document.getElementById('exp-vin').value            = c.vin||c.noSerie||'';
+
+  // Financiero fields
+  document.getElementById('exp-costo-compra').value   = c.costoAdquisicion||c.costoCompra||'';
+  document.getElementById('exp-gastos-entrada').value = c.gastosEntrada||'';
+  document.getElementById('exp-gastos-detalle').value = c.gastosDetalle||'';
+  document.getElementById('exp-precio-lista').value   = c.precioVenta||c.priceNew||c.precio||'';
+  document.getElementById('exp-precio-piso').value    = c.precioMinimo||'';
+  expCalcMargen();
+
+  // Documentos
+  _expRenderDocumentos();
+
+  // Accesorios
+  document.getElementById('exp-llaves').value      = c.llaves!=null ? c.llaves : 1;
+  document.getElementById('exp-manual').value      = c.manual||'si';
+  document.getElementById('exp-holograma').value   = c.holograma||'0';
+  document.getElementById('exp-carpeta').value     = c.carpetaDocumentos||'si';
+
+  // Historial
+  _expRenderHistorial();
+
+  // Consigna
+  const cs = c.consignaInfo||{};
+  document.getElementById('exp-cs-propietario').value  = cs.propietario||'';
+  document.getElementById('exp-cs-tel').value          = cs.telefono||'';
+  document.getElementById('exp-cs-email').value        = cs.email||'';
+  document.getElementById('exp-cs-precio-min').value   = cs.precioMinimo||'';
+  document.getElementById('exp-cs-comision').value     = cs.comision||'';
+  document.getElementById('exp-cs-fecha-inicio').value = cs.fechaInicio||'';
+  document.getElementById('exp-cs-fecha-fin').value    = cs.fechaFin||'';
+  document.getElementById('exp-cs-estado').value       = cs.estado||'activo';
+  document.getElementById('exp-cs-notas').value        = cs.notas||'';
+
+  // Tab consigna visible solo si aplica
+  expToggleConsignaTab();
+
+  // Reset tab y status
+  expCambiarTab(document.querySelector('.exp-tab[data-tab="resumen"]'));
+  document.getElementById('exp-save-status').textContent='';
+
+  // Abrir
+  document.getElementById('exp-overlay').style.display='block';
+  requestAnimationFrame(()=>{ document.getElementById('exp-drawer').style.transform='translateX(0)'; });
+}
+
+function cerrarExpediente(){
+  const drawer = document.getElementById('exp-drawer');
+  drawer.style.transform='translateX(100%)';
+  setTimeout(()=>{ document.getElementById('exp-overlay').style.display='none'; _expCarroActual=null; }, 290);
+}
+
+document.getElementById('exp-overlay').addEventListener('click', e=>{
+  if(e.target===document.getElementById('exp-overlay')) cerrarExpediente();
+});
+
+function expCambiarTab(btn){
+  document.querySelectorAll('.exp-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.exp-panel').forEach(p=>{ p.classList.remove('active'); p.style.display='none'; });
+  const tab = typeof btn==='string' ? document.querySelector('.exp-tab[data-tab="'+btn+'"]') : btn;
+  if(!tab) return;
+  tab.classList.add('active');
+  const panel = document.getElementById('exp-panel-'+tab.dataset.tab);
+  if(panel){ panel.style.display='flex'; panel.classList.add('active'); }
+}
+
+function expToggleConsignaTab(){
+  const tipo = document.getElementById('exp-tipo-adq').value;
+  const tabCs = document.querySelector('.exp-tab-consigna');
+  if(tabCs) tabCs.style.display = tipo==='consigna' ? '' : 'none';
+}
+
+function expCalcMargen(){
+  const costo  = Number(document.getElementById('exp-costo-compra').value)||0;
+  const gastos = Number(document.getElementById('exp-gastos-entrada').value)||0;
+  const precio = Number(document.getElementById('exp-precio-lista').value)||0;
+  const costoTotal = costo + gastos;
+  const margen = precio - costoTotal;
+  const pct = costoTotal>0 ? ((margen/costoTotal)*100).toFixed(1)+'%' : '—';
+  document.getElementById('exp-mg-costo').textContent   = costoTotal ? fmtMoney(costoTotal) : '—';
+  document.getElementById('exp-mg-margen').textContent  = precio ? fmtMoney(margen) : '—';
+  document.getElementById('exp-mg-margen').style.color  = margen>0 ? 'var(--lime-dark)' : margen<0 ? 'var(--err)' : 'var(--ink)';
+  document.getElementById('exp-mg-pct').textContent     = precio ? pct : '—';
+}
+
+function _expRenderDocumentos(){
+  const lista = document.getElementById('exp-docs-lista');
+  lista.innerHTML = _EXP_DOCS.map(doc=>{
+    const estado = _expDocs[doc.id]||'pendiente';
+    return `<div class="exp-doc-row" data-doc-id="${doc.id}">
+      <div class="exp-doc-nombre">${esc(doc.label)}</div>
+      <div class="exp-doc-btns">
+        <button class="exp-doc-btn ${estado==='entregado'?'estado-entregado':''}" data-estado="entregado" onclick="_expSetDoc('${doc.id}','entregado',this)" type="button">Entregado</button>
+        <button class="exp-doc-btn ${estado==='pendiente'?'estado-pendiente':''}" data-estado="pendiente" onclick="_expSetDoc('${doc.id}','pendiente',this)" type="button">Pendiente</button>
+        <button class="exp-doc-btn ${estado==='noaplica'?'estado-noaplica':''}" data-estado="noaplica" onclick="_expSetDoc('${doc.id}','noaplica',this)" type="button">N/A</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function _expSetDoc(docId, estado, btn){
+  _expDocs[docId] = estado;
+  const row = btn.closest('.exp-doc-row');
+  row.querySelectorAll('.exp-doc-btn').forEach(b=>{
+    b.className='exp-doc-btn'+(b.dataset.estado===estado?' estado-'+estado:'');
+  });
+}
+
+function _expRenderHistorial(){
+  const lista = document.getElementById('exp-historial-lista');
+  if(!_expHistorial.length){
+    lista.innerHTML = '<div style="color:var(--muted);font-size:.82rem;padding:12px 0;text-align:center">Sin eventos registrados aún.</div>';
+    return;
+  }
+  lista.innerHTML = [..._expHistorial].reverse().map(ev=>`
+    <div class="exp-hist-item">
+      <div class="exp-hist-dot"></div>
+      <div>
+        <div style="font-size:.84rem;font-weight:600;color:var(--ink)">${esc(ev.nota||ev.tipo||'')}</div>
+        <div class="exp-hist-meta">${esc(ev.fecha||'')} ${ev.usuario?'· '+esc(ev.usuario):''}</div>
+      </div>
+    </div>`).join('');
+}
+
+function expAgregarHistorial(){
+  const input = document.getElementById('exp-hist-nota');
+  const nota = input.value.trim();
+  if(!nota) return;
+  const ahora = new Date();
+  _expHistorial.push({
+    nota,
+    tipo: 'nota',
+    fecha: ahora.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'})+' '+ahora.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}),
+    usuario: nombreActual||'Admin',
+  });
+  input.value='';
+  _expRenderHistorial();
+}
+
+function expGuardar(){
+  if(!_expCarroActual) return;
+  const btn = document.getElementById('exp-guardar-btn');
+  const stat = document.getElementById('exp-save-status');
+  btn.disabled=true;
+  stat.textContent='Guardando…';
+
+  // Recopilar datos resumen
+  const marca  = document.getElementById('exp-marca').value.trim();
+  const modelo = document.getElementById('exp-modelo').value.trim();
+  const anio   = Number(document.getElementById('exp-anio').value)||null;
+  const titulo = [marca,modelo,anio].filter(Boolean).join(' ');
+
+  const cambios = {
+    // Resumen
+    marca, brand:marca, modelo, version:modelo,
+    año: anio, anio,
+    color:      document.getElementById('exp-color').value,
+    kilometraje:Number(document.getElementById('exp-km').value)||0,
+    km:         Number(document.getElementById('exp-km').value)||0,
+    transmision:document.getElementById('exp-trans').value,
+    combustible:document.getElementById('exp-combustible').value,
+    tipo:       document.getElementById('exp-tipo-carr').value,
+    carroceria: document.getElementById('exp-tipo-carr').value,
+    vin:        document.getElementById('exp-vin').value.trim().toUpperCase(),
+    noSerie:    document.getElementById('exp-vin').value.trim().toUpperCase(),
+    estatusVenta:document.getElementById('exp-estatus').value,
+    tipoAdquisicion:document.getElementById('exp-tipo-adq').value,
+    notasInternas:document.getElementById('exp-notas').value,
+    ...(titulo ? {nombreCarro:titulo, title:titulo} : {}),
+    // Financiero
+    costoAdquisicion:Number(document.getElementById('exp-costo-compra').value)||0,
+    costoCompra:     Number(document.getElementById('exp-costo-compra').value)||0,
+    gastosEntrada:   Number(document.getElementById('exp-gastos-entrada').value)||0,
+    gastosDetalle:   document.getElementById('exp-gastos-detalle').value,
+    precioVenta:     Number(document.getElementById('exp-precio-lista').value)||0,
+    precioMinimo:    Number(document.getElementById('exp-precio-piso').value)||0,
+    // Documentos
+    documentos: _expDocs,
+    llaves:   Number(document.getElementById('exp-llaves').value)||1,
+    manual:   document.getElementById('exp-manual').value,
+    holograma:document.getElementById('exp-holograma').value,
+    carpetaDocumentos:document.getElementById('exp-carpeta').value,
+    // Historial
+    historialExp: _expHistorial,
+  };
+
+  // Consigna (solo si aplica)
+  if(document.getElementById('exp-tipo-adq').value==='consigna'){
+    cambios.consignaInfo = {
+      propietario: document.getElementById('exp-cs-propietario').value.trim(),
+      telefono:    document.getElementById('exp-cs-tel').value.trim(),
+      email:       document.getElementById('exp-cs-email').value.trim(),
+      precioMinimo:Number(document.getElementById('exp-cs-precio-min').value)||0,
+      comision:    Number(document.getElementById('exp-cs-comision').value)||0,
+      fechaInicio: document.getElementById('exp-cs-fecha-inicio').value,
+      fechaFin:    document.getElementById('exp-cs-fecha-fin').value,
+      estado:      document.getElementById('exp-cs-estado').value,
+      notas:       document.getElementById('exp-cs-notas').value,
+    };
+  }
+
+  window.parent.postMessage({
+    type:    'wecars-carro-actualizar',
+    carroId: _expCarroActual._id,
+    cambios,
+  }, '*');
+
+  // Actualiza local para que la tabla se refresque sin esperar respuesta
+  const idx = inventario.findIndex(x=>x._id===_expCarroActual._id);
+  if(idx>=0){
+    inventario[idx] = Object.assign({}, inventario[idx], cambios);
+    window._inventarioAdmin = inventario;
+    renderInventario();
+  }
+
+  // Espera respuesta del Velo (wecars-inventario-datos recargará el array)
+  setTimeout(()=>{
+    btn.disabled=false;
+    stat.textContent='Guardado correctamente';
+    setTimeout(()=>{ stat.textContent=''; }, 2500);
+  }, 1200);
+}
 document.getElementById('inv-cancel-btn').addEventListener('click', cerrarModalCarro);
 document.getElementById('inv-overlay').addEventListener('click', e=>{ if(e.target===document.getElementById('inv-overlay')) cerrarModalCarro(); });
 document.getElementById('inv-nuevo-btn').addEventListener('click', ()=>abrirModalCarro(null));
 document.getElementById('inv-refresh-btn').addEventListener('click', ()=>{ window.parent.postMessage({type:'wecars-inventario-solicitar'},'*'); toast('Actualizando inventario…'); });
 document.getElementById('inv-tbody').addEventListener('click', e=>{
+  const expBtn = e.target.closest('.inv-exp-btn');
+  if(expBtn){ const c=inventario.find(x=>x._id===expBtn.dataset.invId); if(c) abrirExpediente(c); return; }
   const editBtn = e.target.closest('.inv-editar-btn');
   if(editBtn){ const c=inventario.find(x=>x._id===editBtn.dataset.invId); if(c) abrirModalCarro(c); }
   const delBtn = e.target.closest('.inv-eliminar-btn');
