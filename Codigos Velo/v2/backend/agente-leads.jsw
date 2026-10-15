@@ -1,0 +1,149 @@
+// ═══════════════════════════════════════════════════════════════════════
+//  weCars ERP v2 — Backend: Endpoint para el Agente IA
+//  Archivo: backend/agente-leads.jsw
+//
+//  El Agente IA (n8n, Make, GPT Actions, Voiceflow, etc.) llama a este
+//  archivo para insertar leads automáticamente en ALeads.
+//
+//  Uso desde el agente:
+//    import { recibirLeadAgente } from 'backend/agente-leads';
+//    await recibirLeadAgente({ nombre, telefono, interes, notas });
+//
+//  O como HTTP endpoint desde fuera de Wix:
+//    POST https://www.wecarsbajio.com/_functions/recibirLeadExterno
+//    Body: { apiKey, nombre, telefono, interes, notas, fuente }
+//    (requiere exponer la función en http-functions.js)
+// ═══════════════════════════════════════════════════════════════════════
+
+import wixData from 'wix-data';
+import { publish } from 'wix-realtime';
+
+// ── Config ──────────────────────────────────────────────────────────────
+const CANAL_RT = { name: 'wecars-erp-v2' };
+
+// Vendedor "genérico" para leads del agente sin asignar.
+// Reemplaza con el email del gerente o un usuario "weCars Bot" en Wix Members.
+const VENDEDOR_AGENTE_DEFAULT = 'op.wecars@gmail.com';
+
+// ════════════════════════════════════════════════════════════════════════
+//  recibirLeadAgente
+//  Llamado internamente desde el agente de IA (dentro de Wix).
+//  Parámetros:
+//    nombre    {string}  — nombre del prospecto
+//    telefono  {string}  — teléfono (10 dígitos)
+//    email     {string?} — correo (opcional)
+//    interes   {string?} — auto de interés ("Kia Sportage", "SUV", etc.)
+//    notas     {string?} — resumen de la conversación del agente
+//    fuente    {string?} — "WhatsApp Bot", "Meta Ads", "Landing IA", etc.
+//    vendedorId{string?} — si el agente ya sabe a qué vendedor asignar
+//    sucursal  {string?} — "Bajío", "Chihuahua", etc.
+// ════════════════════════════════════════════════════════════════════════
+export async function recibirLeadAgente(datos) {
+  // ── Validaciones mínimas ─────────────────────────────────────────────
+  if (!datos.nombre || !datos.telefono) {
+    return { ok: false, error: 'nombre y telefono son requeridos' };
+  }
+
+  // ── Deduplicación: si ya existe un lead con el mismo teléfono y está
+  //    activo (no Ganado/Perdido), no crear uno nuevo, solo añadir nota ─
+  const existente = await wixData
+    .query('ALeads')
+    .eq('telefono', datos.telefono)
+    .ne('estatus', 'Ganado')
+    .ne('estatus', 'Perdido')
+    .limit(1)
+    .find({ suppressAuth: true });
+
+  if (existente.items.length) {
+    const lead = existente.items[0];
+    // Añadir nota al lead existente
+    await wixData.insert('Activities', {
+      clienteId:  lead._id,
+      vendedorId: lead.vendedorId,
+      autor:      'Agente IA',
+      tipo:       'agente',
+      descripcion: datos.notas || 'Lead recibido nuevamente por el agente IA',
+      fecha:      new Date().toISOString(),
+      resultado:  '',
+    }, { suppressAuth: true });
+
+    await wixData.update('ALeads', {
+      _id: lead._id,
+      ultimaActividad: new Date().toISOString(),
+    }, { suppressAuth: true });
+
+    _notificar(lead._id, 'actualizar');
+    return { ok: true, lead, duplicado: true, mensaje: 'Lead ya existía — nota añadida' };
+  }
+
+  // ── Crear nuevo lead ─────────────────────────────────────────────────
+  const nuevoLead = {
+    nombre:      datos.nombre,
+    email:       datos.email      || '',
+    telefono:    datos.telefono,
+    fuente:      datos.fuente     || 'Agente IA',
+    interes:     datos.interes    || '',
+    presupuesto: datos.presupuesto || '',
+    estatus:     'Nuevo',
+    vendedorId:  datos.vendedorId || VENDEDOR_AGENTE_DEFAULT,
+    notas:       datos.notas     || '',
+    sucursal:    datos.sucursal  || 'Bajío',
+    fecha:       new Date().toISOString().split('T')[0],
+    origenAgente: true,   // flag para saber que vino del agente
+  };
+
+  const insertado = await wixData.insert('ALeads', nuevoLead, { suppressAuth: true });
+
+  // ── Actividad inicial ────────────────────────────────────────────────
+  if (datos.notas) {
+    await wixData.insert('Activities', {
+      clienteId:  insertado._id,
+      vendedorId: insertado.vendedorId,
+      autor:      'Agente IA',
+      tipo:       'agente',
+      descripcion: datos.notas,
+      fecha:      new Date().toISOString(),
+      resultado:  'positivo',
+    }, { suppressAuth: true });
+  }
+
+  // ── Notificar a todos los paneles abiertos en tiempo real ────────────
+  _notificar(insertado._id, 'crear');
+
+  console.log('[Agente IA] Lead creado:', insertado._id, insertado.nombre);
+  return { ok: true, lead: insertado, creado: true };
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Notificación realtime a los paneles abiertos
+// ════════════════════════════════════════════════════════════════════════
+function _notificar(leadId, accion) {
+  try {
+    publish(CANAL_RT, {
+      type:      'wecars-realtime-update',
+      coleccion: 'ALeads',
+      id:        leadId,
+      accion,
+      _from:     'agente-ia',
+    });
+  } catch (e) {
+    // No crítico
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  PARA EXPONER COMO HTTP ENDPOINT (opcional)
+//  En http-functions.js agregar:
+//
+//  import { recibirLeadAgente } from 'backend/agente-leads';
+//  export async function post_recibirLeadExterno(request) {
+//    const { apiKey, ...datos } = await request.body.json();
+//    if (apiKey !== 'TU_API_KEY_SECRETA') {
+//      return badRequest({ body: 'No autorizado' });
+//    }
+//    const resultado = await recibirLeadAgente(datos);
+//    return ok({ body: JSON.stringify(resultado) });
+//  }
+//
+//  URL: POST https://www.wecarsbajio.com/_functions/recibirLeadExterno
+// ════════════════════════════════════════════════════════════════════════

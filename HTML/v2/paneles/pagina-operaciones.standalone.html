@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>weCars — Operaciones</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+/* ════════════════════════════════════════════════════════
+   TOKENS
+════════════════════════════════════════════════════════ */
+:root{
+  --wc-green:#56a900;--wc-green-dark:#3d7a00;--wc-green-light:#e8f5d6;--wc-green-mid:#a3d96a;
+  --wc-bg:#f4f6f5;--wc-surface:#ffffff;--wc-surface2:#f0f2f1;
+  --wc-nav-bg:#1a2a19;--wc-nav-active:#2d4a2b;--wc-border:#dde3de;
+  --wc-ink:#0d1a0d;--wc-ink2:#4a5e4a;--wc-ink3:#7a8e7a;--wc-ink-invert:#ffffff;
+  --wc-ok:#16a34a;--wc-ok-bg:#f0fdf4;--wc-warn:#d97706;--wc-warn-bg:#fffbeb;
+  --wc-danger:#dc2626;--wc-danger-bg:#fef2f2;--wc-info:#2563eb;--wc-info-bg:#eff6ff;
+  --wc-orange:#ea580c;--wc-orange-bg:#fff7ed;
+  --wc-purple:#7c3aed;--wc-purple-bg:#f5f3ff;
+  --wc-shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --wc-shadow-md:0 4px 12px rgba(0,0,0,.1),0 2px 4px rgba(0,0,0,.06);
+  --wc-r-sm:6px;--wc-r-md:10px;--wc-r-lg:14px;--wc-r-xl:20px;--wc-r-full:9999px;
+  --sb-w:220px;--topbar-h:56px;--bottom-nav-h:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:auto;overflow:visible;min-height:800px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;
+  color:var(--wc-ink);background:var(--wc-bg);-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+img{max-width:100%;display:block}
+
+/* ════════════════════════════════════════════════════════
+   LAYOUT
+════════════════════════════════════════════════════════ */
+.app{display:flex;flex-direction:column}
+@media(min-width:769px){.app{flex-direction:row;align-items:flex-start}}
+
+/* ── Sidebar ─────────────────────────────────────────── */
+.sidebar{
+  width:var(--sb-w);flex-shrink:0;
+  background:var(--wc-nav-bg);color:var(--wc-ink-invert);
+  display:none;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+@media(min-width:769px){.sidebar{display:flex}}
+
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo-mark{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--wc-green-mid)}
+.sb-logo-sub{font-size:10px;opacity:.55;margin-top:2px;letter-spacing:.6px;text-transform:uppercase}
+
+.sb-user{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:var(--wc-green);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:600;line-height:1.2}
+.sb-user-role{font-size:11px;opacity:.6;margin-top:2px}
+
+.sb-nav{flex:1;padding:12px 0}
+.sb-section-label{padding:6px 16px 4px;font-size:10px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;opacity:.4;margin-top:8px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;
+  font-size:13px;font-weight:500;border-radius:0;transition:background .15s;
+  color:rgba(255,255,255,.75);border:none;background:none;width:100%;text-align:left}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-item.active{background:var(--wc-nav-active);color:var(--wc-green-mid);border-left:3px solid var(--wc-green)}
+.sb-item i{font-size:17px;flex-shrink:0;width:20px}
+.sb-badge{margin-left:auto;background:var(--wc-green);color:#000;font-size:10px;font-weight:700;
+  padding:1px 6px;border-radius:var(--wc-r-full);min-width:18px;text-align:center}
+
+/* ── Main ────────────────────────────────────────────── */
+.main{flex:1;min-width:0;min-height:0;padding-bottom:80px}
+@media(min-width:769px){.main{padding-bottom:24px}}
+
+/* ── Topbar ──────────────────────────────────────────── */
+.topbar{height:var(--topbar-h);background:var(--wc-surface);border-bottom:1px solid var(--wc-border);
+  display:flex;align-items:center;gap:12px;padding:0 16px;position:sticky;top:0;z-index:90}
+.topbar-title{font-size:15px;font-weight:700;color:var(--wc-green);flex:1}
+.topbar-sub{font-size:12px;color:var(--wc-ink3);font-weight:400;margin-left:6px}
+.topbar-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--wc-r-md);
+  border:1.5px solid var(--wc-border);background:var(--wc-surface);font-size:13px;font-weight:600;
+  cursor:pointer;color:var(--wc-ink2);transition:all .15s;white-space:nowrap}
+.topbar-btn:hover{border-color:var(--wc-green);color:var(--wc-green)}
+.topbar-btn.primary{background:var(--wc-green);color:#fff;border-color:var(--wc-green)}
+.topbar-btn.primary:hover{background:var(--wc-green-dark)}
+
+/* ── Content padding ─────────────────────────────────── */
+.view-wrap{padding:16px}
+
+/* ── Bottom nav (mobile) ─────────────────────────────── */
+.bottom-nav{
+  display:flex;position:fixed;bottom:0;left:0;right:0;height:var(--bottom-nav-h);
+  background:var(--wc-nav-bg);border-top:1px solid rgba(255,255,255,.1);z-index:100;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+@media(min-width:769px){.bottom-nav{display:none}}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;font-size:10px;color:rgba(255,255,255,.55);cursor:pointer;border:none;background:none;
+  padding:6px 2px;min-height:44px;transition:color .15s}
+.bn-item.active{color:var(--wc-green-mid)}
+.bn-item i{font-size:20px}
+
+/* ════════════════════════════════════════════════════════
+   COMPONENTES BASE
+════════════════════════════════════════════════════════ */
+.card-box{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
+  padding:14px 16px;margin-bottom:14px}
+.card-box-title{font-size:13px;font-weight:700;color:var(--wc-ink2);display:flex;
+  align-items:center;gap:8px;margin-bottom:12px}
+.card-box-title i{font-size:16px;color:var(--wc-ink3)}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-md);
+  padding:12px;text-align:center}
+.stat-card.accent{border-color:var(--wc-green);background:var(--wc-green-light)}
+.stat-num{font-size:22px;font-weight:800;line-height:1;color:var(--wc-ink)}
+.stat-card.accent .stat-num{color:var(--wc-green-dark)}
+.stat-lbl{font-size:11px;color:var(--wc-ink3);margin-top:3px}
+
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--wc-r-full);
+  font-size:11px;font-weight:700;white-space:nowrap}
+.chip-green{background:var(--wc-green-light);color:var(--wc-green-dark)}
+.chip-warn{background:var(--wc-warn-bg);color:var(--wc-warn)}
+.chip-info{background:var(--wc-info-bg);color:var(--wc-info)}
+.chip-orange{background:var(--wc-orange-bg);color:var(--wc-orange)}
+.chip-purple{background:var(--wc-purple-bg);color:var(--wc-purple)}
+.chip-gray{background:var(--wc-surface2);color:var(--wc-ink3)}
+.chip-danger{background:var(--wc-danger-bg);color:var(--wc-danger)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--wc-r-md);
+  border:1.5px solid var(--wc-border);background:var(--wc-surface);font-size:13px;font-weight:600;
+  cursor:pointer;color:var(--wc-ink2);transition:all .15s}
+.btn:hover{border-color:var(--wc-green);color:var(--wc-green)}
+.btn-primary{background:var(--wc-green);color:#fff;border-color:var(--wc-green)}
+.btn-primary:hover{background:var(--wc-green-dark)}
+.btn-danger{background:var(--wc-danger);color:#fff;border-color:var(--wc-danger)}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+.field-group{margin-bottom:12px}
+.field-label{font-size:12px;font-weight:600;color:var(--wc-ink2);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.field-req{color:var(--wc-danger)}
+.field-input{width:100%;padding:9px 12px;border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);
+  background:var(--wc-surface);color:var(--wc-ink);font-size:13px;outline:none;transition:border .15s}
+.field-input:focus{border-color:var(--wc-green)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media(max-width:500px){.field-grid{grid-template-columns:1fr}}
+.field-hint{font-size:11px;color:var(--wc-ink3);margin-top:4px}
+
+.divider{height:1px;background:var(--wc-border);margin:16px 0}
+.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--wc-ink3);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--wc-border)}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 24px;text-align:center;color:var(--wc-ink3)}
+.empty-state i{font-size:40px;opacity:.3;margin-bottom:12px}
+.empty-state h3{font-size:15px;font-weight:700;color:var(--wc-ink2);margin-bottom:6px}
+.empty-state p{font-size:13px;max-width:280px;line-height:1.5}
+
+.loading-row{display:flex;align-items:center;gap:10px;padding:24px;
+  color:var(--wc-ink3);font-size:13px;justify-content:center}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite}
+
+/* ════════════════════════════════════════════════════════
+   FILTER BAR
+════════════════════════════════════════════════════════ */
+.filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-chip{padding:6px 14px;border-radius:var(--wc-r-full);font-size:12px;font-weight:600;
+  border:1.5px solid var(--wc-border);background:var(--wc-surface);color:var(--wc-ink3);cursor:pointer;
+  transition:all .15s;white-space:nowrap}
+.filter-chip:hover{border-color:var(--wc-green);color:var(--wc-green)}
+.filter-chip.active{background:var(--wc-green);color:#fff;border-color:var(--wc-green)}
+
+/* ════════════════════════════════════════════════════════
+   SEARCH BAR
+════════════════════════════════════════════════════════ */
+.search-bar{display:flex;gap:10px;margin-bottom:14px}
+.search-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--wc-surface);
+  border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);padding:7px 12px}
+.search-wrap:focus-within{border-color:var(--wc-green)}
+.search-wrap input{border:none;background:none;outline:none;flex:1;font-size:13px;color:var(--wc-ink)}
+.search-wrap input::placeholder{color:var(--wc-ink3)}
+
+/* ════════════════════════════════════════════════════════
+   VEHICLE CARD
+════════════════════════════════════════════════════════ */
+.vehicle-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
+  padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s;display:flex;gap:14px;align-items:flex-start}
+.vehicle-card:hover{box-shadow:var(--wc-shadow-md)}
+.vehicle-thumb{width:72px;height:54px;border-radius:var(--wc-r-md);background:var(--wc-surface2);
+  object-fit:cover;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  color:var(--wc-ink3);overflow:hidden}
+.vehicle-thumb img{width:100%;height:100%;object-fit:cover}
+.vehicle-thumb i{font-size:24px;opacity:.4}
+.vehicle-body{flex:1;min-width:0}
+.vehicle-name{font-size:14px;font-weight:700;color:var(--wc-ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vehicle-sub{font-size:12px;color:var(--wc-ink3);margin-top:2px}
+.vehicle-price{font-size:15px;font-weight:800;color:var(--wc-ok);margin-top:4px}
+.vehicle-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.vehicle-actions{display:flex;gap:6px;flex-shrink:0;flex-direction:column;align-items:flex-end}
+.veh-action-btn{width:32px;height:32px;border-radius:var(--wc-r-md);border:1.5px solid var(--wc-border);
+  background:var(--wc-surface);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--wc-ink3);transition:all .15s}
+.veh-action-btn:hover{border-color:var(--wc-green);color:var(--wc-green)}
+
+/* ════════════════════════════════════════════════════════
+   MODAL / OVERLAY
+════════════════════════════════════════════════════════ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;
+  display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:600px){.overlay{align-items:center}}
+.overlay.hidden{display:none}
+.modal{background:var(--wc-surface);width:100%;max-width:640px;max-height:92vh;
+  border-radius:var(--wc-r-xl) var(--wc-r-xl) 0 0;overflow-y:auto;
+  display:flex;flex-direction:column}
+@media(min-width:600px){.modal{border-radius:var(--wc-r-xl);max-height:88vh}}
+.modal-hdr{display:flex;align-items:center;gap:12px;padding:16px 20px;
+  border-bottom:1px solid var(--wc-border);position:sticky;top:0;background:var(--wc-surface);z-index:1}
+.modal-title{flex:1;font-size:15px;font-weight:700}
+.modal-close{width:32px;height:32px;border-radius:var(--wc-r-full);border:1.5px solid var(--wc-border);
+  background:var(--wc-surface);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--wc-ink3);flex-shrink:0}
+.modal-close:hover{background:var(--wc-danger-bg);color:var(--wc-danger);border-color:var(--wc-danger)}
+.modal-body{padding:20px;flex:1}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--wc-border);display:flex;gap:10px;justify-content:flex-end;
+  position:sticky;bottom:0;background:var(--wc-surface)}
+
+/* ════════════════════════════════════════════════════════
+   TIPO SELECTOR (Propio / Aliado / Consigna)
+════════════════════════════════════════════════════════ */
+.tipo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.tipo-card{border:2px solid var(--wc-border);border-radius:var(--wc-r-lg);padding:14px 12px;
+  text-align:center;cursor:pointer;transition:all .2s}
+.tipo-card:hover{border-color:var(--wc-green);background:var(--wc-green-light)}
+.tipo-card.selected{border-color:var(--wc-green);background:var(--wc-green-light)}
+.tipo-card i{font-size:26px;color:var(--wc-ink3);margin-bottom:6px;display:block}
+.tipo-card.selected i{color:var(--wc-green-dark)}
+.tipo-card-label{font-size:12px;font-weight:700;color:var(--wc-ink2)}
+.tipo-card.selected .tipo-card-label{color:var(--wc-green-dark)}
+.tipo-card-sub{font-size:10px;color:var(--wc-ink3);margin-top:3px;line-height:1.3}
+
+/* ── Tipo selector inline (dentro del form) ── */
+.tipo-selector-inline{padding:12px 16px 0;margin-bottom:4px}
+.tipo-selector-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--wc-ink3);margin-bottom:8px}
+.tipo-pills{display:flex;gap:8px;flex-wrap:wrap}
+.tipo-pill{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 12px;border:2px solid var(--wc-border);border-radius:var(--wc-r-md);background:var(--wc-surface);cursor:pointer;min-width:80px;flex:1;transition:border-color .15s,background .15s}
+.tipo-pill:hover{border-color:var(--wc-green);background:var(--wc-green-light)}
+.tipo-pill.active{border-color:var(--wc-green);background:var(--wc-green-light)}
+.tipo-pill-icon{font-size:20px;line-height:1}
+.tipo-pill-name{font-size:12px;font-weight:700;color:var(--wc-ink2)}
+.tipo-pill.active .tipo-pill-name{color:var(--wc-green-dark)}
+.tipo-pill-desc{font-size:9px;color:var(--wc-ink3);text-align:center;line-height:1.2}
+
+/* ════════════════════════════════════════════════════════
+   FORM SECTIONS (accordion)
+════════════════════════════════════════════════════════ */
+.form-section{border:1px solid var(--wc-border);border-radius:var(--wc-r-md);overflow:hidden;margin-bottom:10px}
+.form-section-hdr{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;
+  background:var(--wc-surface2);font-size:13px;font-weight:700;user-select:none;transition:background .15s}
+.form-section-hdr:hover{background:var(--wc-green-light)}
+.form-section-hdr.open{background:var(--wc-surface);border-bottom:1px solid var(--wc-border)}
+.form-section-num{width:22px;height:22px;border-radius:50%;background:var(--wc-green);
+  color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.form-section-chev{margin-left:auto;font-size:14px;color:var(--wc-ink3);transition:transform .2s}
+.form-section-hdr.open .form-section-chev{transform:rotate(180deg)}
+.form-section-body{padding:14px;background:var(--wc-surface);display:none}
+.form-section-body.open{display:block}
+
+/* ════════════════════════════════════════════════════════
+   FOTO UPLOAD
+════════════════════════════════════════════════════════ */
+.foto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
+.foto-slot{aspect-ratio:4/3;border:2px dashed var(--wc-border);border-radius:var(--wc-r-md);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;cursor:pointer;color:var(--wc-ink3);font-size:11px;background:var(--wc-surface2);
+  transition:all .15s;overflow:hidden;position:relative}
+.foto-slot:hover{border-color:var(--wc-green);color:var(--wc-green);background:var(--wc-green-light)}
+.foto-slot.has-foto{border-style:solid;border-color:var(--wc-border)}
+.foto-slot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.foto-slot .foto-del{position:absolute;top:4px;right:4px;width:22px;height:22px;
+  border-radius:50%;background:rgba(220,38,38,.85);color:#fff;border:none;cursor:pointer;
+  display:none;align-items:center;justify-content:center;font-size:12px}
+.foto-slot:hover .foto-del{display:flex}
+.foto-slot-add i{font-size:22px}
+
+/* ════════════════════════════════════════════════════════
+   DOCUMENT LIST
+════════════════════════════════════════════════════════ */
+.doc-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--wc-border)}
+.doc-row:last-child{border-bottom:none}
+.doc-icon{width:36px;height:36px;border-radius:var(--wc-r-md);background:var(--wc-info-bg);
+  color:var(--wc-info);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.doc-icon.ok{background:var(--wc-ok-bg);color:var(--wc-ok)}
+.doc-body{flex:1;min-width:0}
+.doc-name{font-size:13px;font-weight:600;color:var(--wc-ink)}
+.doc-sub{font-size:11px;color:var(--wc-ink3);margin-top:2px}
+.doc-actions{display:flex;gap:6px;flex-shrink:0}
+.doc-btn{padding:5px 10px;border-radius:var(--wc-r-sm);border:1.5px solid var(--wc-border);
+  background:var(--wc-surface);font-size:11px;font-weight:600;cursor:pointer;color:var(--wc-ink2)}
+.doc-btn:hover{border-color:var(--wc-green);color:var(--wc-green)}
+
+/* ════════════════════════════════════════════════════════
+   PRECIO CARDS
+════════════════════════════════════════════════════════ */
+.precio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
+@media(max-width:500px){.precio-grid{grid-template-columns:1fr}}
+.precio-card{background:var(--wc-surface2);border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);padding:12px}
+.precio-card-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--wc-ink3);margin-bottom:6px}
+.precio-card input{width:100%;background:none;border:none;outline:none;font-size:18px;font-weight:800;color:var(--wc-ok)}
+.precio-card.lista input{color:var(--wc-ink)}
+.precio-card.credito input{color:var(--wc-info)}
+
+/* ════════════════════════════════════════════════════════
+   VENDEDOR CARD
+════════════════════════════════════════════════════════ */
+.vend-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
+  padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.vend-avatar{width:44px;height:44px;border-radius:50%;background:var(--wc-green);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.vend-body{flex:1;min-width:0}
+.vend-nombre{font-size:14px;font-weight:700}
+.vend-meta{font-size:12px;color:var(--wc-ink3);margin-top:2px}
+.vend-stats{display:flex;gap:12px;margin-top:6px}
+.vend-stat{font-size:12px;color:var(--wc-ink2)}
+.vend-stat strong{font-weight:700;color:var(--wc-ink)}
+.vend-actions{flex-shrink:0;display:flex;gap:6px}
+
+/* ════════════════════════════════════════════════════════
+   VIEWS
+════════════════════════════════════════════════════════ */
+.view{padding:0}
+.view.hidden{display:none}
+
+/* ════════════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════════ */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--wc-ink);color:#fff;padding:10px 20px;border-radius:var(--wc-r-full);
+  font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;
+  white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok{background:var(--wc-ok)}
+#toast.error{background:var(--wc-danger)}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ TOAST ════════════════════════════════ -->
+<div id="toast"></div>
+
+<div class="app">
+
+  <!-- ═══════════════════════════ SIDEBAR ════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">weCars Bajío</div>
+      <div class="sb-logo-sub">Panel Operaciones</div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-avatar">OP</div>
+      <div>
+        <div class="sb-user-name" id="sb-nombre">Operaciones</div>
+        <div class="sb-user-role" id="sb-rol">Operaciones</div>
+      </div>
+    </div>
+    <nav class="sb-nav" aria-label="Navegación principal">
+      <div class="sb-section-label">Inventario</div>
+      <button class="sb-item active" onclick="mostrarVista('inventario',this)">
+        <i class="ti ti-car" aria-hidden="true"></i>Vehículos
+        <span class="sb-badge" id="sb-badge-inv" style="display:none"></span>
+      </button>
+      <button class="sb-item" onclick="mostrarVista('rentabilidad',this)">
+        <i class="ti ti-chart-bar" aria-hidden="true"></i>Rentabilidad
+      </button>
+
+      <div class="sb-section-label">Equipo</div>
+      <button class="sb-item" onclick="mostrarVista('vendedores',this)">
+        <i class="ti ti-users" aria-hidden="true"></i>Vendedores
+        <span class="sb-badge" id="sb-badge-vend" style="display:none"></span>
+      </button>
+      <button class="sb-item" onclick="mostrarVista('clientes',this)">
+        <i class="ti ti-address-book" aria-hidden="true"></i>Todos los clientes
+      </button>
+
+      <div class="sb-section-label">Ventas</div>
+      <button class="sb-item" onclick="mostrarVista('creditos',this)">
+        <i class="ti ti-building-bank" aria-hidden="true"></i>Créditos F&I
+        <span class="sb-badge" id="sb-badge-cred" style="display:none"></span>
+      </button>
+      <button class="sb-item" onclick="mostrarVista('expedientes',this)">
+        <i class="ti ti-files" aria-hidden="true"></i>Expedientes
+      </button>
+      <button class="sb-item" onclick="mostrarVista('reportes',this)">
+        <i class="ti ti-report-analytics" aria-hidden="true"></i>Reportes
+      </button>
+    </nav>
+  </aside>
+
+  <!-- ═══════════════════════════ MAIN ════════════════════════════════════ -->
+  <main class="main" id="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Inventario
+          <span class="topbar-sub" id="topbar-sub"></span>
+        </div>
+      </div>
+      <button class="topbar-btn primary" id="topbar-cta" onclick="abrirModalNuevoVehiculo()">
+        <i class="ti ti-plus" aria-hidden="true"></i><span id="topbar-cta-label">+ Vehículo</span>
+      </button>
+    </div>
+
+    <!-- ─── VIEW: INVENTARIO ─── -->
+    <div class="view view-wrap" id="view-inventario">
+
+      <!-- Stats -->
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card accent">
+          <div class="stat-num" id="stat-total">—</div>
+          <div class="stat-lbl">Total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-disponible">—</div>
+          <div class="stat-lbl">Disponibles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-apartados">—</div>
+          <div class="stat-lbl">Apartados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-prep">—</div>
+          <div class="stat-lbl">En preparación</div>
+        </div>
+      </div>
+
+      <!-- Buscador + filtros -->
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="ti ti-search" aria-hidden="true"></i>
+          <input type="search" id="inv-search" placeholder="Buscar marca, modelo, VIN, placas..." oninput="filtrarInventario()">
+        </div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-chip active" onclick="setFiltroTipo('todos',this)">Todos</button>
+        <button class="filter-chip" onclick="setFiltroTipo('Propio',this)">
+          <i class="ti ti-building-store" style="font-size:12px"></i> Propio
+        </button>
+        <button class="filter-chip" onclick="setFiltroTipo('Aliado',this)">
+          <i class="ti ti-handshake" style="font-size:12px"></i> Aliado
+        </button>
+        <button class="filter-chip" onclick="setFiltroTipo('Consigna',this)">
+          <i class="ti ti-user-check" style="font-size:12px"></i> Consigna
+        </button>
+        <button class="filter-chip" onclick="setFiltroEstado('Disponible',this)">Disponibles</button>
+        <button class="filter-chip" onclick="setFiltroEstado('En preparación',this)">En prep.</button>
+      </div>
+
+      <!-- Lista de vehículos -->
+      <div id="inv-list"></div>
+      <div id="inv-empty" class="empty-state" style="display:none">
+        <i class="ti ti-car"></i>
+        <h3>Sin vehículos</h3>
+        <p>Agrega el primer vehículo al inventario.</p>
+        <button class="btn btn-primary" style="margin-top:16px" onclick="abrirModalNuevoVehiculo()">
+          <i class="ti ti-plus" aria-hidden="true"></i>Agregar vehículo
+        </button>
+      </div>
+      <div id="inv-loading" class="loading-row" style="display:none">
+        <i class="ti ti-loader-2 spin"></i>Cargando inventario...
+      </div>
+    </div>
+
+    <!-- ─── VIEW: RENTABILIDAD ─── -->
+    <div class="view view-wrap hidden" id="view-rentabilidad">
+      <div class="card-box">
+        <div class="card-box-title"><i class="ti ti-chart-bar"></i>Rentabilidad por vehículo</div>
+        <div id="rent-list">
+          <div class="empty-state" style="padding:24px 0">
+            <i class="ti ti-chart-bar" style="font-size:32px;opacity:.3;margin-bottom:8px;display:block"></i>
+            <p style="font-size:13px;color:var(--wc-ink3)">Disponible en Fase 2 — próximamente</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── VIEW: VENDEDORES ─── -->
+    <div class="view view-wrap hidden" id="view-vendedores">
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="search" placeholder="Buscar vendedor..." oninput="filtrarVendedores(this.value)">
+        </div>
+        <button class="btn btn-primary" onclick="abrirModalInvitarVendedor()">
+          <i class="ti ti-user-plus"></i><span class="hidden-xs">Invitar</span>
+        </button>
+      </div>
+      <div id="vend-list"></div>
+      <div id="vend-empty" class="empty-state" style="display:none">
+        <i class="ti ti-users"></i>
+        <h3>Sin vendedores</h3>
+        <p>Invita al primer vendedor al equipo.</p>
+      </div>
+      <div id="vend-loading" class="loading-row"><i class="ti ti-loader-2 spin"></i>Cargando...</div>
+    </div>
+
+    <!-- ─── VIEW: TODOS LOS CLIENTES ─── -->
+    <div class="view view-wrap hidden" id="view-clientes">
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="search" id="cli-search" placeholder="Buscar cliente, teléfono, auto..." oninput="filtrarClientes()">
+        </div>
+        <select class="field-input" id="cli-vend-filter" style="width:auto;padding:8px 12px" onchange="filtrarClientes()">
+          <option value="">Todos los vendedores</option>
+        </select>
+      </div>
+      <div id="cli-list"></div>
+      <div id="cli-loading" class="loading-row"><i class="ti ti-loader-2 spin"></i>Cargando...</div>
+    </div>
+
+    <!-- ─── VIEW: CRÉDITOS F&I ─── -->
+    <div class="view view-wrap hidden" id="view-creditos">
+      <div class="filter-bar">
+        <button class="filter-chip active" onclick="setFiltroCred('todos',this)">Todos</button>
+        <button class="filter-chip" onclick="setFiltroCred('Pendiente',this)">Pendientes</button>
+        <button class="filter-chip" onclick="setFiltroCred('Enviado',this)">Enviados</button>
+        <button class="filter-chip" onclick="setFiltroCred('Aprobado',this)">Aprobados</button>
+        <button class="filter-chip" onclick="setFiltroCred('Rechazado',this)">Rechazados</button>
+      </div>
+      <div id="cred-list"></div>
+      <div id="cred-loading" class="loading-row"><i class="ti ti-loader-2 spin"></i>Cargando...</div>
+    </div>
+
+    <!-- ─── VIEW: EXPEDIENTES DE VENTAS ─── -->
+    <div class="view view-wrap hidden" id="view-expedientes">
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="search" placeholder="Buscar cliente, vehículo, VIN, folio..." oninput="buscarExpedientes(this.value)">
+        </div>
+      </div>
+      <div id="exp-list">
+        <div class="empty-state">
+          <i class="ti ti-files"></i>
+          <h3>Expedientes de ventas</h3>
+          <p>Disponible en Fase 4 — historial completo buscable</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── VIEW: REPORTES ─── -->
+    <div class="view view-wrap hidden" id="view-reportes">
+      <div class="card-box">
+        <div class="card-box-title"><i class="ti ti-report-analytics"></i>Reportes para Gerencia</div>
+        <div class="empty-state" style="padding:24px 0">
+          <i class="ti ti-report-analytics" style="font-size:32px;opacity:.3;margin-bottom:8px;display:block"></i>
+          <p style="font-size:13px;color:var(--wc-ink3)">Disponible en Fase 4 — próximamente</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════════ BOTTOM NAV (mobile) ══════════════════════════════════ -->
+<nav class="bottom-nav" aria-label="Navegación móvil">
+  <button class="bn-item active" id="bn-inventario" onclick="mostrarVista('inventario',this,'bn')">
+    <i class="ti ti-car"></i>Inventario
+  </button>
+  <button class="bn-item" id="bn-vendedores" onclick="mostrarVista('vendedores',this,'bn')">
+    <i class="ti ti-users"></i>Equipo
+  </button>
+  <button class="bn-item" id="bn-clientes" onclick="mostrarVista('clientes',this,'bn')">
+    <i class="ti ti-address-book"></i>Clientes
+  </button>
+  <button class="bn-item" id="bn-creditos" onclick="mostrarVista('creditos',this,'bn')">
+    <i class="ti ti-building-bank"></i>Créditos
+  </button>
+  <button class="bn-item" id="bn-reportes" onclick="mostrarVista('reportes',this,'bn')">
+    <i class="ti ti-report-analytics"></i>Reportes
+  </button>
+</nav>
+
+<!-- ═══════════════ MODAL: SELECTOR TIPO ══════════════════════════════════ -->
+<div class="overlay hidden" id="overlay-tipo" onclick="if(event.target===this)cerrarModalTipo()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-hdr">
+      <i class="ti ti-plus-circle" style="font-size:20px;color:var(--wc-green)"></i>
+      <div class="modal-title">¿Qué tipo de vehículo?</div>
+      <button class="modal-close" onclick="cerrarModalTipo()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="tipo-grid">
+        <div class="tipo-card" id="tipo-propio" onclick="seleccionarTipo('Propio')">
+          <i class="ti ti-building-store"></i>
+          <div class="tipo-card-label">Propio</div>
+          <div class="tipo-card-sub">Vehículo de la sucursal</div>
+        </div>
+        <div class="tipo-card" id="tipo-aliado" onclick="seleccionarTipo('Aliado')">
+          <i class="ti ti-handshake"></i>
+          <div class="tipo-card-label">Aliado</div>
+          <div class="tipo-card-sub">Otra agencia o proveedor aliado</div>
+        </div>
+        <div class="tipo-card" id="tipo-consigna" onclick="seleccionarTipo('Consigna')">
+          <i class="ti ti-user-check"></i>
+          <div class="tipo-card-label">Consigna</div>
+          <div class="tipo-card-sub">Particular nos deja vender su auto</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--wc-ink3);text-align:center">
+        Cada tipo requiere información diferente en el expediente.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: FORM VEHÍCULO ═══════════════════════════════════ -->
+<div class="overlay hidden" id="overlay-vehiculo" onclick="if(event.target===this)cerrarModalVehiculo()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-veh-title">Nuevo vehículo — Propio</div>
+      <button class="modal-close" onclick="cerrarModalVehiculo()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body" id="modal-veh-body">
+      <!-- Generado por JS según tipo -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="cerrarModalVehiculo()">Cancelar</button>
+      <button class="btn btn-primary" id="btn-guardar-veh" onclick="guardarVehiculo()">
+        <i class="ti ti-device-floppy"></i>Guardar vehículo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: INVITAR VENDEDOR ════════════════════════════════ -->
+<div class="overlay hidden" id="overlay-invitar" onclick="if(event.target===this)cerrarModalInvitar()">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-hdr">
+      <i class="ti ti-user-plus" style="font-size:20px;color:var(--wc-green)"></i>
+      <div class="modal-title">Invitar vendedor</div>
+      <button class="modal-close" onclick="cerrarModalInvitar()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <div class="field-label">Nombre completo <span class="field-req">*</span></div>
+        <input class="field-input" id="inv-nombre" placeholder="Nombre del vendedor">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Correo electrónico <span class="field-req">*</span></div>
+        <input class="field-input" id="inv-email" type="email" placeholder="correo@ejemplo.com">
+        <div class="field-hint">Se enviará la invitación de acceso a este correo.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Teléfono</div>
+        <input class="field-input" id="inv-tel" type="tel" placeholder="477-000-0000">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Sucursal</div>
+        <select class="field-input" id="inv-sucursal">
+          <option value="Bajío">Bajío</option>
+          <option value="León">León</option>
+          <option value="Silao">Silao</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Meta mensual de cierres</div>
+        <input class="field-input" id="inv-meta" type="number" value="5" min="1">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="cerrarModalInvitar()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarVendedor()">
+        <i class="ti ti-send"></i>Crear acceso
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   WC PROTOCOL (postMessage ↔ Velo)
+════════════════════════════════════════════════════════ */
+const WC = {
+  OUT: {
+    READY:            'wecars-ready',
+    RESIZE:           'wecars-resize',
+    CARS_LISTAR:      'wecars-cars-listar',
+    CAR_CREAR:        'wecars-car-crear',
+    CAR_EDITAR:       'wecars-car-editar',
+    CAR_GET:          'wecars-car-get',
+    USUARIOS_LISTAR:  'wecars-usuarios-listar',
+    USUARIO_CREAR:    'wecars-usuario-crear',
+    USUARIO_EDITAR:   'wecars-usuario-editar',
+    LEADS_LISTAR_TODOS:'wecars-leads-listar-todos',
+    CREDITOS_LISTAR:  'wecars-creditos-listar',
+    CREDITO_EDITAR:   'wecars-credito-editar',
+    DOC_SUBIR:        'wecars-doc-subir',
+    FOTO_SUBIR:       'wecars-foto-subir',
+    CONSIGNA_CREAR:   'wecars-consigna-crear',
+    ALIADO_CREAR:     'wecars-aliado-crear',
+    ALIADOS_LISTAR:   'wecars-aliados-listar',
+  },
+  IN: {
+    CONTEXTO:         'wecars-contexto',
+    ERROR:            'wecars-error',
+    CARS_LISTA:       'wecars-cars-lista',
+    CAR_RESULTADO:    'wecars-car-resultado',
+    USUARIOS_LISTA:   'wecars-usuarios-lista',
+    USUARIO_RESULTADO:'wecars-usuario-resultado',
+    LEADS_LISTA:      'wecars-leads-lista',
+    CREDITOS_LISTA:   'wecars-creditos-lista',
+    CREDITO_RESULTADO:'wecars-credito-resultado',
+    DOC_RESULTADO:    'wecars-doc-resultado',
+    FOTO_RESULTADO:   'wecars-foto-resultado',
+    ALIADOS_LISTA:    'wecars-aliados-lista',
+    CONSIGNA_RESULTADO:'wecars-consigna-resultado',
+  },
+  send(tipo, payload = {}) { window.parent.postMessage({ type: tipo, ...payload }, '*'); },
+  onMany(mapa) {
+    window.addEventListener('message', (e) => {
+      if (!e.data || !e.data.type) return;
+      const h = mapa[e.data.type];
+      if (h) h(e.data);
+    });
+  }
+};
+
+/* ════════════════════════════════════════════════════════
+   WIX IMAGE RESOLVER
+════════════════════════════════════════════════════════ */
+function resolveWixImg(raw, w = 400, h = 300) {
+  if (!raw) return '';
+  if (typeof raw === 'object' && raw.url) raw = raw.url;
+  if (typeof raw !== 'string') return '';
+  if (raw.startsWith('http')) return raw;
+  // wix:image://v1/<fileId>/<filename>#originWidth=...
+  const m = raw.match(/wix:image:\/\/v1\/([^\/]+)\//);
+  if (m) return `https://static.wixstatic.com/media/${m[1]}/v1/fill/w_${w},h_${h},al_c,q_80,usm_0.66_1.00_0.01,enc_auto/${m[1]}`;
+  return raw;
+}
+
+/* ════════════════════════════════════════════════════════
+   ESTADO GLOBAL
+════════════════════════════════════════════════════════ */
+let CTX = null;
+let INVENTARIO = [];
+let VENDEDORES = [];
+let CLIENTES   = [];
+let CREDITOS   = [];
+let ALIADOS    = [];
+let _filtroTipo   = 'todos';
+let _filtroEstado = null;
+let _tipoSeleccionado = 'Propio';
+let _editandoCarId    = null;
+
+/* ════════════════════════════════════════════════════════
+   RESIZE OBSERVER (scroll único con Wix)
+════════════════════════════════════════════════════════ */
+const _resizeObs = new ResizeObserver(() => enviarAltura());
+_resizeObs.observe(document.body);
+function enviarAltura() {
+  WC.send(WC.OUT.RESIZE, { height: document.body.scrollHeight });
+}
+
+/* ════════════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════════ */
+const Toast = {
+  _t: null,
+  show(msg, tipo = '') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'show' + (tipo ? ' ' + tipo : '');
+    clearTimeout(this._t);
+    this._t = setTimeout(() => el.classList.remove('show'), 3000);
+  }
+};
+
+/* ════════════════════════════════════════════════════════
+   ESCAPE HTML
+════════════════════════════════════════════════════════ */
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+// Limpia precios que vienen del CMS como string formateado "$200,000" o "200000"
+function parsePrice(v) {
+  if (v == null || v === '') return null;
+  if (typeof v === 'number') return isNaN(v) ? null : v;
+  // Quita $, comas de miles, espacios
+  const clean = String(v).replace(/[$,\s]/g, '');
+  const n = parseFloat(clean);
+  return isNaN(n) ? null : n;
+}
+function fmt(n) {
+  const num = parsePrice(n);
+  return num != null ? '$' + num.toLocaleString('es-MX') : '—';
+}
+
+/* ════════════════════════════════════════════════════════
+   NAVEGACIÓN
+════════════════════════════════════════════════════════ */
+const VISTAS = ['inventario','rentabilidad','vendedores','clientes','creditos','expedientes','reportes'];
+const VISTA_CONFIG = {
+  inventario:    { title: 'Inventario',              cta: '+ Vehículo',   ctaFn: 'abrirModalNuevoVehiculo' },
+  rentabilidad:  { title: 'Rentabilidad',            cta: null },
+  vendedores:    { title: 'Vendedores',              cta: '+ Invitar',    ctaFn: 'abrirModalInvitarVendedor' },
+  clientes:      { title: 'Todos los clientes',      cta: null },
+  creditos:      { title: 'Créditos F&I',            cta: null },
+  expedientes:   { title: 'Expedientes de ventas',   cta: null },
+  reportes:      { title: 'Reportes',                cta: null },
+};
+
+function mostrarVista(key, btn, origen) {
+  VISTAS.forEach(v => document.getElementById('view-' + v).classList.toggle('hidden', v !== key));
+  const cfg = VISTA_CONFIG[key] || {};
+  document.getElementById('topbar-title').textContent = cfg.title || key;
+  const ctaBtn = document.getElementById('topbar-cta');
+  if (cfg.cta) {
+    ctaBtn.style.display = '';
+    document.getElementById('topbar-cta-label').textContent = cfg.cta;
+    ctaBtn.onclick = cfg.ctaFn ? window[cfg.ctaFn] : null;
+  } else {
+    ctaBtn.style.display = 'none';
+  }
+
+  // Sidebar activo
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  if (btn && origen !== 'bn') btn.classList.add('active');
+
+  // Bottom nav activo
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+  const bnMap = { inventario:'bn-inventario', vendedores:'bn-vendedores',
+    clientes:'bn-clientes', creditos:'bn-creditos', reportes:'bn-reportes' };
+  if (bnMap[key]) document.getElementById(bnMap[key])?.classList.add('active');
+  if (btn && origen === 'bn') btn.classList.add('active');
+
+  // Cargar datos si es necesario
+  if (key === 'vendedores' && !VENDEDORES.length) cargarVendedores();
+  if (key === 'clientes'   && !CLIENTES.length)   cargarTodosClientes();
+  if (key === 'creditos'   && !CREDITOS.length)    cargarCreditos();
+}
+
+/* ════════════════════════════════════════════════════════
+   COMUNICACIÓN CON VELO
+════════════════════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  enviarAltura();
+  WC.send(WC.OUT.READY);
+});
+
+WC.onMany({
+  [WC.IN.CONTEXTO]: (d) => {
+    CTX = d;
+    const nombre   = d.usuario  || 'Operaciones';
+    const initials = nombre.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('sb-avatar').textContent = initials;
+    document.getElementById('sb-nombre').textContent = nombre;
+    document.getElementById('sb-rol').textContent    = d.rol || 'Operaciones';
+    cargarInventario();
+  },
+
+  [WC.IN.CARS_LISTA]: (d) => {
+    INVENTARIO = d.items || [];
+    ocultarLoading('inv');
+    renderInventario();
+  },
+
+  [WC.IN.CAR_RESULTADO]: (d) => {
+    // Rehabilita botón guardar si sigue deshabilitado
+    const btn = document.getElementById('btn-guardar-veh');
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-device-floppy"></i>Guardar vehículo'; }
+
+    if (d.ok) {
+      Toast.show(d.creado ? 'Vehículo agregado ✓' : 'Vehículo actualizado ✓', 'ok');
+      cerrarModalVehiculo();
+      // Actualiza localmente sin recargar todo
+      if (d.car) {
+        if (d.creado) {
+          INVENTARIO.unshift(d.car);
+        } else {
+          const idx = INVENTARIO.findIndex(c => c._id === d.car._id);
+          if (idx >= 0) INVENTARIO[idx] = d.car; else INVENTARIO.unshift(d.car);
+        }
+        renderInventario();
+      } else {
+        cargarInventario(); // fallback: recarga completa
+      }
+    } else {
+      Toast.show('Error: ' + (d.error || 'No se pudo guardar'), 'error');
+      console.error('[CAR_RESULTADO] error:', d.error);
+    }
+  },
+
+  [WC.IN.USUARIOS_LISTA]: (d) => {
+    VENDEDORES = (d.items || []).filter(u => u.rol === 'Vendedor' || !u.rol);
+    ocultarLoading('vend');
+    renderVendedores();
+  },
+
+  [WC.IN.USUARIO_RESULTADO]: (d) => {
+    if (d.ok) {
+      Toast.show('Vendedor guardado ✓', 'ok');
+      cerrarModalInvitar();
+      cargarVendedores();
+    } else {
+      Toast.show(d.error || 'Error', 'error');
+    }
+  },
+
+  [WC.IN.LEADS_LISTA]: (d) => {
+    CLIENTES = d.items || [];
+    ocultarLoading('cli');
+    renderClientes();
+  },
+
+  [WC.IN.CREDITOS_LISTA]: (d) => {
+    CREDITOS = d.items || [];
+    ocultarLoading('cred');
+    renderCreditos();
+  },
+
+  [WC.IN.ERROR]: (d) => {
+    Toast.show(d.mensaje || 'Error del servidor', 'error');
+  },
+
+  [WC.IN.FOTO_RESULTADO]: (d) => {
+    if (d.ok && d.url) {
+      // Actualiza el slot de foto con la URL real
+      const slot = document.querySelector(`.foto-slot[data-idx="${d.idx}"]`);
+      if (slot) {
+        slot.classList.add('has-foto');
+        slot.innerHTML = `<img src="${resolveWixImg(d.url,200,150)}" alt="foto">
+          <button class="foto-del" onclick="event.stopPropagation();_borrarFoto(${d.idx})" title="Eliminar">✕</button>`;
+        slot.setAttribute('data-url', d.url);
+      }
+      // Si es foto 0, guarda como fotoPrincipal del vehículo en edición
+      if (d.idx === 0 && _editandoCarId) {
+        WC.send(WC.OUT.CAR_EDITAR, { id: _editandoCarId, datos: { fotoPrincipal: d.url } });
+      }
+      Toast.show('Foto subida ✓', 'ok');
+    } else {
+      Toast.show(d.error || 'Error al subir foto', 'error');
+    }
+    // Rehabilitar el slot
+    const btnSlot = document.querySelector(`.foto-slot[data-idx="${d.idx}"]`);
+    if (btnSlot) btnSlot.style.opacity = '1';
+  },
+});
+
+/* ════════════════════════════════════════════════════════
+   LOADING HELPERS
+════════════════════════════════════════════════════════ */
+function mostrarLoading(prefix) {
+  const el = document.getElementById(prefix + '-loading');
+  if (el) el.style.display = 'flex';
+}
+function ocultarLoading(prefix) {
+  if (!prefix) return;
+  const el = document.getElementById(prefix + '-loading');
+  if (el) el.style.display = 'none';
+}
+
+/* ════════════════════════════════════════════════════════
+   INVENTARIO
+════════════════════════════════════════════════════════ */
+function cargarInventario() {
+  mostrarLoading('inv');
+  WC.send(WC.OUT.CARS_LISTAR, { limite: 200 });
+}
+
+function renderInventario() {
+  const q   = (document.getElementById('inv-search')?.value || '').toLowerCase();
+  let items = INVENTARIO.filter(c => {
+    if (_filtroTipo !== 'todos') {
+      const t = (c.tipoAdquisicion || c.tipoOrigen || 'propio').toLowerCase();
+      if (t !== _filtroTipo.toLowerCase()) return false;
+    }
+    if (_filtroEstado) {
+      const e = c.estatusVenta || c.estadoVehiculo || 'Disponible';
+      if (e !== _filtroEstado) return false;
+    }
+    if (!q) return true;
+    return [c.marca, c.modelo, c.anio, c.año, c.version, c.nombre, c.nombreCarro, c.title, c.numeroSerie, c.vin, c.numeroPlacas, c.color]
+      .some(f => f && String(f).toLowerCase().includes(q));
+  });
+
+  // Stats — usa estatusVenta (nombre real del CMS)
+  const estOf = c => c.estatusVenta || c.estadoVehiculo || 'Disponible';
+  document.getElementById('stat-total').textContent      = INVENTARIO.length;
+  document.getElementById('stat-disponible').textContent = INVENTARIO.filter(c=>estOf(c)==='Disponible').length;
+  document.getElementById('stat-apartados').textContent  = INVENTARIO.filter(c=>estOf(c)==='Apartado'||estOf(c)==='Reservado').length;
+  document.getElementById('stat-prep').textContent       = INVENTARIO.filter(c=>estOf(c)==='En preparación').length;
+
+  const el    = document.getElementById('inv-list');
+  const empty = document.getElementById('inv-empty');
+
+  if (!items.length) { el.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  const TIPO_CHIP = {
+    'Propio':   '<span class="chip chip-green"><i class="ti ti-building-store" style="font-size:10px"></i>Propio</span>',
+    'propio':   '<span class="chip chip-green"><i class="ti ti-building-store" style="font-size:10px"></i>Propio</span>',
+    'Aliado':   '<span class="chip chip-info"><i class="ti ti-handshake" style="font-size:10px"></i>Aliado</span>',
+    'aliado':   '<span class="chip chip-info"><i class="ti ti-handshake" style="font-size:10px"></i>Aliado</span>',
+    'Consigna': '<span class="chip chip-purple"><i class="ti ti-user-check" style="font-size:10px"></i>Consigna</span>',
+    'consigna': '<span class="chip chip-purple"><i class="ti ti-user-check" style="font-size:10px"></i>Consigna</span>',
+  };
+  const ESTADO_CHIP = {
+    'Disponible':     '<span class="chip chip-green">Disponible</span>',
+    'En preparación': '<span class="chip chip-warn">En prep.</span>',
+    'Apartado':       '<span class="chip chip-orange">Apartado</span>',
+    'Reservado':      '<span class="chip chip-orange">Reservado</span>',
+    'Vendido':        '<span class="chip chip-gray">Vendido</span>',
+    'Consigna':       '<span class="chip chip-purple">Consigna</span>',
+  };
+
+  el.innerHTML = items.map(c => {
+    // Tipo: tipoAdquisicion es el campo real del CMS
+    const tipoOrigen  = c.tipoAdquisicion || c.tipoOrigen || 'propio';
+    const tipoChip    = TIPO_CHIP[tipoOrigen] || TIPO_CHIP['propio'];
+    // Estado: estatusVenta es el campo real del CMS
+    const estadoVeh   = c.estatusVenta || c.estadoVehiculo || 'Disponible';
+    const estadoChip  = ESTADO_CHIP[estadoVeh] || ESTADO_CHIP['Disponible'];
+    // Nombre: combina marca+modelo+año con todos los fallbacks del CMS
+    const marca  = c.marca  || c.brand || '';
+    const modelo = c.modelo || '';
+    const anio   = c.año    || c.anio  || c.year || '';
+    const nombre = [marca, modelo, anio].filter(Boolean).join(' ')
+                   || c.nombre || c.nombreCarro || c.title || 'Sin nombre';
+    // Foto: `fotos[]` es el array principal en el CMS (admin lo confirma)
+    const rawFoto = c.fotoPrincipal || c.imagenUrl || c.imagen || c.image || c.imageUrl
+                  || (Array.isArray(c.fotos)  && c.fotos[0])
+                  || (Array.isArray(c.images) && c.images[0]) || '';
+    const thumb   = resolveWixImg(rawFoto, 144, 108);
+    const hasVideo = !!c.video;
+    const vin6    = (c.vin || c.noSerie || c.serialNumber || c.numeroSerie || '').slice(-6);
+    const precio  = parsePrice(c.priceNew || c.precioVenta || c.precio || c.precioPromo || c.precioLista);
+    return `
+    <div class="vehicle-card" onclick="abrirDetalleVehiculo('${esc(c._id)}')">
+      <div class="vehicle-thumb">
+        ${thumb ? `<img src="${esc(thumb)}" alt="${esc(nombre)}" loading="lazy" onerror="this.style.display='none'">` : '<i class="ti ti-car"></i>'}
+      </div>
+      <div class="vehicle-body">
+        <div class="vehicle-name">${esc(nombre)}</div>
+        <div class="vehicle-sub">${[c.version||'',c.color||'',c.statusDescription||c.km||c.kilometraje?Number(c.statusDescription||c.km||c.kilometraje||0).toLocaleString('es-MX')+' km':''].filter(Boolean).join(' · ')}</div>
+        <div class="vehicle-price">${precio ? fmt(precio) : '<span style="color:var(--wc-ink3);font-size:12px">Sin precio</span>'}</div>
+        <div class="vehicle-chips">
+          ${tipoChip}
+          ${estadoChip}
+          ${hasVideo ? '<span class="chip chip-gray" title="Tiene video"><i class="ti ti-video" style="font-size:10px"></i></span>' : ''}
+          ${vin6 ? `<span class="chip chip-gray" title="VIN">···${esc(vin6)}</span>` : ''}
+        </div>
+      </div>
+      <div class="vehicle-actions">
+        <button class="veh-action-btn" title="Editar vehículo" onclick="event.stopPropagation();editarVehiculo('${esc(c._id)}')">
+          <i class="ti ti-pencil"></i>
+        </button>
+        <button class="veh-action-btn" title="Cambiar tipo (Propio/Aliado/Consigna)" onclick="event.stopPropagation();cambiarTipoVehiculo('${esc(c._id)}','${esc(tipoOrigen)}')">
+          <i class="ti ti-transfer"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setFiltroTipo(tipo, btn) {
+  _filtroTipo   = tipo;
+  _filtroEstado = null;
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderInventario();
+}
+function setFiltroEstado(estado, btn) {
+  _filtroEstado = _filtroEstado === estado ? null : estado;
+  _filtroTipo   = 'todos';
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  if (_filtroEstado) btn.classList.add('active');
+  renderInventario();
+}
+function filtrarInventario() { renderInventario(); }
+
+/* ════════════════════════════════════════════════════════
+   MODAL TIPO → MODAL FORM
+════════════════════════════════════════════════════════ */
+function abrirModalNuevoVehiculo() {
+  _editandoCarId = null;
+  document.getElementById('overlay-tipo').classList.remove('hidden');
+  document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
+}
+function cerrarModalTipo() {
+  document.getElementById('overlay-tipo').classList.add('hidden');
+}
+function seleccionarTipo(tipo) {
+  _tipoSeleccionado = tipo;
+  cerrarModalTipo();
+  abrirFormVehiculo(tipo, null);
+}
+
+function abrirDetalleVehiculo(id) {
+  editarVehiculo(id);
+}
+function editarVehiculo(id) {
+  _editandoCarId = id;
+  const car = INVENTARIO.find(c => c._id === id);
+  if (!car) return;
+  // Normaliza tipoAdquisicion → _tipoSeleccionado
+  const t = car.tipoAdquisicion || car.tipoOrigen || 'Propio';
+  _tipoSeleccionado = t.charAt(0).toUpperCase() + t.slice(1).toLowerCase()
+    .replace('consigna','Consigna').replace('aliado','Aliado').replace('propio','Propio');
+  if (!['Propio','Aliado','Consigna'].includes(_tipoSeleccionado)) _tipoSeleccionado = 'Propio';
+  abrirFormVehiculo(_tipoSeleccionado, car);
+}
+function editarPrecios(id) {
+  editarVehiculo(id);
+  // After form opens, auto-open the precios section
+  setTimeout(() => {
+    const secPrecio = document.getElementById('sec-precios');
+    if (secPrecio && !secPrecio.classList.contains('open')) {
+      document.getElementById('hdr-precios')?.click();
+    }
+  }, 200);
+}
+
+function abrirFormVehiculo(tipo, car) {
+  const overlay = document.getElementById('overlay-vehiculo');
+  const title   = document.getElementById('modal-veh-title');
+  const body    = document.getElementById('modal-veh-body');
+  title.textContent = (car ? 'Editar' : 'Nuevo') + ' vehículo';
+  body.innerHTML    = _buildFormVehiculo(tipo, car);
+  overlay.classList.remove('hidden');
+  // Guarda referencia al car original para cambios de tipo en-form
+  body._carData = car;
+}
+
+// Cambia el tipo desde dentro del form sin cerrar el modal
+function _cambiarTipoEnForm(nuevoTipo) {
+  if (!['Propio','Aliado','Consigna'].includes(nuevoTipo)) return;
+  _tipoSeleccionado = nuevoTipo;
+  // Actualiza pills
+  document.querySelectorAll('.tipo-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.tipo === nuevoTipo);
+  });
+  // Actualiza título del modal
+  const t = document.getElementById('modal-veh-title');
+  if (t) t.textContent = (document.getElementById('modal-veh-body')._carData ? 'Editar' : 'Nuevo') + ' vehículo';
+  // Reconstruye solo la sección tipo (id="sec-tipo-wrap")
+  const wrap = document.getElementById('sec-tipo-wrap');
+  if (!wrap) return;
+  const raw = document.getElementById('modal-veh-body')._carData || {};
+  const cs = raw.consignaInfo || {};
+  const vn = {
+    cons_nombre: cs.propietario||raw.cons_nombre||raw.consignaNombre||'', cons_rfc: raw.cons_rfc||'', cons_curp: raw.cons_curp||'',
+    cons_tel: cs.telefono||raw.cons_tel||'', cons_email: cs.email||raw.cons_email||'', cons_dir: raw.cons_dir||'',
+    cons_precioMin: (cs.precioMinimo!=null?cs.precioMinimo:'')||raw.cons_precioMin||'', cons_comisionPct: (cs.comision!=null?cs.comision:'')||raw.cons_comisionPct||'',
+    cons_plazo: raw.cons_plazo||60, cons_fechaInicio: raw.cons_fechaInicio||'',
+    ali_empresa: raw.ali_empresa||raw.aliadoEmpresa||'', ali_contacto: raw.ali_contacto||'',
+    ali_rfc: raw.ali_rfc||'', ali_tel: raw.ali_tel||'', ali_email: raw.ali_email||'',
+    ali_precioBase: raw.ali_precioBase||'', ali_splitPct: raw.ali_splitPct||'',
+    costoAdquisicion: raw.costoAdquisicion||raw.costPrice||'', fuenteAdquisicion: raw.fuenteAdquisicion||'Compra directa',
+    fechaAdquisicion: raw.fechaAdquisicion||'',
+  };
+  wrap.outerHTML = _buildSecTipo(nuevoTipo, vn);
+}
+function cerrarModalVehiculo() {
+  document.getElementById('overlay-vehiculo').classList.add('hidden');
+}
+
+function _toggleFormSection(hdr) {
+  hdr.classList.toggle('open');
+  const body = hdr.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// Construye solo la sección dinámica del tipo (1: Consigna/Aliado/Propio)
+function _buildSecTipo(tipo, v) {
+  const s = (id, val, placeholder, type='text') =>
+    `<input class="field-input" id="vf-${id}" type="${type}" value="${esc(val)}" placeholder="${esc(placeholder)}">`;
+  let inner = '';
+  if (tipo === 'Consigna') {
+    inner = `
+      <div class="field-grid">
+        <div class="field-group" style="grid-column:1/-1">
+          <div class="field-label">Nombre completo <span class="field-req">*</span></div>
+          ${s('cons-nombre', v.cons_nombre||'', 'Nombre del propietario')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">RFC</div>
+          ${s('cons-rfc', v.cons_rfc||'', 'ABCD123456XY0')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">CURP</div>
+          ${s('cons-curp', v.cons_curp||'', 'CURP del propietario')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Teléfono <span class="field-req">*</span></div>
+          ${s('cons-tel', v.cons_tel||'', '477-000-0000', 'tel')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Correo electrónico</div>
+          ${s('cons-email', v.cons_email||'', 'correo@gmail.com', 'email')}
+        </div>
+        <div class="field-group" style="grid-column:1/-1">
+          <div class="field-label">Dirección</div>
+          ${s('cons-dir', v.cons_dir||'', 'Calle, colonia, ciudad')}
+        </div>
+      </div>
+      <div class="section-title">Contrato de consigna</div>
+      <div class="field-grid">
+        <div class="field-group">
+          <div class="field-label">Precio mínimo propietario</div>
+          ${s('cons-precio-min', v.cons_precioMin||'', '250000', 'number')}
+          <div class="field-hint">Lo que quiere recibir el dueño</div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">% Comisión weCars</div>
+          ${s('cons-comision-pct', v.cons_comisionPct||'', '5', 'number')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Plazo del contrato</div>
+          <select class="field-input" id="vf-cons-plazo">
+            ${[30,60,90].map(d=>`<option value="${d}" ${(v.cons_plazo||60)==d?'selected':''}>${d} días</option>`).join('')}
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Fecha de inicio</div>
+          ${s('cons-fecha-inicio', v.cons_fechaInicio||'', '', 'date')}
+        </div>
+      </div>`;
+  } else if (tipo === 'Aliado') {
+    inner = `
+      <div class="field-grid">
+        <div class="field-group" style="grid-column:1/-1">
+          <div class="field-label">Nombre empresa / agencia <span class="field-req">*</span></div>
+          ${s('ali-empresa', v.ali_empresa||'', 'Nombre del aliado')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Contacto (nombre)</div>
+          ${s('ali-contacto', v.ali_contacto||'', 'Persona de contacto')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">RFC empresa</div>
+          ${s('ali-rfc', v.ali_rfc||'', 'RFC del aliado')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Teléfono</div>
+          ${s('ali-tel', v.ali_tel||'', '477-000-0000', 'tel')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Correo</div>
+          ${s('ali-email', v.ali_email||'', 'aliado@empresa.com', 'email')}
+        </div>
+      </div>
+      <div class="section-title">Condiciones comerciales</div>
+      <div class="field-grid">
+        <div class="field-group">
+          <div class="field-label">Precio que nos da el aliado</div>
+          ${s('ali-precio-base', v.ali_precioBase||'', '200000', 'number')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">% Split para el aliado</div>
+          ${s('ali-split-pct', v.ali_splitPct||'', '0', 'number')}
+          <div class="field-hint">0 = precio fijo, sin split</div>
+        </div>
+      </div>`;
+  } else {
+    inner = `
+      <div class="field-grid">
+        <div class="field-group">
+          <div class="field-label">Costo de adquisición</div>
+          ${s('prop-costo', v.costoAdquisicion||'', '180000', 'number')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Fuente</div>
+          <select class="field-input" id="vf-prop-fuente">
+            ${['Subasta','Trade-in','Compra directa','Remate','Otro'].map(o=>
+              `<option value="${esc(o)}" ${(v.fuenteAdquisicion||'')=== o?'selected':''}>${esc(o)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Fecha de adquisición</div>
+          ${s('prop-fecha', v.fechaAdquisicion||'', '', 'date')}
+        </div>
+      </div>`;
+  }
+  const labels = { Propio: 'Propio (inventario weCars)', Aliado: 'Aliado / socio comercial', Consigna: 'Consigna (propietario externo)' };
+  return `<div id="sec-tipo-wrap" class="form-section">
+    <div class="form-section-hdr open" onclick="_toggleFormSection(this)">
+      <div class="form-section-num">1</div>
+      <span>${labels[tipo] || tipo}</span>
+      <i class="ti ti-chevron-down form-section-chev"></i>
+    </div>
+    <div class="form-section-body open">${inner}</div>
+  </div>`;
+}
+
+function _buildFormVehiculo(tipo, car) {
+  const raw = car || {};
+  // Normaliza campos CMS → nombres internos del form
+  const v = {
+    ...raw,
+    // Nombre / identificación
+    marca:            raw.marca  || raw.brand  || '',
+    modelo:           raw.modelo || raw.version || raw.nombreCarro || raw.title || '',
+    anio:             raw.año    || raw.anio    || raw.year || '',
+    version:          raw.version || '',
+    color:            raw.color  || '',
+    colorInterior:    raw.colorInterior || '',
+    // KM — CMS usa statusDescription como campo principal, km/kilometraje como alias
+    km:               raw.statusDescription || raw.km || raw.kilometraje || '',
+    transmision:      raw.transmision || raw.transmission || 'Automática',
+    combustible:      raw.combustible || raw.fuel || 'Gasolina',
+    motor:            raw.motor  || raw.engine || '',
+    // Identificadores
+    vin:              raw.vin    || raw.noSerie || raw.serialNumber || raw.numeroSerie || '',
+    numeroPlacas:     raw.numeroPlacas || raw.placas || '',
+    estadoPlacas:     raw.estadoPlacas || '',
+    estadoVehiculo:   raw.estatusVenta  || raw.estadoVehiculo || 'Disponible',
+    condicionGeneral: raw.condicionGeneral || 8,
+    // Precios — CMS puede guardarlos como número o como string "$200,000"
+    // parsePrice() los limpia siempre para que funcionen en <input type="number">
+    precioLista:      parsePrice(raw.priceNew || raw.precioVenta || raw.precio || raw.precioLista) ?? '',
+    precioPromo:      parsePrice(raw.precioPromo)    ?? '',
+    precioCredito:    parsePrice(raw.precioCredito)  ?? '',
+    precioMinimo:     parsePrice(raw.precioMinimo)   ?? '',
+    precioTraslado:   parsePrice(raw.precioTraslado) ?? '',
+    // Fotos — CMS usa array `fotos` (campo principal), con fallbacks
+    fotos:            Array.isArray(raw.fotos)   ? raw.fotos
+                    : Array.isArray(raw.images)  ? raw.images
+                    : [],
+    fotoPrincipal:    raw.fotoPrincipal || raw.imagenUrl || raw.imagen || raw.image || raw.imageUrl
+                    || (Array.isArray(raw.fotos)  && raw.fotos[0])
+                    || (Array.isArray(raw.images) && raw.images[0]) || '',
+    video:            raw.video || '',
+    // Tipo
+    tipoAdquisicion:  raw.tipoAdquisicion || raw.tipoOrigen || 'propio',
+    costoAdquisicion: parsePrice(raw.costoAdquisicion || raw.costoCompra || raw.costPrice) ?? '',
+    fuenteAdquisicion:raw.fuenteAdquisicion || 'Compra directa',
+    fechaAdquisicion: raw.fechaAdquisicion || '',
+    estadoTraslado:   raw.estadoTraslado || 'local',
+    // Aliado (campo plano — compatibilidad hacia atrás)
+    ali_empresa:   raw.ali_empresa  || raw.aliadoEmpresa || '',
+    ali_contacto:  raw.ali_contacto || '',
+    ali_rfc:       raw.ali_rfc      || '',
+    ali_tel:       raw.ali_tel      || '',
+    ali_email:     raw.ali_email    || '',
+    ali_precioBase: parsePrice(raw.ali_precioBase) ?? '',
+    ali_splitPct:   parsePrice(raw.ali_splitPct)   ?? '',
+    // Consigna — CMS guarda en objeto anidado `consignaInfo`; campos planos como fallback
+    cons_nombre:     (raw.consignaInfo && raw.consignaInfo.propietario) || raw.cons_nombre    || raw.consignaNombre || '',
+    cons_rfc:        raw.cons_rfc  || '',
+    cons_curp:       raw.cons_curp || '',
+    cons_tel:        (raw.consignaInfo && raw.consignaInfo.telefono)    || raw.cons_tel       || '',
+    cons_email:      (raw.consignaInfo && raw.consignaInfo.email)       || raw.cons_email     || '',
+    cons_dir:        raw.cons_dir  || '',
+    cons_precioMin:  parsePrice((raw.consignaInfo && raw.consignaInfo.precioMinimo) ?? raw.cons_precioMin) ?? '',
+    cons_comisionPct:parsePrice((raw.consignaInfo && raw.consignaInfo.comision)     ?? raw.cons_comisionPct)     ?? '',
+    cons_fechaInicio:(raw.consignaInfo && raw.consignaInfo.fechaInicio)  || raw.cons_fechaInicio || '',
+    cons_fechaFin:   (raw.consignaInfo && raw.consignaInfo.fechaFin)    || raw.cons_fechaFin    || '',
+    cons_plazo:      raw.cons_plazo || 60,
+    // Notas
+    notasInternas:   raw.notasInternas || raw.notasAdmin || '',
+  };
+  const s = (id, val, placeholder, type='text') =>
+    `<input class="field-input" id="vf-${id}" type="${type}" value="${esc(val)}" placeholder="${esc(placeholder)}">`;
+  const sel = (id, val, opts) =>
+    `<select class="field-input" id="vf-${id}">${opts.map(o=>`<option value="${esc(o)}" ${val===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
+
+  /* ── Selector inline de tipo ── */
+  const selectorTipo = `
+  <div class="tipo-selector-inline">
+    <div class="tipo-selector-label">Tipo de vehículo</div>
+    <div class="tipo-pills">
+      ${['Propio','Aliado','Consigna'].map(t => {
+        const descs = {Propio:'Inventario weCars',Aliado:'Socio comercial',Consigna:'Propietario externo'};
+        const ics   = {Propio:'🏢',Aliado:'🤝',Consigna:'👤'};
+        return `<button class="tipo-pill${t===tipo?' active':''}" data-tipo="${t}"
+          onclick="_cambiarTipoEnForm('${t}')" type="button">
+          <span class="tipo-pill-icon">${ics[t]}</span>
+          <span class="tipo-pill-name">${t}</span>
+          <span class="tipo-pill-desc">${descs[t]}</span>
+        </button>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  /* ── Sección 1: datos según tipo (delegada a _buildSecTipo) ── */
+  const secTipo = _buildSecTipo(tipo, v);
+
+  /* ── Sección 2: datos del vehículo ── */
+  const secVeh = `
+  <div class="form-section">
+    <div class="form-section-hdr open" onclick="_toggleFormSection(this)">
+      <div class="form-section-num">2</div>
+      <span>Datos del vehículo</span>
+      <i class="ti ti-chevron-down form-section-chev"></i>
+    </div>
+    <div class="form-section-body open">
+      <div class="field-grid">
+        <div class="field-group">
+          <div class="field-label">Marca <span class="field-req">*</span></div>
+          ${s('marca', v.marca||'', 'Volkswagen, Toyota...')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Modelo <span class="field-req">*</span></div>
+          ${s('modelo', v.modelo||'', 'Golf, Corolla...')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Año <span class="field-req">*</span></div>
+          ${s('anio', v.anio||'', '2022', 'number')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Versión / Trim</div>
+          ${s('version', v.version||'', 'Highline, Limited...')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Color exterior</div>
+          ${s('color', v.color||'', 'Blanco, Negro...')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Color interior</div>
+          ${s('color-int', v.colorInterior||'', 'Beige, Negro...')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Kilometraje</div>
+          ${s('km', v.km||'', '45000', 'number')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Condición (1–10)</div>
+          <input class="field-input" id="vf-condicion" type="range" min="1" max="10" value="${esc(v.condicionGeneral||8)}"
+            oninput="document.getElementById('vf-condicion-val').textContent=this.value" style="padding:6px 0">
+          <div class="field-hint">Condición: <strong id="vf-condicion-val">${esc(v.condicionGeneral||8)}</strong>/10</div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Transmisión</div>
+          <select class="field-input" id="vf-transmision">
+            ${['Automática','Manual','CVT','Tiptronic'].map(o=>
+              `<option value="${esc(o)}" ${(v.transmision||'Automática')===o?'selected':''}>${esc(o)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Combustible</div>
+          <select class="field-input" id="vf-combustible">
+            ${['Gasolina','Diesel','Híbrido','Eléctrico'].map(o=>
+              `<option value="${esc(o)}" ${(v.combustible||'Gasolina')===o?'selected':''}>${esc(o)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Motor</div>
+          ${s('motor', v.motor||'', '2.0L T, 1.5L NA...')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Número de serie (VIN) <span class="field-req">*</span></div>
+          ${s('vin', v.vin||'', '3VW123456789...')}
+          <div class="field-hint">17 caracteres alfanuméricos</div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Número de placas</div>
+          ${s('placas', v.numeroPlacas||'', 'ABC-123-D')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Estado de las placas</div>
+          ${s('estado-placas', v.estadoPlacas||'', 'Guanajuato')}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Estado del vehículo</div>
+          <select class="field-input" id="vf-estado">
+            ${['Disponible','En preparación','Apartado','Vendido'].map(o=>
+              `<option value="${esc(o)}" ${(v.estadoVehiculo||'Disponible')===o?'selected':''}>${esc(o)}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  /* ── Sección 3: precios ── */
+  const secPrecios = `
+  <div class="form-section">
+    <div class="form-section-hdr" id="hdr-precios" onclick="_toggleFormSection(this)">
+      <div class="form-section-num">3</div>
+      <span>Precios</span>
+      <i class="ti ti-chevron-down form-section-chev"></i>
+    </div>
+    <div class="form-section-body" id="sec-precios">
+      <div class="precio-grid">
+        <div class="precio-card lista">
+          <div class="precio-card-lbl">Precio lista</div>
+          <input type="number" id="vf-precio-lista" value="${esc(v.precioLista||v.precio||'')}" placeholder="0">
+        </div>
+        <div class="precio-card">
+          <div class="precio-card-lbl">Precio promo</div>
+          <input type="number" id="vf-precio-promo" value="${esc(v.precioPromo||'')}" placeholder="0">
+        </div>
+        <div class="precio-card credito">
+          <div class="precio-card-lbl">Precio crédito</div>
+          <input type="number" id="vf-precio-credito" value="${esc(v.precioCredito||'')}" placeholder="0">
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--wc-ink3);margin-top:8px">
+        El precio promo es el que ve el cliente en el catálogo. El precio crédito incluye financiamiento.
+      </p>
+    </div>
+  </div>`;
+
+  /* ── Sección 4: fotos ── */
+  const secFotos = `
+  <div class="form-section">
+    <div class="form-section-hdr" onclick="_toggleFormSection(this)">
+      <div class="form-section-num">4</div>
+      <span>Fotos</span>
+      <i class="ti ti-chevron-down form-section-chev"></i>
+    </div>
+    <div class="form-section-body">
+      <p style="font-size:12px;color:var(--wc-ink3);margin-bottom:12px">
+        Agrega fotos del vehículo. La primera foto será la imagen principal en el catálogo.
+      </p>
+      <div class="foto-grid" id="vf-foto-grid">
+        ${Array.from({length:10}).map((_,i) => {
+          // Lee del array images[] del CMS
+          const rawUrl = i === 0
+            ? (v.fotoPrincipal || (Array.isArray(v.fotos) && v.fotos[0]) || '')
+            : (Array.isArray(v.fotos) && v.fotos[i] ? v.fotos[i] : '');
+          const thumbUrl = resolveWixImg(rawUrl, 200, 150);
+          const rawSaved = rawUrl; // guardamos la URL original (wix:// o https://)
+          if (thumbUrl) {
+            return `<div class="foto-slot has-foto" data-idx="${i}" data-url="${esc(rawSaved)}" onclick="_selFoto(${i})">
+              <img src="${esc(thumbUrl)}" alt="foto ${i+1}" onerror="this.style.display='none'">
+              <button class="foto-del" onclick="event.stopPropagation();_borrarFoto(${i})" title="Eliminar">✕</button>
+              ${i===0?'<span style="position:absolute;bottom:4px;left:4px;font-size:9px;background:rgba(0,0,0,.6);color:#fff;padding:1px 5px;border-radius:3px">Principal</span>':''}
+            </div>`;
+          }
+          return `<div class="foto-slot foto-slot-add" data-idx="${i}" onclick="_selFoto(${i})">
+            <i class="ti ti-camera" style="font-size:18px"></i>
+            <span style="font-size:10px;margin-top:4px">${i===0?'Principal':i+1}</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <p style="font-size:11px;color:var(--wc-ink3);margin-top:8px">
+        JPG/PNG/WebP · máx. 5MB · Foto 1 = imagen principal del catálogo. Hasta 10 fotos.
+      </p>
+      <div class="field-group" style="margin-top:12px">
+        <div class="field-label"><i class="ti ti-brand-youtube" style="font-size:12px;color:#dc2626"></i> Link de video (YouTube / MP4)</div>
+        <input class="field-input" id="vf-video-url" type="url" value="${esc(v.video||'')}" placeholder="https://youtube.com/watch?v=... o URL de video">
+        <div class="field-hint">El video se muestra en la galería del catálogo junto a las fotos.</div>
+      </div>
+    </div>
+  </div>`;
+
+  /* ── Sección 5: documentos ── */
+  const DOCS_VEHICULO = tipo === 'Consigna'
+    ? ['Factura / título','INE del propietario','Comprobante de domicilio','Tarjeta de circulación','Tenencia vigente','Contrato de consigna firmado']
+    : tipo === 'Aliado'
+    ? ['Factura / carta factura','Tarjeta de circulación','Tenencia vigente','Acuerdo con aliado']
+    : ['Factura','Tarjeta de circulación','Tenencia vigente','Verificación','Peritos (si aplica)'];
+
+  const secDocs = `
+  <div class="form-section">
+    <div class="form-section-hdr" onclick="_toggleFormSection(this)">
+      <div class="form-section-num">5</div>
+      <span>Documentos del expediente</span>
+      <i class="ti ti-chevron-down form-section-chev"></i>
+    </div>
+    <div class="form-section-body">
+      ${DOCS_VEHICULO.map((d,i) => `
+        <div class="doc-row">
+          <div class="doc-icon"><i class="ti ti-file-text"></i></div>
+          <div class="doc-body">
+            <div class="doc-name">${esc(d)}</div>
+            <div class="doc-sub">Sin subir</div>
+          </div>
+          <div class="doc-actions">
+            <button class="doc-btn" onclick="_subirDoc('${esc(d)}',${i})">
+              <i class="ti ti-upload" style="font-size:12px"></i> Subir
+            </button>
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+  /* ── Sección 6: notas ── */
+  const secNotas = `
+  <div class="form-section">
+    <div class="form-section-hdr" onclick="_toggleFormSection(this)">
+      <div class="form-section-num">6</div>
+      <span>Notas internas</span>
+      <i class="ti ti-chevron-down form-section-chev"></i>
+    </div>
+    <div class="form-section-body">
+      <textarea class="field-input" id="vf-notas" rows="3"
+        placeholder="Observaciones de preparación, detalles importantes, historial..."
+        style="resize:vertical">${esc(v.notas||v.notasInternas||'')}</textarea>
+    </div>
+  </div>`;
+
+  return selectorTipo + secTipo + secVeh + secPrecios + secFotos + secDocs + secNotas;
+}
+
+/* ════════════════════════════════════════════════════════
+   GUARDAR VEHÍCULO
+════════════════════════════════════════════════════════ */
+function guardarVehiculo() {
+  const get = id => document.getElementById('vf-' + id)?.value?.trim() || '';
+  const getN = id => parsePrice(document.getElementById('vf-' + id)?.value) || 0;
+
+  // Validaciones mínimas
+  if (!get('marca') || !get('modelo') || !get('anio')) {
+    Toast.show('Completa marca, modelo y año', 'error'); return;
+  }
+  if (!get('vin')) {
+    Toast.show('El número de serie (VIN) es requerido', 'error'); return;
+  }
+
+  // Recolectar fotos actuales del grid
+  const fotosGuardadas = [];
+  document.querySelectorAll('#vf-foto-grid .foto-slot[data-url]').forEach(slot => {
+    const url = slot.getAttribute('data-url');
+    if (url) fotosGuardadas.push(url);
+  });
+  const fotoPrincipalUrl = fotosGuardadas[0] || '';
+  const videoUrl = document.getElementById('vf-video-url')?.value?.trim() || '';
+
+  const precioLista  = getN('precio-lista');
+  const precioPromo  = getN('precio-promo');
+  const precioCredito= getN('precio-credito');
+  const kmVal        = getN('km');
+
+  const base = {
+    // Tipo de origen
+    tipoAdquisicion:   _tipoSeleccionado.toLowerCase(),
+    tipoOrigen:        _tipoSeleccionado,
+    // Datos del vehículo
+    marca:             get('marca'),
+    brand:             get('marca'),
+    modelo:            get('modelo'),
+    version:           get('version') || get('modelo'),
+    'año':             parseInt(get('anio')) || null,
+    anio:              parseInt(get('anio')) || null,
+    year:              parseInt(get('anio')) || null,
+    color:             get('color'),
+    colorInterior:     get('color-int'),
+    // KM — campo principal en CMS es statusDescription; km y kilometraje como alias
+    statusDescription: kmVal ? String(kmVal) : '',
+    km:                kmVal || null,
+    kilometraje:       kmVal || null,
+    condicionGeneral:  parseInt(get('condicion')) || 8,
+    transmision:       get('transmision'),
+    transmission:      get('transmision'),
+    combustible:       get('combustible'),
+    fuel:              get('combustible'),
+    motor:             get('motor'),
+    // Identificadores
+    vin:               get('vin').toUpperCase(),
+    noSerie:           get('vin').toUpperCase(),
+    serialNumber:      get('vin').toUpperCase(),
+    numeroPlacas:      get('placas'),
+    estadoPlacas:      get('estado-placas'),
+    // Estado
+    estatusVenta:      get('estado') || 'Disponible',
+    estadoVehiculo:    get('estado') || 'Disponible',
+    // Precios
+    priceNew:          precioLista  || null,
+    precioVenta:       precioLista  || null,
+    precio:            precioPromo  || precioLista  || null,
+    precioLista:       precioLista  || null,
+    precioPromo:       precioPromo  || null,
+    precioCredito:     precioCredito|| null,
+    // Fotos — CMS usa array `fotos` como campo principal
+    ...(fotosGuardadas.length ? {
+      fotos:         fotosGuardadas,
+      images:        fotosGuardadas,   // compat
+      fotoPrincipal: fotoPrincipalUrl,
+      imagenUrl:     fotoPrincipalUrl,
+      imagen:        fotoPrincipalUrl,
+      image:         fotoPrincipalUrl,
+    } : {}),
+    ...(videoUrl ? { video: videoUrl } : {}),
+    notasInternas:     get('notas'),
+    notasAdmin:        get('notas'),
+  };
+
+  if (_tipoSeleccionado === 'Consigna') {
+    if (!get('cons-nombre') || !get('cons-tel')) {
+      Toast.show('Nombre y teléfono del propietario son requeridos', 'error'); return;
+    }
+    // Guarda en objeto anidado consignaInfo (formato del panel Admin)
+    base.consignaInfo = {
+      propietario:  get('cons-nombre'),
+      telefono:     get('cons-tel'),
+      email:        get('cons-email'),
+      precioMinimo: getN('cons-precio-min'),
+      comision:     getN('cons-comision-pct'),
+      fechaInicio:  get('cons-fecha-inicio'),
+      fechaFin:     '',
+      estado:       'activo',
+      notas:        '',
+    };
+    // También guarda en campos planos para compatibilidad hacia atrás
+    base.cons_nombre     = get('cons-nombre');
+    base.cons_rfc        = get('cons-rfc');
+    base.cons_curp       = get('cons-curp');
+    base.cons_tel        = get('cons-tel');
+    base.cons_email      = get('cons-email');
+    base.cons_dir        = get('cons-dir');
+    base.cons_precioMin  = getN('cons-precio-min');
+    base.cons_comisionPct= getN('cons-comision-pct');
+    base.precioMinimo    = getN('cons-precio-min'); // campo raíz que admin también lee
+    base.cons_plazo      = parseInt(get('cons-plazo')) || 60;
+    base.cons_fechaInicio= get('cons-fecha-inicio');
+  } else if (_tipoSeleccionado === 'Aliado') {
+    if (!get('ali-empresa')) {
+      Toast.show('Nombre del aliado es requerido', 'error'); return;
+    }
+    base.ali_empresa    = get('ali-empresa');
+    base.ali_contacto   = get('ali-contacto');
+    base.ali_rfc        = get('ali-rfc');
+    base.ali_tel        = get('ali-tel');
+    base.ali_email      = get('ali-email');
+    base.ali_precioBase = getN('ali-precio-base');
+    base.ali_splitPct   = getN('ali-split-pct');
+  } else {
+    // Propio — guarda costo con todos los alias que usa el admin
+    base.costoAdquisicion  = getN('prop-costo');
+    base.costoCompra       = getN('prop-costo'); // alias que usa admin
+    base.costPrice         = getN('prop-costo');
+    base.fuenteAdquisicion = get('prop-fuente');
+    base.fechaAdquisicion  = get('prop-fecha');
+  }
+
+  const btn = document.getElementById('btn-guardar-veh');
+  const restoreBtn = () => { btn.disabled = false; btn.innerHTML = '<i class="ti ti-device-floppy"></i>Guardar vehículo'; };
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader-2 spin"></i>Guardando...';
+
+  if (_editandoCarId) {
+    WC.send(WC.OUT.CAR_EDITAR, { id: _editandoCarId, datos: base });
+  } else {
+    WC.send(WC.OUT.CAR_CREAR, { datos: base });
+  }
+  setTimeout(restoreBtn, 5000);
+}
+
+/* ════════════════════════════════════════════════════════
+   FOTOS — subida real via Velo postMessage
+════════════════════════════════════════════════════════ */
+function _selFoto(idx) {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/jpeg,image/png,image/webp';
+  inp.onchange = async () => {
+    const file = inp.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { Toast.show('Máximo 5MB por foto', 'error'); return; }
+    const slot = document.querySelector(`.foto-slot[data-idx="${idx}"]`);
+    if (slot) slot.style.opacity = '0.4';
+    // Convertir a base64 y enviar a Velo
+    const reader = new FileReader();
+    reader.onload = () => {
+      WC.send(WC.OUT.FOTO_SUBIR, {
+        idx,
+        nombre: file.name,
+        tipo:   file.type,
+        base64: reader.result.split(',')[1],
+        carId:  _editandoCarId || '',
+      });
+    };
+    reader.readAsDataURL(file);
+    Toast.show('Subiendo foto...', '');
+  };
+  inp.click();
+}
+function _borrarFoto(idx) {
+  const slot = document.querySelector(`.foto-slot[data-idx="${idx}"]`);
+  if (!slot) return;
+  slot.classList.remove('has-foto');
+  slot.removeAttribute('data-url');
+  slot.innerHTML = `<i class="ti ti-plus"></i>`;
+  slot.onclick = () => _selFoto(idx);
+}
+function _subirDoc(nombre, idx) {
+  Toast.show('Subida de documentos disponible próximamente', '');
+}
+
+/* ════════════════════════════════════════════════════════
+   CAMBIAR TIPO VEHÍCULO
+════════════════════════════════════════════════════════ */
+function cambiarTipoVehiculo(id, tipoActual) {
+  const tipos = ['Propio', 'Aliado', 'Consigna'];
+  const labels = { Propio: 'Propio (sucursal)', Aliado: 'Aliado / Socio comercial', Consigna: 'Consigna (propietario externo)' };
+  const icons  = { Propio: 'ti-building-store', Aliado: 'ti-handshake', Consigna: 'ti-user-check' };
+  const modal  = document.getElementById('modal-tipo');
+  const grid   = modal.querySelector('.tipo-grid');
+  grid.innerHTML = tipos.map(t => `
+    <div class="tipo-card${t===tipoActual?' selected':''}" onclick="_confirmarCambioTipo('${id}','${t}')">
+      <i class="ti ${icons[t]}" style="font-size:28px;margin-bottom:8px"></i>
+      <div class="tipo-card-name">${labels[t]}</div>
+    </div>`).join('');
+  modal.style.display = 'flex';
+}
+function _confirmarCambioTipo(id, nuevoTipo) {
+  WC.send(WC.OUT.CAR_EDITAR, { id, datos: { tipoAdquisicion: nuevoTipo.toLowerCase(), tipoOrigen: nuevoTipo } });
+  const modal = document.getElementById('modal-tipo');
+  modal.style.display = 'none';
+  Toast.show('Tipo actualizado ✓', 'ok');
+  // Actualiza local
+  const car = INVENTARIO.find(c => c._id === id);
+  if (car) { car.tipoOrigen = nuevoTipo; renderInventario(); }
+}
+
+/* ════════════════════════════════════════════════════════
+   VENDEDORES
+════════════════════════════════════════════════════════ */
+function cargarVendedores() {
+  mostrarLoading('vend');
+  WC.send(WC.OUT.USUARIOS_LISTAR, { rol: 'Vendedor' });
+}
+
+function renderVendedores() {
+  const el    = document.getElementById('vend-list');
+  const empty = document.getElementById('vend-empty');
+  ocultarLoading('vend');
+  if (!VENDEDORES.length) { el.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  el.innerHTML = VENDEDORES.map(v => {
+    const initials  = (v.nombre||'V').split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+    const activo    = v.activo !== false;
+    return `
+    <div class="vend-card">
+      <div class="vend-avatar" style="background:${activo?'var(--wc-green)':'var(--wc-ink3)'}">
+        ${esc(initials)}
+      </div>
+      <div class="vend-body">
+        <div class="vend-nombre">${esc(v.nombre||'Vendedor')}</div>
+        <div class="vend-meta">${esc(v.email||'')} · ${esc(v.sucursal||'Bajío')}</div>
+        <div class="vend-stats">
+          <div class="vend-stat">Leads: <strong id="vstat-${esc(v._id)}">—</strong></div>
+          <div class="vend-stat">Meta: <strong>${esc(v.metaMensual||5)}</strong>/mes</div>
+        </div>
+      </div>
+      <div class="vend-actions">
+        <span class="chip ${activo?'chip-green':'chip-gray'}">${activo?'Activo':'Inactivo'}</span>
+        <button class="btn btn-sm" onclick="editarVendedor('${esc(v._id)}')">
+          <i class="ti ti-pencil"></i>
+        </button>
+        <button class="btn btn-sm" style="color:${activo?'var(--wc-danger)':'var(--wc-ok)'}"
+          onclick="toggleVendedorActivo('${esc(v._id)}',${!activo})">
+          <i class="ti ti-${activo?'user-off':'user-check'}"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filtrarVendedores(q) {
+  const lower = q.toLowerCase();
+  document.querySelectorAll('.vend-card').forEach(card => {
+    card.style.display = card.textContent.toLowerCase().includes(lower) ? '' : 'none';
+  });
+}
+
+function abrirModalInvitarVendedor() {
+  document.getElementById('overlay-invitar').classList.remove('hidden');
+}
+function cerrarModalInvitar() {
+  document.getElementById('overlay-invitar').classList.add('hidden');
+}
+function guardarVendedor() {
+  const nombre   = document.getElementById('inv-nombre')?.value?.trim();
+  const email    = document.getElementById('inv-email')?.value?.trim();
+  const tel      = document.getElementById('inv-tel')?.value?.trim();
+  const sucursal = document.getElementById('inv-sucursal')?.value;
+  const meta     = parseInt(document.getElementById('inv-meta')?.value) || 5;
+  if (!nombre || !email) { Toast.show('Nombre y correo son requeridos', 'error'); return; }
+  WC.send(WC.OUT.USUARIO_CREAR, { nombre, email, telefono: tel, sucursal, metaMensual: meta, rol: 'Vendedor', activo: true });
+}
+function editarVendedor(id) { Toast.show('Edición de vendedor disponible próximamente', ''); }
+function toggleVendedorActivo(id, activo) {
+  WC.send(WC.OUT.USUARIO_EDITAR, { id, datos: { activo } });
+  setTimeout(cargarVendedores, 500);
+}
+
+/* ════════════════════════════════════════════════════════
+   TODOS LOS CLIENTES
+════════════════════════════════════════════════════════ */
+function cargarTodosClientes() {
+  mostrarLoading('cli');
+  WC.send(WC.OUT.LEADS_LISTAR_TODOS, {});
+}
+
+function renderClientes() {
+  const el = document.getElementById('cli-list');
+  ocultarLoading('cli');
+  if (!CLIENTES.length) {
+    el.innerHTML = '<div class="empty-state"><i class="ti ti-address-book"></i><h3>Sin clientes</h3><p>Los clientes aparecerán aquí.</p></div>';
+    return;
+  }
+  // Populate vendor filter
+  const vendSel = document.getElementById('cli-vend-filter');
+  const vendIds = [...new Set(CLIENTES.map(c=>c.vendedorId).filter(Boolean))];
+  if (vendSel.options.length <= 1) {
+    vendIds.forEach(id => {
+      const vend = VENDEDORES.find(v=>v._id===id||v.email===id);
+      const opt  = document.createElement('option');
+      opt.value  = id; opt.textContent = vend?.nombre || id;
+      vendSel.appendChild(opt);
+    });
+  }
+  filtrarClientes();
+}
+
+function filtrarClientes() {
+  const el    = document.getElementById('cli-list');
+  const q     = (document.getElementById('cli-search')?.value||'').toLowerCase();
+  const vFilt = document.getElementById('cli-vend-filter')?.value||'';
+  const items = CLIENTES.filter(c => {
+    if (vFilt && c.vendedorId !== vFilt) return false;
+    if (!q) return true;
+    return [c.nombre,c.telefono,c.email,c.autoInteres,c.interes]
+      .some(f => f && String(f).toLowerCase().includes(q));
+  });
+  if (!items.length) { el.innerHTML = '<div class="empty-state" style="padding:32px"><p>Sin resultados</p></div>'; return; }
+
+  const ETAPA_COLOR = {Nuevo:'chip-info',Contactado:'chip-warn',Seguimiento:'chip-orange',Cierre:'chip-purple',Ganado:'chip-green',Perdido:'chip-gray'};
+  el.innerHTML = items.slice(0,100).map(c => {
+    const initials = (c.nombre||'C').split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+    const vend = VENDEDORES.find(v=>v._id===c.vendedorId||v.email===c.vendedorId);
+    return `
+    <div class="vehicle-card" style="cursor:default">
+      <div class="vehicle-thumb" style="background:var(--wc-green-light);color:var(--wc-green-dark);font-size:16px;font-weight:700">
+        ${esc(initials)}
+      </div>
+      <div class="vehicle-body">
+        <div class="vehicle-name">${esc(c.nombre||'Cliente')}</div>
+        <div class="vehicle-sub">${esc(c.telefono||'')}${c.email?' · '+esc(c.email):''}</div>
+        <div class="vehicle-sub" style="margin-top:2px">${esc(c.autoInteres||c.interes||'')}${vend?' · '+esc(vend.nombre):''}</div>
+        <div class="vehicle-chips">
+          <span class="chip ${ETAPA_COLOR[c.etapa||c.estatus]||'chip-gray'}">${esc(c.etapa||c.estatus||'Nuevo')}</span>
+        </div>
+      </div>
+      <div class="vehicle-actions">
+        <button class="veh-action-btn" title="WhatsApp" onclick="window.open('https://wa.me/52${esc((c.telefono||'').replace(/\D/g,''))}')">
+          <i class="ti ti-brand-whatsapp" style="color:#25d366"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('') + (items.length>100?`<p style="text-align:center;font-size:12px;color:var(--wc-ink3);padding:12px 0">Mostrando 100 de ${items.length} clientes — usa el buscador para filtrar.</p>`:'');
+}
+
+/* ════════════════════════════════════════════════════════
+   CRÉDITOS
+════════════════════════════════════════════════════════ */
+function cargarCreditos() {
+  mostrarLoading('cred');
+  WC.send(WC.OUT.CREDITOS_LISTAR, {});
+}
+function renderCreditos() {
+  const el = document.getElementById('cred-list');
+  ocultarLoading('cred');
+  if (!CREDITOS.length) {
+    el.innerHTML = '<div class="empty-state"><i class="ti ti-building-bank"></i><h3>Sin solicitudes de crédito</h3><p>Los créditos enviados por los vendedores aparecerán aquí.</p></div>';
+    return;
+  }
+  // Render básico — Fase 3 lo completa
+  el.innerHTML = CREDITOS.map(c => `
+    <div class="card-box" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div>
+          <div style="font-weight:700;font-size:14px">${esc(c.clienteNombre||'Cliente')}</div>
+          <div style="font-size:12px;color:var(--wc-ink3)">${esc(c.autoInteres||'')} · ${esc(c.vendedorNombre||'')}</div>
+        </div>
+        <span class="chip chip-warn" style="margin-left:auto">${esc(c.estatus||'Pendiente')}</span>
+      </div>
+    </div>`).join('');
+}
+function setFiltroCred(filtro, btn) {
+  document.querySelectorAll('#view-creditos .filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Fase 3: filtrar por estatus
+}
+
+function buscarExpedientes(q) { /* Fase 4 */ }
+
+/* ════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════ */
+// Standalone demo: si no hay Velo, simular datos mínimos
+setTimeout(() => {
+  if (!CTX) {
+    CTX = { usuario: 'Operaciones Demo', rol: 'Operaciones', sucursal: 'Bajío' };
+    document.getElementById('sb-avatar').textContent = 'OP';
+    document.getElementById('sb-nombre').textContent = CTX.usuario;
+    document.getElementById('sb-rol').textContent    = CTX.rol;
+    // Demo: datos vacíos
+    ocultarLoading('inv');
+    renderInventario();
+  }
+}, 2000);
+</script>
+</body>
+</html>

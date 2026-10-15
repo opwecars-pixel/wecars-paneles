@@ -1,0 +1,140 @@
+// ═══════════════════════════════════════════════════════════════════════
+//  weCars ERP v2 — Backend: Subida de archivos a Wix Media
+//  Archivo: backend/media-upload.jsw
+//
+//  wix-media-backend SOLO puede usarse desde archivos .jsw (backend).
+//  El page JS llama a subirDocumento() desde aquí vía import.
+// ═══════════════════════════════════════════════════════════════════════
+
+import { mediaManager } from 'wix-media-backend';
+import wixData from 'wix-data';
+
+// ════════════════════════════════════════════════════════════════════════
+//  subirDocumento
+//  Recibe base64, lo sube a Wix Media y guarda referencia en Docs.
+//
+//  Parámetros:
+//    entidadId   {string}  — _id del lead/auto al que pertenece el doc
+//    entidadTipo {string}  — 'cliente' | 'auto'
+//    tipo        {string}  — 'INE_FRENTE' | 'COMPROBANTE_DOMICILIO', etc.
+//    base64      {string}  — contenido del archivo en base64
+//    fileName    {string}  — nombre del archivo con extensión
+//    mimeType    {string}  — 'application/pdf' | 'image/jpeg', etc.
+//    vendedorId  {string}  — para trazabilidad
+// ════════════════════════════════════════════════════════════════════════
+export async function subirDocumento({ entidadId, entidadTipo, tipo, base64, fileName, mimeType, vendedorId }) {
+  if (!entidadId || !base64) {
+    return { ok: false, error: 'Datos incompletos' };
+  }
+
+  try {
+    // Convertir base64 a Buffer
+    const buffer = Buffer.from(base64, 'base64');
+
+    // Subir a Wix Media Manager
+    const uploadResult = await mediaManager.upload(
+      '/wecars-docs',           // carpeta en Media Manager
+      buffer,
+      fileName || `doc_${Date.now()}`,
+      {
+        mediaOptions: {
+          mimeType: mimeType || 'application/octet-stream',
+          mediaType: mimeType?.startsWith('image/') ? 'image' : 'document',
+        },
+        metadataOptions: {
+          isPrivate: false,
+          isVisitorUpload: false,
+          context: { tipo, entidadId },
+        },
+      }
+    );
+
+    const fileUrl = uploadResult.fileUrl || uploadResult.url || '';
+    const fileId  = uploadResult.fileId  || uploadResult.id  || '';
+
+    // Guardar referencia en colección Docs
+    const doc = await wixData.insert('Docs', {
+      entidadId,
+      entidadTipo: entidadTipo || 'cliente',
+      tipo,
+      nombre:      fileName || tipo,
+      url:         fileUrl,
+      fileId,
+      mimeType:    mimeType || '',
+      vendedorId:  vendedorId || '',
+      fecha:       new Date().toISOString(),
+    }, { suppressAuth: true });
+
+    return { ok: true, doc, url: fileUrl, fileId, tipo };
+
+  } catch (err) {
+    console.error('[media-upload] subirDocumento:', err.message);
+    return { ok: false, error: err.message };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  subirFotoVehiculo
+//  Sube una foto de vehículo a Wix Media y (opcionalmente) la guarda en Cars.
+//
+//  Parámetros:
+//    carId   {string}  — _id del vehículo (puede ser vacío si es nuevo)
+//    idx     {number}  — índice del slot (0 = foto principal)
+//    base64  {string}  — contenido en base64
+//    nombre  {string}  — nombre del archivo
+//    tipo    {string}  — mimeType
+// ════════════════════════════════════════════════════════════════════════
+export async function subirFotoVehiculo({ carId, idx, base64, nombre, tipo }) {
+  if (!base64) return { ok: false, error: 'Sin datos de imagen' };
+  try {
+    const buffer = Buffer.from(base64, 'base64');
+    const uploadResult = await mediaManager.upload(
+      '/wecars-inventario',
+      buffer,
+      nombre || `foto_${Date.now()}.jpg`,
+      {
+        mediaOptions: {
+          mimeType: tipo || 'image/jpeg',
+          mediaType: 'image',
+        },
+        metadataOptions: {
+          isPrivate:        false,
+          isVisitorUpload:  false,
+          context: { carId, idx },
+        },
+      }
+    );
+    const fileUrl = uploadResult.fileUrl || uploadResult.url || '';
+
+    // Si hay carId y es slot 0, actualiza fotoPrincipal en Cars
+    if (carId && idx === 0) {
+      try {
+        const car = await wixData.get('Cars', carId, { suppressAuth: true });
+        if (car) {
+          await wixData.update('Cars', { ...car, fotoPrincipal: fileUrl }, { suppressAuth: true });
+        }
+      } catch (_) {}
+    }
+
+    return { ok: true, url: fileUrl, idx };
+  } catch (err) {
+    console.error('[media-upload] subirFotoVehiculo:', err.message);
+    return { ok: false, error: err.message, idx };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  listarDocumentos
+//  Consulta Docs por entidadId.
+// ════════════════════════════════════════════════════════════════════════
+export async function listarDocumentos({ entidadId, entidadTipo }) {
+  if (!entidadId) return { ok: true, items: [] };
+  try {
+    let q = wixData.query('Docs').eq('entidadId', entidadId);
+    if (entidadTipo) q = q.eq('entidadTipo', entidadTipo);
+    const res = await q.limit(50).find({ suppressAuth: true });
+    return { ok: true, items: res.items };
+  } catch (err) {
+    return { ok: false, error: err.message, items: [] };
+  }
+}

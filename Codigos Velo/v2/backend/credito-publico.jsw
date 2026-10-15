@@ -1,0 +1,191 @@
+// ═══════════════════════════════════════════════════════════════════════
+//  weCars ERP v2 — Backend: Solicitud de crédito pública (link al cliente)
+//  Archivo: backend/backend-credito-publico.jsw
+//
+//  Colecciones que usa:
+//    CreditTokens     — tokens de un solo uso, 72h de vigencia
+//    CreditApplications — solicitudes de crédito completas
+//    ALeads           — leads (para prefill y actualizar estado)
+//    Creditos         — registro del crédito (folio, estado, etc.)
+//
+//  CreditTokens — campos requeridos:
+//    token       {string}  — identificador único (wc_xxxxxxxx)
+//    leadId      {string}  — ID del lead en ALeads
+//    vendedorId  {string}  — ID del vendedor que generó el token
+//    leadNombre  {string}  — nombre del cliente (para el form público)
+//    autoInteres {string}  — descripción del auto (para el form público)
+//    precioRef   {number}  — precio de referencia
+//    autoInteresId {string} — ID del auto en inventario
+//    expira      {Date}    — fecha de expiración (72h desde creación)
+//    usado       {boolean} — true cuando ya se llenó la solicitud
+//    fecha       {Date}    — fecha de creación
+// ═══════════════════════════════════════════════════════════════════════
+
+import wixData from 'wix-data';
+
+const SUPPRESS = { suppressAuth: true };
+const TOKEN_HORAS = 72;
+
+// ════════════════════════════════════════════════════════════════════════
+//  generarTokenCredito
+//  Crea un token único para que el cliente llene la solicitud.
+//  Llamado desde el backend del panel de vendedores.
+// ════════════════════════════════════════════════════════════════════════
+export async function generarTokenCredito({ leadId, vendedorId, leadNombre, autoInteres, precioRef, autoInteresId }) {
+  if (!leadId || !vendedorId) {
+    return { ok: false, error: 'Datos incompletos' };
+  }
+
+  try {
+    // Invalidar tokens anteriores del mismo lead (limpiar duplicados)
+    const prev = await wixData.query('CreditTokens')
+      .eq('leadId', leadId)
+      .eq('usado', false)
+      .find(SUPPRESS);
+    for (const t of prev.items) {
+      await wixData.update('CreditTokens', { ...t, usado: true }, SUPPRESS);
+    }
+
+    // Generar token único
+    const token = 'wc_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+
+    const expira = new Date();
+    expira.setHours(expira.getHours() + TOKEN_HORAS);
+
+    const item = await wixData.insert('CreditTokens', {
+      token,
+      leadId,
+      vendedorId,
+      leadNombre:   leadNombre  || '',
+      autoInteres:  autoInteres || '',
+      precioRef:    precioRef   || 0,
+      autoInteresId: autoInteresId || '',
+      expira,
+      usado: false,
+      fecha: new Date(),
+    }, SUPPRESS);
+
+    return { ok: true, token, expira: expira.toISOString(), id: item._id };
+
+  } catch (err) {
+    console.error('[credito-publico] generarTokenCredito:', err.message);
+    return { ok: false, error: err.message };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  validarToken
+//  Lee el token y devuelve los datos de prefill (nombre, auto).
+//  Sin datos sensibles — solo lo necesario para mostrar el form.
+// ════════════════════════════════════════════════════════════════════════
+export async function validarToken(token) {
+  if (!token) return { ok: false, error: 'Token requerido' };
+
+  try {
+    const res = await wixData.query('CreditTokens')
+      .eq('token', token)
+      .limit(1)
+      .find(SUPPRESS);
+
+    if (!res.items.length) return { ok: false, error: 'Link inválido o expirado' };
+
+    const t = res.items[0];
+
+    if (t.usado) return { ok: false, error: 'Este link ya fue utilizado' };
+
+    if (new Date(t.expira) < new Date()) {
+      return { ok: false, error: 'Este link ha expirado (validez 72 hrs)' };
+    }
+
+    return {
+      ok: true,
+      leadNombre:   t.leadNombre,
+      autoInteres:  t.autoInteres,
+      precioRef:    t.precioRef,
+      autoInteresId: t.autoInteresId,
+    };
+
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  submitSolicitudPublica
+//  El cliente envía el formulario. Guarda en CreditApplications,
+//  actualiza ALeads y marca el token como usado.
+// ════════════════════════════════════════════════════════════════════════
+export async function submitSolicitudPublica(token, datos) {
+  if (!token || !datos) return { ok: false, error: 'Datos incompletos' };
+
+  try {
+    // 1. Validar token
+    const tokenRes = await wixData.query('CreditTokens')
+      .eq('token', token)
+      .limit(1)
+      .find(SUPPRESS);
+
+    if (!tokenRes.items.length) return { ok: false, error: 'Link inválido' };
+
+    const t = tokenRes.items[0];
+    if (t.usado)                          return { ok: false, error: 'Link ya utilizado' };
+    if (new Date(t.expira) < new Date())  return { ok: false, error: 'Link expirado' };
+
+    const leadId    = t.leadId;
+    const vendedorId = t.vendedorId;
+
+    // 2. Guardar solicitud en CreditApplications
+    const nombre = [datos.nombres, datos.apPat, datos.apMat].filter(Boolean).join(' ');
+
+    const solicitud = await wixData.insert('CreditApplications', {
+      ...datos,
+      nombre,
+      leadId,
+      vendedorId,
+      vehiculo:     t.autoInteresId || datos.vehiculo || '',
+      origen:       'cliente',   // 'cliente' vs 'vendedor'
+      fecha:        new Date().toISOString(),
+    }, SUPPRESS);
+
+    // 3. Generar folio único
+    const folio = `WC-${new Date().getFullYear()}-${solicitud._id.slice(-5).toUpperCase()}`;
+
+    // 4. Crear registro en Creditos
+    const credito = await wixData.insert('Creditos', {
+      folio,
+      leadId,
+      vendedorId,
+      solicitudId:    solicitud._id,
+      vehiculoId:     t.autoInteresId || '',
+      precioVehiculo: datos.precioVehiculo || t.precioRef || 0,
+      engancheMonto:  datos.engancheMonto  || 0,
+      plazoMeses:     datos.plazoMeses     || 0,
+      financiera:     datos.financiera     || '',
+      estado:         'solicitud_enviada',
+      origen:         'cliente',
+      fechaSolicitud: new Date().toISOString(),
+    }, SUPPRESS);
+
+    // 5. Actualizar ALeads con creditoActivoId
+    try {
+      const leadRes = await wixData.get('ALeads', leadId, SUPPRESS);
+      if (leadRes) {
+        await wixData.update('ALeads', {
+          ...leadRes,
+          creditoActivoId: credito._id,
+          creditoFolio:    folio,
+          etapa:           'Seguimiento',
+        }, SUPPRESS);
+      }
+    } catch (_) {}
+
+    // 6. Marcar token como usado
+    await wixData.update('CreditTokens', { ...t, usado: true }, SUPPRESS);
+
+    return { ok: true, folio, creditoId: credito._id, solicitudId: solicitud._id };
+
+  } catch (err) {
+    console.error('[credito-publico] submitSolicitudPublica:', err.message);
+    return { ok: false, error: err.message };
+  }
+}

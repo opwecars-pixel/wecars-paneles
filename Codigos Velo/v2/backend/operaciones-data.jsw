@@ -1,0 +1,68 @@
+// ═══════════════════════════════════════════════════════════════════════
+//  weCars ERP v2 — Backend: Operaciones Data
+//  Archivo: backend/operaciones-data.jsw
+//
+//  Las funciones aquí corren en el servidor (backend).
+//  suppressAuth: true funciona sin restricciones de permisos de Member.
+//
+//  Expone:
+//    obtenerTodosLosLeads()   → todos los leads de todos los vendedores
+//    obtenerTodosLosCars()    → inventario completo
+//    obtenerTodosLosUsuarios()→ equipo completo
+// ═══════════════════════════════════════════════════════════════════════
+
+import wixData from 'wix-data';
+
+// ────────────────────────────────────────────────────────────────────────
+//  LEADS — todos los clientes de todos los vendedores
+// ────────────────────────────────────────────────────────────────────────
+export async function obtenerTodosLosLeads(limite = 500) {
+  try {
+    const r = await wixData
+      .query('ALeads')
+      .descending('_createdDate')
+      .limit(limite)
+      .find({ suppressAuth: true });
+
+    const items = r.items.map(c => ({
+      ...c,
+      etapa: c.etapa || c.estatus || 'Nuevo',
+    }));
+    return { ok: true, items, total: r.totalCount };
+  } catch (err) {
+    console.error('[operaciones-data] obtenerTodosLosLeads error:', err);
+    return { ok: false, items: [], total: 0, error: err.message };
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────
+//  CARS — inventario completo
+// ────────────────────────────────────────────────────────────────────────
+export async function obtenerTodosLosCars(limite = 200) {
+  try {
+    const r = await wixData
+      .query('Cars')
+      .ascending('marca')
+      .limit(limite)
+      .find({ suppressAuth: true });
+    return { ok: true, items: r.items, total: r.totalCount };
+  } catch (err) {
+    console.error('[operaciones-data] obtenerTodosLosCars error:', err);
+    return { ok: false, items: [], total: 0, error: err.message };
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────
+//  USUARIOS — equipo completo
+// ────────────────────────────────────────────────────────────────────────
+export async function obtenerTodosLosUsuarios(rol = '') {
+  try {
+    let q = wixData.query('Usuarios').ascending('nombre').limit(100);
+    if (rol) q = q.eq('rol', rol);
+    const r = await q.find({ suppressAuth: true });
+    return { ok: true, items: r.items };
+  } catch (err) {
+    console.error('[operaciones-data] obtenerTodosLosUsuarios error:', err);
+    return { ok: false, items: [], error: err.message };
+  }
+}
