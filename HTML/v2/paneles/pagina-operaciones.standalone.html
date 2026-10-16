@@ -566,9 +566,17 @@ img{max-width:100%;display:block}
       <!-- KPIs -->
       <div class="rent-kpis" id="rent-kpis"></div>
 
-      <!-- Filtros -->
+      <!-- Filtros por tipo (chips) -->
+      <div class="filter-bar" style="margin-bottom:8px">
+        <button class="filter-chip active" id="rchip-todos"    onclick="setFiltroRentTipo('todos',this)">Todos</button>
+        <button class="filter-chip"        id="rchip-propio"   onclick="setFiltroRentTipo('propio',this)"><i class="ti ti-building-store" style="font-size:11px"></i> Propios</button>
+        <button class="filter-chip"        id="rchip-consigna" onclick="setFiltroRentTipo('consigna',this)"><i class="ti ti-user-check" style="font-size:11px"></i> Consigna</button>
+        <button class="filter-chip"        id="rchip-aliado"   onclick="setFiltroRentTipo('aliado',this)"><i class="ti ti-handshake" style="font-size:11px"></i> Aliado</button>
+      </div>
+
+      <!-- Filtros secundarios + Excel -->
       <div class="rent-filters">
-        <select class="field-input" id="rent-filtro-tipo" onchange="renderRentabilidad()" style="font-size:12px;padding:6px 10px;max-width:140px">
+        <select class="field-input" id="rent-filtro-tipo" onchange="renderRentabilidad()" style="display:none">
           <option value="todos">Todos los tipos</option>
           <option value="propio">Propios</option>
           <option value="consigna">Consigna</option>
@@ -588,6 +596,9 @@ img{max-width:100%;display:block}
           <option value="dias-desc">Más días en lote</option>
           <option value="interes-desc">Más interesados</option>
         </select>
+        <button class="btn btn-sm" onclick="exportarRentabilidadCSV()" title="Descargar Excel/CSV" style="margin-left:auto;gap:4px">
+          <i class="ti ti-table-export"></i><span class="hidden-xs">Excel</span>
+        </button>
       </div>
 
       <!-- Tabla rentabilidad -->
@@ -1344,6 +1355,24 @@ function filtrarInventario() { renderInventario(); }
 /* ════════════════════════════════════════════════════════
    RENTABILIDAD
 ════════════════════════════════════════════════════════ */
+// Resuelve el costo según el tipo de adquisición del vehículo
+function _resolverCosto(c) {
+  const tipo = (c.tipoAdquisicion || c.tipoOrigen || 'propio').toLowerCase();
+  if (tipo === 'consigna') {
+    // Para consigna, el "costo" es el precio mínimo pactado con el dueño
+    const ci = c.consignaInfo || {};
+    return parsePrice(ci.precioMinimo ?? c.cons_precioMin ?? c.precioMinimo)
+        ?? parsePrice(c.costoAdquisicion || c.costoCompra || c.costPrice);
+  }
+  if (tipo === 'aliado') {
+    // Para aliado, el costo es el precio base del aliado
+    return parsePrice(c.ali_precioBase)
+        ?? parsePrice(c.costoAdquisicion || c.costoCompra || c.costPrice);
+  }
+  // Propio: campos estándar
+  return parsePrice(c.costoAdquisicion || c.costoCompra || c.costPrice || c.costo);
+}
+
 function _parsekm(v) {
   if (v == null || v === '') return null;
   const clean = String(v).replace(/[^\d.]/g, '');
@@ -1386,7 +1415,7 @@ function renderRentabilidad() {
   // Todas las filas con margen calculado (para KPIs globales)
   const todasLasFilas = INVENTARIO.map(c => {
     const precio = parsePrice(c.priceNew || c.precioVenta || c.precio || c.precioLista);
-    const costo  = parsePrice(c.costoAdquisicion || c.costoCompra || c.costPrice);
+    const costo  = _resolverCosto(c);
     const margen = (precio != null && costo != null && costo > 0) ? precio - costo : null;
     const pct    = (margen != null && costo > 0) ? (margen / costo) * 100 : null;
     const dias        = _diasEnInventario(c);
@@ -1669,11 +1698,73 @@ function _setExp(id, val) {
   else el.value = val != null ? String(val) : '';
 }
 
+// ── Filtro por tipo (chips en rentabilidad) ────────────────────────────
+function setFiltroRentTipo(tipo, btn) {
+  document.querySelectorAll('#view-rentabilidad .filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const sel = document.getElementById('rent-filtro-tipo');
+  if (sel) sel.value = tipo;
+  renderRentabilidad();
+}
+
+// ── Exportar rentabilidad a CSV ────────────────────────────────────────
+function exportarRentabilidadCSV() {
+  const filtroTipo   = document.getElementById('rent-filtro-tipo')?.value   || 'todos';
+  const filtroEstado = document.getElementById('rent-filtro-estado')?.value || '';
+
+  let rows = INVENTARIO.map(c => {
+    const tipo   = c.tipoAdquisicion || c.tipoOrigen || 'Propio';
+    const precio = parsePrice(c.priceNew || c.precioVenta || c.precio || c.precioLista);
+    const costo  = _resolverCosto(c);
+    const margen = (precio != null && costo != null && costo > 0) ? precio - costo : null;
+    const pct    = (margen != null && costo > 0) ? ((margen / costo) * 100).toFixed(1) : '';
+    const dias   = _diasEnInventario(c);
+    return { c, tipo, precio, costo, margen, pct, dias };
+  });
+
+  if (filtroTipo !== 'todos') rows = rows.filter(r => r.tipo.toLowerCase() === filtroTipo);
+  if (filtroEstado)           rows = rows.filter(r => (r.c.estatusVenta || r.c.estadoVehiculo || 'Disponible') === filtroEstado);
+
+  const hdr = ['Marca','Modelo','Año','Tipo','Estado','VIN','Color','Km','Precio lista','Costo','Margen $','Margen %','Días en lote','Estatus venta','Vendedor'];
+  const csvRows = [
+    hdr,
+    ...rows.map(({ c, tipo, precio, costo, margen, pct, dias }) => [
+      c.marca||'', c.modelo||'', c.anio||c.año||c.year||'',
+      tipo,
+      c.estadoVehiculo||'',
+      c.vin||c.noSerie||'',
+      c.color||'',
+      _parsekm(c.km||c.kilometraje||0)||'',
+      precio||'', costo||'', margen != null ? margen : '', pct,
+      dias != null ? dias : '',
+      c.estatusVenta||'Disponible',
+      c.vendedorNombre||'',
+    ])
+  ];
+
+  const csv = csvRows.map(r =>
+    r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')
+  ).join('\r\n');
+
+  const BOM = '﻿'; // UTF-8 BOM para Excel en español
+  const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const fecha = new Date().toISOString().slice(0,10);
+  a.href     = url;
+  a.download = `rentabilidad-wecars-${fecha}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  Toast.show(`Exportando ${rows.length} vehículos a CSV`, 'ok');
+}
+
 function _expActualizarMargen() {
   const c      = _expVentaActual;
   if (!c) return;
   const precio = parsePrice(document.getElementById('exp-vta-precio')?.value);
-  const costo  = parsePrice(c.costoAdquisicion || c.costoCompra || c.costPrice);
+  const costo  = _resolverCosto(c);
   const wrap   = document.getElementById('exp-vta-margen');
   if (!wrap) return;
   if (precio == null) { wrap.innerHTML = ''; return; }
