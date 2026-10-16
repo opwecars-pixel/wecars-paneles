@@ -1291,25 +1291,35 @@ WC.onMany({
 
   [WC.IN.FOTO_RESULTADO]: (d) => {
     if (d.ok && d.url) {
-      // Actualiza el slot de foto con la URL real
-      const slot = document.querySelector(`.foto-slot[data-idx="${d.idx}"]`);
+      // Decode gridId y realIdx desde el idx codificado
+      const encodedIdx = d.idx;
+      const gridId  = encodedIdx >= 200 ? 'int' : encodedIdx >= 100 ? 'gal' : 'main';
+      const realIdx = encodedIdx >= 200 ? encodedIdx - 200 : encodedIdx >= 100 ? encodedIdx - 100 : 0;
+      const label   = gridId === 'main' ? 'Principal' : gridId === 'int' ? `Int ${realIdx+1}` : String(realIdx+1);
+      const gridEl  = document.getElementById(`vf-foto-grid-${gridId}`);
+      const slot    = gridEl ? gridEl.querySelector(`.foto-slot[data-idx="${realIdx}"]`) : null;
       if (slot) {
         slot.classList.add('has-foto');
+        slot.style.opacity = '1';
         slot.innerHTML = `<img src="${resolveWixImg(d.url,200,150)}" alt="foto">
-          <button class="foto-del" onclick="event.stopPropagation();_borrarFoto(${d.idx})" title="Eliminar">✕</button>`;
+          <button class="foto-del" onclick="event.stopPropagation();_borrarFoto('${gridId}',${realIdx})" title="Eliminar">✕</button>
+          <span style="position:absolute;bottom:4px;left:4px;font-size:9px;background:rgba(0,0,0,.6);color:#fff;padding:1px 5px;border-radius:3px">${label}</span>`;
         slot.setAttribute('data-url', d.url);
       }
-      // Si es foto 0, guarda como fotoPrincipal del vehículo en edición
-      if (d.idx === 0 && _editandoCarId) {
+      if (gridId === 'main' && _editandoCarId) {
         WC.send(WC.OUT.CAR_EDITAR, { id: _editandoCarId, datos: { fotoPrincipal: d.url } });
       }
       Toast.show('Foto subida ✓', 'ok');
     } else {
       Toast.show(d.error || 'Error al subir foto', 'error');
+      // Rehabilitar slot en error
+      const encodedIdx = d.idx;
+      const gridId  = encodedIdx >= 200 ? 'int' : encodedIdx >= 100 ? 'gal' : 'main';
+      const realIdx = encodedIdx >= 200 ? encodedIdx - 200 : encodedIdx >= 100 ? encodedIdx - 100 : 0;
+      const gridEl  = document.getElementById(`vf-foto-grid-${gridId}`);
+      const slot    = gridEl ? gridEl.querySelector(`.foto-slot[data-idx="${realIdx}"]`) : null;
+      if (slot) slot.style.opacity = '1';
     }
-    // Rehabilitar el slot
-    const btnSlot = document.querySelector(`.foto-slot[data-idx="${d.idx}"]`);
-    if (btnSlot) btnSlot.style.opacity = '1';
   },
 });
 
@@ -2326,11 +2336,17 @@ function _buildFormVehiculo(tipo, car) {
         </div>
         <div class="field-group">
           <div class="field-label">Color exterior</div>
-          ${s('color', v.color||'', 'Blanco, Negro...')}
+          <select class="field-input" id="vf-color">
+            ${['','Blanco','Blanco Perlado','Plata','Gris','Gris Oscuro','Negro','Rojo','Rojo Vino','Naranja','Amarillo','Verde','Verde Oliva','Azul','Azul Marino','Azul Cielo','Morado','Café','Beige','Dorado','Bronce','Otro'].map(o=>
+              `<option value="${esc(o)}" ${(v.color||'')=== o?'selected':''}>${o||'— seleccionar —'}</option>`).join('')}
+          </select>
         </div>
         <div class="field-group">
           <div class="field-label">Color interior</div>
-          ${s('color-int', v.colorInterior||'', 'Beige, Negro...')}
+          <select class="field-input" id="vf-color-int">
+            ${['','Negro','Gris','Beige','Café','Vino','Crema','Blanco','Azul','Rojo','Naranja','Otro'].map(o=>
+              `<option value="${esc(o)}" ${(v.colorInterior||'')=== o?'selected':''}>${o||'— seleccionar —'}</option>`).join('')}
+          </select>
         </div>
         <div class="field-group">
           <div class="field-label">Kilometraje</div>
@@ -2380,6 +2396,17 @@ function _buildFormVehiculo(tipo, car) {
               `<option value="${esc(o)}" ${(v.estadoVehiculo||'Disponible')===o?'selected':''}>${esc(o)}</option>`).join('')}
           </select>
         </div>
+        <div class="field-group">
+          <div class="field-label">Tipo de factura</div>
+          <select class="field-input" id="vf-tipo-factura">
+            ${['','De agencia','De seminuevos','De empresa','Sin factura'].map(o=>
+              `<option value="${esc(o)}" ${(v.tipoFactura||'')=== o?'selected':''}>${o||'— seleccionar —'}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Consecutivo / No. factura</div>
+          ${s('consecutivo-factura', v.consecutivoFactura||v.noFactura||'', 'Ej. FAC-2024-001')}
+        </div>
       </div>
     </div>
   </div>`;
@@ -2414,6 +2441,25 @@ function _buildFormVehiculo(tipo, car) {
   </div>`;
 
   /* ── Sección 4: fotos ── */
+  // Helper para construir un slot de foto
+  const _fotoSlot = (gridId, i, rawUrl, label) => {
+    const thumbUrl = resolveWixImg(rawUrl, 200, 150);
+    if (thumbUrl) {
+      return `<div class="foto-slot has-foto" data-grid="${gridId}" data-idx="${i}" data-url="${esc(rawUrl)}" onclick="_selFoto('${gridId}',${i})">
+        <img src="${esc(thumbUrl)}" alt="${label}" onerror="this.style.display='none'">
+        <button class="foto-del" onclick="event.stopPropagation();_borrarFoto('${gridId}',${i})" title="Eliminar">✕</button>
+        <span style="position:absolute;bottom:4px;left:4px;font-size:9px;background:rgba(0,0,0,.6);color:#fff;padding:1px 5px;border-radius:3px">${label}</span>
+      </div>`;
+    }
+    return `<div class="foto-slot foto-slot-add" data-grid="${gridId}" data-idx="${i}" onclick="_selFoto('${gridId}',${i})">
+      <i class="ti ti-camera" style="font-size:18px"></i>
+      <span style="font-size:10px;margin-top:4px">${label}</span>
+    </div>`;
+  };
+  // Datos guardados — ext: slot0=fotoPrincipal, slots1-7=fotos[0..6]; int: fotosInterior[0..7]
+  const fotoPpal   = v.fotoPrincipal || (Array.isArray(v.fotos) && v.fotos[0]) || '';
+  const fotosGal   = Array.isArray(v.fotos) ? v.fotos : [];   // fotos[] completo; slot0 sobrescribe con fotoPpal
+  const fotosInt   = Array.isArray(v.fotosInterior) ? v.fotosInterior : [];
   const secFotos = `
   <div class="form-section">
     <div class="form-section-hdr" onclick="_toggleFormSection(this)">
@@ -2422,32 +2468,28 @@ function _buildFormVehiculo(tipo, car) {
       <i class="ti ti-chevron-down form-section-chev"></i>
     </div>
     <div class="form-section-body">
-      <p style="font-size:12px;color:var(--wc-ink3);margin-bottom:12px">
-        Agrega fotos del vehículo. La primera foto será la imagen principal en el catálogo.
-      </p>
-      <div class="foto-grid" id="vf-foto-grid">
-        ${Array.from({length:10}).map((_,i) => {
-          // Lee del array images[] del CMS
-          const rawUrl = i === 0
-            ? (v.fotoPrincipal || (Array.isArray(v.fotos) && v.fotos[0]) || '')
-            : (Array.isArray(v.fotos) && v.fotos[i] ? v.fotos[i] : '');
-          const thumbUrl = resolveWixImg(rawUrl, 200, 150);
-          const rawSaved = rawUrl; // guardamos la URL original (wix:// o https://)
-          if (thumbUrl) {
-            return `<div class="foto-slot has-foto" data-idx="${i}" data-url="${esc(rawSaved)}" onclick="_selFoto(${i})">
-              <img src="${esc(thumbUrl)}" alt="foto ${i+1}" onerror="this.style.display='none'">
-              <button class="foto-del" onclick="event.stopPropagation();_borrarFoto(${i})" title="Eliminar">✕</button>
-              ${i===0?'<span style="position:absolute;bottom:4px;left:4px;font-size:9px;background:rgba(0,0,0,.6);color:#fff;padding:1px 5px;border-radius:3px">Principal</span>':''}
-            </div>`;
-          }
-          return `<div class="foto-slot foto-slot-add" data-idx="${i}" onclick="_selFoto(${i})">
-            <i class="ti ti-camera" style="font-size:18px"></i>
-            <span style="font-size:10px;margin-top:4px">${i===0?'Principal':i+1}</span>
-          </div>`;
+
+      <div style="font-size:12px;font-weight:600;color:var(--wc-ink2);margin-bottom:6px">
+        <i class="ti ti-car" style="font-size:12px;color:var(--wc-green)"></i> Fotos exteriores — 8 fotos
+        <span style="font-size:10px;font-weight:400;color:var(--wc-ink3);margin-left:4px">La primera = imagen principal del catálogo</span>
+      </div>
+      <div class="foto-grid" id="vf-foto-grid-gal" style="margin-bottom:16px">
+        ${Array.from({length:8}).map((_,i) => {
+          // slot 0 = fotoPrincipal; slots 1-7 = fotos[0..6] (el CMS guarda galería a partir de [0])
+          const saved = i === 0 ? fotoPpal : (fotosGal[i-1] || '');
+          return _fotoSlot('gal', i, saved || '', i === 0 ? 'Principal' : `Ext ${i+1}`);
         }).join('')}
       </div>
-      <p style="font-size:11px;color:var(--wc-ink3);margin-top:8px">
-        JPG/PNG/WebP · máx. 5MB · Foto 1 = imagen principal del catálogo. Hasta 10 fotos.
+
+      <div style="font-size:12px;font-weight:600;color:var(--wc-ink2);margin-bottom:6px">
+        <i class="ti ti-armchair" style="font-size:12px;color:var(--wc-ink3)"></i> Fotos interiores — 8 fotos
+      </div>
+      <div class="foto-grid" id="vf-foto-grid-int" style="margin-bottom:8px">
+        ${Array.from({length:8}).map((_,i) => _fotoSlot('int', i, fotosInt[i]||'', `Int ${i+1}`)).join('')}
+      </div>
+
+      <p style="font-size:11px;color:var(--wc-ink3);margin-top:4px">
+        JPG/PNG/WebP · máx. 5MB por foto · 8 exteriores + 8 interiores.
       </p>
       <div class="field-group" style="margin-top:12px">
         <div class="field-label"><i class="ti ti-brand-youtube" style="font-size:12px;color:#dc2626"></i> Link de video (YouTube / MP4)</div>
@@ -2521,13 +2563,19 @@ function guardarVehiculo() {
     Toast.show('El número de serie (VIN) es requerido', 'error'); return;
   }
 
-  // Recolectar fotos actuales del grid
-  const fotosGuardadas = [];
-  document.querySelectorAll('#vf-foto-grid .foto-slot[data-url]').forEach(slot => {
-    const url = slot.getAttribute('data-url');
-    if (url) fotosGuardadas.push(url);
-  });
-  const fotoPrincipalUrl = fotosGuardadas[0] || '';
+  // Recolectar fotos de los 3 grids
+  const _collectGrid = id => {
+    const urls = [];
+    document.querySelectorAll(`#${id} .foto-slot[data-url]`).forEach(sl => {
+      const u = sl.getAttribute('data-url'); if (u) urls.push(u);
+    });
+    return urls;
+  };
+  // Exterior: slot0 = fotoPrincipal, slots1-7 = galería. Interior: fotosInterior[]
+  const fotosGalArr  = _collectGrid('vf-foto-grid-gal');  // [principal, ext2..ext8]
+  const fotosIntArr  = _collectGrid('vf-foto-grid-int');  // [int1..int8]
+  const fotoPrincipalUrl = fotosGalArr[0] || '';
+  const fotosGuardadas   = fotosGalArr.slice(1); // galería sin principal (fotos[0..6] en CMS)
   const videoUrl = document.getElementById('vf-video-url')?.value?.trim() || '';
 
   const precioLista  = getN('precio-lista');
@@ -2547,8 +2595,8 @@ function guardarVehiculo() {
     'año':             parseInt(get('anio')) || null,
     anio:              parseInt(get('anio')) || null,
     year:              parseInt(get('anio')) || null,
-    color:             get('color'),
-    colorInterior:     get('color-int'),
+    color:             document.getElementById('vf-color')?.value || '',
+    colorInterior:     document.getElementById('vf-color-int')?.value || '',
     // KM — campo principal en CMS es statusDescription; km y kilometraje como alias
     statusDescription: kmVal ? String(kmVal) : '',
     km:                kmVal || null,
@@ -2575,16 +2623,26 @@ function guardarVehiculo() {
     precioLista:       precioLista  || null,
     precioPromo:       precioPromo  || null,
     precioCredito:     precioCredito|| null,
-    // Fotos — CMS usa array `fotos` como campo principal
-    ...(fotosGuardadas.length ? {
-      fotos:         fotosGuardadas,
-      images:        fotosGuardadas,   // compat
+    // Fotos — fotoPrincipal = slot0 exterior; fotos[] = galería ext; fotosInterior[] = interior
+    ...(fotoPrincipalUrl ? {
       fotoPrincipal: fotoPrincipalUrl,
       imagenUrl:     fotoPrincipalUrl,
       imagen:        fotoPrincipalUrl,
       image:         fotoPrincipalUrl,
     } : {}),
+    ...(fotosGuardadas.length ? {
+      fotos:         fotosGuardadas,
+      images:        fotosGuardadas,
+    } : {}),
+    ...(fotosIntArr.length ? {
+      fotosInterior:        fotosIntArr,
+      imagenesInterior:     fotosIntArr, // compat
+    } : {}),
     ...(videoUrl ? { video: videoUrl } : {}),
+    // Factura
+    tipoFactura:       get('tipo-factura'),
+    consecutivoFactura:get('consecutivo-factura'),
+    noFactura:         get('consecutivo-factura'),
     notasInternas:     get('notas'),
     notasAdmin:        get('notas'),
   };
@@ -2653,7 +2711,7 @@ function guardarVehiculo() {
 /* ════════════════════════════════════════════════════════
    FOTOS — subida real via Velo postMessage
 ════════════════════════════════════════════════════════ */
-function _selFoto(idx) {
+function _selFoto(gridId, idx) {
   const inp = document.createElement('input');
   inp.type = 'file';
   inp.accept = 'image/jpeg,image/png,image/webp';
@@ -2661,13 +2719,16 @@ function _selFoto(idx) {
     const file = inp.files[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) { Toast.show('Máximo 5MB por foto', 'error'); return; }
-    const slot = document.querySelector(`.foto-slot[data-idx="${idx}"]`);
+    const gridEl = document.getElementById(`vf-foto-grid-${gridId}`);
+    const slot = gridEl ? gridEl.querySelector(`.foto-slot[data-idx="${idx}"]`) : null;
     if (slot) slot.style.opacity = '0.4';
-    // Convertir a base64 y enviar a Velo
     const reader = new FileReader();
     reader.onload = () => {
+      // Encode gridId in idx: main=0..0, gal=100..108, int=200..204
+      const idxEncoded = gridId === 'main' ? 0 : gridId === 'gal' ? 100 + idx : 200 + idx;
       WC.send(WC.OUT.FOTO_SUBIR, {
-        idx,
+        idx:    idxEncoded,
+        gridId,
         nombre: file.name,
         tipo:   file.type,
         base64: reader.result.split(',')[1],
@@ -2679,13 +2740,15 @@ function _selFoto(idx) {
   };
   inp.click();
 }
-function _borrarFoto(idx) {
-  const slot = document.querySelector(`.foto-slot[data-idx="${idx}"]`);
+function _borrarFoto(gridId, idx) {
+  const gridEl = document.getElementById(`vf-foto-grid-${gridId}`);
+  const slot = gridEl ? gridEl.querySelector(`.foto-slot[data-idx="${idx}"]`) : null;
   if (!slot) return;
   slot.classList.remove('has-foto');
   slot.removeAttribute('data-url');
-  slot.innerHTML = `<i class="ti ti-plus"></i>`;
-  slot.onclick = () => _selFoto(idx);
+  const label = gridId === 'main' ? 'Principal' : gridId === 'int' ? `Int ${idx+1}` : String(idx+1);
+  slot.innerHTML = `<i class="ti ti-camera" style="font-size:18px"></i><span style="font-size:10px;margin-top:4px">${label}</span>`;
+  slot.onclick = () => _selFoto(gridId, idx);
 }
 function _subirDoc(nombre, idx) {
   Toast.show('Subida de documentos disponible próximamente', '');
