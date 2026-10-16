@@ -1307,7 +1307,7 @@ WC.onMany({
         slot.setAttribute('data-url', d.url);
       }
       if (gridId === 'main' && _editandoCarId) {
-        WC.send(WC.OUT.CAR_EDITAR, { id: _editandoCarId, datos: { fotoPrincipal: d.url } });
+        WC.send(WC.OUT.CAR_EDITAR, { id: _editandoCarId, datos: { image: d.url, fotoPrincipal: d.url } });
       }
       Toast.show('Foto subida ✓', 'ok');
     } else {
@@ -2471,9 +2471,12 @@ function _buildFormVehiculo(tipo, car) {
   // Datos guardados — ext: slot0=fotoPrincipal, slots1-7=fotos[0..6]; int: fotosInterior[0..7]
   // Intentar varios nombres de campo que Wix puede asignar según cómo se creó el CMS
   const _tryArr = (...keys) => { for (const k of keys) { if (Array.isArray(v[k]) && v[k].length) return v[k]; } return []; };
-  const fotosGal = _tryArr('fotos','images','galeriaFotos','galeria','imagenes','imagenesExteriores','extFotos');
-  const fotosInt = _tryArr('fotosInterior','imagenesInterior','fotosInt','intFotos','interiorFotos','fotoInterior');
-  // image = ID real del campo "Imagenes" (portada) en el CMS de Wix
+  // IDs reales del CMS Cars de Wix:
+  //   image         → "Imagenes" (portada, tipo Imagen)
+  //   mediagallery  → "Galería de Fotos" (galería exterior, tipo Galería de multimedia)
+  //   fotosInterior → "Fotos interior" (tipo Galería de multimedia)
+  const fotosGal = _tryArr('mediagallery','fotos','images','galeriaFotos','galeria');
+  const fotosInt = _tryArr('fotosInterior','imagenesInterior','intFotos');
   const fotoPpal = v.image || v.fotoPrincipal || v.imagenUrl || v.imagen || v.imageUrl || fotosGal[0] || '';
   const secFotos = `
   <div class="form-section">
@@ -2640,18 +2643,18 @@ function guardarVehiculo() {
     precioCredito:     precioCredito|| null,
     // Fotos — fotoPrincipal = slot0 exterior; fotos[] = galería ext; fotosInterior[] = interior
     ...(fotoPrincipalUrl ? {
-      fotoPrincipal: fotoPrincipalUrl,
+      image:         fotoPrincipalUrl,   // ID real en CMS: "Imagenes" (portada)
+      fotoPrincipal: fotoPrincipalUrl,   // compat legacy
       imagenUrl:     fotoPrincipalUrl,
       imagen:        fotoPrincipalUrl,
-      image:         fotoPrincipalUrl,
     } : {}),
     ...(fotosGuardadas.length ? {
-      fotos:         fotosGuardadas,
-      images:        fotosGuardadas,
+      mediagallery:  fotosGuardadas,   // ID real en CMS: "Galería de Fotos"
+      fotos:         fotosGuardadas,   // compat legacy
+      images:        fotosGuardadas,   // compat legacy
     } : {}),
     ...(fotosIntArr.length ? {
-      fotosInterior:        fotosIntArr,
-      imagenesInterior:     fotosIntArr, // compat
+      fotosInterior: fotosIntArr,      // ID real en CMS: "Fotos interior"
     } : {}),
     ...(videoUrl ? { video: videoUrl } : {}),
     // Factura
