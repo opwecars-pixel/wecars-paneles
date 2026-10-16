@@ -305,6 +305,91 @@ img{max-width:100%;display:block}
 /* ════════════════════════════════════════════════════════
    PRECIO CARDS
 ════════════════════════════════════════════════════════ */
+/* ── RENTABILIDAD ── */
+.rent-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+@media(max-width:600px){.rent-kpis{grid-template-columns:repeat(2,1fr)}}
+.rent-kpi{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-md);padding:12px 14px}
+.rent-kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--wc-ink3);margin-bottom:4px}
+.rent-kpi-val{font-size:20px;font-weight:800;color:var(--wc-ink);font-variant-numeric:tabular-nums}
+.rent-kpi-sub{font-size:11px;color:var(--wc-ink3);margin-top:2px}
+.rent-kpi.green .rent-kpi-val{color:var(--wc-ok)}
+.rent-kpi.red   .rent-kpi-val{color:var(--wc-danger)}
+.rent-kpi.blue  .rent-kpi-val{color:var(--wc-info)}
+.rent-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.rent-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--wc-border);cursor:pointer;transition:background .12s}
+.rent-row:last-child{border-bottom:none}
+.rent-row:hover{background:var(--wc-surface2)}
+.rent-row-thumb{width:52px;height:40px;border-radius:6px;object-fit:cover;background:var(--wc-surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.rent-row-thumb img{width:100%;height:100%;object-fit:cover}
+.rent-row-info{flex:1;min-width:0}
+.rent-row-nombre{font-size:13px;font-weight:700;color:var(--wc-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rent-row-sub{font-size:11px;color:var(--wc-ink3);margin-top:1px}
+.rent-row-nums{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.rent-margen-val{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.rent-margen-pct{font-size:11px;font-weight:700;padding:1px 6px;border-radius:20px}
+.rent-margen-pct.high{background:#dcfce7;color:#15803d}
+.rent-margen-pct.mid {background:#fef9c3;color:#854d0e}
+.rent-margen-pct.low {background:#fee2e2;color:#b91c1c}
+.rent-margen-pct.neg {background:#fce7f3;color:#9d174d}
+.rent-margen-pct.nc  {background:var(--wc-surface2);color:var(--wc-ink3)}
+.rent-bar-wrap{margin-top:4px;height:4px;background:var(--wc-border);border-radius:4px;width:80px}
+.rent-bar{height:4px;border-radius:4px;background:var(--wc-ok)}
+.rent-no-costo{font-size:10px;color:var(--wc-ink3);font-style:italic}
+
+/* ── EXPEDIENTES DE VENTAS ── */
+.exp-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.exp-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--wc-border);cursor:pointer;transition:background .12s}
+.exp-card:last-child{border-bottom:none}
+.exp-card:hover{background:var(--wc-surface2)}
+.exp-card-thumb{width:60px;height:46px;border-radius:8px;background:var(--wc-surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.exp-card-thumb img{width:100%;height:100%;object-fit:cover}
+.exp-card-body{flex:1;min-width:0}
+.exp-card-nombre{font-size:13px;font-weight:700;color:var(--wc-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-card-sub{font-size:11px;color:var(--wc-ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.exp-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.exp-badge.apartado{background:#fef3c7;color:#92400e}
+.exp-badge.vendido{background:#dcfce7;color:#14532d}
+.exp-badge.entregado{background:#dbeafe;color:#1e40af}
+.exp-badge.en-tramite{background:#f3e8ff;color:#6b21a8}
+.exp-docs-pct{font-size:11px;color:var(--wc-ink3);font-variant-numeric:tabular-nums}
+/* Drawer */
+.exp-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;backdrop-filter:blur(2px)}
+.exp-drawer{position:fixed;top:0;right:0;bottom:0;width:min(480px,100vw);background:var(--wc-bg);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 32px rgba(0,0,0,.18)}
+.exp-drawer-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--wc-border);flex-shrink:0}
+.exp-drawer-thumb{width:52px;height:40px;border-radius:8px;background:var(--wc-surface2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.exp-drawer-thumb img{width:100%;height:100%;object-fit:cover}
+.exp-drawer-title{flex:1;min-width:0}
+.exp-drawer-title h3{font-size:14px;font-weight:800;color:var(--wc-ink);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-drawer-title p{font-size:11px;color:var(--wc-ink3);margin:2px 0 0}
+.exp-tabs{display:flex;border-bottom:1px solid var(--wc-border);flex-shrink:0;overflow-x:auto}
+.exp-tab{padding:10px 14px;font-size:12px;font-weight:700;color:var(--wc-ink3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
+.exp-tab.active{color:var(--wc-accent);border-bottom-color:var(--wc-accent)}
+.exp-pane{flex:1;overflow-y:auto;padding:14px 16px;display:none;flex-direction:column;gap:12px}
+.exp-pane.active{display:flex}
+.exp-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:400px){.exp-field-row{grid-template-columns:1fr}}
+.exp-field label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--wc-ink3);display:block;margin-bottom:4px}
+.exp-field input,.exp-field select,.exp-field textarea{width:100%;padding:8px 10px;border:1.5px solid var(--wc-border);border-radius:var(--wc-r-sm);background:var(--wc-surface);color:var(--wc-ink);font-size:13px;font-family:inherit;box-sizing:border-box}
+.exp-field input:focus,.exp-field select:focus,.exp-field textarea:focus{border-color:var(--wc-accent);outline:none}
+/* Doc checklist */
+.exp-doc-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--wc-border)}
+.exp-doc-row:last-child{border-bottom:none}
+.exp-doc-label{flex:1;font-size:13px;color:var(--wc-ink)}
+.exp-doc-btns{display:flex;gap:6px;flex-shrink:0}
+.exp-doc-btn{padding:4px 10px;border-radius:20px;border:1.5px solid var(--wc-border);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--wc-surface);color:var(--wc-ink3);transition:all .12s}
+.exp-doc-btn.ok{background:#dcfce7;color:#15803d;border-color:#bbf7d0}
+.exp-doc-btn.pendiente{background:#fef9c3;color:#854d0e;border-color:#fde047}
+.exp-doc-btn.na{background:var(--wc-surface2);color:var(--wc-ink3);border-color:var(--wc-border)}
+/* Timeline */
+.exp-tl-item{display:flex;gap:10px;padding:6px 0}
+.exp-tl-dot{width:8px;height:8px;border-radius:50%;background:var(--wc-accent);flex-shrink:0;margin-top:5px}
+.exp-tl-body{flex:1;min-width:0}
+.exp-tl-msg{font-size:12px;color:var(--wc-ink)}
+.exp-tl-meta{font-size:10px;color:var(--wc-ink3);margin-top:2px}
+/* Footer */
+.exp-drawer-foot{padding:12px 16px;border-top:1px solid var(--wc-border);display:flex;gap:8px;flex-shrink:0}
+
 .precio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
 @media(max-width:500px){.precio-grid{grid-template-columns:1fr}}
 .precio-card{background:var(--wc-surface2);border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);padding:12px}
@@ -477,15 +562,39 @@ img{max-width:100%;display:block}
 
     <!-- ─── VIEW: RENTABILIDAD ─── -->
     <div class="view view-wrap hidden" id="view-rentabilidad">
-      <div class="card-box">
-        <div class="card-box-title"><i class="ti ti-chart-bar"></i>Rentabilidad por vehículo</div>
-        <div id="rent-list">
-          <div class="empty-state" style="padding:24px 0">
-            <i class="ti ti-chart-bar" style="font-size:32px;opacity:.3;margin-bottom:8px;display:block"></i>
-            <p style="font-size:13px;color:var(--wc-ink3)">Disponible en Fase 2 — próximamente</p>
-          </div>
-        </div>
+
+      <!-- KPIs -->
+      <div class="rent-kpis" id="rent-kpis"></div>
+
+      <!-- Filtros -->
+      <div class="rent-filters">
+        <select class="field-input" id="rent-filtro-tipo" onchange="renderRentabilidad()" style="font-size:12px;padding:6px 10px;max-width:140px">
+          <option value="todos">Todos los tipos</option>
+          <option value="propio">Propios</option>
+          <option value="consigna">Consigna</option>
+          <option value="aliado">Aliado</option>
+        </select>
+        <select class="field-input" id="rent-filtro-estado" onchange="renderRentabilidad()" style="font-size:12px;padding:6px 10px;max-width:150px">
+          <option value="">Todos los estados</option>
+          <option value="Disponible">Disponibles</option>
+          <option value="Vendido">Vendidos</option>
+          <option value="Apartado">Apartados</option>
+        </select>
+        <select class="field-input" id="rent-orden" onchange="renderRentabilidad()" style="font-size:12px;padding:6px 10px;max-width:160px">
+          <option value="margen-desc">Mayor margen $</option>
+          <option value="pct-desc">Mayor margen %</option>
+          <option value="precio-desc">Mayor precio</option>
+          <option value="margen-asc">Menor margen</option>
+          <option value="dias-desc">Más días en lote</option>
+          <option value="interes-desc">Más interesados</option>
+        </select>
       </div>
+
+      <!-- Tabla rentabilidad -->
+      <div class="card-box" style="overflow:hidden">
+        <div id="rent-list"></div>
+      </div>
+
     </div>
 
     <!-- ─── VIEW: VENDEDORES ─── -->
@@ -538,29 +647,169 @@ img{max-width:100%;display:block}
 
     <!-- ─── VIEW: EXPEDIENTES DE VENTAS ─── -->
     <div class="view view-wrap hidden" id="view-expedientes">
-      <div class="search-bar">
+      <!-- Filtros + búsqueda -->
+      <div class="search-bar" style="margin-bottom:8px">
         <div class="search-wrap">
           <i class="ti ti-search"></i>
-          <input type="search" placeholder="Buscar cliente, vehículo, VIN, folio..." oninput="buscarExpedientes(this.value)">
+          <input type="search" id="exp-search" placeholder="Buscar auto, cliente, vendedor, VIN..." oninput="renderExpedientes()">
         </div>
       </div>
-      <div id="exp-list">
-        <div class="empty-state">
-          <i class="ti ti-files"></i>
-          <h3>Expedientes de ventas</h3>
-          <p>Disponible en Fase 4 — historial completo buscable</p>
+      <div class="exp-filtros">
+        <select class="field-input" id="exp-filtro-estatus" onchange="renderExpedientes()" style="font-size:12px;padding:6px 10px;max-width:150px">
+          <option value="">Todos los estados</option>
+          <option value="Apartado">Apartados</option>
+          <option value="Vendido">Vendidos</option>
+          <option value="Entregado">Entregados</option>
+        </select>
+        <select class="field-input" id="exp-filtro-docs" onchange="renderExpedientes()" style="font-size:12px;padding:6px 10px;max-width:160px">
+          <option value="">Todos los expedientes</option>
+          <option value="incompleto">Con docs pendientes</option>
+          <option value="completo">Docs completos</option>
+        </select>
+      </div>
+      <!-- Lista -->
+      <div class="card-box" style="overflow:hidden">
+        <div id="exp-list">
+          <div class="empty-state"><i class="ti ti-loader-2 spin"></i><p>Cargando...</p></div>
         </div>
+      </div>
+    </div>
+
+    <!-- ═══════ DRAWER: EXPEDIENTE DE VENTA ════════════════════════════ -->
+    <div class="exp-overlay" id="exp-overlay" onclick="cerrarExpedienteVenta()"></div>
+    <div class="exp-drawer" id="exp-drawer">
+      <!-- Head -->
+      <div class="exp-drawer-head">
+        <div class="exp-drawer-thumb" id="exp-drw-thumb">
+          <i class="ti ti-car" style="font-size:18px;color:var(--wc-ink3)"></i>
+        </div>
+        <div class="exp-drawer-title">
+          <h3 id="exp-drw-nombre">—</h3>
+          <p id="exp-drw-sub">—</p>
+        </div>
+        <span class="exp-badge" id="exp-drw-badge"></span>
+        <button onclick="cerrarExpedienteVenta()" style="margin-left:6px;width:32px;height:32px;border:none;background:var(--wc-surface2);border-radius:var(--wc-r-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--wc-ink);font-size:16px;flex-shrink:0"><i class="ti ti-x"></i></button>
+      </div>
+      <!-- Tabs -->
+      <div class="exp-tabs">
+        <button class="exp-tab active" data-tab="venta" onclick="expCambiarTab(this)">Venta</button>
+        <button class="exp-tab" data-tab="docs" onclick="expCambiarTab(this)">Documentos</button>
+        <button class="exp-tab" data-tab="comprador" onclick="expCambiarTab(this)">Comprador</button>
+        <button class="exp-tab" data-tab="historial" onclick="expCambiarTab(this)">Historial</button>
+      </div>
+      <!-- Pane: Venta -->
+      <div class="exp-pane active" id="exp-pane-venta">
+        <div class="exp-field-row">
+          <div class="exp-field">
+            <label>Precio de venta</label>
+            <input type="number" id="exp-vta-precio" placeholder="0">
+          </div>
+          <div class="exp-field">
+            <label>Forma de pago</label>
+            <select id="exp-vta-formapago">
+              <option value="Contado">Contado</option>
+              <option value="Crédito bancario">Crédito bancario</option>
+              <option value="Crédito agencia">Crédito agencia</option>
+              <option value="Permuta">Permuta</option>
+              <option value="Transferencia">Transferencia</option>
+            </select>
+          </div>
+        </div>
+        <div class="exp-field-row">
+          <div class="exp-field">
+            <label>Comisión vendedor ($)</label>
+            <input type="number" id="exp-vta-comision" placeholder="0">
+          </div>
+          <div class="exp-field">
+            <label>Fecha de venta</label>
+            <input type="date" id="exp-vta-fecha">
+          </div>
+        </div>
+        <div class="exp-field-row">
+          <div class="exp-field">
+            <label>Estatus del expediente</label>
+            <select id="exp-vta-estatus">
+              <option value="Apartado">Apartado</option>
+              <option value="Vendido">Vendido</option>
+              <option value="Entregado">Entregado</option>
+            </select>
+          </div>
+          <div class="exp-field">
+            <label>Plazo crédito (meses)</label>
+            <input type="number" id="exp-vta-plazo" placeholder="—">
+          </div>
+        </div>
+        <div class="exp-field">
+          <label>Notas de la venta</label>
+          <textarea id="exp-vta-notas" rows="3" placeholder="Observaciones, condiciones especiales..."></textarea>
+        </div>
+        <div id="exp-vta-margen" style="background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:10px 12px;font-size:12px"></div>
+      </div>
+      <!-- Pane: Docs -->
+      <div class="exp-pane" id="exp-pane-docs">
+        <div style="font-size:11px;color:var(--wc-ink3);margin-bottom:4px">Marca el estado de cada documento. <b id="exp-docs-resumen"></b></div>
+        <div id="exp-docs-lista"></div>
+      </div>
+      <!-- Pane: Comprador -->
+      <div class="exp-pane" id="exp-pane-comprador">
+        <div class="exp-field-row">
+          <div class="exp-field">
+            <label>Nombre completo</label>
+            <input type="text" id="exp-cmp-nombre" placeholder="Nombre del comprador">
+          </div>
+          <div class="exp-field">
+            <label>Teléfono</label>
+            <input type="tel" id="exp-cmp-tel" placeholder="55 1234 5678">
+          </div>
+        </div>
+        <div class="exp-field-row">
+          <div class="exp-field">
+            <label>Correo electrónico</label>
+            <input type="email" id="exp-cmp-email" placeholder="correo@ejemplo.com">
+          </div>
+          <div class="exp-field">
+            <label>RFC</label>
+            <input type="text" id="exp-cmp-rfc" placeholder="RFC del comprador">
+          </div>
+        </div>
+        <div class="exp-field">
+          <label>Domicilio</label>
+          <input type="text" id="exp-cmp-dir" placeholder="Calle, número, colonia, ciudad">
+        </div>
+        <div class="exp-field-row">
+          <div class="exp-field">
+            <label>Factura a nombre de</label>
+            <input type="text" id="exp-cmp-factura-nombre" placeholder="Persona física o moral">
+          </div>
+          <div class="exp-field">
+            <label>Uso del CFDI</label>
+            <select id="exp-cmp-uso-cfdi">
+              <option value="G03">G03 - Gastos en general</option>
+              <option value="P01">P01 - Por definir</option>
+              <option value="S01">S01 - Sin efectos fiscales</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Pane: Historial -->
+      <div class="exp-pane" id="exp-pane-historial">
+        <div id="exp-historial-lista">
+          <div style="font-size:12px;color:var(--wc-ink3);text-align:center;padding:24px 0">Sin historial registrado</div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <div class="exp-drawer-foot">
+        <button class="btn" style="flex:1" onclick="cerrarExpedienteVenta()">Cancelar</button>
+        <button class="btn btn-primary" style="flex:2" id="exp-save-btn" onclick="guardarExpedienteVenta()">
+          <i class="ti ti-device-floppy"></i> Guardar expediente
+        </button>
       </div>
     </div>
 
     <!-- ─── VIEW: REPORTES ─── -->
     <div class="view view-wrap hidden" id="view-reportes">
-      <div class="card-box">
-        <div class="card-box-title"><i class="ti ti-report-analytics"></i>Reportes para Gerencia</div>
-        <div class="empty-state" style="padding:24px 0">
-          <i class="ti ti-report-analytics" style="font-size:32px;opacity:.3;margin-bottom:8px;display:block"></i>
-          <p style="font-size:13px;color:var(--wc-ink3)">Disponible en Fase 4 — próximamente</p>
-        </div>
+      <div id="reportes-content">
+        <div class="empty-state" style="padding:32px"><i class="ti ti-loader-2 spin"></i><p>Calculando...</p></div>
       </div>
     </div>
 
@@ -842,9 +1091,12 @@ function mostrarVista(key, btn, origen) {
   if (btn && origen === 'bn') btn.classList.add('active');
 
   // Cargar datos si es necesario
-  if (key === 'vendedores' && !VENDEDORES.length) cargarVendedores();
-  if (key === 'clientes'   && !CLIENTES.length)   cargarTodosClientes();
-  if (key === 'creditos'   && !CREDITOS.length)    cargarCreditos();
+  if (key === 'vendedores'   && !VENDEDORES.length) cargarVendedores();
+  if (key === 'clientes'     && !CLIENTES.length)   cargarTodosClientes();
+  if (key === 'creditos'     && !CREDITOS.length)    cargarCreditos();
+  if (key === 'rentabilidad')                        renderRentabilidad();
+  if (key === 'expedientes' && INVENTARIO.length)    renderExpedientes();
+  if (key === 'reportes')                            renderReportes();
 }
 
 /* ════════════════════════════════════════════════════════
@@ -876,6 +1128,9 @@ WC.onMany({
     // Rehabilita botón guardar si sigue deshabilitado
     const btn = document.getElementById('btn-guardar-veh');
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-device-floppy"></i>Guardar vehículo'; }
+
+    // Si viene de guardar expediente de venta, delegar y salir
+    if (_expGuardandoId) { _expOnCarResultado(d); return; }
 
     if (d.ok) {
       Toast.show(d.creado ? 'Vehículo agregado ✓' : 'Vehículo actualizado ✓', 'ok');
@@ -1085,6 +1340,472 @@ function setFiltroEstado(estado, btn) {
   renderInventario();
 }
 function filtrarInventario() { renderInventario(); }
+
+/* ════════════════════════════════════════════════════════
+   RENTABILIDAD
+════════════════════════════════════════════════════════ */
+function _parsekm(v) {
+  if (v == null || v === '') return null;
+  const clean = String(v).replace(/[^\d.]/g, '');
+  const n = parseFloat(clean);
+  return isNaN(n) ? null : n;
+}
+
+function _diasEnInventario(c) {
+  const base = c.fechaAdquisicion || c.fechaIngreso || c._createdDate;
+  if (!base) return null;
+  const ms = Date.now() - new Date(base).getTime();
+  return Math.max(0, Math.floor(ms / 86400000));
+}
+
+function renderRentabilidad() {
+  if (!INVENTARIO.length) {
+    document.getElementById('rent-kpis').innerHTML = '';
+    document.getElementById('rent-list').innerHTML =
+      '<div class="empty-state" style="padding:32px 0"><i class="ti ti-loader-2 spin"></i><p>Cargando inventario...</p></div>';
+    return;
+  }
+
+  const filtroTipo   = document.getElementById('rent-filtro-tipo')?.value  || 'todos';
+  const filtroEstado = document.getElementById('rent-filtro-estado')?.value || '';
+  const orden        = document.getElementById('rent-orden')?.value         || 'margen-desc';
+
+  // Índice de interesados por auto (match por texto en autoInteres)
+  const _interesadosPorAuto = {};
+  CLIENTES.forEach(lead => {
+    const ai = (lead.autoInteres || lead.interes || '').trim().toLowerCase();
+    if (!ai) return;
+    INVENTARIO.forEach(c => {
+      const key = [c.marca||'', c.modelo||'', c.año||c.anio||c.year||''].join(' ').trim().toLowerCase();
+      if (key && ai.includes(key.split(' ')[0]) && ai.includes(key.split(' ')[1] || key.split(' ')[0])) {
+        _interesadosPorAuto[c._id] = (_interesadosPorAuto[c._id] || 0) + 1;
+      }
+    });
+  });
+
+  // Todas las filas con margen calculado (para KPIs globales)
+  const todasLasFilas = INVENTARIO.map(c => {
+    const precio = parsePrice(c.priceNew || c.precioVenta || c.precio || c.precioLista);
+    const costo  = parsePrice(c.costoAdquisicion || c.costoCompra || c.costPrice);
+    const margen = (precio != null && costo != null && costo > 0) ? precio - costo : null;
+    const pct    = (margen != null && costo > 0) ? (margen / costo) * 100 : null;
+    const dias        = _diasEnInventario(c);
+    const interesados = _interesadosPorAuto[c._id] || 0;
+    return { c, precio, costo, margen, pct, dias, interesados };
+  });
+
+  // KPIs siempre sobre TODO el inventario (sin filtros)
+  const kpiConPrecio = todasLasFilas.filter(r => r.precio != null);
+  const kpiConMargen = todasLasFilas.filter(r => r.margen != null);
+  const kpiTotalValor    = kpiConPrecio.reduce((s, r) => s + r.precio, 0);
+  const kpiTotalMargen   = kpiConMargen.reduce((s, r) => s + r.margen, 0);
+  const kpiMargenProm    = kpiConMargen.length
+    ? kpiConMargen.reduce((s, r) => s + r.pct, 0) / kpiConMargen.length
+    : null;
+  const kpiSinCosto      = todasLasFilas.filter(r => r.costo == null || r.costo === 0).length;
+  const kpiPromDias      = todasLasFilas.filter(r => r.dias != null);
+  const promDias         = kpiPromDias.length
+    ? Math.round(kpiPromDias.reduce((s, r) => s + r.dias, 0) / kpiPromDias.length)
+    : null;
+
+  document.getElementById('rent-kpis').innerHTML = `
+    <div class="rent-kpi blue">
+      <div class="rent-kpi-lbl">Valor total inventario</div>
+      <div class="rent-kpi-val">${fmt(kpiTotalValor) || '—'}</div>
+      <div class="rent-kpi-sub">${kpiConPrecio.length} de ${todasLasFilas.length} con precio</div>
+    </div>
+    <div class="rent-kpi ${kpiTotalMargen >= 0 ? 'green' : 'red'}">
+      <div class="rent-kpi-lbl">Margen bruto total</div>
+      <div class="rent-kpi-val">${kpiConMargen.length ? fmt(kpiTotalMargen) : '—'}</div>
+      <div class="rent-kpi-sub">${kpiConMargen.length} vehículos con costo</div>
+    </div>
+    <div class="rent-kpi ${kpiMargenProm != null ? (kpiMargenProm >= 15 ? 'green' : kpiMargenProm >= 8 ? '' : 'red') : ''}">
+      <div class="rent-kpi-lbl">Margen promedio %</div>
+      <div class="rent-kpi-val">${kpiMargenProm != null ? kpiMargenProm.toFixed(1) + '%' : '—'}</div>
+      <div class="rent-kpi-sub">sobre costo · meta ≥15%</div>
+    </div>
+    <div class="rent-kpi ${kpiSinCosto > 0 ? 'red' : 'green'}">
+      <div class="rent-kpi-lbl">Sin costo registrado</div>
+      <div class="rent-kpi-val">${kpiSinCosto}</div>
+      <div class="rent-kpi-sub">${promDias != null ? `Prom. ${promDias} días en lote` : 'Cargar costos pendientes'}</div>
+    </div>`;
+
+  // Lista filtrada
+  let rows = todasLasFilas.slice();
+  if (filtroTipo !== 'todos') {
+    rows = rows.filter(r => (r.c.tipoAdquisicion || r.c.tipoOrigen || 'propio').toLowerCase() === filtroTipo);
+  }
+  if (filtroEstado) {
+    rows = rows.filter(r => (r.c.estatusVenta || r.c.estadoVehiculo || 'Disponible') === filtroEstado);
+  }
+
+  rows.sort((a, b) => {
+    if (orden === 'margen-desc') return (b.margen ?? -Infinity) - (a.margen ?? -Infinity);
+    if (orden === 'margen-asc')  return (a.margen ?? Infinity)  - (b.margen ?? Infinity);
+    if (orden === 'pct-desc')    return (b.pct    ?? -Infinity) - (a.pct    ?? -Infinity);
+    if (orden === 'precio-desc') return (b.precio ?? -Infinity) - (a.precio ?? -Infinity);
+    if (orden === 'dias-desc')    return (b.dias        ?? -Infinity) - (a.dias        ?? -Infinity);
+    if (orden === 'interes-desc') return (b.interesados ?? -Infinity) - (a.interesados ?? -Infinity);
+    return 0;
+  });
+
+  const list = document.getElementById('rent-list');
+  if (!rows.length) {
+    list.innerHTML = '<div class="empty-state" style="padding:32px 0"><i class="ti ti-chart-bar"></i><p>Sin vehículos con ese filtro</p></div>';
+    return;
+  }
+
+  const maxMargen = Math.max(...rows.map(r => r.margen ?? 0), 1);
+
+  list.innerHTML = rows.map(({ c, precio, costo, margen, pct, dias, interesados }) => {
+    const nombre    = [c.marca||c.brand||'', c.modelo||'', c.año||c.anio||c.year||''].filter(Boolean).join(' ') || c.nombre || c.title || 'Sin nombre';
+    const rawFoto   = c.fotoPrincipal || c.imagenUrl || c.imagen || c.image || (Array.isArray(c.fotos) && c.fotos[0]) || '';
+    const thumb     = resolveWixImg(rawFoto, 80, 60);
+    const tipo      = (c.tipoAdquisicion || c.tipoOrigen || 'propio').toLowerCase();
+    const estado    = c.estatusVenta || c.estadoVehiculo || 'Disponible';
+    const tipoLabel = { propio:'Propio', aliado:'Aliado', consigna:'Consigna' }[tipo] || tipo;
+    const km        = _parsekm(c.statusDescription || c.km || c.kilometraje);
+
+    let pctClass = 'nc', pctLabel = 'Sin costo';
+    if (pct != null) {
+      pctLabel  = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+      pctClass  = pct >= 20 ? 'high' : pct >= 8 ? 'mid' : pct >= 0 ? 'low' : 'neg';
+    }
+
+    const margenStr   = margen != null ? (margen < 0 ? '-' : '') + fmt(Math.abs(margen)) : '—';
+    const margenColor = margen != null ? (margen >= 0 ? 'var(--wc-ok)' : 'var(--wc-danger)') : 'var(--wc-ink3)';
+    const barW        = margen != null && maxMargen > 0 ? Math.max(0, Math.min(100, (margen / maxMargen) * 100)) : 0;
+
+    // Alerta visual si lleva demasiados días en lote
+    const diasAlerta = dias != null && dias > 60 ? `<span style="font-size:10px;color:var(--wc-warn);font-weight:700">⚠ ${dias}d en lote</span>` : dias != null ? `<span style="font-size:10px;color:var(--wc-ink3)">${dias}d</span>` : '';
+
+    return `<div class="rent-row" onclick="editarVehiculo('${esc(c._id)}')">
+      <div class="rent-row-thumb">
+        ${thumb ? `<img src="${esc(thumb)}" alt="${esc(nombre)}" loading="lazy" onerror="this.style.display='none'">` : '<i class="ti ti-car" style="font-size:18px;color:var(--wc-ink3)"></i>'}
+      </div>
+      <div class="rent-row-info">
+        <div class="rent-row-nombre">${esc(nombre)}</div>
+        <div class="rent-row-sub">
+          ${esc(tipoLabel)} · ${esc(estado)}${km ? ` · ${km.toLocaleString('es-MX')} km` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+          <div class="rent-bar-wrap" style="flex:1"><div class="rent-bar" style="width:${barW}%;background:${margenColor}"></div></div>
+          ${diasAlerta}
+          ${interesados > 0 ? `<span style="font-size:10px;background:var(--wc-info-bg);color:var(--wc-info);font-weight:700;padding:1px 5px;border-radius:20px"><i class="ti ti-users" style="font-size:9px"></i> ${interesados}</span>` : ''}
+        </div>
+      </div>
+      <div class="rent-row-nums">
+        <div style="font-size:12px;color:var(--wc-ink3)">${precio ? fmt(precio) : '<span style="font-style:italic;color:var(--wc-ink3)">Sin precio</span>'}</div>
+        ${costo ? `<div style="font-size:11px;color:var(--wc-ink3)">Costo: ${fmt(costo)}</div>` : '<div style="font-size:11px;color:var(--wc-ink3);font-style:italic">Sin costo</div>'}
+        <div class="rent-margen-val" style="color:${margenColor}">${margenStr}</div>
+        <span class="rent-margen-pct ${pctClass}">${pctLabel}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════════
+   EXPEDIENTES DE VENTAS
+════════════════════════════════════════════════════════ */
+const EXP_DOCS_VENTA = [
+  { id:'ineComprador',        label:'INE / Identificación oficial del comprador' },
+  { id:'comprobanteDomicilio',label:'Comprobante de domicilio (máx. 3 meses)' },
+  { id:'contratoCompraventa', label:'Contrato de compraventa firmado' },
+  { id:'pagare',              label:'Pagaré firmado' },
+  { id:'facturaVehiculo',     label:'Factura del vehículo (endosada)' },
+  { id:'tarjetaCirculacion',  label:'Tarjeta de circulación' },
+  { id:'comprobantePago',     label:'Comprobante de pago / transferencia' },
+  { id:'solicitudCredito',    label:'Solicitud de crédito (si aplica)' },
+  { id:'cartaAprobacion',     label:'Carta de aprobación del banco (si aplica)' },
+];
+
+let _expVentaActual = null;   // car CMS record abierto en el drawer
+let _expVentaDocs   = {};     // estado de docs { ineComprador: 'ok'|'pendiente'|'na', ... }
+
+function renderExpedientes() {
+  const q       = (document.getElementById('exp-search')?.value || '').toLowerCase();
+  const estatus = document.getElementById('exp-filtro-estatus')?.value || '';
+  const docsFilt= document.getElementById('exp-filtro-docs')?.value || '';
+
+  // Solo autos en proceso de venta (Apartado, Vendido, Entregado)
+  const ESTATUS_VENTA = ['Apartado','Reservado','Vendido','Entregado'];
+  let rows = INVENTARIO.filter(c => ESTATUS_VENTA.includes(c.estatusVenta || 'Disponible'));
+
+  if (estatus) rows = rows.filter(c => (c.estatusVenta || '') === estatus);
+  if (q) {
+    rows = rows.filter(c => {
+      const txt = [c.marca||'',c.modelo||'',c.año||c.anio||'',c.vin||c.noSerie||'',
+                   c.compradorNombre||'',c.vendedorNombre||''].join(' ').toLowerCase();
+      return txt.includes(q);
+    });
+  }
+
+  // Filtro de docs
+  if (docsFilt) {
+    rows = rows.filter(c => {
+      const docs  = c.documentosVenta || {};
+      const total = EXP_DOCS_VENTA.length;
+      const ok    = EXP_DOCS_VENTA.filter(d => docs[d.id] === 'ok').length;
+      return docsFilt === 'completo' ? ok === total : ok < total;
+    });
+  }
+
+  // Ordenar: Apartado primero, luego Vendido, luego Entregado; dentro de cada grupo por fecha desc
+  const ORDER = { Apartado:0, Reservado:0, Vendido:1, Entregado:2 };
+  rows.sort((a, b) => {
+    const oa = ORDER[a.estatusVenta] ?? 9;
+    const ob = ORDER[b.estatusVenta] ?? 9;
+    if (oa !== ob) return oa - ob;
+    return new Date(b.fechaVenta || b._updatedDate || 0) - new Date(a.fechaVenta || a._updatedDate || 0);
+  });
+
+  const list = document.getElementById('exp-list');
+  if (!rows.length) {
+    list.innerHTML = '<div class="empty-state" style="padding:32px 0"><i class="ti ti-files"></i><p>Sin expedientes' + (q || estatus ? ' con ese filtro' : ' de ventas') + '</p></div>';
+    return;
+  }
+
+  list.innerHTML = rows.map(c => {
+    const nombre    = [c.marca||'',c.modelo||'',c.año||c.anio||''].filter(Boolean).join(' ') || c.nombre || 'Sin nombre';
+    const rawFoto   = c.fotoPrincipal || c.imagenUrl || c.imagen || c.image || (Array.isArray(c.fotos)&&c.fotos[0]) || '';
+    const thumb     = resolveWixImg(rawFoto, 120, 90);
+    const est       = c.estatusVenta || 'Disponible';
+    const badgeCls  = { Apartado:'apartado', Vendido:'vendido', Entregado:'entregado', Reservado:'apartado' }[est] || 'en-tramite';
+    const comprador = c.compradorNombre || '—';
+    const vendedor  = c.vendedorNombre  || '—';
+    const docs      = c.documentosVenta || {};
+    const docsOk    = EXP_DOCS_VENTA.filter(d => docs[d.id] === 'ok').length;
+    const docsTotal = EXP_DOCS_VENTA.length;
+    const pctDocs   = Math.round((docsOk / docsTotal) * 100);
+    const precio    = parsePrice(c.precioVenta || c.precioFinal || c.priceNew || c.precio);
+
+    return `<div class="exp-card" onclick="abrirExpedienteVenta('${esc(c._id)}')">
+      <div class="exp-card-thumb">
+        ${thumb ? `<img src="${esc(thumb)}" loading="lazy" onerror="this.style.display='none'">` : '<i class="ti ti-car" style="font-size:18px;color:var(--wc-ink3)"></i>'}
+      </div>
+      <div class="exp-card-body">
+        <div class="exp-card-nombre">${esc(nombre)}</div>
+        <div class="exp-card-sub">Comprador: ${esc(comprador)} · Vendedor: ${esc(vendedor)}</div>
+        <div style="margin-top:4px;display:flex;align-items:center;gap:6px">
+          <div style="flex:1;height:4px;background:var(--wc-border);border-radius:4px;overflow:hidden">
+            <div style="height:4px;border-radius:4px;background:${pctDocs===100?'var(--wc-ok)':'var(--wc-warn)'};width:${pctDocs}%"></div>
+          </div>
+          <span style="font-size:10px;color:var(--wc-ink3);flex-shrink:0">${docsOk}/${docsTotal} docs</span>
+        </div>
+      </div>
+      <div class="exp-card-right">
+        <span class="exp-badge ${badgeCls}">${esc(est)}</span>
+        <span style="font-size:12px;font-weight:800;color:var(--wc-ink);font-variant-numeric:tabular-nums">${precio ? fmt(precio) : '—'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirExpedienteVenta(carId) {
+  const c = INVENTARIO.find(v => v._id === carId);
+  if (!c) return;
+  _expVentaActual = c;
+  _expVentaDocs   = Object.assign({}, c.documentosVenta || {});
+
+  const nombre  = [c.marca||'',c.modelo||'',c.año||c.anio||''].filter(Boolean).join(' ') || c.nombre || 'Sin nombre';
+  const rawFoto = c.fotoPrincipal || c.imagenUrl || c.imagen || c.image || (Array.isArray(c.fotos)&&c.fotos[0]) || '';
+  const thumb   = resolveWixImg(rawFoto, 104, 80);
+  const est     = c.estatusVenta || 'Disponible';
+  const badgeCls= { Apartado:'apartado', Vendido:'vendido', Entregado:'entregado', Reservado:'apartado' }[est] || 'en-tramite';
+
+  // Header
+  const drwThumb = document.getElementById('exp-drw-thumb');
+  drwThumb.innerHTML = thumb
+    ? `<img src="${esc(thumb)}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<i class=\\'ti ti-car\\' style=\\'font-size:18px\\'></i>'">`
+    : '<i class="ti ti-car" style="font-size:18px;color:var(--wc-ink3)"></i>';
+  document.getElementById('exp-drw-nombre').textContent = nombre;
+  document.getElementById('exp-drw-sub').textContent    = [c.vin||c.noSerie||'', c.vendedorNombre||''].filter(Boolean).join(' · ') || 'Sin VIN';
+  const badge = document.getElementById('exp-drw-badge');
+  badge.textContent = est;
+  badge.className   = `exp-badge ${badgeCls}`;
+
+  // Pane venta
+  _setExp('exp-vta-precio',     parsePrice(c.precioVenta || c.precioFinal || c.priceNew || c.precio) || '');
+  _setExp('exp-vta-formapago',  c.formaPago || 'Contado');
+  _setExp('exp-vta-comision',   c.comisionVendedor || '');
+  _setExp('exp-vta-fecha',      c.fechaVenta ? c.fechaVenta.slice(0,10) : '');
+  _setExp('exp-vta-estatus',    est);
+  _setExp('exp-vta-plazo',      c.plazoMeses || '');
+  _setExp('exp-vta-notas',      c.notasVenta || c.notasInternas || '');
+  _expActualizarMargen();
+
+  // Pane comprador
+  _setExp('exp-cmp-nombre',        c.compradorNombre || '');
+  _setExp('exp-cmp-tel',           c.compradorTel    || '');
+  _setExp('exp-cmp-email',         c.compradorEmail  || '');
+  _setExp('exp-cmp-rfc',           c.compradorRfc    || '');
+  _setExp('exp-cmp-dir',           c.compradorDir    || '');
+  _setExp('exp-cmp-factura-nombre',c.facturaNombre   || '');
+  _setExp('exp-cmp-uso-cfdi',      c.usoCfdi         || 'G03');
+
+  // Pane docs
+  _expRenderDocs();
+
+  // Pane historial
+  _expRenderHistorial();
+
+  // Activar tab venta
+  expCambiarTab(document.querySelector('.exp-tab[data-tab="venta"]'));
+
+  // Mover overlay al body si hace falta
+  const ov = document.getElementById('exp-overlay');
+  if (ov && ov.parentElement !== document.body) document.body.appendChild(ov);
+  const drw = document.getElementById('exp-drawer');
+  if (drw && drw.parentElement !== document.body) document.body.appendChild(drw);
+
+  ov.style.display = 'block';
+  requestAnimationFrame(() => { drw.style.transform = 'translateX(0)'; });
+}
+
+function _setExp(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (el.tagName === 'SELECT') el.value = val != null ? String(val) : '';
+  else el.value = val != null ? String(val) : '';
+}
+
+function _expActualizarMargen() {
+  const c      = _expVentaActual;
+  if (!c) return;
+  const precio = parsePrice(document.getElementById('exp-vta-precio')?.value);
+  const costo  = parsePrice(c.costoAdquisicion || c.costoCompra || c.costPrice);
+  const wrap   = document.getElementById('exp-vta-margen');
+  if (!wrap) return;
+  if (precio == null) { wrap.innerHTML = ''; return; }
+  if (costo == null) {
+    wrap.innerHTML = `<span style="color:var(--wc-ink3)">Sin costo registrado — no se puede calcular margen</span>`;
+    return;
+  }
+  const margen = precio - costo;
+  const pct    = costo > 0 ? ((margen / costo) * 100).toFixed(1) : null;
+  const color  = margen >= 0 ? 'var(--wc-ok)' : 'var(--wc-danger)';
+  wrap.innerHTML = `<span style="font-weight:800;color:${color}">Margen: ${margen < 0 ? '-' : ''}${fmt(Math.abs(margen))}</span>`
+    + (pct !== null ? `<span style="color:var(--wc-ink3);margin-left:8px">(${pct}% sobre costo)</span>` : '')
+    + `<span style="color:var(--wc-ink3);margin-left:12px;font-size:11px">Precio lista: ${fmt(parsePrice(c.priceNew||c.precioVenta||c.precio)||0) || '—'} · Costo: ${fmt(costo)}</span>`;
+}
+
+function _expRenderDocs() {
+  const lista = document.getElementById('exp-docs-lista');
+  const resumen = document.getElementById('exp-docs-resumen');
+  if (!lista) return;
+  const ok  = EXP_DOCS_VENTA.filter(d => _expVentaDocs[d.id] === 'ok').length;
+  const tot = EXP_DOCS_VENTA.length;
+  if (resumen) resumen.textContent = `${ok} de ${tot} documentos confirmados`;
+  lista.innerHTML = EXP_DOCS_VENTA.map(d => {
+    const estado = _expVentaDocs[d.id] || 'pendiente';
+    return `<div class="exp-doc-row">
+      <span class="exp-doc-label">${esc(d.label)}</span>
+      <div class="exp-doc-btns">
+        <button class="exp-doc-btn ${estado==='ok'?'ok':''}" onclick="expSetDoc('${d.id}','ok')">✓ Entregado</button>
+        <button class="exp-doc-btn ${estado==='pendiente'&&estado!=='ok'&&estado!=='na'?'pendiente':''}" onclick="expSetDoc('${d.id}','pendiente')">Pendiente</button>
+        <button class="exp-doc-btn ${estado==='na'?'na':''}" onclick="expSetDoc('${d.id}','na')">N/A</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function expSetDoc(docId, estado) {
+  _expVentaDocs[docId] = estado;
+  _expRenderDocs();
+}
+
+function _expRenderHistorial() {
+  const lista = document.getElementById('exp-historial-lista');
+  if (!lista || !_expVentaActual) return;
+  const hist = Array.isArray(_expVentaActual.historialVenta) ? _expVentaActual.historialVenta : [];
+  if (!hist.length) {
+    lista.innerHTML = '<div style="font-size:12px;color:var(--wc-ink3);text-align:center;padding:24px 0">Sin historial registrado</div>';
+    return;
+  }
+  lista.innerHTML = [...hist].reverse().map(h => {
+    const fecha = h.fecha ? new Date(h.fecha).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'}) : '—';
+    return `<div class="exp-tl-item">
+      <div class="exp-tl-dot"></div>
+      <div class="exp-tl-body">
+        <div class="exp-tl-msg">${esc(h.descripcion || h.accion || '—')}</div>
+        <div class="exp-tl-meta">${fecha}${h.usuario ? ' · ' + esc(h.usuario) : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function expCambiarTab(btn) {
+  document.querySelectorAll('.exp-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.exp-pane').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  if (!btn) return;
+  btn.classList.add('active');
+  const pane = document.getElementById('exp-pane-' + btn.dataset.tab);
+  if (pane) { pane.style.display = 'flex'; pane.classList.add('active'); }
+}
+
+function cerrarExpedienteVenta() {
+  const drw = document.getElementById('exp-drawer');
+  drw.style.transform = 'translateX(100%)';
+  setTimeout(() => {
+    document.getElementById('exp-overlay').style.display = 'none';
+    _expVentaActual = null;
+  }, 260);
+}
+
+function guardarExpedienteVenta() {
+  if (!_expVentaActual) return;
+  const btn = document.getElementById('exp-save-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Guardando...'; }
+
+  const datos = {
+    estatusVenta:      document.getElementById('exp-vta-estatus')?.value,
+    precioVenta:       parsePrice(document.getElementById('exp-vta-precio')?.value),
+    precioFinal:       parsePrice(document.getElementById('exp-vta-precio')?.value),
+    formaPago:         document.getElementById('exp-vta-formapago')?.value,
+    comisionVendedor:  parsePrice(document.getElementById('exp-vta-comision')?.value),
+    fechaVenta:        document.getElementById('exp-vta-fecha')?.value || null,
+    plazoMeses:        parsePrice(document.getElementById('exp-vta-plazo')?.value),
+    notasVenta:        document.getElementById('exp-vta-notas')?.value,
+    compradorNombre:   document.getElementById('exp-cmp-nombre')?.value,
+    compradorTel:      document.getElementById('exp-cmp-tel')?.value,
+    compradorEmail:    document.getElementById('exp-cmp-email')?.value,
+    compradorRfc:      document.getElementById('exp-cmp-rfc')?.value,
+    compradorDir:      document.getElementById('exp-cmp-dir')?.value,
+    facturaNombre:     document.getElementById('exp-cmp-factura-nombre')?.value,
+    usoCfdi:           document.getElementById('exp-cmp-uso-cfdi')?.value,
+    documentosVenta:   _expVentaDocs,
+  };
+
+  // Agregar entrada al historial
+  const entrada = { fecha: new Date().toISOString(), descripcion: `Expediente actualizado`, usuario: CTX?.usuario || 'Operaciones', nuevoEstado: datos.estatusVenta };
+  const historialVenta = Array.isArray(_expVentaActual.historialVenta) ? [..._expVentaActual.historialVenta, entrada] : [entrada];
+  datos.historialVenta = historialVenta;
+
+  WC.send(WC.OUT.CAR_EDITAR, { id: _expVentaActual._id, datos });
+
+  // Escucha el resultado (reutiliza CAR_RESULTADO)
+  _expGuardandoId = _expVentaActual._id;
+}
+
+let _expGuardandoId = null;
+
+// Hook en el manejador CAR_RESULTADO existente — actualiza localmente
+function _expOnCarResultado(resultado) {
+  if (!_expGuardandoId) return;
+  const btn = document.getElementById('exp-save-btn');
+  if (resultado.ok) {
+    // Actualiza INVENTARIO local
+    const idx = INVENTARIO.findIndex(c => c._id === _expGuardandoId);
+    if (idx >= 0) INVENTARIO[idx] = Object.assign({}, INVENTARIO[idx], resultado.car || {}, { documentosVenta: _expVentaDocs });
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> Guardado'; setTimeout(() => { btn.innerHTML = '<i class="ti ti-device-floppy"></i> Guardar expediente'; }, 2000); }
+    Toast.show('Expediente guardado', 'ok');
+    renderExpedientes();
+  } else {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-device-floppy"></i> Guardar expediente'; }
+    Toast.show('Error al guardar: ' + (resultado.error || ''), 'error');
+  }
+  _expGuardandoId = null;
+}
 
 /* ════════════════════════════════════════════════════════
    MODAL TIPO → MODAL FORM
@@ -1827,11 +2548,32 @@ function renderVendedores() {
   if (!VENDEDORES.length) { el.innerHTML = ''; empty.style.display = ''; return; }
   empty.style.display = 'none';
 
+  // Calcular stats por vendedor usando CLIENTES ya cargados
+  const ahora    = new Date();
+  const mesIni   = new Date(ahora.getFullYear(), ahora.getMonth(), 1).getTime();
+
   el.innerHTML = VENDEDORES.map(v => {
-    const initials  = (v.nombre||'V').split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
-    const activo    = v.activo !== false;
+    const initials = (v.nombre||'V').split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+    const activo   = v.activo !== false;
+    const meta     = v.metaMensual || 5;
+
+    // Stats desde CLIENTES (ya en memoria, sin nueva petición)
+    const leadsVend  = CLIENTES.filter(c => c.vendedorId === v._id || c.vendedorId === v.email);
+    const leadsTotal = leadsVend.length;
+    const leadsHoy   = leadsVend.filter(c => new Date(c._createdDate||0).getTime() >= mesIni).length;
+    const ganados    = leadsVend.filter(c => (c.etapa||c.estatus) === 'Ganado').length;
+    const activos    = leadsVend.filter(c => !['Ganado','Perdido'].includes(c.etapa||c.estatus||'')).length;
+    const pctMeta    = Math.min(100, Math.round((leadsHoy / meta) * 100));
+    const colorMeta  = pctMeta >= 100 ? 'var(--wc-ok)' : pctMeta >= 60 ? 'var(--wc-warn)' : 'var(--wc-danger)';
+
+    // Autos vendidos (autos en Cars con estatusVenta=Vendido/Entregado asignados a este vendedor)
+    const autosVend  = INVENTARIO.filter(c =>
+      ['Vendido','Entregado'].includes(c.estatusVenta||'') &&
+      (c.vendedorId === v._id || c.vendedorId === v.email)
+    ).length;
+
     return `
-    <div class="vend-card">
+    <div class="vend-card" id="vcard-${esc(v._id)}">
       <div class="vend-avatar" style="background:${activo?'var(--wc-green)':'var(--wc-ink3)'}">
         ${esc(initials)}
       </div>
@@ -1839,16 +2581,27 @@ function renderVendedores() {
         <div class="vend-nombre">${esc(v.nombre||'Vendedor')}</div>
         <div class="vend-meta">${esc(v.email||'')} · ${esc(v.sucursal||'Bajío')}</div>
         <div class="vend-stats">
-          <div class="vend-stat">Leads: <strong id="vstat-${esc(v._id)}">—</strong></div>
-          <div class="vend-stat">Meta: <strong>${esc(v.metaMensual||5)}</strong>/mes</div>
+          <div class="vend-stat" title="Leads activos en cartera"><i class="ti ti-users" style="font-size:11px"></i> <strong>${activos}</strong> activos</div>
+          <div class="vend-stat" title="Ventas cerradas (Ganado)"><i class="ti ti-trophy" style="font-size:11px;color:var(--wc-warn)"></i> <strong>${ganados}</strong> cerrados</div>
+          <div class="vend-stat" title="Autos entregados/vendidos"><i class="ti ti-car" style="font-size:11px"></i> <strong>${autosVend}</strong> unidades</div>
+        </div>
+        <div style="margin-top:6px">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--wc-ink3);margin-bottom:2px">
+            <span>Meta mensual</span>
+            <span style="font-weight:700;color:${colorMeta}">${leadsHoy}/${meta} leads</span>
+          </div>
+          <div style="height:5px;background:var(--wc-border);border-radius:4px;overflow:hidden">
+            <div style="height:5px;border-radius:4px;background:${colorMeta};width:${pctMeta}%;transition:width .4s"></div>
+          </div>
         </div>
       </div>
       <div class="vend-actions">
         <span class="chip ${activo?'chip-green':'chip-gray'}">${activo?'Activo':'Inactivo'}</span>
-        <button class="btn btn-sm" onclick="editarVendedor('${esc(v._id)}')">
+        <button class="btn btn-sm" title="Editar vendedor" onclick="editarVendedor('${esc(v._id)}')">
           <i class="ti ti-pencil"></i>
         </button>
         <button class="btn btn-sm" style="color:${activo?'var(--wc-danger)':'var(--wc-ok)'}"
+          title="${activo?'Desactivar':'Activar'} vendedor"
           onclick="toggleVendedorActivo('${esc(v._id)}',${!activo})">
           <i class="ti ti-${activo?'user-off':'user-check'}"></i>
         </button>
@@ -1879,7 +2632,94 @@ function guardarVendedor() {
   if (!nombre || !email) { Toast.show('Nombre y correo son requeridos', 'error'); return; }
   WC.send(WC.OUT.USUARIO_CREAR, { nombre, email, telefono: tel, sucursal, metaMensual: meta, rol: 'Vendedor', activo: true });
 }
-function editarVendedor(id) { Toast.show('Edición de vendedor disponible próximamente', ''); }
+let _vendEditorId = null;
+function editarVendedor(id) {
+  const v = VENDEDORES.find(v => v._id === id);
+  if (!v) return;
+  _vendEditorId = id;
+  const ov = document.getElementById('overlay-editar-vend');
+  if (!ov) { _crearOverlayEditarVend(); editarVendedor(id); return; }
+  document.getElementById('vedit-nombre').value   = v.nombre   || '';
+  document.getElementById('vedit-email').value    = v.email    || '';
+  document.getElementById('vedit-tel').value      = v.telefono || '';
+  document.getElementById('vedit-sucursal').value = v.sucursal || 'Bajío';
+  document.getElementById('vedit-meta').value     = v.metaMensual || 5;
+  document.getElementById('vedit-rol').value      = v.rol      || 'Vendedor';
+  ov.classList.remove('hidden');
+}
+function _crearOverlayEditarVend() {
+  const div = document.createElement('div');
+  div.id = 'overlay-editar-vend';
+  div.className = 'modal-overlay hidden';
+  div.innerHTML = `
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-head">
+      <h3 class="modal-title"><i class="ti ti-pencil"></i> Editar vendedor</h3>
+      <button class="modal-close" onclick="document.getElementById('overlay-editar-vend').classList.add('hidden')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <label class="field-label">Nombre completo</label>
+        <input class="field-input" id="vedit-nombre" type="text" placeholder="Nombre">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Correo electrónico</label>
+        <input class="field-input" id="vedit-email" type="email" placeholder="correo@ejemplo.com">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Teléfono</label>
+        <input class="field-input" id="vedit-tel" type="tel" placeholder="55 1234 5678">
+      </div>
+      <div style="display:flex;gap:10px">
+        <div class="field-group" style="flex:1">
+          <label class="field-label">Sucursal</label>
+          <select class="field-input" id="vedit-sucursal">
+            <option value="Bajío">Bajío</option>
+            <option value="León">León</option>
+            <option value="Irapuato">Irapuato</option>
+          </select>
+        </div>
+        <div class="field-group" style="flex:1">
+          <label class="field-label">Rol</label>
+          <select class="field-input" id="vedit-rol">
+            <option value="Vendedor">Vendedor</option>
+            <option value="F&I">F&I</option>
+            <option value="Gerente">Gerente</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Meta mensual (leads)</label>
+        <input class="field-input" id="vedit-meta" type="number" min="1" max="100" placeholder="5">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="document.getElementById('overlay-editar-vend').classList.add('hidden')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEdicionVendedor()">
+        <i class="ti ti-device-floppy"></i> Guardar cambios
+      </button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+}
+function guardarEdicionVendedor() {
+  if (!_vendEditorId) return;
+  const datos = {
+    nombre:      document.getElementById('vedit-nombre')?.value?.trim(),
+    email:       document.getElementById('vedit-email')?.value?.trim(),
+    telefono:    document.getElementById('vedit-tel')?.value?.trim(),
+    sucursal:    document.getElementById('vedit-sucursal')?.value,
+    metaMensual: parseInt(document.getElementById('vedit-meta')?.value) || 5,
+    rol:         document.getElementById('vedit-rol')?.value,
+  };
+  if (!datos.nombre || !datos.email) { Toast.show('Nombre y correo son requeridos', 'error'); return; }
+  WC.send(WC.OUT.USUARIO_EDITAR, { id: _vendEditorId, datos });
+  document.getElementById('overlay-editar-vend')?.classList.add('hidden');
+  // Actualizar localmente sin recargar
+  const idx = VENDEDORES.findIndex(v => v._id === _vendEditorId);
+  if (idx >= 0) { VENDEDORES[idx] = { ...VENDEDORES[idx], ...datos }; renderVendedores(); }
+  Toast.show('Vendedor actualizado', 'ok');
+}
 function toggleVendedorActivo(id, activo) {
   WC.send(WC.OUT.USUARIO_EDITAR, { id, datos: { activo } });
   setTimeout(cargarVendedores, 500);
@@ -1959,6 +2799,8 @@ function cargarCreditos() {
   mostrarLoading('cred');
   WC.send(WC.OUT.CREDITOS_LISTAR, {});
 }
+let _credFiltro = 'todos';
+
 function renderCreditos() {
   const el = document.getElementById('cred-list');
   ocultarLoading('cred');
@@ -1966,25 +2808,243 @@ function renderCreditos() {
     el.innerHTML = '<div class="empty-state"><i class="ti ti-building-bank"></i><h3>Sin solicitudes de crédito</h3><p>Los créditos enviados por los vendedores aparecerán aquí.</p></div>';
     return;
   }
-  // Render básico — Fase 3 lo completa
-  el.innerHTML = CREDITOS.map(c => `
-    <div class="card-box" style="margin-bottom:10px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div>
-          <div style="font-weight:700;font-size:14px">${esc(c.clienteNombre||'Cliente')}</div>
-          <div style="font-size:12px;color:var(--wc-ink3)">${esc(c.autoInteres||'')} · ${esc(c.vendedorNombre||'')}</div>
-        </div>
-        <span class="chip chip-warn" style="margin-left:auto">${esc(c.estatus||'Pendiente')}</span>
-      </div>
-    </div>`).join('');
+  filtrarCreditos();
 }
+
+function filtrarCreditos() {
+  const el   = document.getElementById('cred-list');
+  const rows = _credFiltro === 'todos'
+    ? CREDITOS
+    : CREDITOS.filter(c => (c.estatus||'Pendiente') === _credFiltro);
+
+  if (!rows.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:32px"><p>Sin créditos con ese filtro</p></div>';
+    return;
+  }
+
+  const BADGE = {
+    Pendiente: 'chip-warn',
+    Enviado:   'chip-info',
+    Aprobado:  'chip-green',
+    Rechazado: 'chip-gray',
+  };
+
+  const ESTATUS_OPCIONES = ['Pendiente','Enviado','Aprobado','Rechazado'];
+
+  el.innerHTML = rows.map(c => {
+    const est      = c.estatus || 'Pendiente';
+    const vend     = VENDEDORES.find(v => v._id === c.vendedorId || v.email === c.vendedorId);
+    const fecha    = c._createdDate ? new Date(c._createdDate).toLocaleDateString('es-MX',{day:'2-digit',month:'short'}) : '';
+    const monto    = parsePrice(c.montoSolicitado || c.monto || 0);
+    const banco    = c.banco || c.institucion || '';
+    const plazo    = c.plazo ? `${c.plazo} meses` : '';
+    const opciones = ESTATUS_OPCIONES.map(o => `<option value="${o}" ${o===est?'selected':''}>${o}</option>`).join('');
+
+    return `
+    <div class="card-box" style="margin-bottom:8px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-weight:700;font-size:14px">${esc(c.clienteNombre||'Cliente')}</span>
+            <span class="chip ${BADGE[est]||'chip-warn'}">${esc(est)}</span>
+          </div>
+          <div style="font-size:12px;color:var(--wc-ink3);margin-top:2px">
+            ${esc(c.autoInteres||'')}${banco?' · '+esc(banco):''}${plazo?' · '+esc(plazo):''}
+          </div>
+          <div style="font-size:11px;color:var(--wc-ink3);margin-top:2px">
+            Vendedor: ${esc(vend?.nombre || c.vendedorNombre || '—')}${fecha?' · '+fecha:''}
+            ${monto ? ' · <strong style="color:var(--wc-ink)">$'+fmt(monto)+'</strong>' : ''}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+          <select class="field-input" style="font-size:11px;padding:4px 8px;width:120px"
+            onchange="cambiarEstatusCred('${esc(c._id)}',this.value,this)">
+            ${opciones}
+          </select>
+          ${c.telefono ? `<button class="btn btn-sm" onclick="window.open('https://wa.me/52${esc((c.telefono||'').replace(/\D/g,''))}')" title="WhatsApp"><i class="ti ti-brand-whatsapp" style="color:#25d366"></i></button>` : ''}
+        </div>
+      </div>
+      ${c.notas ? `<div style="margin-top:8px;font-size:12px;color:var(--wc-ink3);border-top:1px solid var(--wc-border);padding-top:6px">${esc(c.notas)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function cambiarEstatusCred(id, nuevoEstatus, sel) {
+  WC.send(WC.OUT.CREDITO_EDITAR, { id, datos: { estatus: nuevoEstatus } });
+  const idx = CREDITOS.findIndex(c => c._id === id);
+  if (idx >= 0) { CREDITOS[idx].estatus = nuevoEstatus; }
+  Toast.show(`Crédito → ${nuevoEstatus}`, 'ok');
+}
+
 function setFiltroCred(filtro, btn) {
   document.querySelectorAll('#view-creditos .filter-chip').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  // Fase 3: filtrar por estatus
+  _credFiltro = filtro;
+  filtrarCreditos();
 }
 
-function buscarExpedientes(q) { /* Fase 4 */ }
+/* ════════════════════════════════════════════════════════
+   REPORTES — resumen ejecutivo con datos ya en memoria
+════════════════════════════════════════════════════════ */
+function renderReportes() {
+  const el = document.getElementById('reportes-content');
+  if (!INVENTARIO.length && !CLIENTES.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:32px"><p>Carga el inventario y clientes primero</p></div>';
+    return;
+  }
+
+  const ahora  = new Date();
+  const mesIni = new Date(ahora.getFullYear(), ahora.getMonth(), 1).getTime();
+  const mesAnt = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1).getTime();
+
+  // ── KPIs de inventario ──
+  const totalAutos    = INVENTARIO.length;
+  const disponibles   = INVENTARIO.filter(c => (c.estatusVenta||'Disponible') === 'Disponible').length;
+  const apartados     = INVENTARIO.filter(c => ['Apartado','Reservado'].includes(c.estatusVenta||'')).length;
+  const vendidosMes   = INVENTARIO.filter(c =>
+    ['Vendido','Entregado'].includes(c.estatusVenta||'') &&
+    new Date(c.fechaVenta || c._updatedDate || 0).getTime() >= mesIni
+  ).length;
+  const vendidosAntMes= INVENTARIO.filter(c =>
+    ['Vendido','Entregado'].includes(c.estatusVenta||'') &&
+    new Date(c.fechaVenta || c._updatedDate || 0).getTime() >= mesAnt &&
+    new Date(c.fechaVenta || c._updatedDate || 0).getTime() <  mesIni
+  ).length;
+  const tendVentas    = vendidosAntMes > 0 ? Math.round(((vendidosMes - vendidosAntMes) / vendidosAntMes) * 100) : null;
+
+  // ── KPIs de leads ──
+  const leadsTotal    = CLIENTES.length;
+  const leadsMes      = CLIENTES.filter(c => new Date(c._createdDate||0).getTime() >= mesIni).length;
+  const leadsGanados  = CLIENTES.filter(c => (c.etapa||c.estatus) === 'Ganado').length;
+  const leadsPerdidos = CLIENTES.filter(c => (c.etapa||c.estatus) === 'Perdido').length;
+  const leadsActivos  = leadsTotal - leadsGanados - leadsPerdidos;
+  const tasaCierre    = leadsTotal > 0 ? Math.round((leadsGanados / leadsTotal) * 100) : 0;
+
+  // ── Ranking de vendedores ──
+  const rankVend = VENDEDORES.map(v => {
+    const leadsV  = CLIENTES.filter(c => c.vendedorId === v._id || c.vendedorId === v.email);
+    const ganV    = leadsV.filter(c => (c.etapa||c.estatus) === 'Ganado').length;
+    const mesV    = leadsV.filter(c => new Date(c._createdDate||0).getTime() >= mesIni).length;
+    const unidsV  = INVENTARIO.filter(c =>
+      ['Vendido','Entregado'].includes(c.estatusVenta||'') &&
+      (c.vendedorId === v._id || c.vendedorId === v.email)
+    ).length;
+    return { nombre: v.nombre||'Vendedor', ganados: ganV, leadsMes: mesV, unidades: unidsV, meta: v.metaMensual||5 };
+  }).sort((a, b) => b.unidades - a.unidades || b.ganados - a.ganados);
+
+  // ── Autos más interesados (match autoInteres) ──
+  const interesMap = {};
+  CLIENTES.forEach(c => {
+    if (!c.autoInteres && !c.interes) return;
+    const txt = (c.autoInteres || c.interes || '').toLowerCase();
+    INVENTARIO.forEach(car => {
+      if (!car.marca || !car.modelo) return;
+      if (txt.includes(car.marca.toLowerCase()) && txt.includes(car.modelo.toLowerCase())) {
+        const key = car._id;
+        interesMap[key] = (interesMap[key] || { car, count: 0 });
+        interesMap[key].count++;
+      }
+    });
+  });
+  const topAutos = Object.values(interesMap)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
+  // ── Render ──
+  el.innerHTML = `
+  <!-- KPIs inventario -->
+  <div class="kpi-row" style="margin-bottom:14px">
+    <div class="kpi-card">
+      <div class="kpi-label">Total inventario</div>
+      <div class="kpi-value">${totalAutos}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Disponibles</div>
+      <div class="kpi-value">${disponibles}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Apartados</div>
+      <div class="kpi-value" style="color:var(--wc-warn)">${apartados}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Vendidos este mes</div>
+      <div class="kpi-value" style="color:var(--wc-ok)">${vendidosMes}</div>
+      ${tendVentas !== null ? `<div class="kpi-sub" style="color:${tendVentas>=0?'var(--wc-ok)':'var(--wc-danger)'}">${tendVentas>=0?'▲':'▼'} ${Math.abs(tendVentas)}% vs mes ant.</div>` : ''}
+    </div>
+  </div>
+
+  <!-- KPIs leads -->
+  <div class="kpi-row" style="margin-bottom:14px">
+    <div class="kpi-card">
+      <div class="kpi-label">Leads totales</div>
+      <div class="kpi-value">${leadsTotal}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Leads este mes</div>
+      <div class="kpi-value">${leadsMes}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Leads activos</div>
+      <div class="kpi-value">${leadsActivos}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tasa de cierre</div>
+      <div class="kpi-value" style="color:${tasaCierre>=20?'var(--wc-ok)':tasaCierre>=10?'var(--wc-warn)':'var(--wc-danger)'}">${tasaCierre}%</div>
+      <div class="kpi-sub">meta ≥ 20%</div>
+    </div>
+  </div>
+
+  <!-- Ranking vendedores -->
+  ${rankVend.length ? `
+  <div class="card-box" style="margin-bottom:14px">
+    <div class="card-box-title"><i class="ti ti-trophy"></i>Ranking vendedores — ${ahora.toLocaleString('es-MX',{month:'long'})}</div>
+    ${rankVend.map((v, i) => {
+      const pct = Math.min(100, Math.round((v.leadsMes / v.meta) * 100));
+      const medalColor = i===0?'#f59e0b':i===1?'#9ca3af':i===2?'#b45309':'var(--wc-ink3)';
+      return `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--wc-border)">
+        <span style="font-size:16px;font-weight:900;color:${medalColor};width:20px;text-align:center">${i+1}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13px">${esc(v.nombre)}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${v.leadsMes} leads este mes · ${v.ganados} cerrados · ${v.unidades} unidades</div>
+          <div style="margin-top:3px;height:4px;background:var(--wc-border);border-radius:4px;overflow:hidden">
+            <div style="height:4px;border-radius:4px;background:${pct>=100?'var(--wc-ok)':'var(--wc-warn)'};width:${pct}%"></div>
+          </div>
+        </div>
+        <span style="font-size:11px;font-weight:700;flex-shrink:0;color:${pct>=100?'var(--wc-ok)':'var(--wc-ink3)'}">${pct}%</span>
+      </div>`;
+    }).join('')}
+  </div>` : ''}
+
+  <!-- Top autos más solicitados -->
+  ${topAutos.length ? `
+  <div class="card-box">
+    <div class="card-box-title"><i class="ti ti-heart"></i>Autos más solicitados</div>
+    ${topAutos.map((entry, i) => {
+      const c = entry.car;
+      const nombre = [c.marca,c.modelo,c.anio||c.año].filter(Boolean).join(' ');
+      const rawFoto = c.fotoPrincipal || c.imagenUrl || (Array.isArray(c.fotos)&&c.fotos[0]) || '';
+      const thumb = resolveWixImg(rawFoto, 80, 60);
+      const est = c.estatusVenta || 'Disponible';
+      const estColor = { Disponible:'chip-green', Apartado:'chip-warn', Vendido:'chip-info', Entregado:'chip-gray' }[est]||'chip-gray';
+      return `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--wc-border)">
+        <span style="font-size:13px;font-weight:900;color:var(--wc-ink3);width:16px">${i+1}</span>
+        <div style="width:48px;height:36px;border-radius:6px;overflow:hidden;background:var(--wc-surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center">
+          ${thumb ? `<img src="${esc(thumb)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : '<i class="ti ti-car" style="font-size:14px;color:var(--wc-ink3)"></i>'}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13px">${esc(nombre)}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.estadoVehiculo||'')} · <span class="chip ${estColor}" style="font-size:10px;padding:1px 6px">${esc(est)}</span></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:16px;font-weight:900;color:var(--wc-accent)">${entry.count}</div>
+          <div style="font-size:10px;color:var(--wc-ink3)">interesados</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>` : ''}`;
+}
 
 /* ════════════════════════════════════════════════════════
    INIT
