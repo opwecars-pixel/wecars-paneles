@@ -14,7 +14,7 @@
 
 import wixData from 'wix-data';
 import wixUsers from 'wix-users';
-import { obtenerTodosLosLeads, obtenerTodosLosCars, obtenerTodosLosUsuarios, crearCar, editarCar, obtenerCar } from 'backend/operaciones-data';
+import { obtenerTodosLosLeads, obtenerTodosLosCars, obtenerTodosLosUsuarios, crearCar, editarCar, obtenerCar, editarLead } from 'backend/operaciones-data';
 import { subirFotoVehiculo } from 'backend/media-upload';
 
 const HTML_ID = '#htmlOperaciones';
@@ -31,6 +31,7 @@ const OUT = {
   USUARIO_CREAR:     'wecars-usuario-crear',
   USUARIO_EDITAR:    'wecars-usuario-editar',
   LEADS_LISTAR_TODOS:'wecars-leads-listar-todos',
+  LEAD_EDITAR:       'wecars-lead-editar',
   CREDITOS_LISTAR:   'wecars-creditos-listar',
   CREDITO_EDITAR:    'wecars-credito-editar',
   DOC_SUBIR:         'wecars-doc-subir',
@@ -46,6 +47,7 @@ const IN = {
   USUARIOS_LISTA:    'wecars-usuarios-lista',
   USUARIO_RESULTADO: 'wecars-usuario-resultado',
   LEADS_LISTA:       'wecars-leads-lista',
+  LEAD_RESULTADO:    'wecars-lead-resultado',
   CREDITOS_LISTA:    'wecars-creditos-lista',
   CREDITO_RESULTADO: 'wecars-credito-resultado',
   DOC_RESULTADO:     'wecars-doc-resultado',
@@ -89,6 +91,7 @@ $w.onReady(() => {
         case OUT.USUARIO_CREAR:     await manejarUsuarioCrear(msg);         break;
         case OUT.USUARIO_EDITAR:    await manejarUsuarioEditar(msg);        break;
         case OUT.LEADS_LISTAR_TODOS:await manejarLeadsListarTodos(msg);     break;
+        case OUT.LEAD_EDITAR:       await manejarLeadEditar(msg);           break;
         case OUT.CREDITOS_LISTAR:   await manejarCreditosListar(msg);       break;
         case OUT.CREDITO_EDITAR:    await manejarCreditoEditar(msg);        break;
         case OUT.ALIADOS_LISTAR:    await manejarAliadosListar(msg);        break;
@@ -248,6 +251,15 @@ async function manejarUsuarioEditar(msg) {
 // ════════════════════════════════════════════════════════════════════════
 //  9. LEADS_LISTAR_TODOS — todos los leads via backend (bypass permisos Member)
 // ════════════════════════════════════════════════════════════════════════
+async function manejarLeadEditar(msg) {
+  if (!msg.id || !msg.datos) {
+    enviar(IN.LEAD_RESULTADO, { ok: false, error: 'Parámetros faltantes' });
+    return;
+  }
+  const r = await editarLead(msg.id, msg.datos);
+  enviar(IN.LEAD_RESULTADO, r);
+}
+
 async function manejarLeadsListarTodos(msg) {
   const r = await obtenerTodosLosLeads(msg.limite || 500);
   enviar(IN.LEADS_LISTA, { items: r.items, total: r.total });

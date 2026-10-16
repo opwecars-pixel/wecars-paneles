@@ -94,6 +94,25 @@ export async function obtenerCar(id) {
 }
 
 // ────────────────────────────────────────────────────────────────────────
+//  LEADS — editar un lead (reasignar vendedor, cambiar etapa, etc.)
+// ────────────────────────────────────────────────────────────────────────
+export async function editarLead(id, datos) {
+  try {
+    const actual = await wixData.get('ALeads', id, { suppressAuth: true });
+    if (!actual) return { ok: false, error: 'Cliente no encontrado' };
+    const actualizado = await wixData.update('ALeads', {
+      ...actual,
+      ...datos,
+      _id: id,
+    }, { suppressAuth: true });
+    return { ok: true, lead: actualizado };
+  } catch (err) {
+    console.error('[operaciones-data] editarLead error:', err);
+    return { ok: false, error: err.message };
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────
 //  USUARIOS — equipo completo
 // ────────────────────────────────────────────────────────────────────────
 export async function obtenerTodosLosUsuarios(rol = '') {
