@@ -1588,47 +1588,72 @@ function renderRentabilidad() {
     return { c, precio, costo, margen, pct, dias, interesados };
   });
 
-  // KPIs siempre sobre TODO el inventario (sin filtros)
-  const kpiConPrecio = todasLasFilas.filter(r => r.precio != null);
-  const kpiConMargen = todasLasFilas.filter(r => r.margen != null);
-  const kpiTotalValor    = kpiConPrecio.reduce((s, r) => s + r.precio, 0);
-  const kpiTotalMargen   = kpiConMargen.reduce((s, r) => s + r.margen, 0);
-  const kpiMargenProm    = kpiConMargen.length
-    ? kpiConMargen.reduce((s, r) => s + r.pct, 0) / kpiConMargen.length
-    : null;
-  const kpiSinCosto      = todasLasFilas.filter(r => r.costo == null || r.costo === 0).length;
-  const kpiPromDias      = todasLasFilas.filter(r => r.dias != null);
-  const promDias         = kpiPromDias.length
-    ? Math.round(kpiPromDias.reduce((s, r) => s + r.dias, 0) / kpiPromDias.length)
-    : null;
+  // Helper: calcular KPIs sobre un subconjunto de filas
+  const _calcKpis = filas => {
+    const conPrecio = filas.filter(r => r.precio != null);
+    const conMargen = filas.filter(r => r.margen != null);
+    const sinCosto  = filas.filter(r => r.costo == null || r.costo === 0);
+    const conDias   = filas.filter(r => r.dias  != null);
+    return {
+      total:      filas.length,
+      totalValor: conPrecio.reduce((s,r) => s + r.precio, 0),
+      conPrecio:  conPrecio.length,
+      totalMargen:conMargen.reduce((s,r) => s + r.margen, 0),
+      conMargen:  conMargen.length,
+      margenProm: conMargen.length ? conMargen.reduce((s,r) => s + r.pct, 0) / conMargen.length : null,
+      sinCosto:   sinCosto.length,
+      promDias:   conDias.length ? Math.round(conDias.reduce((s,r) => s + r.dias, 0) / conDias.length) : null,
+    };
+  };
+
+  // KPIs del grupo actualmente filtrado (o todo si filtroTipo=todos)
+  const filasFiltradas = filtroTipo === 'todos' ? todasLasFilas
+    : todasLasFilas.filter(r => (r.c.tipoAdquisicion || r.c.tipoOrigen || 'propio').toLowerCase() === filtroTipo);
+  const K = _calcKpis(filasFiltradas);
+
+  // Desglose por tipo (siempre sobre todo el inventario para la barra)
+  const _kTipo = t => _calcKpis(todasLasFilas.filter(r =>
+    (r.c.tipoAdquisicion || r.c.tipoOrigen || 'propio').toLowerCase() === t));
+  const kP = _kTipo('propio'), kC = _kTipo('consigna'), kA = _kTipo('aliado');
+  const totalN = todasLasFilas.length || 1;
+  const pctP = Math.round((kP.total/totalN)*100);
+  const pctC = Math.round((kC.total/totalN)*100);
+  const pctA = Math.round((kA.total/totalN)*100);
+
+  const tipoLabel = { todos:'Todo el inventario', propio:'Propios', consigna:'Consigna', aliado:'Aliado' }[filtroTipo];
 
   document.getElementById('rent-kpis').innerHTML = `
     <div class="rent-kpi blue">
-      <div class="rent-kpi-lbl">Valor total inventario</div>
-      <div class="rent-kpi-val">${fmt(kpiTotalValor) || '—'}</div>
-      <div class="rent-kpi-sub">${kpiConPrecio.length} de ${todasLasFilas.length} con precio</div>
+      <div class="rent-kpi-lbl">Valor total · ${tipoLabel}</div>
+      <div class="rent-kpi-val">${K.conPrecio ? fmt(K.totalValor) : '—'}</div>
+      <div class="rent-kpi-sub">${K.conPrecio} de ${K.total} con precio</div>
     </div>
-    <div class="rent-kpi ${kpiTotalMargen >= 0 ? 'green' : 'red'}">
-      <div class="rent-kpi-lbl">Margen bruto total</div>
-      <div class="rent-kpi-val">${kpiConMargen.length ? fmt(kpiTotalMargen) : '—'}</div>
-      <div class="rent-kpi-sub">${kpiConMargen.length} vehículos con costo</div>
+    <div class="rent-kpi ${K.conMargen && K.totalMargen >= 0 ? 'green' : K.conMargen ? 'red' : ''}">
+      <div class="rent-kpi-lbl">Margen bruto · ${tipoLabel}</div>
+      <div class="rent-kpi-val">${K.conMargen ? fmt(K.totalMargen) : '—'}</div>
+      <div class="rent-kpi-sub">${K.conMargen} vehículos con costo</div>
     </div>
-    <div class="rent-kpi ${kpiMargenProm != null ? (kpiMargenProm >= 15 ? 'green' : kpiMargenProm >= 8 ? '' : 'red') : ''}">
-      <div class="rent-kpi-lbl">Margen promedio %</div>
-      <div class="rent-kpi-val">${kpiMargenProm != null ? kpiMargenProm.toFixed(1) + '%' : '—'}</div>
-      <div class="rent-kpi-sub">sobre costo · meta ≥15%</div>
+    <div class="rent-kpi ${K.margenProm != null ? (K.margenProm >= 15 ? 'green' : K.margenProm >= 8 ? '' : 'red') : ''}">
+      <div class="rent-kpi-lbl">Margen promedio % · ${tipoLabel}</div>
+      <div class="rent-kpi-val">${K.margenProm != null ? K.margenProm.toFixed(1)+'%' : '—'}</div>
+      <div class="rent-kpi-sub">${K.sinCosto} sin costo · meta ≥15%</div>
     </div>
-    <div class="rent-kpi ${kpiSinCosto > 0 ? 'red' : 'green'}">
-      <div class="rent-kpi-lbl">Sin costo registrado</div>
-      <div class="rent-kpi-val">${kpiSinCosto}</div>
-      <div class="rent-kpi-sub">${promDias != null ? `Prom. ${promDias} días en lote` : 'Cargar costos pendientes'}</div>
+    <div class="rent-kpi">
+      <div class="rent-kpi-lbl">Distribución inventario</div>
+      <div style="display:flex;gap:3px;height:8px;border-radius:4px;overflow:hidden;margin:4px 0 6px">
+        <div style="width:${pctP}%;background:var(--wc-green)" title="Propios ${pctP}%"></div>
+        <div style="width:${pctC}%;background:var(--wc-warn)" title="Consigna ${pctC}%"></div>
+        <div style="width:${pctA}%;background:var(--wc-info)" title="Aliado ${pctA}%"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:10px;color:var(--wc-ink3)">
+        <span><span style="color:var(--wc-green)">●</span> Propios ${pctP}% (${kP.total}) ${kP.margenProm!=null?kP.margenProm.toFixed(0)+'% mg':''}</span>
+        <span><span style="color:var(--wc-warn)">●</span> Consigna ${pctC}% (${kC.total}) ${kC.margenProm!=null?kC.margenProm.toFixed(0)+'% mg':''}</span>
+        <span><span style="color:var(--wc-info)">●</span> Aliado ${pctA}% (${kA.total}) ${kA.margenProm!=null?kA.margenProm.toFixed(0)+'% mg':''}</span>
+      </div>
     </div>`;
 
-  // Lista filtrada
-  let rows = todasLasFilas.slice();
-  if (filtroTipo !== 'todos') {
-    rows = rows.filter(r => (r.c.tipoAdquisicion || r.c.tipoOrigen || 'propio').toLowerCase() === filtroTipo);
-  }
+  // Lista filtrada (usa filasFiltradas ya filtrada por tipo)
+  let rows = filasFiltradas.slice();
   if (filtroEstado) {
     rows = rows.filter(r => (r.c.estatusVenta || r.c.estadoVehiculo || 'Disponible') === filtroEstado);
   }
