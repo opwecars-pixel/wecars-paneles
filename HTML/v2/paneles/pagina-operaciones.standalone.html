@@ -1357,7 +1357,7 @@ WC.onMany({
       const encodedIdx = d.idx;
       const gridId  = encodedIdx >= 200 ? 'int' : encodedIdx >= 100 ? 'gal' : 'main';
       const realIdx = encodedIdx >= 200 ? encodedIdx - 200 : encodedIdx >= 100 ? encodedIdx - 100 : 0;
-      const label   = gridId === 'main' ? 'Principal' : gridId === 'int' ? `Int ${realIdx+1}` : String(realIdx+1);
+      const label   = gridId === 'int' ? (_INT_LABELS[realIdx]||`Int ${realIdx+1}`) : (_EXT_LABELS[realIdx]||`Ext ${realIdx+1}`);
       const gridEl  = document.getElementById(`vf-foto-grid-${gridId}`);
       const slot    = gridEl ? gridEl.querySelector(`.foto-slot[data-idx="${realIdx}"]`) : null;
       if (slot) {
@@ -2532,10 +2532,21 @@ function _buildFormVehiculo(tipo, car) {
   };
   // Datos guardados — ext: slot0=fotoPrincipal, slots1-7=fotos[0..6]; int: fotosInterior[0..7]
   // Intentar varios nombres de campo que Wix puede asignar según cómo se creó el CMS
-  const _tryArr = (...keys) => { for (const k of keys) { if (Array.isArray(v[k]) && v[k].length) return v[k]; } return []; };
+  // Wix "Galería de multimedia" devuelve array de objetos {src,type} O strings
+  const _extractUrl = item => {
+    if (!item) return '';
+    if (typeof item === 'string') return item;
+    return item.src || item.url || item.fileUrl || item.file_url || item.uri || '';
+  };
+  const _tryArr = (...keys) => {
+    for (const k of keys) {
+      if (Array.isArray(v[k]) && v[k].length) return v[k].map(_extractUrl).filter(Boolean);
+    }
+    return [];
+  };
   // IDs reales del CMS Cars de Wix:
   //   image         → "Imagenes" (portada, tipo Imagen)
-  //   mediagallery  → "Galería de Fotos" (galería exterior, tipo Galería de multimedia)
+  //   mediagallery  → "Galería de Fotos" (exterior, tipo Galería de multimedia)
   //   fotosInterior → "Fotos interior" (tipo Galería de multimedia)
   const fotosGal = _tryArr('mediagallery','fotos','images','galeriaFotos','galeria');
   const fotosInt = _tryArr('fotosInterior','imagenesInterior','intFotos');
@@ -2553,20 +2564,25 @@ function _buildFormVehiculo(tipo, car) {
         <i class="ti ti-car" style="font-size:12px;color:var(--wc-green)"></i> Fotos exteriores — 8 fotos
         <span style="font-size:10px;font-weight:400;color:var(--wc-ink3);margin-left:4px">La primera = imagen principal del catálogo</span>
       </div>
-      <div class="foto-grid" id="vf-foto-grid-gal" style="margin-bottom:16px">
-        ${Array.from({length:8}).map((_,i) => {
-          // slot 0 = fotoPrincipal; slots 1-7 = fotos[0..6] (el CMS guarda galería a partir de [0])
-          const saved = i === 0 ? fotoPpal : (fotosGal[i-1] || '');
-          return _fotoSlot('gal', i, saved || '', i === 0 ? 'Principal' : `Ext ${i+1}`);
-        }).join('')}
-      </div>
+      ${(() => {
+        const EXT = ['Principal','Frontal Izq','Frontal Centro','Frontal Der','Lateral Izq','Lateral Der','Trasera Izq','Trasera Der'];
+        return `<div class="foto-grid" id="vf-foto-grid-gal" style="margin-bottom:16px">
+          ${EXT.map((lbl,i) => {
+            const saved = i === 0 ? fotoPpal : (fotosGal[i-1] || '');
+            return _fotoSlot('gal', i, saved || '', lbl);
+          }).join('')}
+        </div>`;
+      })()}
 
       <div style="font-size:12px;font-weight:600;color:var(--wc-ink2);margin-bottom:6px">
         <i class="ti ti-armchair" style="font-size:12px;color:var(--wc-ink3)"></i> Fotos interiores — 8 fotos
       </div>
-      <div class="foto-grid" id="vf-foto-grid-int" style="margin-bottom:8px">
-        ${Array.from({length:8}).map((_,i) => _fotoSlot('int', i, fotosInt[i]||'', `Int ${i+1}`)).join('')}
-      </div>
+      ${(() => {
+        const INT = ['Tablero','Radio/Pantalla','Volante','Asientos Del.','Asientos Tras.','Cajuela','Puerta','Detalle'];
+        return `<div class="foto-grid" id="vf-foto-grid-int" style="margin-bottom:8px">
+          ${INT.map((lbl,i) => _fotoSlot('int', i, fotosInt[i]||'', lbl)).join('')}
+        </div>`;
+      })()}
 
       <p style="font-size:11px;color:var(--wc-ink3);margin-top:4px">
         JPG/PNG/WebP · máx. 5MB por foto · 8 exteriores + 8 interiores.
@@ -2840,13 +2856,15 @@ function _selFoto(gridId, idx) {
   };
   inp.click();
 }
+const _EXT_LABELS = ['Principal','Frontal Izq','Frontal Centro','Frontal Der','Lateral Izq','Lateral Der','Trasera Izq','Trasera Der'];
+const _INT_LABELS = ['Tablero','Radio/Pantalla','Volante','Asientos Del.','Asientos Tras.','Cajuela','Puerta','Detalle'];
 function _borrarFoto(gridId, idx) {
   const gridEl = document.getElementById(`vf-foto-grid-${gridId}`);
   const slot = gridEl ? gridEl.querySelector(`.foto-slot[data-idx="${idx}"]`) : null;
   if (!slot) return;
   slot.classList.remove('has-foto');
   slot.removeAttribute('data-url');
-  const label = gridId === 'main' ? 'Principal' : gridId === 'int' ? `Int ${idx+1}` : String(idx+1);
+  const label = gridId === 'int' ? (_INT_LABELS[idx]||`Int ${idx+1}`) : (_EXT_LABELS[idx]||`Ext ${idx+1}`);
   slot.innerHTML = `<i class="ti ti-camera" style="font-size:18px"></i><span style="font-size:10px;margin-top:4px">${label}</span>`;
   slot.onclick = () => _selFoto(gridId, idx);
 }
