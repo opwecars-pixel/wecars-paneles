@@ -53,6 +53,47 @@ export async function obtenerTodosLosCars(limite = 200) {
 }
 
 // ────────────────────────────────────────────────────────────────────────
+//  CARS — crear / editar (suppressAuth solo funciona en backend)
+// ────────────────────────────────────────────────────────────────────────
+export async function crearCar(datos) {
+  try {
+    const nuevo = await wixData.insert('Cars', {
+      ...datos,
+      _createdDate: new Date(),
+    }, { suppressAuth: true });
+    return { ok: true, car: nuevo, creado: true };
+  } catch (err) {
+    console.error('[operaciones-data] crearCar error:', err);
+    return { ok: false, error: err.message };
+  }
+}
+
+export async function editarCar(id, datos) {
+  try {
+    const actual = await wixData.get('Cars', id, { suppressAuth: true });
+    if (!actual) return { ok: false, error: 'Vehículo no encontrado' };
+    const actualizado = await wixData.update('Cars', {
+      ...actual,
+      ...datos,
+      _id: id,
+    }, { suppressAuth: true });
+    return { ok: true, car: actualizado, creado: false };
+  } catch (err) {
+    console.error('[operaciones-data] editarCar error:', err);
+    return { ok: false, error: err.message };
+  }
+}
+
+export async function obtenerCar(id) {
+  try {
+    const car = await wixData.get('Cars', id, { suppressAuth: true });
+    return { ok: !!car, car: car || null };
+  } catch (err) {
+    return { ok: false, error: err.message, car: null };
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────
 //  USUARIOS — equipo completo
 // ────────────────────────────────────────────────────────────────────────
 export async function obtenerTodosLosUsuarios(rol = '') {

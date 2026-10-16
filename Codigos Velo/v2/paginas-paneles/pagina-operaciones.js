@@ -14,7 +14,7 @@
 
 import wixData from 'wix-data';
 import wixUsers from 'wix-users';
-import { obtenerTodosLosLeads, obtenerTodosLosCars, obtenerTodosLosUsuarios } from 'backend/operaciones-data';
+import { obtenerTodosLosLeads, obtenerTodosLosCars, obtenerTodosLosUsuarios, crearCar, editarCar, obtenerCar } from 'backend/operaciones-data';
 import { subirFotoVehiculo } from 'backend/media-upload';
 
 const HTML_ID = '#htmlOperaciones';
@@ -153,54 +153,33 @@ async function manejarCarsListar(msg) {
 }
 
 // ════════════════════════════════════════════════════════════════════════
-//  3. CAR_CREAR
+//  3. CAR_CREAR — via backend (suppressAuth solo funciona en .jsw)
 // ════════════════════════════════════════════════════════════════════════
 async function manejarCarCrear(msg) {
   if (!msg.datos) { enviar(IN.CAR_RESULTADO, { ok: false, error: 'Sin datos' }); return; }
-  try {
-    const nuevo = await wixData.insert('Cars', {
-      ...msg.datos,
-      _createdDate: new Date(),
-    }, { suppressAuth: true });
-    enviar(IN.CAR_RESULTADO, { ok: true, car: nuevo, creado: true });
-  } catch (err) {
-    enviar(IN.CAR_RESULTADO, { ok: false, error: err.message });
-  }
+  const r = await crearCar(msg.datos);
+  enviar(IN.CAR_RESULTADO, r);
 }
 
 // ════════════════════════════════════════════════════════════════════════
-//  4. CAR_EDITAR
+//  4. CAR_EDITAR — via backend (suppressAuth solo funciona en .jsw)
 // ════════════════════════════════════════════════════════════════════════
 async function manejarCarEditar(msg) {
   if (!msg.id || !msg.datos) {
     enviar(IN.CAR_RESULTADO, { ok: false, error: 'Parámetros faltantes' });
     return;
   }
-  try {
-    const actual = await wixData.get('Cars', msg.id, { suppressAuth: true });
-    if (!actual) { enviar(IN.CAR_RESULTADO, { ok: false, error: 'Vehículo no encontrado' }); return; }
-    const actualizado = await wixData.update('Cars', {
-      ...actual,
-      ...msg.datos,
-      _id: msg.id,
-    }, { suppressAuth: true });
-    enviar(IN.CAR_RESULTADO, { ok: true, car: actualizado, creado: false });
-  } catch (err) {
-    enviar(IN.CAR_RESULTADO, { ok: false, error: err.message });
-  }
+  const r = await editarCar(msg.id, msg.datos);
+  enviar(IN.CAR_RESULTADO, r);
 }
 
 // ════════════════════════════════════════════════════════════════════════
-//  5. CAR_GET — obtener un vehículo por id
+//  5. CAR_GET — via backend
 // ════════════════════════════════════════════════════════════════════════
 async function manejarCarGet(msg) {
   if (!msg.id) return;
-  try {
-    const car = await wixData.get('Cars', msg.id, { suppressAuth: true });
-    enviar(IN.CAR_RESULTADO, { ok: !!car, car: car || null });
-  } catch (err) {
-    enviar(IN.CAR_RESULTADO, { ok: false, error: err.message });
-  }
+  const r = await obtenerCar(msg.id);
+  enviar(IN.CAR_RESULTADO, r);
 }
 
 // ════════════════════════════════════════════════════════════════════════
