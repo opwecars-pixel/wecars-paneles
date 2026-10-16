@@ -1050,6 +1050,7 @@ const WC = {
     CREDITO_EDITAR:   'wecars-credito-editar',
     DOC_SUBIR:        'wecars-doc-subir',
     FOTO_SUBIR:       'wecars-foto-subir',
+    VIDEO_URL_SOLICITAR: 'wecars-video-url-solicitar',
     CONSIGNA_CREAR:   'wecars-consigna-crear',
     ALIADO_CREAR:     'wecars-aliado-crear',
     ALIADOS_LISTAR:   'wecars-aliados-listar',
@@ -1067,6 +1068,7 @@ const WC = {
     CREDITO_RESULTADO:'wecars-credito-resultado',
     DOC_RESULTADO:    'wecars-doc-resultado',
     FOTO_RESULTADO:   'wecars-foto-resultado',
+    VIDEO_URL_RESULTADO: 'wecars-video-url-resultado',
     ALIADOS_LISTA:    'wecars-aliados-lista',
     CONSIGNA_RESULTADO:'wecars-consigna-resultado',
   },
@@ -1287,6 +1289,66 @@ WC.onMany({
 
   [WC.IN.ERROR]: (d) => {
     Toast.show(d.mensaje || 'Error del servidor', 'error');
+  },
+
+  [WC.IN.VIDEO_URL_RESULTADO]: async (d) => {
+    const slot    = document.getElementById('vf-video-slot');
+    const prog    = document.getElementById('vf-video-progress');
+    const bar     = document.getElementById('vf-video-bar');
+    const pctLbl  = document.getElementById('vf-video-pct');
+    const hidden  = document.getElementById('vf-video-url');
+    if (!d.ok || !d.uploadUrl) {
+      Toast.show('Error al preparar subida: ' + (d.error||''), 'error');
+      if (slot) slot.style.opacity = '1';
+      return;
+    }
+    // Subida directa con XHR para mostrar progreso
+    const file = _videoPendiente;
+    if (!file) return;
+    _videoPendiente = null;
+    const formData = new FormData();
+    formData.append('upload_token', d.uploadToken || '');
+    formData.append('file', file, file.name);
+    const xhr = new XMLHttpRequest();
+    if (prog) prog.style.display = 'block';
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        if (bar)    bar.style.width    = pct + '%';
+        if (pctLbl) pctLbl.textContent = `Subiendo… ${pct}%`;
+      }
+    };
+    xhr.onload = () => {
+      if (prog) prog.style.display = 'none';
+      try {
+        const res = JSON.parse(xhr.responseText);
+        const url = (Array.isArray(res) ? res[0]?.file_url || res[0]?.fileUrl : res.file_url || res.fileUrl) || '';
+        if (url && slot && hidden) {
+          hidden.value = url;
+          slot.setAttribute('data-url', url);
+          slot.classList.add('has-foto');
+          slot.style.opacity = '1';
+          slot.innerHTML = `<i class="ti ti-video" style="font-size:28px;color:var(--wc-green)"></i>
+            <span style="font-size:10px;margin-top:4px">${file.name.slice(0,22)}</span>
+            <button class="foto-del" onclick="event.stopPropagation();_borrarVideo()" title="Eliminar">✕</button>`;
+          // Si hay carId, guarda inmediatamente en CMS
+          if (_editandoCarId) WC.send(WC.OUT.CAR_EDITAR, { id: _editandoCarId, datos: { video: url } });
+          Toast.show('Video subido ✓', 'ok');
+        } else {
+          throw new Error('Sin URL en respuesta');
+        }
+      } catch (err) {
+        if (slot) slot.style.opacity = '1';
+        Toast.show('Error procesando respuesta del video', 'error');
+      }
+    };
+    xhr.onerror = () => {
+      if (prog) prog.style.display = 'none';
+      if (slot) slot.style.opacity = '1';
+      Toast.show('Error de red al subir video', 'error');
+    };
+    xhr.open('POST', d.uploadUrl);
+    xhr.send(formData);
   },
 
   [WC.IN.FOTO_RESULTADO]: (d) => {
@@ -2509,11 +2571,31 @@ function _buildFormVehiculo(tipo, car) {
       <p style="font-size:11px;color:var(--wc-ink3);margin-top:4px">
         JPG/PNG/WebP · máx. 5MB por foto · 8 exteriores + 8 interiores.
       </p>
-      <div class="field-group" style="margin-top:12px">
-        <div class="field-label"><i class="ti ti-brand-youtube" style="font-size:12px;color:#dc2626"></i> Link de video (YouTube / MP4)</div>
-        <input class="field-input" id="vf-video-url" type="url" value="${esc(v.video||'')}" placeholder="https://youtube.com/watch?v=... o URL de video">
-        <div class="field-hint">El video se muestra en la galería del catálogo junto a las fotos.</div>
+      <div style="font-size:12px;font-weight:600;color:var(--wc-ink2);margin-top:4px;margin-bottom:6px">
+        <i class="ti ti-video" style="font-size:12px;color:var(--wc-ink3)"></i> Video del vehículo
       </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">
+        <div id="vf-video-slot" class="foto-slot foto-slot-add" style="width:140px;aspect-ratio:16/9;flex-shrink:0"
+          onclick="_selVideo()" ${v.video ? `data-url="${esc(v.video)}"` : ''}>
+          ${v.video
+            ? `<i class="ti ti-video" style="font-size:28px;color:var(--wc-green)"></i>
+               <span style="font-size:10px;margin-top:4px">Video cargado</span>
+               <button class="foto-del" onclick="event.stopPropagation();_borrarVideo()" title="Eliminar">✕</button>`
+            : `<i class="ti ti-video-plus" style="font-size:28px"></i>
+               <span style="font-size:10px;margin-top:4px">Subir video</span>`
+          }
+        </div>
+        <div style="flex:1;min-width:180px">
+          <div class="field-hint" style="margin-bottom:6px">MP4 · MOV · WebM · máx. 200MB<br>Se muestra en la galería del catálogo.</div>
+          <div id="vf-video-progress" style="display:none">
+            <div style="font-size:12px;color:var(--wc-ink2);margin-bottom:4px" id="vf-video-pct">Subiendo… 0%</div>
+            <div style="height:6px;background:var(--wc-surface2);border-radius:3px;overflow:hidden">
+              <div id="vf-video-bar" style="height:100%;width:0%;background:var(--wc-green);transition:width .3s"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input type="hidden" id="vf-video-url" value="${esc(v.video||'')}">
     </div>
   </div>`;
 
@@ -2767,6 +2849,38 @@ function _borrarFoto(gridId, idx) {
   const label = gridId === 'main' ? 'Principal' : gridId === 'int' ? `Int ${idx+1}` : String(idx+1);
   slot.innerHTML = `<i class="ti ti-camera" style="font-size:18px"></i><span style="font-size:10px;margin-top:4px">${label}</span>`;
   slot.onclick = () => _selFoto(gridId, idx);
+}
+let _videoPendiente = null;
+function _selVideo() {
+  const inp = document.createElement('input');
+  inp.type  = 'file';
+  inp.accept = 'video/mp4,video/quicktime,video/webm,video/x-msvideo';
+  inp.onchange = () => {
+    const file = inp.files[0];
+    if (!file) return;
+    if (file.size > 200 * 1024 * 1024) { Toast.show('Máximo 200MB por video', 'error'); return; }
+    _videoPendiente = file;
+    const slot = document.getElementById('vf-video-slot');
+    if (slot) slot.style.opacity = '0.5';
+    WC.send(WC.OUT.VIDEO_URL_SOLICITAR, {
+      carId:    _editandoCarId || '',
+      fileName: file.name,
+      mimeType: file.type || 'video/mp4',
+    });
+    Toast.show('Preparando subida de video...', '');
+  };
+  inp.click();
+}
+function _borrarVideo() {
+  const slot   = document.getElementById('vf-video-slot');
+  const hidden = document.getElementById('vf-video-url');
+  if (slot) {
+    slot.classList.remove('has-foto');
+    slot.removeAttribute('data-url');
+    slot.innerHTML = `<i class="ti ti-video-plus" style="font-size:28px"></i><span style="font-size:10px;margin-top:4px">Subir video</span>`;
+    slot.onclick = () => _selVideo();
+  }
+  if (hidden) hidden.value = '';
 }
 function _subirDoc(nombre, idx) {
   Toast.show('Subida de documentos disponible próximamente', '');

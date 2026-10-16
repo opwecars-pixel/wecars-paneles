@@ -124,6 +124,33 @@ export async function subirFotoVehiculo({ carId, idx, base64, nombre, tipo }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════
+//  obtenerUrlSubidaVideo
+//  Devuelve una URL firmada para que el browser suba el video directo a
+//  Wix Media (evita pasar el archivo por postMessage/base64).
+//
+//  Parámetros:
+//    carId    {string} — _id del vehículo
+//    fileName {string} — nombre del archivo (ej. "tour.mp4")
+//    mimeType {string} — "video/mp4" | "video/quicktime" | "video/webm"
+// ════════════════════════════════════════════════════════════════════════
+export async function obtenerUrlSubidaVideo({ carId, fileName, mimeType }) {
+  try {
+    const { uploadUrl, uploadToken } = await mediaManager.getUploadUrl(
+      '/wecars-videos',
+      {
+        fileName:  fileName || `video_${Date.now()}.mp4`,
+        mimeType:  mimeType || 'video/mp4',
+        mediaType: 'video',
+      }
+    );
+    return { ok: true, uploadUrl, uploadToken, carId };
+  } catch (err) {
+    console.error('[media-upload] obtenerUrlSubidaVideo:', err.message);
+    return { ok: false, error: err.message };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
 //  listarDocumentos
 //  Consulta Docs por entidadId.
 // ════════════════════════════════════════════════════════════════════════

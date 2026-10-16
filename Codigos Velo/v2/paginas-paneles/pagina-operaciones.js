@@ -15,7 +15,7 @@
 import wixData from 'wix-data';
 import wixUsers from 'wix-users';
 import { obtenerTodosLosLeads, obtenerTodosLosCars, obtenerTodosLosUsuarios, crearCar, editarCar, obtenerCar, editarLead } from 'backend/operaciones-data';
-import { subirFotoVehiculo } from 'backend/media-upload';
+import { subirFotoVehiculo, obtenerUrlSubidaVideo } from 'backend/media-upload';
 
 const HTML_ID = '#htmlOperaciones';
 
@@ -36,6 +36,7 @@ const OUT = {
   CREDITO_EDITAR:    'wecars-credito-editar',
   DOC_SUBIR:         'wecars-doc-subir',
   FOTO_SUBIR:        'wecars-foto-subir',
+  VIDEO_URL_SOLICITAR: 'wecars-video-url-solicitar',
   ALIADOS_LISTAR:    'wecars-aliados-listar',
 };
 
@@ -52,6 +53,7 @@ const IN = {
   CREDITO_RESULTADO: 'wecars-credito-resultado',
   DOC_RESULTADO:     'wecars-doc-resultado',
   FOTO_RESULTADO:    'wecars-foto-resultado',
+  VIDEO_URL_RESULTADO: 'wecars-video-url-resultado',
   ALIADOS_LISTA:     'wecars-aliados-lista',
 };
 
@@ -96,6 +98,7 @@ $w.onReady(() => {
         case OUT.CREDITO_EDITAR:    await manejarCreditoEditar(msg);        break;
         case OUT.ALIADOS_LISTAR:    await manejarAliadosListar(msg);        break;
         case OUT.FOTO_SUBIR:        await manejarFotoSubir(msg);            break;
+        case OUT.VIDEO_URL_SOLICITAR: await manejarVideoUrlSolicitar(msg); break;
         default: break;
       }
     } catch (err) {
@@ -313,6 +316,18 @@ async function manejarFotoSubir(msg) {
     tipo:   msg.tipo   || 'image/jpeg',
   });
   enviar(IN.FOTO_RESULTADO, r);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  VIDEO_URL_SOLICITAR — devuelve URL firmada para subida directa al browser
+// ════════════════════════════════════════════════════════════════════════
+async function manejarVideoUrlSolicitar(msg) {
+  const r = await obtenerUrlSubidaVideo({
+    carId:    msg.carId    || '',
+    fileName: msg.fileName || `video_${Date.now()}.mp4`,
+    mimeType: msg.mimeType || 'video/mp4',
+  });
+  enviar(IN.VIDEO_URL_RESULTADO, r);
 }
 
 // ════════════════════════════════════════════════════════════════════════
