@@ -2473,7 +2473,8 @@ function _buildFormVehiculo(tipo, car) {
   const _tryArr = (...keys) => { for (const k of keys) { if (Array.isArray(v[k]) && v[k].length) return v[k]; } return []; };
   const fotosGal = _tryArr('fotos','images','galeriaFotos','galeria','imagenes','imagenesExteriores','extFotos');
   const fotosInt = _tryArr('fotosInterior','imagenesInterior','fotosInt','intFotos','interiorFotos','fotoInterior');
-  const fotoPpal = v.fotoPrincipal || v.imagenUrl || v.imagen || v.image || v.imageUrl || fotosGal[0] || '';
+  // image = ID real del campo "Imagenes" (portada) en el CMS de Wix
+  const fotoPpal = v.image || v.fotoPrincipal || v.imagenUrl || v.imagen || v.imageUrl || fotosGal[0] || '';
   const secFotos = `
   <div class="form-section">
     <div class="form-section-hdr" onclick="_toggleFormSection(this)">
@@ -3440,7 +3441,7 @@ function renderReportes() {
     ${topAutos.map((entry, i) => {
       const c = entry.car;
       const nombre = [c.marca,c.modelo,c.anio||c.año].filter(Boolean).join(' ');
-      const rawFoto = c.fotoPrincipal || c.imagenUrl || (Array.isArray(c.fotos)&&c.fotos[0]) || '';
+      const rawFoto = c.image || c.fotoPrincipal || c.imagenUrl || (Array.isArray(c.fotos)&&c.fotos[0]) || '';
       const thumb = resolveWixImg(rawFoto, 80, 60);
       const est = c.estatusVenta || 'Disponible';
       const estColor = { Disponible:'chip-green', Apartado:'chip-warn', Vendido:'chip-info', Entregado:'chip-gray' }[est]||'chip-gray';
