@@ -2048,6 +2048,18 @@ function abrirFormVehiculo(tipo, car) {
   const title   = document.getElementById('modal-veh-title');
   const body    = document.getElementById('modal-veh-body');
   title.textContent = (car ? 'Editar' : 'Nuevo') + ' vehículo';
+  // Debug temporal: mostrar en consola los campos de fotos del carro
+  if (car) {
+    const fotoKeys = Object.keys(car).filter(k =>
+      Array.isArray(car[k]) && car[k].length &&
+      typeof car[k][0] === 'string' && (car[k][0].startsWith('wix:') || car[k][0].startsWith('http'))
+    );
+    console.log('[weCars] Campos imagen del carro:', {
+      fotoPrincipal: car.fotoPrincipal, imagenUrl: car.imagenUrl, imagen: car.imagen,
+      fotosArrays: fotoKeys.reduce((o,k) => { o[k] = car[k]; return o; }, {}),
+      allKeys: Object.keys(car),
+    });
+  }
   body.innerHTML    = _buildFormVehiculo(tipo, car);
   overlay.classList.remove('hidden');
   // Guarda referencia al car original para cambios de tipo en-form
@@ -2457,9 +2469,11 @@ function _buildFormVehiculo(tipo, car) {
     </div>`;
   };
   // Datos guardados — ext: slot0=fotoPrincipal, slots1-7=fotos[0..6]; int: fotosInterior[0..7]
-  const fotoPpal   = v.fotoPrincipal || (Array.isArray(v.fotos) && v.fotos[0]) || '';
-  const fotosGal   = Array.isArray(v.fotos) ? v.fotos : [];   // fotos[] completo; slot0 sobrescribe con fotoPpal
-  const fotosInt   = Array.isArray(v.fotosInterior) ? v.fotosInterior : [];
+  // Intentar varios nombres de campo que Wix puede asignar según cómo se creó el CMS
+  const _tryArr = (...keys) => { for (const k of keys) { if (Array.isArray(v[k]) && v[k].length) return v[k]; } return []; };
+  const fotosGal = _tryArr('fotos','images','galeriaFotos','galeria','imagenes','imagenesExteriores','extFotos');
+  const fotosInt = _tryArr('fotosInterior','imagenesInterior','fotosInt','intFotos','interiorFotos','fotoInterior');
+  const fotoPpal = v.fotoPrincipal || v.imagenUrl || v.imagen || v.image || v.imageUrl || fotosGal[0] || '';
   const secFotos = `
   <div class="form-section">
     <div class="form-section-hdr" onclick="_toggleFormSection(this)">
