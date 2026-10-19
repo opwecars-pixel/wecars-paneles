@@ -412,22 +412,20 @@ body {
 }
 
 /* ── AUTOCOMPLETE ───────────────────────────────────────────── */
-.rr-ac-wrap { position: relative; }
 .rr-ac-drop {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0; right: 0;
+  display: none;
+  margin-top: 6px;
   background: var(--surface);
   border: 1.5px solid var(--line-2);
   border-radius: var(--r-md);
   box-shadow: 0 4px 20px rgba(0,0,0,.13);
-  z-index: 200;
-  max-height: 220px;
-  overflow-y: auto;
-  display: none;
+  overflow: hidden;
   scrollbar-width: thin;
 }
 .rr-ac-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px 14px;
   cursor: pointer;
   font-size: .9375rem;
@@ -436,13 +434,54 @@ body {
   transition: background .1s;
 }
 .rr-ac-item:last-child { border-bottom: none; }
-.rr-ac-item:hover, .rr-ac-item.ac-hover {
-  background: var(--lime-bg);
+.rr-ac-item:hover, .rr-ac-item.ac-hover { background: var(--lime-bg); }
+
+/* Imagen del auto */
+.rr-ac-img {
+  width: 52px;
+  height: 38px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--line);
 }
+.rr-ac-img-placeholder {
+  width: 52px;
+  height: 38px;
+  border-radius: 6px;
+  background: var(--line);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* Avatar vendedor */
+.rr-ac-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: .3px;
+}
+
+.rr-ac-body { min-width: 0; flex: 1; }
+.rr-ac-label { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rr-ac-sub {
   font-size: .8125rem;
   color: var(--muted);
-  margin-top: 2px;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .rr-ac-empty {
   padding: 12px 14px;
@@ -660,15 +699,16 @@ body {
   /* ── Solicitar listas al cargar ─────────────────────────── */
   enviar({ type: 'wecars-rr-ready' });
 
+  function _e(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
   /* ── Autocomplete helper ────────────────────────────────── */
   function makeAC(cfg) {
-    // cfg: { inputId, hiddenId, dropId, hintId, getItems, labelFn, subFn, valueFn, hintText, allowFree }
-    var inp   = document.getElementById(cfg.inputId);
-    var hid   = cfg.hiddenId ? document.getElementById(cfg.hiddenId) : null;
-    var drop  = document.getElementById(cfg.dropId);
-    var hint  = cfg.hintId   ? document.getElementById(cfg.hintId)  : null;
-    var selVal = '';   // valor (email/id) actualmente seleccionado
-    var selLbl = '';   // label actualmente seleccionado
+    var inp    = document.getElementById(cfg.inputId);
+    var hid    = cfg.hiddenId ? document.getElementById(cfg.hiddenId) : null;
+    var drop   = document.getElementById(cfg.dropId);
+    var hint   = cfg.hintId   ? document.getElementById(cfg.hintId)  : null;
+    var selVal = '';
+    var selLbl = '';
 
     function setHint(msg, cls) {
       if (!hint) return;
@@ -676,14 +716,20 @@ body {
       hint.className = 'rr-ac-hint' + (cls ? ' ' + cls : '');
     }
 
+    function hideDrop() {
+      drop.style.display = 'none';
+      drop.innerHTML = '';
+      notificarAltura();
+    }
+
     function showDrop(items) {
-      if (!items.length) { drop.style.display = 'none'; notificarAltura(); return; }
-      drop.innerHTML = items.slice(0, 8).map(function (item) {
-        var lbl = cfg.labelFn(item);
-        var sub = cfg.subFn  ? cfg.subFn(item) : '';
-        var val = cfg.valueFn(item);
-        return '<div class="rr-ac-item" data-val="' + _e(val) + '" data-lbl="' + _e(lbl) + '">' +
-               _e(lbl) + (sub ? '<div class="rr-ac-sub">' + _e(sub) + '</div>' : '') + '</div>';
+      if (!items.length) { hideDrop(); return; }
+      drop.innerHTML = items.slice(0, 9).map(function (item) {
+        var lbl   = cfg.labelFn(item);
+        var val   = cfg.valueFn(item);
+        var inner = cfg.renderItem ? cfg.renderItem(item)
+          : '<div class="rr-ac-body"><div class="rr-ac-label">' + _e(lbl) + '</div></div>';
+        return '<div class="rr-ac-item" data-val="' + _e(val) + '" data-lbl="' + _e(lbl) + '">' + inner + '</div>';
       }).join('');
       drop.style.display = '';
       drop.querySelectorAll('.rr-ac-item').forEach(function (el) {
@@ -693,86 +739,90 @@ body {
           selLbl = el.dataset.lbl;
           inp.value = selLbl;
           if (hid) hid.value = selVal;
-          drop.style.display = 'none';
-          setHint('✓ Seleccionado del inventario/lista', 'ok');
-          notificarAltura();
+          hideDrop();
+          setHint('✓ Seleccionado', 'ok');
         });
       });
       notificarAltura();
     }
 
-    inp.addEventListener('focus', function () {
+    function filterAndShow() {
+      var q     = inp.value.trim().toLowerCase();
       var items = cfg.getItems();
-      if (!items.length) return;
-      var q = inp.value.trim().toLowerCase();
-      var filtered = q ? items.filter(function(it){ return cfg.labelFn(it).toLowerCase().indexOf(q) >= 0; })
-                       : items.slice(0, 8);
-      showDrop(filtered);
-    });
-
-    inp.addEventListener('input', function () {
-      // Reset selected value when user types
-      selVal = ''; selLbl = '';
-      if (hid) hid.value = '';
-      var q = inp.value.trim().toLowerCase();
-      if (!q) { drop.style.display = 'none'; setHint(cfg.hintText || ''); notificarAltura(); return; }
-      var items = cfg.getItems();
+      if (!q) { items.length ? showDrop(items.slice(0, 9)) : hideDrop(); return; }
       var filtered = items.filter(function (it) {
         return cfg.labelFn(it).toLowerCase().indexOf(q) >= 0;
       });
-      if (filtered.length) {
-        showDrop(filtered);
-        setHint('');
-      } else {
-        drop.innerHTML = '<div class="rr-ac-empty">No encontrado en inventario. Se guardará como texto libre.</div>';
+      if (filtered.length) { showDrop(filtered); setHint(''); }
+      else {
+        drop.innerHTML = '<div class="rr-ac-empty">' +
+          (cfg.allowFree ? 'No encontrado — se guardará como texto libre.' : 'No encontrado. Verifica tu nombre.') +
+          '</div>';
         drop.style.display = '';
         if (cfg.allowFree) setHint('Se guardará como texto libre', 'warn');
         notificarAltura();
       }
-    });
+    }
 
+    inp.addEventListener('focus', filterAndShow);
+    inp.addEventListener('input', function () {
+      selVal = ''; selLbl = '';
+      if (hid) hid.value = '';
+      filterAndShow();
+    });
     inp.addEventListener('blur', function () {
-      setTimeout(function () { drop.style.display = 'none'; notificarAltura(); }, 150);
-      // Si el campo tiene texto pero no hay selección y no permite libre → warn
-      if (inp.value.trim() && !selVal && !cfg.allowFree) {
+      setTimeout(hideDrop, 200);
+      if (inp.value.trim() && !selVal && !cfg.allowFree)
         setHint('No encontrado en la lista. Verifica tu nombre.', 'warn');
-      }
     });
 
     return {
-      getValue: function () { return selVal || (cfg.allowFree ? inp.value.trim() : ''); },
-      getLabel: function () { return selLbl || inp.value.trim(); },
+      getValue:     function () { return selVal || (cfg.allowFree ? inp.value.trim() : ''); },
+      getLabel:     function () { return selLbl || inp.value.trim(); },
       hasSelection: function () { return !!selVal; },
     };
   }
 
-  function _e(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
-
-  /* ── Instanciar ACs (después de que el DOM esté listo) ───── */
+  /* ── AC vendedores (con avatar) ─────────────────────────── */
   var acVend = makeAC({
-    inputId:  'vendedor',
-    hiddenId: 'vendedorEmail',
-    dropId:   'vendedorDrop',
-    hintId:   'vendedorHint',
-    getItems: function () { return vendedores; },
-    labelFn:  function (v) { return v.nombre; },
-    subFn:    function (v) { return v.puesto || ''; },
-    valueFn:  function (v) { return v.email; },
-    hintText: 'Selecciona tu nombre de la lista',
+    inputId:   'vendedor',
+    hiddenId:  'vendedorEmail',
+    dropId:    'vendedorDrop',
+    hintId:    'vendedorHint',
+    getItems:  function () { return vendedores; },
+    labelFn:   function (v) { return v.nombre; },
+    valueFn:   function (v) { return v.email; },
     allowFree: false,
+    renderItem: function (v) {
+      var ini = (v.nombre||'V').split(' ').map(function(p){return p[0]||'';}).join('').slice(0,2).toUpperCase();
+      return '<div class="rr-ac-avatar">' + _e(ini) + '</div>' +
+             '<div class="rr-ac-body">' +
+               '<div class="rr-ac-label">' + _e(v.nombre) + '</div>' +
+               (v.puesto ? '<div class="rr-ac-sub">' + _e(v.puesto) + '</div>' : '') +
+             '</div>';
+    },
   });
 
+  /* ── AC autos (con imagen) ──────────────────────────────── */
   var acAuto = makeAC({
-    inputId:  'autoInteres',
-    hiddenId: 'autoInteresId',
-    dropId:   'autoDrop',
-    hintId:   'autoHint',
-    getItems: function () { return autos; },
-    labelFn:  function (a) { return a.label; },
-    subFn:    null,
-    valueFn:  function (a) { return a._id; },
-    hintText: '',
+    inputId:   'autoInteres',
+    hiddenId:  'autoInteresId',
+    dropId:    'autoDrop',
+    hintId:    'autoHint',
+    getItems:  function () { return autos; },
+    labelFn:   function (a) { return a.label; },
+    valueFn:   function (a) { return a._id; },
     allowFree: true,
+    renderItem: function (a) {
+      var img = a.foto
+        ? '<img class="rr-ac-img" src="' + _e(a.foto) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">'
+        : '<div class="rr-ac-img-placeholder">&#x1F697;</div>';
+      return img +
+             '<div class="rr-ac-body">' +
+               '<div class="rr-ac-label">' + _e(a.label) + '</div>' +
+               (a.año ? '<div class="rr-ac-sub">Año ' + _e(a.año) + ' &middot; En inventario</div>' : '') +
+             '</div>';
+    },
   });
 
   /* ── Recibir mensajes del Velo ──────────────────────────── */
