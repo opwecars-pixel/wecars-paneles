@@ -5182,8 +5182,35 @@ function opAbrirDetalle(leadId) {
       setTimeout(()=>set('op-auto-modelo-sel', c.autoModelo||''), 100);
     },50);
   }
-  // Limpiar preview auto si no hay auto asignado del inventario
-  if (!c.autoInventarioId) {
+  // Si tiene auto del inventario guardado (por ID), mostrar preview pre-rellenado
+  const _effAutoId = c.autoInventarioId || c.autoInteresId || '';
+  if (_effAutoId) {
+    const _invMatch = INVENTARIO.find(v => v._id === _effAutoId);
+    if (_invMatch) {
+      setTimeout(() => {
+        const _m  = _invMatch.marca||_invMatch.brand||'';
+        const _mo = _invMatch.modelo||'';
+        const _y  = _invMatch.año||_invMatch.anio||_invMatch.year||'';
+        const _v  = _invMatch.version||_invMatch.trim||'';
+        const _p  = _invMatch.precio||0;
+        const _km = _invMatch.kilometraje ? `${Number(_invMatch.kilometraje).toLocaleString('es-MX')} km` : '';
+        const _rf = (_invMatch.fotos&&_invMatch.fotos[0]) ? _invMatch.fotos[0] : (_invMatch.fotoPrincipal||_invMatch.image||'');
+        const _f  = resolveWixImg(_rf, 104, 80);
+        const _lb = ([_m, _mo, String(_y||'')].filter(Boolean).join(' ')) || _invMatch.nombre || _invMatch.title || c.autoInteres || '';
+        opAutoSelDesdeInv({ autoId: _invMatch._id, autoNombre: _lb, autoMarca: _m, autoModelo: _mo,
+          autoAnio: String(_y||''), autoVersion: _v, autoPrecio: _p, autoFoto: _f, autoKm: _km });
+        // Asegurar que autoInventarioId quede guardado aunque venga solo en autoInteresId
+        const hidInv = document.getElementById('op-auto-inventario-id');
+        if (hidInv && !c.autoInventarioId) hidInv.value = _invMatch._id;
+      }, 250);
+    } else if (c.autoInteres && !c.autoMarca) {
+      // Auto no está en inventario actual pero tiene texto — poner en el buscador
+      setTimeout(() => {
+        const si = document.getElementById('op-auto-inv-search');
+        if (si) si.value = c.autoInteres;
+      }, 100);
+    }
+  } else if (!c.autoInventarioId) {
     const prev = document.getElementById('op-auto-sel-preview');
     if (prev) prev.style.display = 'none';
     const datCard = document.getElementById('op-auto-datos-card');
