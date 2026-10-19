@@ -842,6 +842,9 @@ img{max-width:100%;display:block}
         <div class="cli-search-row">
           <i class="ti ti-search" style="color:var(--wc-ink3);flex-shrink:0" aria-hidden="true"></i>
           <input type="text" id="cli-search" placeholder="Buscar por nombre, teléfono, auto..." oninput="filtrarClientes()">
+          <button class="btn btn-ghost btn-sm" id="btn-buenos-cli" onclick="toggleBuenosContactos(this)" style="flex-shrink:0;white-space:nowrap;color:var(--wc-ink3)" title="Solo contactos activos (no Perdidos ni sin teléfono)">
+            <i class="ti ti-star" style="font-size:14px"></i>
+          </button>
           <button class="btn btn-ghost btn-sm" id="btn-ver-arch-cli" onclick="toggleVerArchivadosCli(this)" style="flex-shrink:0;white-space:nowrap;color:var(--wc-ink3)" title="Ver/ocultar archivados">
             <i class="ti ti-archive" style="font-size:14px"></i>
           </button>
@@ -4360,9 +4363,9 @@ function editarVendedor(id) {
 function _crearOverlayEditarVend() {
   const div = document.createElement('div');
   div.id = 'overlay-editar-vend';
-  div.className = 'modal-overlay hidden';
+  div.className = 'overlay hidden';
   div.innerHTML = `
-  <div class="modal-box" style="max-width:480px;max-height:90vh;overflow-y:auto">
+  <div class="modal" style="max-width:480px;max-height:90vh;overflow-y:auto">
     <div class="modal-head">
       <h3 class="modal-title"><i class="ti ti-user-edit"></i> Editar vendedor</h3>
       <button class="modal-close" onclick="document.getElementById('overlay-editar-vend').classList.add('hidden')"><i class="ti ti-x"></i></button>
@@ -4598,12 +4601,21 @@ function filtrarClientes() {
   const sort   = document.getElementById('cli-sort')?.value||'reciente';
 
   let items = base.filter(c => {
-    const est = c.estatusLead || '';
+    const est   = c.estatusLead || '';
+    const etapa = c.etapa || c.estatus || 'Nuevo';
     if (_verArchivadosCli) { if (est !== 'archivado') return false; }
     else { if (est === 'archivado' || est === 'eliminado') return false; }
-    if (_opEtapaFiltro !== 'all' && (c.etapa||c.estatus||'Nuevo') !== _opEtapaFiltro) return false;
+    if (_opEtapaFiltro !== 'all' && etapa !== _opEtapaFiltro) return false;
     if (vFilt && c.vendedorId !== vFilt) return false;
     if (oFilt && (c.fuente||c.origen||'') !== oFilt) return false;
+    // Filtro "Buenos contactos": tiene teléfono, no está en Perdido y tiene actividad reciente (< 60 días)
+    if (_soloContactosBuenos) {
+      const tel = (c.telefono||c.phone||c.celular||'').trim();
+      if (!tel) return false;
+      if (etapa === 'Perdido') return false;
+      const dias = (Date.now() - new Date(c._updatedDate||c._createdDate||0)) / 86400000;
+      if (dias > 60) return false;
+    }
     if (!q) return true;
     return [c.nombre, c.telefono, c.autoInteres, c.interes, c.email]
       .some(f => f && String(f).toLowerCase().includes(q));
@@ -4697,7 +4709,8 @@ function opClienteCard(c) {
    NUEVO CLIENTE — abre la vista de detalle vacía para capturar al cliente
 ──────────────────────────────────────────────────────────────────────── */
 let _opModoNuevo = false;
-let _verArchivadosCli = false;
+let _verArchivadosCli   = false;
+let _soloContactosBuenos = false;
 
 function opNuevoCliente() {
   _opModoNuevo  = true;
@@ -5169,6 +5182,14 @@ function opCliLlamar() {
 }
 
 // ── Archivar / Eliminar cliente ────────────────────────────────────────────
+function toggleBuenosContactos(btn) {
+  _soloContactosBuenos = !_soloContactosBuenos;
+  btn.classList.toggle('active', _soloContactosBuenos);
+  btn.style.color = _soloContactosBuenos ? 'var(--wc-warn)' : 'var(--wc-ink3)';
+  btn.querySelector('i').style.fill = _soloContactosBuenos ? 'currentColor' : 'none';
+  filtrarClientes();
+}
+
 function toggleVerArchivadosCli(btn) {
   _verArchivadosCli = !_verArchivadosCli;
   btn.classList.toggle('active', _verArchivadosCli);
@@ -5184,9 +5205,9 @@ function opArchivarCliente() {
   if (!ov) {
     ov = document.createElement('div');
     ov.id = 'overlay-archivar-cli';
-    ov.className = 'modal-overlay';
+    ov.className = 'overlay hidden';
     ov.innerHTML = `
-    <div class="modal-box" style="max-width:400px">
+    <div class="modal" style="max-width:400px">
       <div class="modal-head">
         <h3 class="modal-title"><i class="ti ti-archive"></i> Archivar cliente</h3>
         <button class="modal-close" onclick="document.getElementById('overlay-archivar-cli').classList.add('hidden')"><i class="ti ti-x"></i></button>
@@ -5270,9 +5291,9 @@ function opEliminarCliente() {
   if (!ov) {
     ov = document.createElement('div');
     ov.id = 'overlay-eliminar-cli';
-    ov.className = 'modal-overlay';
+    ov.className = 'overlay hidden';
     ov.innerHTML = `
-    <div class="modal-box" style="max-width:380px">
+    <div class="modal" style="max-width:380px">
       <div class="modal-head">
         <h3 class="modal-title" style="color:#e53935"><i class="ti ti-trash"></i> Eliminar cliente</h3>
         <button class="modal-close" onclick="document.getElementById('overlay-eliminar-cli').classList.add('hidden')"><i class="ti ti-x"></i></button>
