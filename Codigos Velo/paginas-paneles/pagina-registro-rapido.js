@@ -14,7 +14,6 @@ import wixData                 from 'wix-data';
 import { findOrCreateCliente } from 'backend/clientes.jsw';
 import { crearLead }           from 'backend/leads.jsw';
 import { registrarActividad }  from 'backend/actividades.jsw';
-import { queryColeccion }      from 'backend/operaciones.jsw';
 
 const HTML_ID = '#htmlRegistroRapido';
 
@@ -47,12 +46,12 @@ $w.onReady(function () {
 });
 
 // ─── Enviar lista de vendedores al iframe ──────────────────────────
+// Usa wixData directo (suppressAuth) porque la página es pública —
+// queryColeccion requeriría usuario autenticado y devolvería vacío.
 function _enviarVendedores() {
-  queryColeccion('Usuarios', ['Vendedor', 'Administración', 'Gerencia', 'Finanzas'], [
-    { limit: 100 },
-  ])
-    .then(function (items) {
-      const vendedores = items
+  wixData.query('Usuarios').ascending('nombre').limit(100).find({ suppressAuth: true })
+    .then(function (r) {
+      const vendedores = r.items
         .map(function (u) {
           return {
             nombre: u.nombre || u.title || u._id,
@@ -60,7 +59,7 @@ function _enviarVendedores() {
             puesto: u.puesto || u.rol || '',
           };
         })
-        .filter(function (v) { return v.email; })
+        .filter(function (v) { return v.nombre; })
         .sort(function (a, b) { return a.nombre.localeCompare(b.nombre, 'es'); });
 
       $w(HTML_ID).postMessage({ type: 'wecars-rr-vendedores', vendedores: vendedores });

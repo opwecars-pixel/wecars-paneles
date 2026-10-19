@@ -85,8 +85,9 @@ img{max-width:100%;display:block}
 .topbar-btn.primary:hover{background:var(--wc-green-dark)}
 
 /* ── Content padding ─────────────────────────────────── */
-.view-wrap{padding:20px 24px}
-@media(max-width:768px){.view-wrap{padding:14px 16px}}
+.view-wrap{padding:28px 32px}
+@media(max-width:1024px){.view-wrap{padding:20px 24px}}
+@media(max-width:768px){.view-wrap{padding:16px 18px}}
 
 /* ── Bottom nav (mobile) ─────────────────────────────── */
 .bottom-nav{
@@ -105,14 +106,47 @@ img{max-width:100%;display:block}
    COMPONENTES BASE
 ════════════════════════════════════════════════════════ */
 .card-box{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
-  padding:14px 16px;margin-bottom:14px}
+  padding:18px 20px;margin-bottom:16px}
 .card-box-title{font-size:13px;font-weight:700;color:var(--wc-ink2);display:flex;
-  align-items:center;gap:8px;margin-bottom:12px}
+  align-items:center;gap:8px;margin-bottom:14px}
 .card-box-title i{font-size:16px;color:var(--wc-ink3)}
 
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+/* ── KPI grid (Reportes) ─────────────────────────────── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
+  padding:16px 18px}
+.kpi-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--wc-ink3);margin-bottom:6px}
+.kpi-value{font-size:28px;font-weight:800;line-height:1;color:var(--wc-ink)}
+.kpi-sub{font-size:11px;color:var(--wc-ink3);margin-top:4px}
+.kpi-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--wc-ink3);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.kpi-section-label::after{content:'';flex:1;height:1px;background:var(--wc-border)}
+
+/* ── Pipeline etapas ─────────────────────────────────── */
+.pipeline-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.pipeline-chip{background:var(--wc-surface);border:1px solid var(--wc-border);
+  border-radius:var(--wc-r-lg);padding:10px 14px;min-width:80px;text-align:center}
+.pipeline-chip-n{font-size:20px;font-weight:800;line-height:1}
+.pipeline-chip-l{font-size:10px;color:var(--wc-ink3);margin-top:3px}
+
+/* ── Ranking vendedor ────────────────────────────────── */
+.rank-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--wc-border)}
+.rank-row:last-child{border-bottom:none}
+.rank-avatar{width:36px;height:36px;border-radius:50%;background:var(--wc-surface2);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;
+  color:var(--wc-ink2);flex-shrink:0}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-meta{font-size:11px;color:var(--wc-ink3);margin-top:1px}
+.rank-bar{margin-top:4px;height:4px;background:var(--wc-border);border-radius:4px;overflow:hidden}
+.rank-bar-fill{height:4px;border-radius:4px;transition:width .4s}
+.rank-pct{font-size:11px;font-weight:700;flex-shrink:0}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .stat-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-md);
-  padding:12px;text-align:center}
+  padding:14px;text-align:center}
 .stat-card.accent{border-color:var(--wc-green);background:var(--wc-green-light)}
 .stat-num{font-size:22px;font-weight:800;line-height:1;color:var(--wc-ink)}
 .stat-card.accent .stat-num{color:var(--wc-green-dark)}
@@ -167,7 +201,7 @@ img{max-width:100%;display:block}
 /* ════════════════════════════════════════════════════════
    FILTER BAR
 ════════════════════════════════════════════════════════ */
-.filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .filter-chip{padding:6px 14px;border-radius:var(--wc-r-full);font-size:12px;font-weight:600;
   border:1.5px solid var(--wc-border);background:var(--wc-surface);color:var(--wc-ink3);cursor:pointer;
   transition:all .15s;white-space:nowrap}
@@ -177,7 +211,7 @@ img{max-width:100%;display:block}
 /* ════════════════════════════════════════════════════════
    SEARCH BAR
 ════════════════════════════════════════════════════════ */
-.search-bar{display:flex;gap:10px;margin-bottom:14px}
+.search-bar{display:flex;gap:10px;margin-bottom:16px}
 .search-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--wc-surface);
   border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);padding:7px 12px}
 .search-wrap:focus-within{border-color:var(--wc-green)}
@@ -187,7 +221,7 @@ img{max-width:100%;display:block}
 /* ════════════════════════════════════════════════════════
    VEHICLE CARD — grid de fotos
 ════════════════════════════════════════════════════════ */
-#inv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;padding:6px 0}
+#inv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;padding:8px 0}
 .vehicle-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
   cursor:pointer;transition:box-shadow .18s,transform .18s;overflow:hidden;display:flex;flex-direction:column}
 .vehicle-card:hover{box-shadow:var(--wc-shadow-md);transform:translateY(-2px)}
@@ -382,20 +416,32 @@ img{max-width:100%;display:block}
 .exp-badge.entregado{background:#dbeafe;color:#1e40af}
 .exp-badge.en-tramite{background:#f3e8ff;color:#6b21a8}
 .exp-docs-pct{font-size:11px;color:var(--wc-ink3);font-variant-numeric:tabular-nums}
-/* Drawer */
-.exp-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;backdrop-filter:blur(2px)}
-.exp-drawer{position:fixed;top:0;right:0;bottom:0;width:min(480px,100vw);background:var(--wc-bg);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 32px rgba(0,0,0,.18)}
-.exp-drawer-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--wc-border);flex-shrink:0}
-.exp-drawer-thumb{width:52px;height:40px;border-radius:8px;background:var(--wc-surface2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.exp-drawer-thumb img{width:100%;height:100%;object-fit:cover}
-.exp-drawer-title{flex:1;min-width:0}
-.exp-drawer-title h3{font-size:14px;font-weight:800;color:var(--wc-ink);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.exp-drawer-title p{font-size:11px;color:var(--wc-ink3);margin:2px 0 0}
-.exp-tabs{display:flex;border-bottom:1px solid var(--wc-border);flex-shrink:0;overflow-x:auto}
-.exp-tab{padding:10px 14px;font-size:12px;font-weight:700;color:var(--wc-ink3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
+/* Vista completa de expediente (reemplaza drawer lateral) */
+.exp-det-hero{display:flex;align-items:center;gap:14px;padding:16px 0 20px;border-bottom:1px solid var(--wc-border);margin-bottom:18px}
+.exp-det-thumb{width:72px;height:54px;border-radius:10px;background:var(--wc-surface2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.exp-det-thumb img{width:100%;height:100%;object-fit:cover}
+.exp-det-info{flex:1;min-width:0}
+.exp-det-nombre{font-size:18px;font-weight:800;color:var(--wc-ink);margin:0;line-height:1.2}
+.exp-det-sub{font-size:12px;color:var(--wc-ink3);margin-top:3px}
+.exp-tabs{display:flex;border-bottom:1px solid var(--wc-border);flex-shrink:0;overflow-x:auto;margin-bottom:18px}
+.exp-tab{padding:11px 16px;font-size:13px;font-weight:700;color:var(--wc-ink3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
 .exp-tab.active{color:var(--wc-accent);border-bottom-color:var(--wc-accent)}
-.exp-pane{flex:1;overflow-y:auto;padding:14px 16px;display:none;flex-direction:column;gap:12px}
+.exp-pane{display:none;flex-direction:column;gap:14px}
 .exp-pane.active{display:flex}
+/* Buscador de comprador */
+.exp-cli-search-wrap{position:relative;margin-bottom:14px}
+.exp-cli-search-input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);background:var(--wc-surface);color:var(--wc-ink);font-size:13px;font-family:inherit;box-sizing:border-box;outline:none;transition:border-color .15s}
+.exp-cli-search-input:focus{border-color:var(--wc-accent)}
+.exp-cli-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--wc-ink3);font-size:16px;pointer-events:none}
+.exp-cli-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--wc-surface);border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);z-index:50;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.exp-cli-option{padding:10px 14px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--wc-border)}
+.exp-cli-option:last-child{border-bottom:none}
+.exp-cli-option:hover{background:var(--wc-surface2)}
+.exp-cli-option-name{font-size:13px;font-weight:700;color:var(--wc-ink)}
+.exp-cli-option-sub{font-size:11px;color:var(--wc-ink3);margin-top:1px}
+.exp-cli-selected{background:var(--wc-green-light);border:1.5px solid var(--wc-green);border-radius:var(--wc-r-md);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.exp-cli-selected-name{font-size:13px;font-weight:700;color:var(--wc-green-dark);flex:1}
+.exp-cli-selected-sub{font-size:11px;color:var(--wc-green-dark);opacity:.8}
 .exp-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:400px){.exp-field-row{grid-template-columns:1fr}}
 .exp-field label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--wc-ink3);display:block;margin-bottom:4px}
@@ -416,8 +462,8 @@ img{max-width:100%;display:block}
 .exp-tl-body{flex:1;min-width:0}
 .exp-tl-msg{font-size:12px;color:var(--wc-ink)}
 .exp-tl-meta{font-size:10px;color:var(--wc-ink3);margin-top:2px}
-/* Footer */
-.exp-drawer-foot{padding:12px 16px;border-top:1px solid var(--wc-border);display:flex;gap:8px;flex-shrink:0}
+/* Footer expediente vista completa */
+.exp-det-foot{display:flex;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--wc-border)}
 /* ── Tabla de clientes estilo panel vendedores ── */
 .op-cont-search-card{background:var(--wc-surface);border-bottom:1px solid var(--wc-border);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .op-search-wrap{position:relative}
@@ -473,7 +519,6 @@ img{max-width:100%;display:block}
 /* ════════════════════════════════════════════════════════
    VIEWS
 ════════════════════════════════════════════════════════ */
-.view{padding:0}
 .view.hidden{display:none}
 
 /* ── Push navigation (clientes detail) ──────────────── */
@@ -496,9 +541,9 @@ img{max-width:100%;display:block}
   padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px}
 .client-card:hover{border-color:var(--wc-ink3);box-shadow:var(--wc-shadow-sm)}
 .avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:600;flex-shrink:0}
+  font-size:13px;font-weight:700;flex-shrink:0;color:#fff;letter-spacing:.3px}
 .avatar-md{width:40px;height:40px}
-.avatar-lg{width:48px;height:48px;font-size:16px}
+.avatar-lg{width:48px;height:48px;font-size:17px}
 .card-body{flex:1;min-width:0}
 .card-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-meta{font-size:12px;color:var(--wc-ink3);display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap}
@@ -1768,28 +1813,29 @@ img{max-width:100%;display:block}
       </div>
     </div>
 
-    <!-- ═══════ DRAWER: EXPEDIENTE DE VENTA ════════════════════════════ -->
-    <div class="exp-overlay" id="exp-overlay" onclick="cerrarExpedienteVenta()"></div>
-    <div class="exp-drawer" id="exp-drawer">
-      <!-- Head -->
-      <div class="exp-drawer-head">
-        <div class="exp-drawer-thumb" id="exp-drw-thumb">
-          <i class="ti ti-car" style="font-size:18px;color:var(--wc-ink3)"></i>
+    <!-- ─── VIEW: EXPEDIENTE DE VENTA (vista completa) ─── -->
+    <div class="view view-wrap hidden" id="view-expediente-detalle">
+
+      <!-- Hero: foto + nombre + badge + back -->
+      <div class="exp-det-hero">
+        <div class="exp-det-thumb" id="exp-drw-thumb">
+          <i class="ti ti-car" style="font-size:20px;color:var(--wc-ink3)"></i>
         </div>
-        <div class="exp-drawer-title">
-          <h3 id="exp-drw-nombre">—</h3>
-          <p id="exp-drw-sub">—</p>
+        <div class="exp-det-info">
+          <h2 class="exp-det-nombre" id="exp-drw-nombre">—</h2>
+          <div class="exp-det-sub" id="exp-drw-sub">—</div>
         </div>
         <span class="exp-badge" id="exp-drw-badge"></span>
-        <button onclick="cerrarExpedienteVenta()" style="margin-left:6px;width:32px;height:32px;border:none;background:var(--wc-surface2);border-radius:var(--wc-r-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--wc-ink);font-size:16px;flex-shrink:0"><i class="ti ti-x"></i></button>
       </div>
+
       <!-- Tabs -->
       <div class="exp-tabs">
-        <button class="exp-tab active" data-tab="venta" onclick="expCambiarTab(this)">Venta</button>
-        <button class="exp-tab" data-tab="docs" onclick="expCambiarTab(this)">Documentos</button>
-        <button class="exp-tab" data-tab="comprador" onclick="expCambiarTab(this)">Comprador</button>
-        <button class="exp-tab" data-tab="historial" onclick="expCambiarTab(this)">Historial</button>
+        <button class="exp-tab active" data-tab="venta"     onclick="expCambiarTab(this)"><i class="ti ti-receipt" style="font-size:14px"></i> Venta</button>
+        <button class="exp-tab"        data-tab="docs"      onclick="expCambiarTab(this)"><i class="ti ti-files"   style="font-size:14px"></i> Documentos</button>
+        <button class="exp-tab"        data-tab="comprador" onclick="expCambiarTab(this)"><i class="ti ti-user"    style="font-size:14px"></i> Comprador</button>
+        <button class="exp-tab"        data-tab="historial" onclick="expCambiarTab(this)"><i class="ti ti-history" style="font-size:14px"></i> Historial</button>
       </div>
+
       <!-- Pane: Venta -->
       <div class="exp-pane active" id="exp-pane-venta">
         <div class="exp-field-row">
@@ -1810,8 +1856,12 @@ img{max-width:100%;display:block}
         </div>
         <div class="exp-field-row">
           <div class="exp-field">
-            <label>Comisión vendedor ($)</label>
-            <input type="number" id="exp-vta-comision" placeholder="0">
+            <label>Estatus del expediente</label>
+            <select id="exp-vta-estatus">
+              <option value="Apartado">Apartado</option>
+              <option value="Vendido">Vendido</option>
+              <option value="Entregado">Entregado</option>
+            </select>
           </div>
           <div class="exp-field">
             <label>Fecha de venta</label>
@@ -1820,12 +1870,8 @@ img{max-width:100%;display:block}
         </div>
         <div class="exp-field-row">
           <div class="exp-field">
-            <label>Estatus del expediente</label>
-            <select id="exp-vta-estatus">
-              <option value="Apartado">Apartado</option>
-              <option value="Vendido">Vendido</option>
-              <option value="Entregado">Entregado</option>
-            </select>
+            <label>Comisión vendedor ($)</label>
+            <input type="number" id="exp-vta-comision" placeholder="0">
           </div>
           <div class="exp-field">
             <label>Plazo crédito (meses)</label>
@@ -1836,64 +1882,104 @@ img{max-width:100%;display:block}
           <label>Notas de la venta</label>
           <textarea id="exp-vta-notas" rows="3" placeholder="Observaciones, condiciones especiales..."></textarea>
         </div>
-        <div id="exp-vta-margen" style="background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:10px 12px;font-size:12px"></div>
+        <div id="exp-vta-margen" style="background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:12px 14px;font-size:12px"></div>
       </div>
-      <!-- Pane: Docs -->
+
+      <!-- Pane: Documentos -->
       <div class="exp-pane" id="exp-pane-docs">
-        <div style="font-size:11px;color:var(--wc-ink3);margin-bottom:4px">Marca el estado de cada documento. <b id="exp-docs-resumen"></b></div>
+        <div style="font-size:12px;color:var(--wc-ink3);margin-bottom:4px">Marca el estado de cada documento. <b id="exp-docs-resumen"></b></div>
         <div id="exp-docs-lista"></div>
       </div>
+
       <!-- Pane: Comprador -->
       <div class="exp-pane" id="exp-pane-comprador">
-        <div class="exp-field-row">
-          <div class="exp-field">
-            <label>Nombre completo</label>
-            <input type="text" id="exp-cmp-nombre" placeholder="Nombre del comprador">
+        <!-- Buscador de cliente del CRM -->
+        <div class="card-box" style="margin-bottom:4px">
+          <div class="card-box-title"><i class="ti ti-search"></i>Buscar cliente del CRM</div>
+          <div id="exp-cli-selected-banner" style="display:none" class="exp-cli-selected">
+            <i class="ti ti-user-check" style="font-size:18px;color:var(--wc-green-dark)"></i>
+            <div>
+              <div class="exp-cli-selected-name" id="exp-cli-sel-nombre">—</div>
+              <div class="exp-cli-selected-sub" id="exp-cli-sel-sub">—</div>
+            </div>
+            <button onclick="expLimpiarClienteSeleccionado()" style="border:none;background:none;cursor:pointer;color:var(--wc-green-dark);font-size:16px;margin-left:auto"><i class="ti ti-x"></i></button>
           </div>
-          <div class="exp-field">
-            <label>Teléfono</label>
-            <input type="tel" id="exp-cmp-tel" placeholder="55 1234 5678">
+          <div class="exp-cli-search-wrap" id="exp-cli-search-wrap">
+            <i class="ti ti-search exp-cli-search-icon"></i>
+            <input type="search" class="exp-cli-search-input" id="exp-cli-search"
+              placeholder="Nombre, teléfono, correo..."
+              oninput="expBuscarCliente(this.value)"
+              autocomplete="off">
+            <div class="exp-cli-dropdown" id="exp-cli-dropdown" style="display:none"></div>
+          </div>
+          <div style="font-size:11px;color:var(--wc-ink3);margin-top:6px">
+            Selecciona un cliente para auto-llenar sus datos. O llena manualmente abajo.
           </div>
         </div>
-        <div class="exp-field-row">
-          <div class="exp-field">
-            <label>Correo electrónico</label>
-            <input type="email" id="exp-cmp-email" placeholder="correo@ejemplo.com">
+
+        <!-- Datos del comprador (auto-llenados o manuales) -->
+        <div class="card-box">
+          <div class="card-box-title"><i class="ti ti-id-badge"></i>Datos del comprador</div>
+          <div class="exp-field-row">
+            <div class="exp-field">
+              <label>Nombre completo</label>
+              <input type="text" id="exp-cmp-nombre" placeholder="Nombre del comprador">
+            </div>
+            <div class="exp-field">
+              <label>Teléfono</label>
+              <input type="tel" id="exp-cmp-tel" placeholder="55 1234 5678">
+            </div>
+          </div>
+          <div class="exp-field-row">
+            <div class="exp-field">
+              <label>Correo electrónico</label>
+              <input type="email" id="exp-cmp-email" placeholder="correo@ejemplo.com">
+            </div>
+            <div class="exp-field">
+              <label>RFC</label>
+              <input type="text" id="exp-cmp-rfc" placeholder="RFC del comprador">
+            </div>
           </div>
           <div class="exp-field">
-            <label>RFC</label>
-            <input type="text" id="exp-cmp-rfc" placeholder="RFC del comprador">
+            <label>Domicilio</label>
+            <input type="text" id="exp-cmp-dir" placeholder="Calle, número, colonia, ciudad">
           </div>
         </div>
-        <div class="exp-field">
-          <label>Domicilio</label>
-          <input type="text" id="exp-cmp-dir" placeholder="Calle, número, colonia, ciudad">
-        </div>
-        <div class="exp-field-row">
-          <div class="exp-field">
-            <label>Factura a nombre de</label>
-            <input type="text" id="exp-cmp-factura-nombre" placeholder="Persona física o moral">
-          </div>
-          <div class="exp-field">
-            <label>Uso del CFDI</label>
-            <select id="exp-cmp-uso-cfdi">
-              <option value="G03">G03 - Gastos en general</option>
-              <option value="P01">P01 - Por definir</option>
-              <option value="S01">S01 - Sin efectos fiscales</option>
-            </select>
+
+        <!-- Datos fiscales -->
+        <div class="card-box">
+          <div class="card-box-title"><i class="ti ti-receipt-tax"></i>Datos fiscales</div>
+          <div class="exp-field-row">
+            <div class="exp-field">
+              <label>Factura a nombre de</label>
+              <input type="text" id="exp-cmp-factura-nombre" placeholder="Persona física o moral">
+            </div>
+            <div class="exp-field">
+              <label>Uso del CFDI</label>
+              <select id="exp-cmp-uso-cfdi">
+                <option value="G03">G03 - Gastos en general</option>
+                <option value="P01">P01 - Por definir</option>
+                <option value="S01">S01 - Sin efectos fiscales</option>
+                <option value="D01">D01 - Honorarios médicos</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
+
       <!-- Pane: Historial -->
       <div class="exp-pane" id="exp-pane-historial">
         <div id="exp-historial-lista">
           <div style="font-size:12px;color:var(--wc-ink3);text-align:center;padding:24px 0">Sin historial registrado</div>
         </div>
       </div>
+
       <!-- Footer -->
-      <div class="exp-drawer-foot">
-        <button class="btn" style="flex:1" onclick="cerrarExpedienteVenta()">Cancelar</button>
-        <button class="btn btn-primary" style="flex:2" id="exp-save-btn" onclick="guardarExpedienteVenta()">
+      <div class="exp-det-foot">
+        <button class="btn" onclick="cerrarExpedienteVenta()">
+          <i class="ti ti-arrow-left"></i> Regresar
+        </button>
+        <button class="btn btn-primary" style="flex:1" id="exp-save-btn" onclick="guardarExpedienteVenta()">
           <i class="ti ti-device-floppy"></i> Guardar expediente
         </button>
       </div>
@@ -2051,6 +2137,7 @@ const WC = {
     CONSIGNA_CREAR:   'wecars-consigna-crear',
     ALIADO_CREAR:     'wecars-aliado-crear',
     ALIADOS_LISTAR:   'wecars-aliados-listar',
+    GENERAR_TOKEN:    'wecars-generar-token',
   },
   IN: {
     CONTEXTO:         'wecars-contexto',
@@ -2069,6 +2156,7 @@ const WC = {
     VIDEO_URL_RESULTADO: 'wecars-video-url-resultado',
     ALIADOS_LISTA:    'wecars-aliados-lista',
     CONSIGNA_RESULTADO:'wecars-consigna-resultado',
+    TOKEN_GENERADO:   'wecars-token-generado',
   },
   send(tipo, payload = {}) { window.parent.postMessage({ type: tipo, ...payload }, '*'); },
   onMany(mapa) {
@@ -2176,10 +2264,22 @@ const VISTA_CONFIG = {
 };
 
 function mostrarVista(key, btn, origen) {
+  // Sub-vistas full-id (no están en VISTAS): manejo especial
+  if (key === 'view-expediente-detalle') {
+    VISTAS.forEach(v => document.getElementById('view-' + v).classList.add('hidden'));
+    document.getElementById('view-expediente-detalle').classList.remove('hidden');
+    const backBtn = document.getElementById('topbar-back');
+    if (backBtn) { backBtn.classList.add('visible'); backBtn.onclick = cerrarExpedienteVenta; }
+    document.getElementById('topbar-title').textContent = 'Expediente de venta';
+    document.getElementById('topbar-cta').style.display = 'none';
+    return;
+  }
   VISTAS.forEach(v => document.getElementById('view-' + v).classList.toggle('hidden', v !== key));
-  // Siempre ocultar el detalle de cliente al cambiar de sección
+  // Siempre ocultar sub-vistas al cambiar de sección
   const detCli = document.getElementById('view-detalle-cli');
   if (detCli) detCli.classList.add('hidden');
+  const detExp = document.getElementById('view-expediente-detalle');
+  if (detExp) detExp.classList.add('hidden');
   const backBtn = document.getElementById('topbar-back');
   if (backBtn) backBtn.classList.remove('visible');
   _opCliActual = null;
@@ -2271,11 +2371,8 @@ WC.onMany({
 
   [WC.IN.USUARIOS_LISTA]: (d) => {
     if (d.ok === false) { ocultarLoading('vend'); Toast.show('Error al cargar vendedores: ' + (d.error||''), 'error'); return; }
-    // Filtro tolerante: sin rol, rol='Vendedor' (cualquier capitalización/espacio)
-    VENDEDORES = (d.items || []).filter(u => {
-      const rol = String(u.rol || '').trim().toLowerCase();
-      return !rol || rol === 'vendedor';
-    });
+    // Mostrar todos los usuarios del CMS Usuarios (sin filtrar por rol)
+    VENDEDORES = (d.items || []);
     ocultarLoading('vend');
     renderVendedores();
     // Si el detalle de cliente está abierto, refrescar el select de asignación
@@ -2337,6 +2434,18 @@ WC.onMany({
     // Si el editor está abierto en modo Aliado, actualiza el select
     const sel = document.getElementById('vf-aliado-sel');
     if (sel) _populateAliadoSelect(sel, sel.dataset.current || '');
+  },
+
+  [WC.IN.TOKEN_GENERADO]: (d) => {
+    const btn = document.querySelector('[onclick="opGenerarLinkCredito()"]');
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.pointerEvents = ''; }
+    if (!d.ok) { Toast.show('Error al generar link: ' + (d.error||''), 'error'); return; }
+    const wrap = document.getElementById('op-link-generado-wrap');
+    const urlEl = document.getElementById('op-link-generado-url');
+    if (urlEl) urlEl.textContent = d.link;
+    if (wrap) wrap.style.display = 'block';
+    _opLeadEditar({ linkCredito: d.link, linkCreditoFecha: new Date().toISOString() });
+    Toast.show('Link generado ✓ — válido 72 horas', 'ok');
   },
 
   [WC.IN.ERROR]: (d) => {
@@ -2772,14 +2881,19 @@ function renderRentabilidad() {
   const filtroEstado = document.getElementById('rent-filtro-estado')?.value || '';
   const orden        = document.getElementById('rent-orden')?.value         || 'margen-desc';
 
-  // Índice de interesados por auto (match por texto en autoInteres)
+  // Índice de interesados por auto — ID exacto primero, fallback por texto
   const _interesadosPorAuto = {};
   CLIENTES.forEach(lead => {
+    const invId = lead.autoInventarioId || lead.autoInteresId || lead.vehiculoId || '';
+    if (invId) {
+      _interesadosPorAuto[invId] = (_interesadosPorAuto[invId] || 0) + 1;
+      return;
+    }
     const ai = (lead.autoInteres || lead.interes || '').trim().toLowerCase();
     if (!ai) return;
     INVENTARIO.forEach(c => {
-      const key = [c.marca||'', c.modelo||'', c.año||c.anio||c.year||''].join(' ').trim().toLowerCase();
-      if (key && ai.includes(key.split(' ')[0]) && ai.includes(key.split(' ')[1] || key.split(' ')[0])) {
+      if (!c.marca || !c.modelo) return;
+      if (ai.includes(c.marca.toLowerCase()) && ai.includes(c.modelo.toLowerCase())) {
         _interesadosPorAuto[c._id] = (_interesadosPorAuto[c._id] || 0) + 1;
       }
     });
@@ -3077,16 +3191,13 @@ function abrirExpedienteVenta(carId) {
   _expRenderHistorial();
 
   // Activar tab venta
-  expCambiarTab(document.querySelector('.exp-tab[data-tab="venta"]'));
+  expCambiarTab(document.querySelector('#view-expediente-detalle .exp-tab[data-tab="venta"]'));
 
-  // Mover overlay al body si hace falta
-  const ov = document.getElementById('exp-overlay');
-  if (ov && ov.parentElement !== document.body) document.body.appendChild(ov);
-  const drw = document.getElementById('exp-drawer');
-  if (drw && drw.parentElement !== document.body) document.body.appendChild(drw);
+  // Limpiar buscador de cliente
+  expLimpiarClienteSeleccionado();
 
-  ov.style.display = 'block';
-  requestAnimationFrame(() => { drw.style.transform = 'translateX(0)'; });
+  // Navegar a la vista de detalle
+  mostrarVista('view-expediente-detalle');
 }
 
 function _setExp(id, val) {
@@ -3224,21 +3335,93 @@ function _expRenderHistorial() {
 }
 
 function expCambiarTab(btn) {
-  document.querySelectorAll('.exp-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.exp-pane').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  const det = document.getElementById('view-expediente-detalle');
+  if (det) {
+    det.querySelectorAll('.exp-tab').forEach(t => t.classList.remove('active'));
+    det.querySelectorAll('.exp-pane').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  }
   if (!btn) return;
   btn.classList.add('active');
   const pane = document.getElementById('exp-pane-' + btn.dataset.tab);
   if (pane) { pane.style.display = 'flex'; pane.classList.add('active'); }
 }
 
+// ── Buscador de cliente (tab Comprador) ───────────────────────────────────
+let _expCliTimer = null;
+function expBuscarCliente(q) {
+  clearTimeout(_expCliTimer);
+  const dd = document.getElementById('exp-cli-dropdown');
+  if (!q || q.trim().length < 2) { if (dd) dd.style.display = 'none'; return; }
+  _expCliTimer = setTimeout(() => {
+    const term = q.toLowerCase();
+    const matches = (CLIENTES || []).filter(c => {
+      const n = (c.nombre || c.fullName || '').toLowerCase();
+      const t = String(c.telefono || c.phone || c.tel || '').replace(/\D/g,'');
+      const e = (c.correo || c.email || '').toLowerCase();
+      return n.includes(term) || t.includes(term.replace(/\D/g,'')) || e.includes(term);
+    }).slice(0, 8);
+    if (!dd) return;
+    if (!matches.length) {
+      dd.innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--wc-ink3)">Sin resultados</div>';
+      dd.style.display = 'block';
+      return;
+    }
+    dd.innerHTML = matches.map(c => {
+      const nombre = c.nombre || c.fullName || 'Sin nombre';
+      const tel    = c.telefono || c.phone || c.tel || '';
+      const email  = c.correo   || c.email || '';
+      const sub    = [tel, email].filter(Boolean).join(' · ') || 'Sin contacto';
+      return `<div class="exp-cli-option" onclick="expSeleccionarCliente('${esc(c._id)}')">
+        <div class="exp-cli-option-name">${esc(nombre)}</div>
+        <div class="exp-cli-option-sub">${esc(sub)}</div>
+      </div>`;
+    }).join('');
+    dd.style.display = 'block';
+  }, 200);
+}
+
+function expSeleccionarCliente(clienteId) {
+  const c = (CLIENTES || []).find(x => x._id === clienteId);
+  if (!c) return;
+  const nombre = c.nombre || c.fullName || '';
+  const tel    = c.telefono || c.phone || c.tel || '';
+  const email  = c.correo   || c.email || '';
+  // Auto-llenar campos
+  _setExp('exp-cmp-nombre', nombre);
+  _setExp('exp-cmp-tel',    tel);
+  _setExp('exp-cmp-email',  email);
+  _setExp('exp-cmp-rfc',    c.rfc || '');
+  _setExp('exp-cmp-dir',    c.domicilio || c.direccion || c.address || '');
+  _setExp('exp-cmp-factura-nombre', c.nombreFiscal || nombre);
+  // Mostrar banner de cliente seleccionado
+  const banner = document.getElementById('exp-cli-selected-banner');
+  const wrap   = document.getElementById('exp-cli-search-wrap');
+  const selNom = document.getElementById('exp-cli-sel-nombre');
+  const selSub = document.getElementById('exp-cli-sel-sub');
+  if (selNom) selNom.textContent = nombre;
+  if (selSub) selSub.textContent = [tel, email].filter(Boolean).join(' · ') || 'Sin contacto';
+  if (banner) banner.style.display = 'flex';
+  if (wrap)   wrap.style.display   = 'none';
+  // Cerrar dropdown
+  const dd = document.getElementById('exp-cli-dropdown');
+  if (dd) dd.style.display = 'none';
+  Toast.show('Datos de ' + nombre + ' cargados ✓', 'ok');
+}
+
+function expLimpiarClienteSeleccionado() {
+  const banner = document.getElementById('exp-cli-selected-banner');
+  const wrap   = document.getElementById('exp-cli-search-wrap');
+  const input  = document.getElementById('exp-cli-search');
+  const dd     = document.getElementById('exp-cli-dropdown');
+  if (banner) banner.style.display = 'none';
+  if (wrap)   wrap.style.display   = 'block';
+  if (input)  input.value = '';
+  if (dd)     dd.style.display = 'none';
+}
+
 function cerrarExpedienteVenta() {
-  const drw = document.getElementById('exp-drawer');
-  drw.style.transform = 'translateX(100%)';
-  setTimeout(() => {
-    document.getElementById('exp-overlay').style.display = 'none';
-    _expVentaActual = null;
-  }, 260);
+  _expVentaActual = null;
+  mostrarVista('expedientes');
 }
 
 function guardarExpedienteVenta() {
@@ -4246,6 +4429,18 @@ function cargarVendedores() {
   WC.send(WC.OUT.USUARIOS_LISTAR, {}); // sin filtro de rol: filtramos en frontend para no perder variantes
 }
 
+// Match vendedor por _id, email O nombre (leads legacy guardan nombre como vendedorId)
+function _esVendedor(c, v) {
+  const vid = (c.vendedorId||'').trim();
+  if (!vid) return false;
+  if (vid === v._id || vid === v.email) return true;
+  const vNom = (v.nombre||'').trim().toLowerCase();
+  if (vNom && vid.toLowerCase() === vNom) return true;
+  const vnLead = (c.vendedorNombre||'').trim().toLowerCase();
+  if (vNom && vnLead && vnLead === vNom) return true;
+  return false;
+}
+
 function renderVendedores() {
   const el    = document.getElementById('vend-list');
   const empty = document.getElementById('vend-empty');
@@ -4278,7 +4473,7 @@ function renderVendedores() {
     const meta     = v.metaMensual || 5;
 
     // Stats desde CLIENTES (ya en memoria, sin nueva petición)
-    const leadsVend  = CLIENTES.filter(c => c.vendedorId === v._id || c.vendedorId === v.email);
+    const leadsVend  = CLIENTES.filter(c => _esVendedor(c, v));
     const leadsTotal = leadsVend.length;
     const leadsHoy   = leadsVend.filter(c => new Date(c._createdDate||0).getTime() >= mesIni).length;
     const ganados    = leadsVend.filter(c => (c.etapa||c.estatus) === 'Ganado').length;
@@ -4288,16 +4483,15 @@ function renderVendedores() {
 
     // Autos vendidos (autos en Cars con estatusVenta=Vendido/Entregado asignados a este vendedor)
     const autosVend  = INVENTARIO.filter(c =>
-      ['Vendido','Entregado'].includes(c.estatusVenta||'') &&
-      (c.vendedorId === v._id || c.vendedorId === v.email)
+      ['Vendido','Entregado'].includes(c.estatusVenta||'') && _esVendedor(c, v)
     ).length;
 
     const metaU    = v.metaUnidades || 5;
     const pctU     = Math.min(100, Math.round((autosVend / metaU) * 100));
     const colorU   = pctU >= 100 ? 'var(--wc-ok)' : pctU >= 60 ? 'var(--wc-warn)' : 'var(--wc-danger)';
-    const tel      = (v.telefono||'').replace(/\D/g,'').slice(-10);
+    const tel      = String(v.telefono||'').replace(/\D/g,'').slice(-10);
     return `
-    <div class="vend-card${activo?'':' vend-inactivo'}" id="vcard-${esc(v._id)}" style="${activo?'':'opacity:.55'}">
+    <div class="vend-card${activo?'':' vend-inactivo'}" id="vcard-${esc(v._id)}" style="${activo?'':'opacity:.55'};cursor:pointer" onclick="editarVendedor('${esc(v._id)}')">
       <div class="vend-avatar" style="background:${activo?'var(--wc-green)':'var(--wc-ink3)'}">
         ${esc(initials)}
       </div>
@@ -4338,9 +4532,9 @@ function renderVendedores() {
         </div>
         ${v.notas ? `<div style="font-size:11px;color:var(--wc-ink3);margin-top:6px;padding:6px 8px;background:var(--wc-surface2,var(--wc-surface));border-radius:6px;border-left:3px solid var(--wc-border)"><i class="ti ti-notes" style="font-size:11px"></i> ${esc(v.notas)}</div>` : ''}
       </div>
-      <div class="vend-actions">
+      <div class="vend-actions" onclick="event.stopPropagation()">
         <span class="chip ${activo?'chip-green':'chip-gray'}">${activo?'Activo':'Inactivo'}</span>
-        <button class="btn btn-sm" title="Editar vendedor" onclick="editarVendedor('${esc(v._id)}')">
+        <button class="btn btn-sm" title="Editar / metas" onclick="editarVendedor('${esc(v._id)}')">
           <i class="ti ti-pencil"></i>
         </button>
         <button class="btn btn-sm" style="color:${activo?'var(--wc-danger)':'var(--wc-ok)'}"
@@ -4358,6 +4552,17 @@ function filtrarVendedores(q) {
   document.querySelectorAll('.vend-card').forEach(card => {
     card.style.display = card.textContent.toLowerCase().includes(lower) ? '' : 'none';
   });
+}
+
+function abrirRegistroRapido(vendedorId, vendedorEmail, vendedorNombre) {
+  const base = CTX?.siteUrl || 'https://www.wecarsbajio.com';
+  const params = new URLSearchParams({
+    vid:     vendedorId     || '',
+    vemail:  vendedorEmail  || '',
+    vnombre: vendedorNombre || '',
+  });
+  const url = `${base}/registro-rapido?${params.toString()}`;
+  window.open(url, '_blank');
 }
 
 function abrirModalInvitarVendedor() {
@@ -4561,7 +4766,18 @@ function cargarTodosClientes() {
   WC.send(WC.OUT.LEADS_LISTAR_TODOS, { limite: 5000 });
 }
 
-const _AV_COLORS = ['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#10b981','#16a34a','#ea580c'];
+// Color de avatar por calidad de perfil del lead
+function _avatarCalidad(c) {
+  let score = 0;
+  if (c.nombre && c.nombre.trim().length > 1)                               score++;
+  if (c.telefono || c.phone || c.tel)                                       score++;
+  if (c.correo   || c.email)                                                score++;
+  if (c.autoInteres || c.interes || c.autoInteresNombre || c.autoInteresId) score++;
+  if (score >= 4) return { bg:'#16a34a', label:'Perfil completo' };   // verde
+  if (score === 3) return { bg:'#2563eb', label:'Buen contacto' };    // azul
+  if (score === 2) return { bg:'#d97706', label:'Info básica' };      // naranja
+  return               { bg:'#6b7280', label:'Lead frío' };           // gris
+}
 
 function renderClientes() {
   const loadEl = document.getElementById('cli-loading');
@@ -4714,13 +4930,13 @@ function opClienteCard(c) {
   const etapa  = c.etapa || c.estatus || 'Nuevo';
   const clr    = ETAPA_COLORS[etapa] || '#888';
   const ini    = opInitials(c.nombre);
-  const avClr  = _AV_COLORS[(c.nombre||'?').charCodeAt(0) % _AV_COLORS.length];
+  const cal    = _avatarCalidad(c);
   const vend   = VENDEDORES.find(v => v._id===c.vendedorId || v.email===c.vendedorId);
   const vendNm = vend?.nombre || c.vendedorNombre || '';
-  const tel    = (c.telefono||'').replace(/\D/g,'').slice(-10);
+  const tel    = String(c.telefono||'').replace(/\D/g,'').slice(-10);
   const auto   = c.autoInteres || c.interes || '';
   return `<div class="client-card" onclick="opAbrirDetalle('${esc(c._id)}')">
-    <div class="avatar" style="background:${avClr}">${esc(ini)}</div>
+    <div class="avatar" style="background:${cal.bg}" title="${cal.label}">${esc(ini)}</div>
     <div class="card-body">
       <div class="card-name">${esc(c.nombre||'Sin nombre')}</div>
       <div class="card-meta">
@@ -4897,13 +5113,13 @@ function opAbrirDetalle(leadId) {
   const etapa  = c.etapa || c.estatus || 'Nuevo';
   const clr    = ETAPA_COLORS[etapa] || '#888';
   const ini    = opInitials(c.nombre);
-  const avClr  = _AV_COLORS[(c.nombre||'?').charCodeAt(0) % _AV_COLORS.length];
+  const cal    = _avatarCalidad(c);
 
   // Header
   const detActions = document.querySelector('.detail-actions');
   if (detActions) detActions.style.display = '';
   const avEl = document.getElementById('det-avatar');
-  if (avEl) { avEl.textContent = ini; avEl.style.background = avClr; }
+  if (avEl) { avEl.textContent = ini; avEl.style.background = cal.bg; avEl.title = cal.label; }
   _setText('det-name',  c.nombre||'Sin nombre');
   _setText('det-id',    '#' + opShortId(c._id));
   _setText('det-tel',   c.telefono||'—');
@@ -5181,6 +5397,13 @@ function opGuardarDatos() {
     autoEnganche:       gn('op-auto-enganche'),
     autoPartePago:      g('op-auto-parte-pago'),
     autoInventarioId:   g('op-auto-inventario-id'),
+    autoInteresId:      g('op-auto-inventario-id'), // alias para Reportes y Panel Vendedores
+    // autoInteres como texto para retrocompatibilidad (Panel Vendedores, filtros texto)
+    autoInteres: (() => {
+      const marca = g('op-auto-marca'); const modelo = g('op-auto-modelo-sel');
+      const anio  = g('op-auto-anio-min'); const ver = g('op-auto-version');
+      return [marca, modelo, anio, ver].filter(Boolean).join(' ').trim() || _opCliActual.autoInteres || '';
+    })(),
     // Etapa
     etapa:              _opCliActual.etapa || 'Nuevo',
     estatus:            _opCliActual.etapa || 'Nuevo',
@@ -5207,11 +5430,11 @@ function opReasignar() {
 }
 
 function opCliWA() {
-  const tel = (_opCliActual?.telefono||'').replace(/\D/g,'').slice(-10);
+  const tel = String(_opCliActual?.telefono||'').replace(/\D/g,'').slice(-10);
   if (tel) window.open('https://wa.me/52'+tel);
 }
 function opCliLlamar() {
-  const tel = (_opCliActual?.telefono||'').replace(/\D/g,'').slice(-10);
+  const tel = String(_opCliActual?.telefono||'').replace(/\D/g,'').slice(-10);
   if (tel) window.open('tel:+52'+tel);
 }
 
@@ -5844,21 +6067,20 @@ function opRegistrarCierre() {
 ════════════════════════════════════════════════════════ */
 function opGenerarLinkCredito() {
   if (!_opCliActual) return;
-  const wrap = document.getElementById('op-link-generado-wrap');
-  const urlEl = document.getElementById('op-link-generado-url');
-  // Construir URL con params del cliente
-  const base = window.location.origin + '/solicitud-credito';
-  const params = new URLSearchParams({
-    leadId: _opCliActual._id,
-    nombre: _opCliActual.nombre||'',
-    tel:    _opCliActual.telefono||'',
+  const btn = document.querySelector('[onclick="opGenerarLinkCredito()"]');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
+  // Buscar auto de interés asignado al expediente
+  const autoId  = _opCliActual.autoInteresId  || _opCliActual.vehiculoId || '';
+  const autoDsc = _opCliActual.autoInteres || _opCliActual.autoInteresNombre || '';
+  const precio  = _opCliActual.precioVehiculo  || 0;
+  WC.send(WC.OUT.GENERAR_TOKEN, {
+    leadId:        _opCliActual._id,
+    vendedorId:    CTX?.email || CTX?.userId || '',
+    leadNombre:    _opCliActual.nombre  || '',
+    autoInteres:   autoDsc,
+    precioRef:     precio,
+    autoInteresId: autoId,
   });
-  const url = base + '?' + params.toString();
-  if (urlEl) urlEl.textContent = url;
-  if (wrap) wrap.style.display = 'block';
-  // Guardar link en lead
-  _opLeadEditar({ linkCredito: url, linkCreditoFecha: new Date().toISOString() });
-  Toast.show('Link generado', 'ok');
 }
 
 function opCredMostrarForm() {
@@ -5984,7 +6206,7 @@ function opCredPrefill(c) {
 
 function opEnviarLinkWA() {
   const url = document.getElementById('op-link-generado-url')?.textContent||'';
-  const tel = (_opCliActual?.telefono||'').replace(/\D/g,'').slice(-10);
+  const tel = String(_opCliActual?.telefono||'').replace(/\D/g,'').slice(-10);
   if (!tel) { Toast.show('El cliente no tiene teléfono','warn'); return; }
   const msg = encodeURIComponent(`Hola ${_opCliActual?.nombre?.split(' ')[0]||''}, aquí está tu link para llenar la solicitud de crédito:\n${url}`);
   window.open(`https://wa.me/52${tel}?text=${msg}`);
@@ -6299,7 +6521,7 @@ function filtrarCreditos() {
             onchange="cambiarEstatusCred('${esc(c._id)}',this.value,this)">
             ${opciones}
           </select>
-          ${c.telefono ? `<button class="btn btn-sm" onclick="window.open('https://wa.me/52${esc((c.telefono||'').replace(/\D/g,''))}')" title="WhatsApp"><i class="ti ti-brand-whatsapp" style="color:#25d366"></i></button>` : ''}
+          ${c.telefono ? `<button class="btn btn-sm" onclick="window.open('https://wa.me/52${esc(String(c.telefono||'').replace(/\D/g,''))}')" title="WhatsApp"><i class="ti ti-brand-whatsapp" style="color:#25d366"></i></button>` : ''}
         </div>
       </div>
       ${c.notas ? `<div style="margin-top:8px;font-size:12px;color:var(--wc-ink3);border-top:1px solid var(--wc-border);padding-top:6px">${esc(c.notas)}</div>` : ''}
@@ -6360,27 +6582,37 @@ function renderReportes() {
 
   // ── Ranking de vendedores ──
   const rankVend = VENDEDORES.map(v => {
-    const leadsV  = CLIENTES.filter(c => c.vendedorId === v._id || c.vendedorId === v.email);
+    const leadsV  = CLIENTES.filter(c => _esVendedor(c, v));
     const ganV    = leadsV.filter(c => (c.etapa||c.estatus) === 'Ganado').length;
     const mesV    = leadsV.filter(c => new Date(c._createdDate||0).getTime() >= mesIni).length;
     const unidsV  = INVENTARIO.filter(c =>
-      ['Vendido','Entregado'].includes(c.estatusVenta||'') &&
-      (c.vendedorId === v._id || c.vendedorId === v.email)
+      ['Vendido','Entregado'].includes(c.estatusVenta||'') && _esVendedor(c, v)
     ).length;
-    return { nombre: v.nombre||'Vendedor', ganados: ganV, leadsMes: mesV, unidades: unidsV, meta: v.metaMensual||5 };
-  }).sort((a, b) => b.unidades - a.unidades || b.ganados - a.ganados);
+    return { nombre: v.nombre||'Vendedor', leads: leadsV.length, ganados: ganV, leadsMes: mesV, unidades: unidsV, meta: v.metaMensual||5 };
+  }).sort((a, b) => b.leads - a.leads || b.unidades - a.unidades || b.ganados - a.ganados);
 
-  // ── Autos más interesados (match autoInteres) ──
+  // ── Autos más interesados ──
+  // Prioridad 1: match exacto por ID (autoInventarioId, autoInteresId, vehiculoId)
+  // Prioridad 2: match por texto en autoInteres/interes contra marca+modelo del inventario
   const interesMap = {};
   CLIENTES.forEach(c => {
-    if (!c.autoInteres && !c.interes) return;
-    const txt = (c.autoInteres || c.interes || '').toLowerCase();
+    const invId = c.autoInventarioId || c.autoInteresId || c.vehiculoId || '';
+    if (invId) {
+      const car = INVENTARIO.find(v => v._id === invId);
+      if (car) {
+        interesMap[car._id] = interesMap[car._id] || { car, count: 0 };
+        interesMap[car._id].count++;
+        return;
+      }
+    }
+    // Fallback: match por texto
+    const txt = (c.autoInteres || c.interes || c.autoMarca && (c.autoMarca + ' ' + (c.autoModelo||'')) || '').toLowerCase().trim();
+    if (!txt) return;
     INVENTARIO.forEach(car => {
       if (!car.marca || !car.modelo) return;
       if (txt.includes(car.marca.toLowerCase()) && txt.includes(car.modelo.toLowerCase())) {
-        const key = car._id;
-        interesMap[key] = (interesMap[key] || { car, count: 0 });
-        interesMap[key].count++;
+        interesMap[car._id] = interesMap[car._id] || { car, count: 0 };
+        interesMap[car._id].count++;
       }
     });
   });
@@ -6388,10 +6620,37 @@ function renderReportes() {
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
+  // ── Pipeline por etapa ──
+  const etapas = ['Nuevo','Contactado','Cita agendada','Prueba de manejo','En negociación','Ganado','Perdido'];
+  const pipelineData = etapas.map(e => ({
+    etapa: e,
+    count: CLIENTES.filter(c => (c.etapa||c.estatus||'Nuevo') === e).length,
+  }));
+  const etapaColors = {
+    'Nuevo':'var(--wc-info)', 'Contactado':'var(--wc-purple)',
+    'Cita agendada':'var(--wc-warn)', 'Prueba de manejo':'var(--wc-orange)',
+    'En negociación':'var(--wc-green)', 'Ganado':'var(--wc-ok)', 'Perdido':'var(--wc-danger)',
+  };
+  const etapaShort = {
+    'Nuevo':'Nuevo', 'Contactado':'Contactado', 'Cita agendada':'Cita',
+    'Prueba de manejo':'Prueba', 'En negociación':'Negocia', 'Ganado':'Ganado', 'Perdido':'Perdido',
+  };
+
+  const mesLabel = ahora.toLocaleString('es-MX',{month:'long',year:'numeric'});
+
   // ── Render ──
   el.innerHTML = `
-  <!-- KPIs inventario -->
-  <div class="kpi-row" style="margin-bottom:14px">
+  <!-- Encabezado -->
+  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+    <div>
+      <h2 style="font-size:20px;font-weight:800;margin:0">Reportes</h2>
+      <div style="font-size:12px;color:var(--wc-ink3);margin-top:2px">${mesLabel} · ${totalAutos} vehículos · ${leadsTotal} leads</div>
+    </div>
+  </div>
+
+  <!-- Sección Inventario -->
+  <div class="kpi-section-label"><i class="ti ti-car"></i>Inventario</div>
+  <div class="kpi-row">
     <div class="kpi-card">
       <div class="kpi-label">Total inventario</div>
       <div class="kpi-value">${totalAutos}</div>
@@ -6399,6 +6658,7 @@ function renderReportes() {
     <div class="kpi-card">
       <div class="kpi-label">Disponibles</div>
       <div class="kpi-value">${disponibles}</div>
+      <div class="kpi-sub">${totalAutos>0?Math.round(disponibles/totalAutos*100):0}% del total</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Apartados</div>
@@ -6407,81 +6667,175 @@ function renderReportes() {
     <div class="kpi-card">
       <div class="kpi-label">Vendidos este mes</div>
       <div class="kpi-value" style="color:var(--wc-ok)">${vendidosMes}</div>
-      ${tendVentas !== null ? `<div class="kpi-sub" style="color:${tendVentas>=0?'var(--wc-ok)':'var(--wc-danger)'}">${tendVentas>=0?'▲':'▼'} ${Math.abs(tendVentas)}% vs mes ant.</div>` : ''}
+      ${tendVentas !== null ? `<div class="kpi-sub" style="color:${tendVentas>=0?'var(--wc-ok)':'var(--wc-danger)'}">${tendVentas>=0?'▲':'▼'} ${Math.abs(tendVentas)}% vs mes ant.</div>` : '<div class="kpi-sub">sin comparativa</div>'}
     </div>
   </div>
 
-  <!-- KPIs leads -->
-  <div class="kpi-row" style="margin-bottom:14px">
+  <!-- Sección Leads / CRM -->
+  <div class="kpi-section-label"><i class="ti ti-address-book"></i>CRM · Leads</div>
+  <div class="kpi-row">
     <div class="kpi-card">
       <div class="kpi-label">Leads totales</div>
       <div class="kpi-value">${leadsTotal}</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Leads este mes</div>
+      <div class="kpi-label">Nuevos este mes</div>
       <div class="kpi-value">${leadsMes}</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Leads activos</div>
+      <div class="kpi-label">Activos</div>
       <div class="kpi-value">${leadsActivos}</div>
+      <div class="kpi-sub">${leadsPerdidos} perdidos</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Tasa de cierre</div>
       <div class="kpi-value" style="color:${tasaCierre>=20?'var(--wc-ok)':tasaCierre>=10?'var(--wc-warn)':'var(--wc-danger)'}">${tasaCierre}%</div>
-      <div class="kpi-sub">meta ≥ 20%</div>
+      <div class="kpi-sub">meta ≥ 20% · ${leadsGanados} cerrados</div>
     </div>
+  </div>
+
+  <!-- Pipeline por etapa -->
+  <div class="card-box">
+    <div class="card-box-title"><i class="ti ti-filter"></i>Pipeline de ventas</div>
+    <div class="pipeline-row">
+      ${pipelineData.map(p => `
+      <div class="pipeline-chip" style="border-top:3px solid ${etapaColors[p.etapa]||'var(--wc-border)'}">
+        <div class="pipeline-chip-n" style="color:${etapaColors[p.etapa]||'var(--wc-ink)'}">${p.count}</div>
+        <div class="pipeline-chip-l">${etapaShort[p.etapa]||p.etapa}</div>
+      </div>`).join('')}
+    </div>
+    ${leadsTotal > 0 ? `
+    <div style="height:8px;background:var(--wc-border);border-radius:8px;overflow:hidden;display:flex;margin-top:4px">
+      ${pipelineData.filter(p=>p.count>0).map(p=>`
+        <div style="flex:${p.count};background:${etapaColors[p.etapa]||'var(--wc-border)'};min-width:2px" title="${p.etapa}: ${p.count}"></div>
+      `).join('')}
+    </div>` : ''}
   </div>
 
   <!-- Ranking vendedores -->
   ${rankVend.length ? `
-  <div class="card-box" style="margin-bottom:14px">
-    <div class="card-box-title"><i class="ti ti-trophy"></i>Ranking vendedores — ${ahora.toLocaleString('es-MX',{month:'long'})}</div>
+  <div class="card-box">
+    <div class="card-box-title"><i class="ti ti-trophy"></i>Ranking vendedores — ${mesLabel}</div>
     ${rankVend.map((v, i) => {
-      const pct = Math.min(100, Math.round((v.leadsMes / v.meta) * 100));
-      const medalColor = i===0?'#f59e0b':i===1?'#9ca3af':i===2?'#b45309':'var(--wc-ink3)';
+      const pct = Math.min(100, v.meta > 0 ? Math.round((v.leadsMes / v.meta) * 100) : 0);
+      const medalColor = i===0?'#f59e0b':i===1?'#9ca3af':i===2?'#cd7f32':'var(--wc-ink3)';
+      const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+      const initials = v.nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
       return `
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--wc-border)">
-        <span style="font-size:16px;font-weight:900;color:${medalColor};width:20px;text-align:center">${i+1}</span>
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:13px">${esc(v.nombre)}</div>
-          <div style="font-size:11px;color:var(--wc-ink3)">${v.leadsMes} leads este mes · ${v.ganados} cerrados · ${v.unidades} unidades</div>
-          <div style="margin-top:3px;height:4px;background:var(--wc-border);border-radius:4px;overflow:hidden">
-            <div style="height:4px;border-radius:4px;background:${pct>=100?'var(--wc-ok)':'var(--wc-warn)'};width:${pct}%"></div>
-          </div>
+      <div class="rank-row">
+        <span style="font-size:15px;font-weight:900;color:${medalColor};width:22px;text-align:center;flex-shrink:0">${medal||i+1}</span>
+        <div class="rank-avatar" style="background:${i<3?medalColor+'22':'var(--wc-surface2)'};color:${i<3?medalColor:'var(--wc-ink2)'}">${initials}</div>
+        <div class="rank-info">
+          <div class="rank-name">${esc(v.nombre)}</div>
+          <div class="rank-meta">${v.leads} leads totales · ${v.leadsMes} este mes · ${v.ganados} cerrados · ${v.unidades} vendidos</div>
+          <div class="rank-bar"><div class="rank-bar-fill" style="width:${pct}%;background:${pct>=100?'var(--wc-ok)':'var(--wc-warn)'}"></div></div>
         </div>
-        <span style="font-size:11px;font-weight:700;flex-shrink:0;color:${pct>=100?'var(--wc-ok)':'var(--wc-ink3)'}">${pct}%</span>
+        <span class="rank-pct" style="color:${pct>=100?'var(--wc-ok)':'var(--wc-ink3)'}">${pct}%<br><span style="font-size:9px;font-weight:400">de meta</span></span>
       </div>`;
     }).join('')}
   </div>` : ''}
 
-  <!-- Top autos más solicitados -->
+  <!-- Top autos más solicitados (expandible con clientes) -->
   ${topAutos.length ? `
   <div class="card-box">
-    <div class="card-box-title"><i class="ti ti-heart"></i>Autos más solicitados</div>
+    <div class="card-box-title"><i class="ti ti-heart"></i>Autos más solicitados — click para ver interesados</div>
     ${topAutos.map((entry, i) => {
       const c = entry.car;
+      const carId = c._id;
       const nombre = [c.marca,c.modelo,c.anio||c.año].filter(Boolean).join(' ');
       const rawFoto = c.image || c.fotoPrincipal || c.imagenUrl || (Array.isArray(c.fotos)&&c.fotos[0]) || '';
       const thumb = resolveWixImg(rawFoto, 80, 60);
       const est = c.estatusVenta || 'Disponible';
       const estColor = { Disponible:'chip-green', Apartado:'chip-warn', Vendido:'chip-info', Entregado:'chip-gray' }[est]||'chip-gray';
+
+      // Obtener clientes interesados en este auto
+      const interesados = CLIENTES.filter(cl => {
+        const invId = cl.autoInventarioId || cl.autoInteresId || cl.vehiculoId || '';
+        if (invId && invId === carId) return true;
+        const txt = (cl.autoInteres || cl.interes || '').toLowerCase();
+        return txt && c.marca && c.modelo && txt.includes(c.marca.toLowerCase()) && txt.includes(c.modelo.toLowerCase());
+      });
+
+      // Agrupar por vendedor
+      const porVendedor = {};
+      interesados.forEach(cl => {
+        const vKey = cl.vendedorNombre || cl.vendedorId || 'Sin asignar';
+        if (!porVendedor[vKey]) porVendedor[vKey] = [];
+        porVendedor[vKey].push(cl);
+      });
+      const vendGrupos = Object.entries(porVendedor).sort((a,b) => b[1].length - a[1].length);
+
+      const panelId = 'auto-int-' + carId;
       return `
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--wc-border)">
-        <span style="font-size:13px;font-weight:900;color:var(--wc-ink3);width:16px">${i+1}</span>
-        <div style="width:48px;height:36px;border-radius:6px;overflow:hidden;background:var(--wc-surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center">
-          ${thumb ? `<img src="${esc(thumb)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : '<i class="ti ti-car" style="font-size:14px;color:var(--wc-ink3)"></i>'}
+      <div style="border-bottom:1px solid var(--wc-border)">
+        <!-- Fila principal clickeable -->
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 0;cursor:pointer"
+          onclick="document.getElementById('${panelId}').classList.toggle('hidden')">
+          <span style="font-size:13px;font-weight:900;color:var(--wc-ink3);width:16px;text-align:center;flex-shrink:0">${i+1}</span>
+          <div style="width:60px;height:45px;border-radius:8px;overflow:hidden;background:var(--wc-surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center">
+            ${thumb ? `<img src="${esc(thumb)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : '<i class="ti ti-car" style="font-size:18px;color:var(--wc-ink3)"></i>'}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:700">${esc(nombre)}</div>
+            <div style="margin-top:3px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              <span class="chip ${estColor}" style="font-size:10px;padding:1px 7px">${esc(est)}</span>
+              <span style="font-size:11px;color:var(--wc-ink3)">${vendGrupos.length} vendedor${vendGrupos.length!==1?'es':''}</span>
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:center">
+            <div style="font-size:22px;font-weight:900;color:var(--wc-green);line-height:1">${entry.count}</div>
+            <div style="font-size:10px;color:var(--wc-ink3)">interesados</div>
+          </div>
+          <i class="ti ti-chevron-down" style="font-size:14px;color:var(--wc-ink3);flex-shrink:0"></i>
         </div>
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:13px">${esc(nombre)}</div>
-          <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.estadoVehiculo||'')} · <span class="chip ${estColor}" style="font-size:10px;padding:1px 6px">${esc(est)}</span></div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:16px;font-weight:900;color:var(--wc-accent)">${entry.count}</div>
-          <div style="font-size:10px;color:var(--wc-ink3)">interesados</div>
+        <!-- Panel expandible: clientes por vendedor -->
+        <div id="${panelId}" class="hidden" style="padding-bottom:12px">
+          ${vendGrupos.map(([vNom, clientes]) => {
+            const ini = vNom.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+            return `
+            <div style="margin-bottom:8px">
+              <!-- Cabecera vendedor -->
+              <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--wc-surface2);border-radius:8px;margin-bottom:4px">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--wc-green);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(ini)}</div>
+                <div style="font-size:13px;font-weight:600;flex:1">${esc(vNom)}</div>
+                <span style="font-size:12px;color:var(--wc-ink3);font-weight:600">${clientes.length} cliente${clientes.length!==1?'s':''}</span>
+              </div>
+              <!-- Lista de clientes -->
+              ${clientes.map(cl => {
+                const tel = String(cl.telefono||'').replace(/\D/g,'').slice(-10);
+                const wa  = tel ? `https://wa.me/52${tel}` : '';
+                const etapa = cl.etapa || cl.estatus || 'Nuevo';
+                const etapaClr = ETAPA_COLORS[etapa] || '#888';
+                return `
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 10px 6px 38px">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(cl.nombre||'Sin nombre')}</div>
+                    <div style="font-size:11px;color:var(--wc-ink3)">${esc(cl.telefono||'Sin tel')}${cl.correo?` · ${esc(cl.correo)}`:''}</div>
+                  </div>
+                  <span style="font-size:10px;padding:1px 7px;border-radius:20px;background:${etapaClr}22;color:${etapaClr};font-weight:600;flex-shrink:0">${esc(etapa)}</span>
+                  <div style="display:flex;gap:4px;flex-shrink:0">
+                    ${wa ? `<a href="${wa}" target="_blank" onclick="event.stopPropagation()"
+                      style="width:30px;height:30px;border-radius:8px;background:#25d36622;color:#25d366;border:1px solid #25d36633;display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none">
+                      <i class="ti ti-brand-whatsapp"></i></a>` : ''}
+                    ${tel ? `<a href="tel:${tel}" onclick="event.stopPropagation()"
+                      style="width:30px;height:30px;border-radius:8px;background:var(--wc-surface2);color:var(--wc-ink2);border:1px solid var(--wc-border);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none">
+                      <i class="ti ti-phone"></i></a>` : ''}
+                    <button onclick="event.stopPropagation();opAbrirDetalle('${esc(cl._id)}')" title="Ver ficha"
+                      style="width:30px;height:30px;border-radius:8px;background:var(--wc-surface2);color:var(--wc-ink2);border:1px solid var(--wc-border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px">
+                      <i class="ti ti-user"></i></button>
+                  </div>
+                </div>`;
+              }).join('')}
+            </div>`;
+          }).join('')}
         </div>
       </div>`;
     }).join('')}
-  </div>` : ''}`;
+  </div>` : `
+  <div class="card-box" style="text-align:center;padding:24px">
+    <i class="ti ti-heart" style="font-size:32px;color:var(--wc-border)"></i>
+    <div style="font-size:13px;color:var(--wc-ink3);margin-top:8px">Sin datos de autos más solicitados.<br>Se calcula cuando los leads incluyen el campo <em>Auto de interés</em>.</div>
+  </div>`}`;
 }
 
 /* ════════════════════════════════════════════════════════
