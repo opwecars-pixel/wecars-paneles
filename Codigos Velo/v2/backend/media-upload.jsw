@@ -211,6 +211,52 @@ export async function obtenerUrlSubidaVideo({ carId, fileName, mimeType }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════
+//  obtenerUrlSubidaDoc
+//  Devuelve URL firmada para que el browser suba el documento directo.
+// ════════════════════════════════════════════════════════════════════════
+export async function obtenerUrlSubidaDoc({ entidadId, entidadTipo, tipo, fileName, mimeType }) {
+  try {
+    const isImage = (mimeType || '').startsWith('image/');
+    const { uploadUrl, uploadToken } = await mediaManager.getUploadUrl(
+      '/wecars-docs',
+      {
+        fileName:  fileName || `doc_${Date.now()}.pdf`,
+        mimeType:  mimeType || 'application/pdf',
+        mediaType: isImage ? 'image' : 'document',
+      }
+    );
+    return { ok: true, uploadUrl, uploadToken, entidadId, entidadTipo, tipo };
+  } catch (err) {
+    console.error('[media-upload] obtenerUrlSubidaDoc:', err.message);
+    return { ok: false, error: err.message };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  confirmarDocSubida
+//  Guarda la URL final en la colección Docs.
+// ════════════════════════════════════════════════════════════════════════
+export async function confirmarDocSubida({ entidadId, entidadTipo, tipo, fileName, mimeType, url, vendedorId }) {
+  if (!entidadId || !url) return { ok: true }; // noop if no entity yet
+  try {
+    const doc = await wixData.insert('Docs', {
+      entidadId,
+      entidadTipo: entidadTipo || 'auto',
+      tipo:        tipo        || 'otro',
+      nombre:      fileName    || tipo,
+      url,
+      mimeType:    mimeType    || '',
+      vendedorId:  vendedorId  || '',
+      fecha:       new Date().toISOString(),
+    }, { suppressAuth: true });
+    return { ok: true, doc, url, tipo };
+  } catch (err) {
+    console.error('[media-upload] confirmarDocSubida:', err.message);
+    return { ok: false, error: err.message };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
 //  listarDocumentos
 //  Consulta Docs por entidadId.
 // ════════════════════════════════════════════════════════════════════════

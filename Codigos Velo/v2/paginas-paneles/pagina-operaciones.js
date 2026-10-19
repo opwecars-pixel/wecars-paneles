@@ -16,7 +16,7 @@ import wixData from 'wix-data';
 import wixUsers from 'wix-users';
 import wixLocation from 'wix-location';
 import { obtenerTodosLosLeads, obtenerTodosLosCars, obtenerTodosLosUsuarios, crearCar, editarCar, obtenerCar, crearLead, editarLead } from 'backend/operaciones-data';
-import { subirFotoVehiculo, obtenerUrlSubidaFoto, confirmarFotoSubida, obtenerUrlSubidaVideo, subirDocumento } from 'backend/media-upload';
+import { subirFotoVehiculo, obtenerUrlSubidaFoto, confirmarFotoSubida, obtenerUrlSubidaVideo, subirDocumento, obtenerUrlSubidaDoc, confirmarDocSubida } from 'backend/media-upload';
 import { generarTokenCredito } from 'backend/credito-publico.jsw';
 
 const HTML_ID = '#htmlOperaciones';
@@ -38,6 +38,8 @@ const OUT = {
   CREDITOS_LISTAR:   'wecars-creditos-listar',
   CREDITO_EDITAR:    'wecars-credito-editar',
   DOC_SUBIR:         'wecars-doc-subir',
+  DOC_URL_SOLICITAR: 'wecars-doc-url-solicitar',
+  DOC_URL_CONFIRMAR: 'wecars-doc-url-confirmar',
   FOTO_SUBIR:        'wecars-foto-subir',
   FOTO_URL_SOLICITAR: 'wecars-foto-url-solicitar',
   FOTO_URL_CONFIRMAR: 'wecars-foto-url-confirmar',
@@ -59,6 +61,7 @@ const IN = {
   CREDITOS_LISTA:    'wecars-creditos-lista',
   CREDITO_RESULTADO: 'wecars-credito-resultado',
   DOC_RESULTADO:     'wecars-doc-resultado',
+  DOC_URL_RESULTADO: 'wecars-doc-url-resultado',
   FOTO_RESULTADO:    'wecars-foto-resultado',
   FOTO_URL_RESULTADO: 'wecars-foto-url-resultado',
   VIDEO_URL_RESULTADO: 'wecars-video-url-resultado',
@@ -107,7 +110,9 @@ $w.onReady(() => {
         case OUT.CREDITOS_LISTAR:   await manejarCreditosListar(msg);       break;
         case OUT.CREDITO_EDITAR:    await manejarCreditoEditar(msg);        break;
         case OUT.ALIADOS_LISTAR:    await manejarAliadosListar(msg);        break;
-        case OUT.DOC_SUBIR:         await manejarDocSubir(msg);             break;
+        case OUT.DOC_SUBIR:          await manejarDocSubir(msg);              break;
+        case OUT.DOC_URL_SOLICITAR:  await manejarDocUrlSolicitar(msg);      break;
+        case OUT.DOC_URL_CONFIRMAR:  await manejarDocUrlConfirmar(msg);      break;
         case OUT.GENERAR_TOKEN:     await manejarGenerarToken(msg);         break;
         case OUT.FOTO_SUBIR:           await manejarFotoSubir(msg);             break;
         case OUT.FOTO_URL_SOLICITAR:   await manejarFotoUrlSolicitar(msg);     break;
@@ -352,6 +357,33 @@ async function manejarGenerarToken(msg) {
     r.link = `${siteOrigin}/solicitud-credito?t=${r.token}`;
   }
   enviar(IN.TOKEN_GENERADO, r);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  DOC_URL_SOLICITAR / DOC_URL_CONFIRMAR — subida directa de documentos
+// ════════════════════════════════════════════════════════════════════════
+async function manejarDocUrlSolicitar(msg) {
+  const r = await obtenerUrlSubidaDoc({
+    entidadId:   msg.entidadId   || '',
+    entidadTipo: msg.entidadTipo || 'auto',
+    tipo:        msg.tipo        || 'otro',
+    fileName:    msg.fileName    || `doc_${Date.now()}.pdf`,
+    mimeType:    msg.mimeType    || 'application/pdf',
+  });
+  enviar(IN.DOC_URL_RESULTADO, { ...r, tipo: msg.tipo, entidadId: msg.entidadId, entidadTipo: msg.entidadTipo, fileName: msg.fileName });
+}
+
+async function manejarDocUrlConfirmar(msg) {
+  const r = await confirmarDocSubida({
+    entidadId:   msg.entidadId   || '',
+    entidadTipo: msg.entidadTipo || 'auto',
+    tipo:        msg.tipo        || 'otro',
+    fileName:    msg.fileName    || '',
+    mimeType:    msg.mimeType    || '',
+    url:         msg.url         || '',
+    vendedorId:  msg.vendedorId  || '',
+  });
+  enviar(IN.DOC_RESULTADO, r);
 }
 
 // ════════════════════════════════════════════════════════════════════════

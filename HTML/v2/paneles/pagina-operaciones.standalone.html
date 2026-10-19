@@ -2132,6 +2132,8 @@ const WC = {
     CREDITOS_LISTAR:  'wecars-creditos-listar',
     CREDITO_EDITAR:   'wecars-credito-editar',
     DOC_SUBIR:        'wecars-doc-subir',
+    DOC_URL_SOLICITAR:'wecars-doc-url-solicitar',
+    DOC_URL_CONFIRMAR:'wecars-doc-url-confirmar',
     FOTO_SUBIR:       'wecars-foto-subir',
     FOTO_URL_SOLICITAR: 'wecars-foto-url-solicitar',
     FOTO_URL_CONFIRMAR: 'wecars-foto-url-confirmar',
@@ -2154,6 +2156,7 @@ const WC = {
     CREDITOS_LISTA:   'wecars-creditos-lista',
     CREDITO_RESULTADO:'wecars-credito-resultado',
     DOC_RESULTADO:    'wecars-doc-resultado',
+    DOC_URL_RESULTADO:'wecars-doc-url-resultado',
     FOTO_RESULTADO:   'wecars-foto-resultado',
     FOTO_URL_RESULTADO: 'wecars-foto-url-resultado',
     VIDEO_URL_RESULTADO: 'wecars-video-url-resultado',
@@ -2208,6 +2211,7 @@ let _filtroEstado = null;
 let _tipoSeleccionado = 'Propio';
 let _editandoCarId    = null;
 let _fotosPendientes  = {}; // idx → { file, slot, gridId, idx } — for direct upload
+let _docsPendientes   = {}; // tipo → { file, row } — for direct doc upload
 
 /* ════════════════════════════════════════════════════════
    RESIZE OBSERVER (scroll único con Wix)
@@ -2424,7 +2428,60 @@ WC.onMany({
       _opDocsArr.push(d.doc);
       if (_opCliActual) opRenderDocs(_opCliActual._id);
     }
+    // Update doc-row UI if came from vehicle expediente
+    if (d.tipo) {
+      const rows = document.querySelectorAll('.doc-row');
+      rows.forEach(row => {
+        if (row.dataset.tipo === d.tipo) {
+          const sub = row.querySelector('.doc-sub');
+          if (sub) sub.innerHTML = `<a href="${d.url}" target="_blank" style="color:var(--wc-accent)">Ver documento</a>`;
+          const btn = row.querySelector('.doc-btn');
+          if (btn) btn.textContent = 'Reemplazar';
+        }
+      });
+    }
     Toast.show('Documento subido ✓', 'ok');
+  },
+
+  [WC.IN.DOC_URL_RESULTADO]: async (d) => {
+    const pending = _docsPendientes[d.tipo || ''];
+    if (!pending) return;
+    delete _docsPendientes[d.tipo];
+    const { file, row } = pending;
+    if (!d.ok || !d.uploadUrl) {
+      Toast.show('Error al preparar subida: ' + (d.error||''), 'error');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('upload_token', d.uploadToken || '');
+    formData.append('file', file, file.name);
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        Toast.show(`Subiendo documento… ${pct}%`, '');
+      }
+    };
+    xhr.onload = () => {
+      try {
+        const res = JSON.parse(xhr.responseText);
+        const url = (Array.isArray(res) ? res[0]?.file_url || res[0]?.fileUrl : res.file_url || res.fileUrl) || '';
+        if (!url) throw new Error('Sin URL en respuesta');
+        WC.send(WC.OUT.DOC_URL_CONFIRMAR, {
+          entidadId:   d.entidadId   || _editandoCarId || '',
+          entidadTipo: d.entidadTipo || 'auto',
+          tipo:        d.tipo        || '',
+          fileName:    d.fileName    || file.name,
+          mimeType:    file.type     || 'application/pdf',
+          url,
+        });
+      } catch (err) {
+        Toast.show('Error procesando respuesta del documento', 'error');
+      }
+    };
+    xhr.onerror = () => { Toast.show('Error de red al subir documento', 'error'); };
+    xhr.open('POST', d.uploadUrl);
+    xhr.send(formData);
   },
 
   [WC.IN.CREDITOS_LISTA]: (d) => {
@@ -4147,14 +4204,14 @@ function _buildFormVehiculo(tipo, car) {
     </div>
     <div class="form-section-body">
       ${DOCS_VEHICULO.map((d,i) => `
-        <div class="doc-row">
+        <div class="doc-row" data-tipo="${esc(d)}">
           <div class="doc-icon"><i class="ti ti-file-text"></i></div>
           <div class="doc-body">
             <div class="doc-name">${esc(d)}</div>
             <div class="doc-sub">Sin subir</div>
           </div>
           <div class="doc-actions">
-            <button class="doc-btn" onclick="_subirDoc('${esc(d)}',${i})">
+            <button class="doc-btn" onclick="_subirDoc('${esc(d)}',${i},this.closest('.doc-row'))">
               <i class="ti ti-upload" style="font-size:12px"></i> Subir
             </button>
           </div>
@@ -4434,8 +4491,26 @@ function _borrarVideo() {
   }
   if (hidden) hidden.value = '';
 }
-function _subirDoc(nombre, idx) {
-  Toast.show('Subida de documentos disponible próximamente', '');
+function _subirDoc(nombre, idx, rowEl) {
+  const inp = document.createElement('input');
+  inp.type   = 'file';
+  inp.accept = 'application/pdf,image/jpeg,image/png,image/webp';
+  inp.onchange = () => {
+    const file = inp.files[0];
+    if (!file) return;
+    const row = rowEl instanceof Element ? rowEl
+      : document.querySelector(`.doc-row[data-tipo="${CSS.escape(nombre)}"]`);
+    _docsPendientes[nombre] = { file, row };
+    WC.send(WC.OUT.DOC_URL_SOLICITAR, {
+      entidadId:   _editandoCarId || '',
+      entidadTipo: 'auto',
+      tipo:        nombre,
+      fileName:    file.name,
+      mimeType:    file.type || 'application/pdf',
+    });
+    Toast.show('Preparando subida...', '');
+  };
+  inp.click();
 }
 
 /* ════════════════════════════════════════════════════════
