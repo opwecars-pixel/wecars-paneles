@@ -731,7 +731,7 @@ body {
           : '<div class="rr-ac-body"><div class="rr-ac-label">' + _e(lbl) + '</div></div>';
         return '<div class="rr-ac-item" data-val="' + _e(val) + '" data-lbl="' + _e(lbl) + '">' + inner + '</div>';
       }).join('');
-      drop.style.display = '';
+      drop.style.display = 'block';
       drop.querySelectorAll('.rr-ac-item').forEach(function (el) {
         el.addEventListener('mousedown', function (ev) {
           ev.preventDefault();
@@ -758,7 +758,7 @@ body {
         drop.innerHTML = '<div class="rr-ac-empty">' +
           (cfg.allowFree ? 'No encontrado — se guardará como texto libre.' : 'No encontrado. Verifica tu nombre.') +
           '</div>';
-        drop.style.display = '';
+        drop.style.display = 'block';
         if (cfg.allowFree) setHint('Se guardará como texto libre', 'warn');
         notificarAltura();
       }
