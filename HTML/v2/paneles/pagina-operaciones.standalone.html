@@ -2133,6 +2133,8 @@ const WC = {
     CREDITO_EDITAR:   'wecars-credito-editar',
     DOC_SUBIR:        'wecars-doc-subir',
     FOTO_SUBIR:       'wecars-foto-subir',
+    FOTO_URL_SOLICITAR: 'wecars-foto-url-solicitar',
+    FOTO_URL_CONFIRMAR: 'wecars-foto-url-confirmar',
     VIDEO_URL_SOLICITAR: 'wecars-video-url-solicitar',
     CONSIGNA_CREAR:   'wecars-consigna-crear',
     ALIADO_CREAR:     'wecars-aliado-crear',
@@ -2153,6 +2155,7 @@ const WC = {
     CREDITO_RESULTADO:'wecars-credito-resultado',
     DOC_RESULTADO:    'wecars-doc-resultado',
     FOTO_RESULTADO:   'wecars-foto-resultado',
+    FOTO_URL_RESULTADO: 'wecars-foto-url-resultado',
     VIDEO_URL_RESULTADO: 'wecars-video-url-resultado',
     ALIADOS_LISTA:    'wecars-aliados-lista',
     CONSIGNA_RESULTADO:'wecars-consigna-resultado',
@@ -2204,6 +2207,7 @@ let _filtroTipo   = 'todos';
 let _filtroEstado = null;
 let _tipoSeleccionado = 'Propio';
 let _editandoCarId    = null;
+let _fotosPendientes  = {}; // idx → { file, slot, gridId, idx } — for direct upload
 
 /* ════════════════════════════════════════════════════════
    RESIZE OBSERVER (scroll único con Wix)
@@ -2507,6 +2511,55 @@ WC.onMany({
       if (prog) prog.style.display = 'none';
       if (slot) slot.style.opacity = '1';
       Toast.show('Error de red al subir video', 'error');
+    };
+    xhr.open('POST', d.uploadUrl);
+    xhr.send(formData);
+  },
+
+  [WC.IN.FOTO_URL_RESULTADO]: async (d) => {
+    const pending = _fotosPendientes[d.idx];
+    if (!pending) return;
+    delete _fotosPendientes[d.idx];
+    const { file, slot } = pending;
+    if (!d.ok || !d.uploadUrl) {
+      Toast.show('Error al preparar subida de foto: ' + (d.error||''), 'error');
+      if (slot) slot.style.opacity = '1';
+      return;
+    }
+    const formData = new FormData();
+    formData.append('upload_token', d.uploadToken || '');
+    formData.append('file', file, file.name);
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        Toast.show(`Subiendo foto… ${pct}%`, '');
+      }
+    };
+    xhr.onload = () => {
+      try {
+        const res = JSON.parse(xhr.responseText);
+        const url = (Array.isArray(res) ? res[0]?.file_url || res[0]?.fileUrl : res.file_url || res.fileUrl) || '';
+        if (!url) throw new Error('Sin URL en respuesta');
+        // Notify Velo to save the URL in Cars CMS
+        WC.send(WC.OUT.FOTO_URL_CONFIRMAR, {
+          carId:  d.carId || _editandoCarId || '',
+          idx:    d.idx,
+          gridId: d.gridId,
+          url,
+        });
+        // Update UI immediately
+        const fakeResult = { ok: true, url, idx: d.idx };
+        WC.onMany({}); // no-op; trigger via direct dispatch
+        window.dispatchEvent(new MessageEvent('message', { data: { type: WC.IN.FOTO_RESULTADO, ...fakeResult } }));
+      } catch (err) {
+        if (slot) slot.style.opacity = '1';
+        Toast.show('Error procesando respuesta de foto', 'error');
+      }
+    };
+    xhr.onerror = () => {
+      if (slot) slot.style.opacity = '1';
+      Toast.show('Error de red al subir foto', 'error');
     };
     xhr.open('POST', d.uploadUrl);
     xhr.send(formData);
@@ -4320,36 +4373,20 @@ function _selFoto(gridId, idx) {
     // Convert to JPEG via canvas to avoid WebP/format issues with Wix Media Manager
     const imgEl = new Image();
     const objectUrl = URL.createObjectURL(file);
-    imgEl.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      const canvas = document.createElement('canvas');
-      // Cap at 1600px max to stay under Wix postMessage ~1MB limit
-      const MAX = 1600;
-      let w = imgEl.naturalWidth, h = imgEl.naturalHeight;
-      if (w > MAX || h > MAX) {
-        if (w >= h) { h = Math.round(h * MAX / w); w = MAX; }
-        else        { w = Math.round(w * MAX / h); h = MAX; }
-      }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(imgEl, 0, 0, w, h);
-      const idxEncoded = gridId === 'main' ? 0 : gridId === 'gal' ? 100 + idx : 200 + idx;
-      const base64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
-      WC.send(WC.OUT.FOTO_SUBIR, {
-        idx:    idxEncoded,
-        gridId,
-        nombre: file.name.replace(/\.\w+$/, '.jpg'),
-        tipo:   'image/jpeg',
-        base64,
-        carId:  _editandoCarId || '',
-      });
-    };
-    imgEl.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      Toast.show('No se pudo leer la imagen', 'error');
-      if (slot) slot.style.opacity = '';
-    };
-    imgEl.src = objectUrl;
-    Toast.show('Subiendo foto...', '');
+    // Direct upload: request a signed URL from Wix, then PUT the file straight
+    // to Wix Media — no base64, no postMessage size limit, full original quality.
+    const idxEncoded = gridId === 'main' ? 0 : gridId === 'gal' ? 100 + idx : 200 + idx;
+    URL.revokeObjectURL(URL.createObjectURL(file)); // not needed, clean up
+    WC.send(WC.OUT.FOTO_URL_SOLICITAR, {
+      carId:    _editandoCarId || '',
+      idx:      idxEncoded,
+      gridId,
+      fileName: file.name,
+      mimeType: file.type || 'image/jpeg',
+    });
+    // Store file reference so we can upload when the URL arrives
+    _fotosPendientes[idxEncoded] = { file, slot, gridId, idx };
+    Toast.show('Preparando subida...', '');
   };
   inp.click();
 }

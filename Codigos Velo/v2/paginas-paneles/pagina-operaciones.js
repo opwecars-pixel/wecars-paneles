@@ -14,8 +14,10 @@
 
 import wixData from 'wix-data';
 import wixUsers from 'wix-users';
+import wixLocation from 'wix-location';
 import { obtenerTodosLosLeads, obtenerTodosLosCars, obtenerTodosLosUsuarios, crearCar, editarCar, obtenerCar, crearLead, editarLead } from 'backend/operaciones-data';
-import { subirFotoVehiculo, obtenerUrlSubidaVideo } from 'backend/media-upload';
+import { subirFotoVehiculo, obtenerUrlSubidaFoto, confirmarFotoSubida, obtenerUrlSubidaVideo, subirDocumento } from 'backend/media-upload';
+import { generarTokenCredito } from 'backend/credito-publico.jsw';
 
 const HTML_ID = '#htmlOperaciones';
 
@@ -37,8 +39,11 @@ const OUT = {
   CREDITO_EDITAR:    'wecars-credito-editar',
   DOC_SUBIR:         'wecars-doc-subir',
   FOTO_SUBIR:        'wecars-foto-subir',
+  FOTO_URL_SOLICITAR: 'wecars-foto-url-solicitar',
+  FOTO_URL_CONFIRMAR: 'wecars-foto-url-confirmar',
   VIDEO_URL_SOLICITAR: 'wecars-video-url-solicitar',
   ALIADOS_LISTAR:    'wecars-aliados-listar',
+  GENERAR_TOKEN:     'wecars-generar-token',
 };
 
 const IN = {
@@ -55,8 +60,10 @@ const IN = {
   CREDITO_RESULTADO: 'wecars-credito-resultado',
   DOC_RESULTADO:     'wecars-doc-resultado',
   FOTO_RESULTADO:    'wecars-foto-resultado',
+  FOTO_URL_RESULTADO: 'wecars-foto-url-resultado',
   VIDEO_URL_RESULTADO: 'wecars-video-url-resultado',
   ALIADOS_LISTA:     'wecars-aliados-lista',
+  TOKEN_GENERADO:    'wecars-token-generado',
 };
 
 let _htmlComp = null;
@@ -100,8 +107,12 @@ $w.onReady(() => {
         case OUT.CREDITOS_LISTAR:   await manejarCreditosListar(msg);       break;
         case OUT.CREDITO_EDITAR:    await manejarCreditoEditar(msg);        break;
         case OUT.ALIADOS_LISTAR:    await manejarAliadosListar(msg);        break;
-        case OUT.FOTO_SUBIR:        await manejarFotoSubir(msg);            break;
-        case OUT.VIDEO_URL_SOLICITAR: await manejarVideoUrlSolicitar(msg); break;
+        case OUT.DOC_SUBIR:         await manejarDocSubir(msg);             break;
+        case OUT.GENERAR_TOKEN:     await manejarGenerarToken(msg);         break;
+        case OUT.FOTO_SUBIR:           await manejarFotoSubir(msg);             break;
+        case OUT.FOTO_URL_SOLICITAR:   await manejarFotoUrlSolicitar(msg);     break;
+        case OUT.FOTO_URL_CONFIRMAR:   await manejarFotoUrlConfirmar(msg);     break;
+        case OUT.VIDEO_URL_SOLICITAR:  await manejarVideoUrlSolicitar(msg);    break;
         default: break;
       }
     } catch (err) {
@@ -138,11 +149,14 @@ async function manejarReady() {
     }
   } catch (_) {}
 
+  let siteOrigin = 'https://www.wecarsbajio.com';
+  try { const u = new URL(wixLocation.url); siteOrigin = u.origin; } catch (_) {}
   enviar(IN.CONTEXTO, {
     usuario:   nombre,
     email,
     rol,
     sucursal,
+    siteUrl: siteOrigin,
     permisos: {
       verTodos:      true,
       editarLeads:   true,
@@ -313,7 +327,82 @@ async function manejarCreditoEditar(msg) {
 }
 
 // ════════════════════════════════════════════════════════════════════════
-//  13. FOTO_SUBIR — sube foto a Wix Media via backend
+//  13. GENERAR_TOKEN — genera token seguro de crédito y devuelve link completo
+// ════════════════════════════════════════════════════════════════════════
+async function manejarGenerarToken(msg) {
+  if (!msg.leadId || !msg.vendedorId) {
+    enviar(IN.TOKEN_GENERADO, { ok: false, error: 'Faltan datos del lead o vendedor' });
+    return;
+  }
+  const r = await generarTokenCredito({
+    leadId:        msg.leadId,
+    vendedorId:    msg.vendedorId,
+    leadNombre:    msg.leadNombre    || '',
+    autoInteres:   msg.autoInteres   || '',
+    precioRef:     msg.precioRef     || 0,
+    autoInteresId: msg.autoInteresId || '',
+  });
+  if (r.ok) {
+    // wixLocation.url da la URL completa de la página actual, de la que extraemos el origen
+    let siteOrigin = 'https://www.wecarsbajio.com';
+    try {
+      const u = new URL(wixLocation.url);
+      siteOrigin = u.origin;
+    } catch (_) {}
+    r.link = `${siteOrigin}/solicitud-credito?t=${r.token}`;
+  }
+  enviar(IN.TOKEN_GENERADO, r);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  14. DOC_SUBIR — sube documento de cliente/vehículo via backend
+// ════════════════════════════════════════════════════════════════════════
+async function manejarDocSubir(msg) {
+  if (!msg.base64) {
+    enviar(IN.DOC_RESULTADO, { ok: false, error: 'Sin datos', tipo: msg.tipo || '' });
+    return;
+  }
+  const r = await subirDocumento({
+    entidadId:   msg.entidadId   || '',
+    entidadTipo: msg.entidadTipo || 'lead',
+    tipo:        msg.tipo        || 'otro',
+    base64:      msg.base64,
+    fileName:    msg.fileName    || `doc_${Date.now()}.pdf`,
+    mimeType:    msg.mimeType    || 'application/pdf',
+    vendedorId:  msg.vendedorId  || '',
+  });
+  enviar(IN.DOC_RESULTADO, r);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  14. FOTO_URL_SOLICITAR / FOTO_URL_CONFIRMAR — subida directa al browser
+// ════════════════════════════════════════════════════════════════════════
+async function manejarFotoUrlSolicitar(msg) {
+  const r = await obtenerUrlSubidaFoto({
+    carId:    msg.carId    || '',
+    idx:      msg.idx      || 0,
+    gridId:   msg.gridId   || '',
+    fileName: msg.fileName || `foto_${Date.now()}.jpg`,
+    mimeType: msg.mimeType || 'image/jpeg',
+  });
+  enviar(IN.FOTO_URL_RESULTADO, r);
+}
+
+async function manejarFotoUrlConfirmar(msg) {
+  const r = await confirmarFotoSubida({
+    carId:  msg.carId  || '',
+    idx:    msg.idx    || 0,
+    gridId: msg.gridId || '',
+    url:    msg.url    || '',
+  });
+  enviar(IN.FOTO_RESULTADO, { ...r, idx: msg.idx });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  14b. FOTO_SUBIR — legacy base64 path (fallback)
+// ════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════
+//  14. FOTO_SUBIR — sube foto a Wix Media via backend
 // ════════════════════════════════════════════════════════════════════════
 async function manejarFotoSubir(msg) {
   if (!msg.base64) {

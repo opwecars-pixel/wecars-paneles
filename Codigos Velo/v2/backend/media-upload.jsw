@@ -124,6 +124,66 @@ export async function subirFotoVehiculo({ carId, idx, base64, nombre, tipo }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════
+//  obtenerUrlSubidaFoto
+//  Devuelve URL firmada para subida directa desde el browser.
+//  Evita el límite de postMessage (~1MB) al no pasar el binario por Velo.
+// ════════════════════════════════════════════════════════════════════════
+export async function obtenerUrlSubidaFoto({ carId, idx, gridId, fileName, mimeType }) {
+  try {
+    const { uploadUrl, uploadToken } = await mediaManager.getUploadUrl(
+      '/wecars-inventario',
+      {
+        fileName:  fileName || `foto_${Date.now()}.jpg`,
+        mimeType:  mimeType || 'image/jpeg',
+        mediaType: 'image',
+      }
+    );
+    return { ok: true, uploadUrl, uploadToken, carId, idx, gridId };
+  } catch (err) {
+    console.error('[media-upload] obtenerUrlSubidaFoto:', err.message);
+    return { ok: false, error: err.message, carId, idx };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  confirmarFotoSubida
+//  Recibe la URL final de Wix Media y la guarda en el CMS de Cars.
+// ════════════════════════════════════════════════════════════════════════
+export async function confirmarFotoSubida({ carId, idx, gridId, url }) {
+  if (!carId || !url) return { ok: true }; // noop if no car yet
+  try {
+    const car = await wixData.get('Cars', carId, { suppressAuth: true });
+    if (!car) return { ok: false, error: 'Auto no encontrado' };
+
+    // Determine which array to update
+    // idx encoding: main=0, gal=100+n, int=200+n
+    let fotos    = Array.isArray(car.fotos)     ? [...car.fotos]     : [];
+    let fotosInt = Array.isArray(car.fotosInt)  ? [...car.fotosInt]  : [];
+
+    if (idx === 0 || gridId === 'main') {
+      car.fotoPrincipal = url;
+      if (!fotos[0]) fotos[0] = url; else fotos[0] = url;
+    } else if (idx >= 200 || gridId === 'int') {
+      const i = idx >= 200 ? idx - 200 : idx;
+      fotosInt[i] = url;
+    } else {
+      const i = idx >= 100 ? idx - 100 : idx;
+      fotos[i] = url;
+    }
+
+    car.fotos    = fotos.filter(Boolean);
+    car.fotosInt = fotosInt.filter(Boolean);
+    if (idx === 0 || gridId === 'main') car.fotoPrincipal = url;
+
+    await wixData.update('Cars', car, { suppressAuth: true });
+    return { ok: true, url, idx };
+  } catch (err) {
+    console.error('[media-upload] confirmarFotoSubida:', err.message);
+    return { ok: false, error: err.message };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
 //  obtenerUrlSubidaVideo
 //  Devuelve una URL firmada para que el browser suba el video directo a
 //  Wix Media (evita pasar el archivo por postMessage/base64).
