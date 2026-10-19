@@ -85,7 +85,8 @@ img{max-width:100%;display:block}
 .topbar-btn.primary:hover{background:var(--wc-green-dark)}
 
 /* ── Content padding ─────────────────────────────────── */
-.view-wrap{padding:16px}
+.view-wrap{padding:20px 24px}
+@media(max-width:768px){.view-wrap{padding:14px 16px}}
 
 /* ── Bottom nav (mobile) ─────────────────────────────── */
 .bottom-nav{
@@ -186,7 +187,7 @@ img{max-width:100%;display:block}
 /* ════════════════════════════════════════════════════════
    VEHICLE CARD — grid de fotos
 ════════════════════════════════════════════════════════ */
-#inv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;padding:4px 0}
+#inv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;padding:6px 0}
 .vehicle-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
   cursor:pointer;transition:box-shadow .18s,transform .18s;overflow:hidden;display:flex;flex-direction:column}
 .vehicle-card:hover{box-shadow:var(--wc-shadow-md);transform:translateY(-2px)}
@@ -732,20 +733,39 @@ img{max-width:100%;display:block}
           <input type="search" id="inv-search" placeholder="Buscar marca, modelo, VIN, placas..." oninput="filtrarInventario()">
         </div>
       </div>
-      <div class="filter-bar">
-        <button class="filter-chip active" onclick="setFiltroTipo('todos',this)">Todos</button>
-        <button class="filter-chip" onclick="setFiltroTipo('Propio',this)">
+      <!-- Fila 1: Tipo de adquisición -->
+      <div class="filter-bar" id="inv-filter-tipo">
+        <span style="font-size:10px;font-weight:700;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px;padding:0 2px;align-self:center">Tipo</span>
+        <button class="filter-chip active" id="fchip-todos"    onclick="setFiltroTipo('todos',this)">Todos</button>
+        <button class="filter-chip"        id="fchip-propio"   onclick="setFiltroTipo('propio',this)">
           <i class="ti ti-building-store" style="font-size:12px"></i> Propio
         </button>
-        <button class="filter-chip" onclick="setFiltroTipo('Aliado',this)">
+        <button class="filter-chip"        id="fchip-aliado"   onclick="setFiltroTipo('aliado',this)">
           <i class="ti ti-handshake" style="font-size:12px"></i> Aliado
         </button>
-        <button class="filter-chip" onclick="setFiltroTipo('Consigna',this)">
+        <button class="filter-chip"        id="fchip-consigna" onclick="setFiltroTipo('consigna',this)">
           <i class="ti ti-user-check" style="font-size:12px"></i> Consigna
         </button>
-        <button class="filter-chip" onclick="setFiltroEstado('Disponible',this)">Disponibles</button>
-        <button class="filter-chip" onclick="setFiltroEstado('En preparación',this)">En prep.</button>
-        <button class="filter-chip filter-chip-archive" id="btn-ver-archivados" onclick="toggleVerArchivados(this)">
+      </div>
+      <!-- Fila 2: Estado del vehículo -->
+      <div class="filter-bar" id="inv-filter-estado" style="margin-top:6px">
+        <span style="font-size:10px;font-weight:700;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px;padding:0 2px;align-self:center">Estado</span>
+        <button class="filter-chip" id="fchip-disp"  onclick="setFiltroEstado('Disponible',this)">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--wc-green);display:inline-block"></span> Disponible
+        </button>
+        <button class="filter-chip" id="fchip-prep"  onclick="setFiltroEstado('En preparación',this)">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--wc-warn);display:inline-block"></span> En prep.
+        </button>
+        <button class="filter-chip" id="fchip-apart" onclick="setFiltroEstado('Apartado',this)">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--wc-orange,#f59e0b);display:inline-block"></span> Apartado
+        </button>
+        <button class="filter-chip" id="fchip-vend"  onclick="setFiltroEstado('Vendido',this)">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--wc-ink3);display:inline-block"></span> Vendido
+        </button>
+        <button class="filter-chip" id="fchip-entreg" onclick="setFiltroEstado('Entregado',this)">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--wc-ink3);display:inline-block"></span> Entregado
+        </button>
+        <button class="filter-chip filter-chip-archive" id="btn-ver-archivados" onclick="toggleVerArchivados(this)" style="margin-left:auto">
           <i class="ti ti-archive" style="font-size:12px"></i> Archivados
           <span id="badge-archivados" style="display:none;background:var(--wc-danger);color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:1px 6px;margin-left:2px">0</span>
         </button>
@@ -2639,28 +2659,37 @@ function cambiarEstatusRapido(id, nuevoEstatus, menu) {
   Toast.show(`Estatus → ${nuevoEstatus} ✓`, 'ok');
 }
 
+function _resetTipoChips() {
+  document.querySelectorAll('#inv-filter-tipo .filter-chip').forEach(b => b.classList.remove('active'));
+  document.getElementById('fchip-todos')?.classList.add('active');
+}
+function _resetEstadoChips() {
+  document.querySelectorAll('#inv-filter-estado .filter-chip').forEach(b => b.classList.remove('active'));
+}
+
 function setFiltroTipo(tipo, btn) {
-  // Toggle: si ya está activo, vuelve a Todos
   if (_filtroTipo === tipo && tipo !== 'todos') {
     _filtroTipo = 'todos';
-    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-    document.querySelector('.filter-chip')?.classList.add('active'); // el primero = Todos
+    _resetTipoChips();
   } else {
-    _filtroTipo   = tipo;
+    _filtroTipo   = tipo.toLowerCase();
     _filtroEstado = null;
-    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    _resetTipoChips();
+    _resetEstadoChips();
+    if (tipo !== 'todos') { document.getElementById('fchip-todos')?.classList.remove('active'); btn.classList.add('active'); }
   }
   renderInventario();
 }
 function setFiltroEstado(estado, btn) {
-  _filtroEstado = _filtroEstado === estado ? null : estado;
-  _filtroTipo   = 'todos';
-  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-  if (_filtroEstado) {
-    btn.classList.add('active');
+  if (_filtroEstado === estado) {
+    _filtroEstado = null;
+    _resetEstadoChips();
   } else {
-    document.querySelector('.filter-chip')?.classList.add('active'); // vuelve a Todos
+    _filtroEstado = estado;
+    _filtroTipo   = 'todos';
+    _resetTipoChips();
+    _resetEstadoChips();
+    btn.classList.add('active');
   }
   renderInventario();
 }
