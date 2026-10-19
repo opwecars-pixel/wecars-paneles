@@ -53,10 +53,15 @@ function _enviarVendedores() {
     .then(function (r) {
       const vendedores = r.items
         .map(function (u) {
+          const fotoRaw = u.foto || u.avatar || u.profilePicture || u.picture || '';
+          const foto = typeof fotoRaw === 'object'
+            ? (fotoRaw.src || fotoRaw.url || '')
+            : String(fotoRaw || '');
           return {
             nombre: u.nombre || u.title || u._id,
             email:  u.email  || u.loginEmail || '',
             puesto: u.puesto || u.rol || '',
+            foto:   foto,
           };
         })
         .filter(function (v) { return v.nombre; })
@@ -84,8 +89,11 @@ function _enviarAutos() {
         const marca = c.marca || c.brand || '';
         const nombre= c.nombre || c.title || '';
         const label = [marca, nombre, año].filter(Boolean).join(' ').trim();
-        // Primera foto del array o campo foto directo
-        const foto  = (c.fotos && c.fotos[0]) || c.foto || c.imagen || c.image || '';
+        // Wix puede guardar imágenes como objeto {src,url} o como string
+        const fotoRaw = (c.fotos && c.fotos[0]) || c.foto || c.imagen || c.image || '';
+        const foto = typeof fotoRaw === 'object'
+          ? (fotoRaw.src || fotoRaw.url || '')
+          : String(fotoRaw || '');
         return { _id: c._id, label: label, marca: marca, año: String(año), foto: foto };
       }).filter(function (a) { return a.label; });
       $w(HTML_ID).postMessage({ type: 'wecars-rr-autos', autos: autos });

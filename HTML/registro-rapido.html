@@ -749,7 +749,7 @@ body {
     function filterAndShow() {
       var q     = inp.value.trim().toLowerCase();
       var items = cfg.getItems();
-      if (!q) { items.length ? showDrop(items.slice(0, 9)) : hideDrop(); return; }
+      if (!q) { hideDrop(); return; }   // no mostrar nada hasta que escriban
       var filtered = items.filter(function (it) {
         return cfg.labelFn(it).toLowerCase().indexOf(q) >= 0;
       });
@@ -764,7 +764,6 @@ body {
       }
     }
 
-    inp.addEventListener('focus', filterAndShow);
     inp.addEventListener('input', function () {
       selVal = ''; selLbl = '';
       if (hid) hid.value = '';
@@ -795,7 +794,10 @@ body {
     allowFree: false,
     renderItem: function (v) {
       var ini = (v.nombre||'V').split(' ').map(function(p){return p[0]||'';}).join('').slice(0,2).toUpperCase();
-      return '<div class="rr-ac-avatar">' + _e(ini) + '</div>' +
+      var left = v.foto
+        ? '<img class="rr-ac-img" style="border-radius:50%;width:36px;height:36px" src="' + _e(v.foto) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">'
+        : '<div class="rr-ac-avatar">' + _e(ini) + '</div>';
+      return left +
              '<div class="rr-ac-body">' +
                '<div class="rr-ac-label">' + _e(v.nombre) + '</div>' +
                (v.puesto ? '<div class="rr-ac-sub">' + _e(v.puesto) + '</div>' : '') +
