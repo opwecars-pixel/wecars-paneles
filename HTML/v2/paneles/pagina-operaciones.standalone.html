@@ -4323,11 +4323,17 @@ function _selFoto(gridId, idx) {
     imgEl.onload = () => {
       URL.revokeObjectURL(objectUrl);
       const canvas = document.createElement('canvas');
-      canvas.width = imgEl.naturalWidth;
-      canvas.height = imgEl.naturalHeight;
-      canvas.getContext('2d').drawImage(imgEl, 0, 0);
+      // Cap at 1600px max to stay under Wix postMessage ~1MB limit
+      const MAX = 1600;
+      let w = imgEl.naturalWidth, h = imgEl.naturalHeight;
+      if (w > MAX || h > MAX) {
+        if (w >= h) { h = Math.round(h * MAX / w); w = MAX; }
+        else        { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(imgEl, 0, 0, w, h);
       const idxEncoded = gridId === 'main' ? 0 : gridId === 'gal' ? 100 + idx : 200 + idx;
-      const base64 = canvas.toDataURL('image/jpeg', 0.88).split(',')[1];
+      const base64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
       WC.send(WC.OUT.FOTO_SUBIR, {
         idx:    idxEncoded,
         gridId,
