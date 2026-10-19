@@ -14,7 +14,7 @@
 
 import wixData from 'wix-data';
 import wixUsers from 'wix-users';
-import { obtenerTodosLosLeads, obtenerTodosLosCars, obtenerTodosLosUsuarios, crearCar, editarCar, obtenerCar, editarLead } from 'backend/operaciones-data';
+import { obtenerTodosLosLeads, obtenerTodosLosCars, obtenerTodosLosUsuarios, crearCar, editarCar, obtenerCar, crearLead, editarLead } from 'backend/operaciones-data';
 import { subirFotoVehiculo, obtenerUrlSubidaVideo } from 'backend/media-upload';
 
 const HTML_ID = '#htmlOperaciones';
@@ -31,6 +31,7 @@ const OUT = {
   USUARIO_CREAR:     'wecars-usuario-crear',
   USUARIO_EDITAR:    'wecars-usuario-editar',
   LEADS_LISTAR_TODOS:'wecars-leads-listar-todos',
+  LEAD_CREAR:        'wecars-lead-crear',
   LEAD_EDITAR:       'wecars-lead-editar',
   CREDITOS_LISTAR:   'wecars-creditos-listar',
   CREDITO_EDITAR:    'wecars-credito-editar',
@@ -48,6 +49,7 @@ const IN = {
   USUARIOS_LISTA:    'wecars-usuarios-lista',
   USUARIO_RESULTADO: 'wecars-usuario-resultado',
   LEADS_LISTA:       'wecars-leads-lista',
+  LEAD_CREADO:       'wecars-lead-creado',
   LEAD_RESULTADO:    'wecars-lead-resultado',
   CREDITOS_LISTA:    'wecars-creditos-lista',
   CREDITO_RESULTADO: 'wecars-credito-resultado',
@@ -93,6 +95,7 @@ $w.onReady(() => {
         case OUT.USUARIO_CREAR:     await manejarUsuarioCrear(msg);         break;
         case OUT.USUARIO_EDITAR:    await manejarUsuarioEditar(msg);        break;
         case OUT.LEADS_LISTAR_TODOS:await manejarLeadsListarTodos(msg);     break;
+        case OUT.LEAD_CREAR:        await manejarLeadCrear(msg);            break;
         case OUT.LEAD_EDITAR:       await manejarLeadEditar(msg);           break;
         case OUT.CREDITOS_LISTAR:   await manejarCreditosListar(msg);       break;
         case OUT.CREDITO_EDITAR:    await manejarCreditoEditar(msg);        break;
@@ -192,8 +195,8 @@ async function manejarCarGet(msg) {
 //  6. USUARIOS_LISTAR (via backend para bypass permisos)
 // ════════════════════════════════════════════════════════════════════════
 async function manejarUsuariosListar(msg) {
-  const r = await obtenerTodosLosUsuarios(msg.rol || '');
-  enviar(IN.USUARIOS_LISTA, { items: r.items });
+  const r = await obtenerTodosLosUsuarios(''); // sin filtro: el frontend filtra por rol
+  enviar(IN.USUARIOS_LISTA, r); // incluye ok/error además de items
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -254,6 +257,15 @@ async function manejarUsuarioEditar(msg) {
 // ════════════════════════════════════════════════════════════════════════
 //  9. LEADS_LISTAR_TODOS — todos los leads via backend (bypass permisos Member)
 // ════════════════════════════════════════════════════════════════════════
+async function manejarLeadCrear(msg) {
+  if (!msg.datos) {
+    enviar(IN.LEAD_CREADO, { ok: false, error: 'Sin datos' });
+    return;
+  }
+  const r = await crearLead(msg.datos);
+  enviar(IN.LEAD_CREADO, r);
+}
+
 async function manejarLeadEditar(msg) {
   if (!msg.id || !msg.datos) {
     enviar(IN.LEAD_RESULTADO, { ok: false, error: 'Parámetros faltantes' });
@@ -264,7 +276,7 @@ async function manejarLeadEditar(msg) {
 }
 
 async function manejarLeadsListarTodos(msg) {
-  const r = await obtenerTodosLosLeads(msg.limite || 500);
+  const r = await obtenerTodosLosLeads(msg.limite || 5000);
   enviar(IN.LEADS_LISTA, { items: r.items, total: r.total });
   if (!r.ok) enviarError('Error al cargar clientes', r.error);
 }

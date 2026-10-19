@@ -2250,7 +2250,12 @@ WC.onMany({
   },
 
   [WC.IN.USUARIOS_LISTA]: (d) => {
-    VENDEDORES = (d.items || []).filter(u => u.rol === 'Vendedor' || !u.rol);
+    if (d.ok === false) { ocultarLoading('vend'); Toast.show('Error al cargar vendedores: ' + (d.error||''), 'error'); return; }
+    // Filtro tolerante: sin rol, rol='Vendedor' (cualquier capitalización/espacio)
+    VENDEDORES = (d.items || []).filter(u => {
+      const rol = String(u.rol || '').trim().toLowerCase();
+      return !rol || rol === 'vendedor';
+    });
     ocultarLoading('vend');
     renderVendedores();
     // Si el detalle de cliente está abierto, refrescar el select de asignación
@@ -4209,7 +4214,7 @@ function _confirmarCambioTipo(id, nuevoTipo) {
 ════════════════════════════════════════════════════════ */
 function cargarVendedores() {
   mostrarLoading('vend');
-  WC.send(WC.OUT.USUARIOS_LISTAR, { rol: 'Vendedor' });
+  WC.send(WC.OUT.USUARIOS_LISTAR, {}); // sin filtro de rol: filtramos en frontend para no perder variantes
 }
 
 function renderVendedores() {
@@ -4366,7 +4371,7 @@ function _crearOverlayEditarVend() {
   div.className = 'overlay hidden';
   div.innerHTML = `
   <div class="modal" style="max-width:480px;max-height:90vh;overflow-y:auto">
-    <div class="modal-head">
+    <div class="modal-hdr">
       <h3 class="modal-title"><i class="ti ti-user-edit"></i> Editar vendedor</h3>
       <button class="modal-close" onclick="document.getElementById('overlay-editar-vend').classList.add('hidden')"><i class="ti ti-x"></i></button>
     </div>
@@ -4856,7 +4861,7 @@ function opAbrirDetalle(leadId) {
   _opCliDirty   = false;
   // Cargar actividades desde el campo JSON del lead (o vaciar si es otro cliente)
   if (prevId !== c._id) {
-    try { _opActsLocales = c.actividades ? JSON.parse(c.actividades) : []; }
+    try { const p = c.actividades ? JSON.parse(c.actividades) : []; _opActsLocales = Array.isArray(p) ? p : []; }
     catch(_) { _opActsLocales = []; }
   }
 
@@ -5186,7 +5191,10 @@ function toggleBuenosContactos(btn) {
   _soloContactosBuenos = !_soloContactosBuenos;
   btn.classList.toggle('active', _soloContactosBuenos);
   btn.style.color = _soloContactosBuenos ? 'var(--wc-warn)' : 'var(--wc-ink3)';
-  btn.querySelector('i').style.fill = _soloContactosBuenos ? 'currentColor' : 'none';
+  const icon = btn.querySelector('i');
+  icon.classList.toggle('ti-star', !_soloContactosBuenos);
+  icon.classList.toggle('ti-star-filled', _soloContactosBuenos);
+  btn.setAttribute('aria-pressed', String(_soloContactosBuenos));
   filtrarClientes();
 }
 
@@ -5194,7 +5202,7 @@ function toggleVerArchivadosCli(btn) {
   _verArchivadosCli = !_verArchivadosCli;
   btn.classList.toggle('active', _verArchivadosCli);
   btn.style.color = _verArchivadosCli ? 'var(--wc-accent)' : 'var(--wc-ink3)';
-  filtrarClientes();
+  renderClientes();
 }
 
 function opArchivarCliente() {
@@ -5208,7 +5216,7 @@ function opArchivarCliente() {
     ov.className = 'overlay hidden';
     ov.innerHTML = `
     <div class="modal" style="max-width:400px">
-      <div class="modal-head">
+      <div class="modal-hdr">
         <h3 class="modal-title"><i class="ti ti-archive"></i> Archivar cliente</h3>
         <button class="modal-close" onclick="document.getElementById('overlay-archivar-cli').classList.add('hidden')"><i class="ti ti-x"></i></button>
       </div>
@@ -5275,9 +5283,9 @@ function opConfirmarArchivo() {
   // Respuesta manejada en LEAD_RESULTADO — cerrar overlay y volver a lista
   const ov = document.getElementById('overlay-archivar-cli');
   if (ov) ov.classList.add('hidden');
-  // Actualizar local y volver
-  Object.assign(_opCliActual, datos);
-  CLIENTES = CLIENTES.filter(c => c._id !== _opCliActual._id);
+  // Actualizar local: mantener el registro con estatus archivado (para que el toggle lo muestre)
+  const archivedId = _opCliActual._id;
+  CLIENTES = CLIENTES.map(c => c._id === archivedId ? { ...c, ...datos } : c);
   renderClientes();
   Toast.show('Cliente archivado', 'ok');
   if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-archive"></i>Archivar'; }
@@ -5294,7 +5302,7 @@ function opEliminarCliente() {
     ov.className = 'overlay hidden';
     ov.innerHTML = `
     <div class="modal" style="max-width:380px">
-      <div class="modal-head">
+      <div class="modal-hdr">
         <h3 class="modal-title" style="color:#e53935"><i class="ti ti-trash"></i> Eliminar cliente</h3>
         <button class="modal-close" onclick="document.getElementById('overlay-eliminar-cli').classList.add('hidden')"><i class="ti ti-x"></i></button>
       </div>
