@@ -410,6 +410,54 @@ body {
   .rr-input, .rr-select, .rr-radio-label { min-height: 48px; }
   .rr-submit { min-height: 52px; }
 }
+
+/* ── AUTOCOMPLETE ───────────────────────────────────────────── */
+.rr-ac-wrap { position: relative; }
+.rr-ac-drop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: var(--surface);
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--r-md);
+  box-shadow: 0 4px 20px rgba(0,0,0,.13);
+  z-index: 200;
+  max-height: 220px;
+  overflow-y: auto;
+  display: none;
+  scrollbar-width: thin;
+}
+.rr-ac-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: .9375rem;
+  line-height: 1.35;
+  border-bottom: 1px solid var(--line);
+  transition: background .1s;
+}
+.rr-ac-item:last-child { border-bottom: none; }
+.rr-ac-item:hover, .rr-ac-item.ac-hover {
+  background: var(--lime-bg);
+}
+.rr-ac-sub {
+  font-size: .8125rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.rr-ac-empty {
+  padding: 12px 14px;
+  font-size: .875rem;
+  color: var(--muted);
+  font-style: italic;
+}
+.rr-ac-hint {
+  font-size: .8125rem;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.4;
+}
+.rr-ac-hint.ok   { color: var(--ok); }
+.rr-ac-hint.warn { color: var(--warn); }
 </style>
 </head>
 <body>
@@ -521,14 +569,20 @@ body {
         <label class="rr-label" for="autoInteres">
           Auto de interés <span class="opt">(opcional)</span>
         </label>
-        <input
-          class="rr-input"
-          id="autoInteres"
-          name="autoInteres"
-          type="text"
-          placeholder="Ej. Nissan Versa 2022, SUV familiar…"
-          inputmode="text"
-        >
+        <div class="rr-ac-wrap">
+          <input
+            class="rr-input"
+            id="autoInteres"
+            name="autoInteres"
+            type="text"
+            placeholder="Busca en inventario o escribe libremente…"
+            inputmode="text"
+            autocomplete="off"
+          >
+          <input type="hidden" id="autoInteresId">
+          <div class="rr-ac-drop" id="autoDrop"></div>
+        </div>
+        <p class="rr-ac-hint" id="autoHint"></p>
       </div>
 
       <!-- Crédito o Contado -->
@@ -549,19 +603,19 @@ body {
       <div class="rr-divider"></div>
       <div class="rr-section-label">Vendedor</div>
 
-      <!-- Vendor selector -->
+      <!-- Vendedor autocomplete -->
       <div class="rr-field" id="vendedorField">
         <label class="rr-label" for="vendedor">
           ¿Quién registra este cliente? <span class="req">*</span>
         </label>
-        <div class="rr-vendedor-loading" id="vendedorLoading">
-          <div class="dot-spinner"></div>
-          <span>Cargando vendedores…</span>
+        <div class="rr-ac-wrap">
+          <input class="rr-input" type="text" id="vendedor" name="vendedor"
+            placeholder="Busca tu nombre…" autocomplete="off" required>
+          <input type="hidden" id="vendedorEmail">
+          <div class="rr-ac-drop" id="vendedorDrop"></div>
         </div>
-        <select class="rr-select" id="vendedor" name="vendedor" style="display:none" required>
-          <option value="">Selecciona tu nombre</option>
-        </select>
-        <p class="rr-field-error" id="err-vendedor">Selecciona quién registra el cliente.</p>
+        <p class="rr-ac-hint" id="vendedorHint">Cargando lista de vendedores…</p>
+        <p class="rr-field-error" id="err-vendedor">Selecciona tu nombre de la lista.</p>
       </div>
 
       <!-- Banner de error global -->
@@ -587,9 +641,8 @@ body {
 <script>
 (function () {
   /* ── Estado ─────────────────────────────────────────────── */
-  var vendedores = [];    // [{nombre, email}] recibidos del Velo
-  var iframeReady = false;
-  var pendientePayload = null;
+  var vendedores = [];    // [{nombre, email, puesto}] recibidos del Velo
+  var autos      = [];    // [{_id, label}] recibidos del Velo
 
   /* ── Refs ───────────────────────────────────────────────── */
   var form          = document.getElementById('regForm');
@@ -598,16 +651,129 @@ body {
   var bannerMsg     = document.getElementById('bannerErrorMsg');
   var successScreen = document.getElementById('successScreen');
   var successDetail = document.getElementById('successDetail');
-  var vendedorSel   = document.getElementById('vendedor');
-  var vendedorLoad  = document.getElementById('vendedorLoading');
 
   /* ── postMessage al padre ───────────────────────────────── */
   function enviar(obj) {
     window.parent.postMessage(obj, '*');
   }
 
-  /* ── Solicitar lista de vendedores al cargar ────────────── */
+  /* ── Solicitar listas al cargar ─────────────────────────── */
   enviar({ type: 'wecars-rr-ready' });
+
+  /* ── Autocomplete helper ────────────────────────────────── */
+  function makeAC(cfg) {
+    // cfg: { inputId, hiddenId, dropId, hintId, getItems, labelFn, subFn, valueFn, hintText, allowFree }
+    var inp   = document.getElementById(cfg.inputId);
+    var hid   = cfg.hiddenId ? document.getElementById(cfg.hiddenId) : null;
+    var drop  = document.getElementById(cfg.dropId);
+    var hint  = cfg.hintId   ? document.getElementById(cfg.hintId)  : null;
+    var selVal = '';   // valor (email/id) actualmente seleccionado
+    var selLbl = '';   // label actualmente seleccionado
+
+    function setHint(msg, cls) {
+      if (!hint) return;
+      hint.textContent = msg;
+      hint.className = 'rr-ac-hint' + (cls ? ' ' + cls : '');
+    }
+
+    function showDrop(items) {
+      if (!items.length) { drop.style.display = 'none'; notificarAltura(); return; }
+      drop.innerHTML = items.slice(0, 8).map(function (item) {
+        var lbl = cfg.labelFn(item);
+        var sub = cfg.subFn  ? cfg.subFn(item) : '';
+        var val = cfg.valueFn(item);
+        return '<div class="rr-ac-item" data-val="' + _e(val) + '" data-lbl="' + _e(lbl) + '">' +
+               _e(lbl) + (sub ? '<div class="rr-ac-sub">' + _e(sub) + '</div>' : '') + '</div>';
+      }).join('');
+      drop.style.display = '';
+      drop.querySelectorAll('.rr-ac-item').forEach(function (el) {
+        el.addEventListener('mousedown', function (ev) {
+          ev.preventDefault();
+          selVal = el.dataset.val;
+          selLbl = el.dataset.lbl;
+          inp.value = selLbl;
+          if (hid) hid.value = selVal;
+          drop.style.display = 'none';
+          setHint('✓ Seleccionado del inventario/lista', 'ok');
+          notificarAltura();
+        });
+      });
+      notificarAltura();
+    }
+
+    inp.addEventListener('focus', function () {
+      var items = cfg.getItems();
+      if (!items.length) return;
+      var q = inp.value.trim().toLowerCase();
+      var filtered = q ? items.filter(function(it){ return cfg.labelFn(it).toLowerCase().indexOf(q) >= 0; })
+                       : items.slice(0, 8);
+      showDrop(filtered);
+    });
+
+    inp.addEventListener('input', function () {
+      // Reset selected value when user types
+      selVal = ''; selLbl = '';
+      if (hid) hid.value = '';
+      var q = inp.value.trim().toLowerCase();
+      if (!q) { drop.style.display = 'none'; setHint(cfg.hintText || ''); notificarAltura(); return; }
+      var items = cfg.getItems();
+      var filtered = items.filter(function (it) {
+        return cfg.labelFn(it).toLowerCase().indexOf(q) >= 0;
+      });
+      if (filtered.length) {
+        showDrop(filtered);
+        setHint('');
+      } else {
+        drop.innerHTML = '<div class="rr-ac-empty">No encontrado en inventario. Se guardará como texto libre.</div>';
+        drop.style.display = '';
+        if (cfg.allowFree) setHint('Se guardará como texto libre', 'warn');
+        notificarAltura();
+      }
+    });
+
+    inp.addEventListener('blur', function () {
+      setTimeout(function () { drop.style.display = 'none'; notificarAltura(); }, 150);
+      // Si el campo tiene texto pero no hay selección y no permite libre → warn
+      if (inp.value.trim() && !selVal && !cfg.allowFree) {
+        setHint('No encontrado en la lista. Verifica tu nombre.', 'warn');
+      }
+    });
+
+    return {
+      getValue: function () { return selVal || (cfg.allowFree ? inp.value.trim() : ''); },
+      getLabel: function () { return selLbl || inp.value.trim(); },
+      hasSelection: function () { return !!selVal; },
+    };
+  }
+
+  function _e(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+  /* ── Instanciar ACs (después de que el DOM esté listo) ───── */
+  var acVend = makeAC({
+    inputId:  'vendedor',
+    hiddenId: 'vendedorEmail',
+    dropId:   'vendedorDrop',
+    hintId:   'vendedorHint',
+    getItems: function () { return vendedores; },
+    labelFn:  function (v) { return v.nombre; },
+    subFn:    function (v) { return v.puesto || ''; },
+    valueFn:  function (v) { return v.email; },
+    hintText: 'Selecciona tu nombre de la lista',
+    allowFree: false,
+  });
+
+  var acAuto = makeAC({
+    inputId:  'autoInteres',
+    hiddenId: 'autoInteresId',
+    dropId:   'autoDrop',
+    hintId:   'autoHint',
+    getItems: function () { return autos; },
+    labelFn:  function (a) { return a.label; },
+    subFn:    null,
+    valueFn:  function (a) { return a._id; },
+    hintText: '',
+    allowFree: true,
+  });
 
   /* ── Recibir mensajes del Velo ──────────────────────────── */
   window.addEventListener('message', function (e) {
@@ -616,7 +782,24 @@ body {
 
     if (d.type === 'wecars-rr-vendedores') {
       vendedores = d.vendedores || [];
-      poblarVendedores(vendedores);
+      var hint = document.getElementById('vendedorHint');
+      if (hint) {
+        hint.textContent = vendedores.length
+          ? 'Escribe tu nombre para buscar en la lista (' + vendedores.length + ' usuarios)'
+          : 'No se cargó la lista. Escribe tu nombre completo.';
+        hint.className = 'rr-ac-hint';
+      }
+      notificarAltura();
+    }
+
+    if (d.type === 'wecars-rr-autos') {
+      autos = d.autos || [];
+      var h = document.getElementById('autoHint');
+      if (h && autos.length) {
+        h.textContent = autos.length + ' autos disponibles en inventario';
+        h.className = 'rr-ac-hint';
+      }
+      notificarAltura();
     }
 
     if (d.type === 'wecars-rr-ok') {
@@ -634,24 +817,7 @@ body {
       mostrarError(d.mensaje || 'Ocurrió un error. Intenta de nuevo.');
       setLoading(false);
     }
-
-    if (d.type === 'wecars-resize') {
-      // El Velo puede pedir resize — lo ignoramos en esta dirección
-    }
   });
-
-  /* ── Poblar select de vendedores ────────────────────────── */
-  function poblarVendedores(lista) {
-    vendedorLoad.style.display = 'none';
-    vendedorSel.style.display  = '';
-    lista.forEach(function (v) {
-      var opt = document.createElement('option');
-      opt.value = v.email;
-      opt.textContent = v.nombre;
-      vendedorSel.appendChild(opt);
-    });
-    notificarAltura();
-  }
 
   /* ── Notificar altura al padre ──────────────────────────── */
   function notificarAltura() {
@@ -692,8 +858,13 @@ body {
     var tel = document.getElementById('telefono').value.replace(/\D/g, '');
     if (tel.length < 10) { mostrarFieldError('telefono', 'err-telefono'); ok = false; }
 
-    var vend = vendedorSel.value;
-    if (!vend) { document.getElementById('err-vendedor').classList.add('show'); ok = false; }
+    var vend = document.getElementById('vendedor').value.trim();
+    if (!vend) {
+      var errVend = document.getElementById('err-vendedor');
+      if (errVend) errVend.classList.add('show');
+      document.getElementById('vendedor').classList.add('error');
+      ok = false;
+    }
 
     return ok;
   }
@@ -764,13 +935,9 @@ body {
     limpiarErrores();
     form.style.display = '';
     successScreen.classList.remove('show');
-    // Re-agregar opción default si se perdió
-    if (!vendedorSel.querySelector('option[value=""]')) {
-      var opt = document.createElement('option');
-      opt.value = ''; opt.textContent = 'Selecciona tu nombre';
-      vendedorSel.insertBefore(opt, vendedorSel.firstChild);
-    }
-    vendedorSel.value = '';
+    // Limpiar campos hidden de ACs
+    document.getElementById('vendedorEmail').value = '';
+    document.getElementById('autoInteresId').value = '';
     document.getElementById('nombre').focus();
     notificarAltura();
   });
@@ -782,18 +949,31 @@ body {
     e.preventDefault();
     if (!validar()) return;
 
-    var vendedorEmail  = vendedorSel.value;
-    var vendedorNombre = vendedorSel.options[vendedorSel.selectedIndex].textContent;
-    var tipoPagoEl     = form.querySelector('input[name="tipoPago"]:checked');
+    var vendedorNombre = document.getElementById('vendedor').value.trim();
+    // Usar email del AC seleccionado; fallback al nombre para legado
+    var vendedorEmailVal = document.getElementById('vendedorEmail').value.trim();
+    if (!vendedorEmailVal) {
+      // Intentar match por nombre exacto en la lista
+      var matchV = vendedores.find(function (v) {
+        return v.nombre && v.nombre.toLowerCase() === vendedorNombre.toLowerCase();
+      });
+      vendedorEmailVal = matchV ? (matchV.email || vendedorNombre) : vendedorNombre;
+    }
+
+    var autoInteresText = document.getElementById('autoInteres').value.trim();
+    var autoInteresIdVal = document.getElementById('autoInteresId').value.trim();
+    var tipoPagoEl = form.querySelector('input[name="tipoPago"]:checked');
 
     var payload = {
-      nombre:         document.getElementById('nombre').value.trim(),
-      telefono:       document.getElementById('telefono').value.replace(/\D/g, ''),
-      correo:         document.getElementById('correo').value.trim(),
-      autoInteres:    document.getElementById('autoInteres').value.trim(),
-      tipoPago:       tipoPagoEl ? tipoPagoEl.value : '',
-      vendedorEmail:  vendedorEmail,
-      vendedorNombre: vendedorNombre,
+      nombre:           document.getElementById('nombre').value.trim(),
+      telefono:         document.getElementById('telefono').value.replace(/\D/g, ''),
+      correo:           document.getElementById('correo').value.trim(),
+      autoInteres:      autoInteresText,
+      autoInteresId:    autoInteresIdVal,
+      autoInventarioId: autoInteresIdVal,
+      tipoPago:         tipoPagoEl ? tipoPagoEl.value : '',
+      vendedorEmail:    vendedorEmailVal,
+      vendedorNombre:   vendedorNombre,
     };
 
     setLoading(true);

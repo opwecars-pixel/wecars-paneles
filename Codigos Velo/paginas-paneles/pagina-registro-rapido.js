@@ -10,6 +10,7 @@
 //    ALeads        — para crear el lead con interés y vendedor asignado
 // ───────────────────────────────────────────────────────────────────
 
+import wixData                 from 'wix-data';
 import { findOrCreateCliente } from 'backend/clientes.jsw';
 import { crearLead }           from 'backend/leads.jsw';
 import { registrarActividad }  from 'backend/actividades.jsw';
@@ -26,9 +27,10 @@ $w.onReady(function () {
     const data = event.data;
     if (!data || !data.type) return;
 
-    // ── El iframe está listo: enviarle la lista de vendedores ──────
+    // ── El iframe está listo: enviarle la lista de vendedores y autos ─
     if (data.type === 'wecars-rr-ready') {
       _enviarVendedores();
+      _enviarAutos();
     }
 
     // ── Resize dinámico del iframe ─────────────────────────────────
@@ -47,7 +49,6 @@ $w.onReady(function () {
 // ─── Enviar lista de vendedores al iframe ──────────────────────────
 function _enviarVendedores() {
   queryColeccion('Usuarios', ['Vendedor', 'Administración', 'Gerencia', 'Finanzas'], [
-    { campo: 'rol', op: 'contains', valor: 'endedor' },
     { limit: 100 },
   ])
     .then(function (items) {
@@ -56,6 +57,7 @@ function _enviarVendedores() {
           return {
             nombre: u.nombre || u.title || u._id,
             email:  u.email  || u.loginEmail || '',
+            puesto: u.puesto || u.rol || '',
           };
         })
         .filter(function (v) { return v.email; })
@@ -69,6 +71,30 @@ function _enviarVendedores() {
     });
 }
 
+// ─── Enviar lista de autos disponibles al iframe ──────────────────
+function _enviarAutos() {
+  wixData.query('Cars')
+    .ne('estatusVenta', 'Vendido')
+    .ne('estatusVenta', 'Entregado')
+    .ascending('marca')
+    .limit(80)
+    .find({ suppressAuth: true })
+    .then(function (r) {
+      const autos = r.items.map(function (c) {
+        const año   = c.año || c.anio || c.year || '';
+        const marca = c.marca || c.brand || '';
+        const nombre= c.nombre || c.title || '';
+        const label = [marca, nombre, año].filter(Boolean).join(' ').trim();
+        return { _id: c._id, label: label, marca: marca };
+      }).filter(function (a) { return a.label; });
+      $w(HTML_ID).postMessage({ type: 'wecars-rr-autos', autos: autos });
+    })
+    .catch(function (err) {
+      console.error('[RegistroRapido] Error cargando autos:', err);
+      $w(HTML_ID).postMessage({ type: 'wecars-rr-autos', autos: [] });
+    });
+}
+
 // ─── Procesar registro de cliente ─────────────────────────────────
 function _procesarRegistro(payload) {
   if (!payload) {
@@ -76,13 +102,15 @@ function _procesarRegistro(payload) {
     return;
   }
 
-  const nombre        = (payload.nombre        || '').trim();
-  const telefono      = (payload.telefono      || '').replace(/\D/g, '');
-  const correo        = (payload.correo        || '').trim();
-  const autoInteres   = (payload.autoInteres   || '').trim();
-  const tipoPago      = (payload.tipoPago      || '').trim();
-  const vendedorEmail = (payload.vendedorEmail || '').trim();
-  const vendedorNombre= (payload.vendedorNombre|| '').trim();
+  const nombre          = (payload.nombre          || '').trim();
+  const telefono        = (payload.telefono        || '').replace(/\D/g, '');
+  const correo          = (payload.correo          || '').trim();
+  const autoInteres     = (payload.autoInteres     || '').trim();
+  const autoInteresId   = (payload.autoInteresId   || '').trim();
+  const autoInventarioId= (payload.autoInventarioId|| autoInteresId).trim();
+  const tipoPago        = (payload.tipoPago        || '').trim();
+  const vendedorEmail   = (payload.vendedorEmail   || '').trim();
+  const vendedorNombre  = (payload.vendedorNombre  || '').trim();
 
   if (!telefono || !vendedorEmail) {
     $w(HTML_ID).postMessage({ type: 'wecars-rr-error', mensaje: 'Faltan datos requeridos (teléfono o vendedor).' });
@@ -127,6 +155,9 @@ function _procesarRegistro(payload) {
         telefono:         telefono,
         correo:           correo,
         interes:          resumen,
+        autoInteres:      autoInteres,
+        autoInteresId:    autoInventarioId || undefined,
+        autoInventarioId: autoInventarioId || undefined,
         resumen:          resumen,
         pagina:           'Registro Rápido',
         origen:           'Vendedor',
