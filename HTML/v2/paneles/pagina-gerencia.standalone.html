@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>weCars — Gerencia</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+/* ════════════════════════════════════════════════════════
+   TOKENS — idénticos a todos los paneles v2
+════════════════════════════════════════════════════════ */
+:root{
+  --wc-green:#56a900;--wc-green-dark:#3d7a00;--wc-green-light:#e8f5d6;--wc-green-mid:#a3d96a;
+  --wc-bg:#f4f6f5;--wc-surface:#ffffff;--wc-surface2:#f0f2f1;
+  --wc-nav-bg:#1a2a19;--wc-nav-active:#2d4a2b;--wc-border:#dde3de;
+  --wc-ink:#0d1a0d;--wc-ink2:#4a5e4a;--wc-ink3:#7a8e7a;--wc-ink-invert:#ffffff;
+  --wc-ok:#16a34a;--wc-ok-bg:#f0fdf4;--wc-warn:#d97706;--wc-warn-bg:#fffbeb;
+  --wc-danger:#dc2626;--wc-danger-bg:#fef2f2;--wc-info:#2563eb;--wc-info-bg:#eff6ff;
+  --wc-orange:#ea580c;--wc-orange-bg:#fff7ed;
+  --wc-purple:#7c3aed;--wc-purple-bg:#f5f3ff;
+  --wc-shadow-sm:0 1px 3px rgba(13,26,13,.08),0 1px 2px rgba(13,26,13,.05);
+  --wc-shadow-md:0 4px 12px rgba(13,26,13,.1),0 2px 4px rgba(13,26,13,.06);
+  --wc-r-sm:6px;--wc-r-md:10px;--wc-r-lg:14px;--wc-r-xl:20px;--wc-r-full:9999px;
+  --sb-w:220px;--topbar-h:56px;--bottom-nav-h:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:auto;overflow:visible;min-height:800px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;
+  color:var(--wc-ink);background:var(--wc-bg);-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:100%;display:block}
+
+.app{display:flex;flex-direction:column}
+@media(min-width:769px){.app{flex-direction:row;align-items:flex-start}}
+
+/* ── Sidebar ── */
+.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--wc-nav-bg);color:var(--wc-ink-invert);
+  display:none;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+@media(min-width:769px){.sidebar{display:flex}}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo-mark{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--wc-green-mid)}
+.sb-logo-sub{font-size:10px;opacity:.55;margin-top:2px;letter-spacing:.6px;text-transform:uppercase}
+.sb-user{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:var(--wc-green);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:600;line-height:1.2}
+.sb-user-role{font-size:11px;opacity:.6;margin-top:2px}
+.sb-nav{flex:1;padding:12px 0}
+.sb-section-label{padding:6px 16px 4px;font-size:10px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;opacity:.4;margin-top:8px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;
+  font-size:13px;font-weight:500;border-radius:0;transition:background .15s;
+  color:rgba(255,255,255,.75);border:none;background:none;width:100%;text-align:left}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-item.active{background:var(--wc-nav-active);color:var(--wc-green-mid);border-left:3px solid var(--wc-green)}
+.sb-item i{font-size:17px;flex-shrink:0;width:20px}
+.sb-badge{margin-left:auto;background:var(--wc-green);color:#000;font-size:10px;font-weight:700;
+  padding:1px 6px;border-radius:var(--wc-r-full);min-width:18px;text-align:center}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;padding-bottom:80px}
+@media(min-width:769px){.main{padding-bottom:24px}}
+
+/* ── Topbar ── */
+.topbar{height:var(--topbar-h);background:var(--wc-surface);border-bottom:1px solid var(--wc-border);
+  display:flex;align-items:center;gap:12px;padding:0 16px;position:sticky;top:0;z-index:90}
+.topbar-title{font-size:15px;font-weight:700;color:var(--wc-green);flex:1}
+.topbar-sub{font-size:12px;color:var(--wc-ink3);font-weight:400;margin-left:6px}
+.topbar-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--wc-r-md);
+  border:1.5px solid var(--wc-border);background:var(--wc-surface);font-size:13px;font-weight:600;
+  cursor:pointer;color:var(--wc-ink2);transition:all .15s;white-space:nowrap}
+.topbar-btn:hover{border-color:var(--wc-green);color:var(--wc-green)}
+.topbar-btn.primary{background:var(--wc-green);color:#fff;border-color:var(--wc-green)}
+.topbar-btn.primary:hover{background:var(--wc-green-dark)}
+
+/* ── Views ── */
+.view-wrap{padding:28px 32px}
+@media(max-width:1024px){.view-wrap{padding:20px 24px}}
+@media(max-width:768px){.view-wrap{padding:16px 18px}}
+.view{display:none}.view.active{display:block}
+
+/* ── Bottom nav ── */
+.bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:var(--bottom-nav-h);
+  background:var(--wc-nav-bg);border-top:1px solid rgba(255,255,255,.1);z-index:100;
+  padding-bottom:env(safe-area-inset-bottom,0)}
+@media(min-width:769px){.bottom-nav{display:none}}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;font-size:10px;color:rgba(255,255,255,.55);cursor:pointer;border:none;background:none;
+  padding:6px 2px;min-height:44px;transition:color .15s}
+.bn-item.active{color:var(--wc-green-mid)}
+.bn-item i{font-size:20px}
+
+/* ══ Componentes ══════════════════════════════════════ */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);padding:16px 18px}
+.kpi-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--wc-ink3);margin-bottom:6px}
+.kpi-value{font-size:26px;font-weight:800;line-height:1;color:var(--wc-ink);font-variant-numeric:tabular-nums}
+.kpi-sub{font-size:11px;color:var(--wc-ink3);margin-top:4px}
+.kpi-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--wc-ink3);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.kpi-section-label::after{content:'';flex:1;height:1px;background:var(--wc-border)}
+
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--wc-r-full);
+  font-size:11px;font-weight:700;white-space:nowrap}
+.chip-green{background:var(--wc-green-light);color:var(--wc-green-dark)}
+.chip-warn{background:var(--wc-warn-bg);color:var(--wc-warn)}
+.chip-info{background:var(--wc-info-bg);color:var(--wc-info)}
+.chip-orange{background:var(--wc-orange-bg);color:var(--wc-orange)}
+.chip-gray{background:var(--wc-surface2);color:var(--wc-ink3)}
+.chip-danger{background:var(--wc-danger-bg);color:var(--wc-danger)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--wc-r-md);
+  border:1.5px solid var(--wc-border);background:var(--wc-surface);font-size:13px;font-weight:600;
+  cursor:pointer;color:var(--wc-ink2);transition:all .15s}
+.btn:hover{border-color:var(--wc-green);color:var(--wc-green)}
+.btn-primary{background:var(--wc-green);color:#fff;border-color:var(--wc-green)}
+.btn-primary:hover{background:var(--wc-green-dark)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-danger{background:var(--wc-danger);color:#fff;border-color:var(--wc-danger)}
+
+.field-group{margin-bottom:12px}
+.field-label{font-size:12px;font-weight:600;color:var(--wc-ink2);margin-bottom:5px}
+.field-input{width:100%;padding:9px 12px;border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);
+  background:var(--wc-surface);color:var(--wc-ink);font-size:13px;outline:none;transition:border .15s}
+.field-input:focus{border-color:var(--wc-green)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media(max-width:500px){.field-grid{grid-template-columns:1fr}}
+
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-chip{padding:6px 14px;border-radius:var(--wc-r-full);font-size:12px;font-weight:600;
+  border:1.5px solid var(--wc-border);background:var(--wc-surface);color:var(--wc-ink3);cursor:pointer;
+  transition:all .15s;white-space:nowrap}
+.filter-chip:hover{border-color:var(--wc-green);color:var(--wc-green)}
+.filter-chip.active{background:var(--wc-green);color:#fff;border-color:var(--wc-green)}
+
+.search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-wrap{flex:1;min-width:180px;display:flex;align-items:center;gap:8px;background:var(--wc-surface);
+  border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);padding:7px 12px}
+.search-wrap:focus-within{border-color:var(--wc-green)}
+.search-wrap input{border:none;background:none;outline:none;flex:1;font-size:13px;color:var(--wc-ink)}
+.search-wrap input::placeholder{color:var(--wc-ink3)}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 24px;text-align:center;color:var(--wc-ink3)}
+.empty-state i{font-size:40px;opacity:.3;margin-bottom:12px}
+.empty-state h3{font-size:15px;font-weight:700;color:var(--wc-ink2);margin-bottom:6px}
+.empty-state p{font-size:13px;max-width:280px;line-height:1.5}
+
+.table-wrap{overflow-x:auto;border-radius:var(--wc-r-lg);border:1px solid var(--wc-border);margin-bottom:16px}
+.data-table{width:100%;border-collapse:collapse;background:var(--wc-surface);font-size:13px}
+.data-table th{background:var(--wc-surface2);font-weight:700;font-size:11px;color:var(--wc-ink2);
+  text-align:left;padding:9px 14px;border-bottom:1px solid var(--wc-border);white-space:nowrap;
+  text-transform:uppercase;letter-spacing:.4px}
+.data-table td{padding:10px 14px;border-bottom:1px solid var(--wc-border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--wc-surface2)}
+.data-table td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+
+/* ── Ranking vendedor ── */
+.ranking-item{display:flex;align-items:center;gap:14px;padding:14px 18px;
+  background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);margin-bottom:10px}
+.rank-pos{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;flex-shrink:0}
+.rank-pos.gold{background:#fef3c7;color:#92400e}
+.rank-pos.silver{background:#f1f5f9;color:#475569}
+.rank-pos.bronze{background:#fff7ed;color:#9a3412}
+.rank-pos.other{background:var(--wc-surface2);color:var(--wc-ink3)}
+.rank-avatar{width:38px;height:38px;border-radius:50%;background:var(--wc-green-light);
+  color:var(--wc-green-dark);font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rank-info{flex:1;min-width:0}
+.rank-nombre{font-weight:700;font-size:14px}
+.rank-sub{font-size:12px;color:var(--wc-ink3);margin-top:2px}
+.rank-stats{text-align:right;flex-shrink:0}
+.rank-ventas{font-size:18px;font-weight:800;color:var(--wc-green)}
+.rank-bono{font-size:11px;color:var(--wc-ink3);margin-top:2px}
+.rank-bar-wrap{flex:1;min-width:80px;max-width:120px}
+.rank-bar{height:6px;background:var(--wc-border);border-radius:3px;overflow:hidden;margin-top:4px}
+.rank-bar-fill{height:100%;background:var(--wc-green);border-radius:3px}
+
+/* ── Overlay centrado ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;
+  align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.overlay-panel{width:min(480px,100%);max-height:90vh;background:var(--wc-surface);
+  border-radius:var(--wc-r-lg);overflow-y:auto;display:flex;flex-direction:column;
+  box-shadow:0 8px 40px rgba(13,26,13,.25)}
+.overlay-hdr{display:flex;align-items:center;gap:12px;padding:16px 20px;
+  border-bottom:1px solid var(--wc-border);position:sticky;top:0;background:var(--wc-surface);z-index:1}
+.overlay-title{flex:1;font-size:15px;font-weight:700}
+.overlay-close{width:32px;height:32px;border-radius:var(--wc-r-full);border:1.5px solid var(--wc-border);
+  background:var(--wc-surface);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--wc-ink3)}
+.overlay-close:hover{background:var(--wc-danger-bg);color:var(--wc-danger);border-color:var(--wc-danger)}
+.overlay-body{padding:20px;flex:1}
+.overlay-footer{padding:14px 20px;border-top:1px solid var(--wc-border);
+  display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--wc-surface)}
+
+/* ── Finanzas resumen cards ── */
+.fin-res-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+@media(max-width:600px){.fin-res-grid{grid-template-columns:1fr}}
+.fin-res-card{background:var(--wc-surface);border:1.5px solid var(--wc-border);border-radius:var(--wc-r-lg);padding:16px}
+.fin-res-card.ok{border-color:var(--wc-ok);background:var(--wc-ok-bg)}
+.fin-res-card.danger{border-color:var(--wc-danger);background:var(--wc-danger-bg)}
+.fin-res-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--wc-ink3);margin-bottom:8px}
+.fin-res-val{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}
+.fin-res-sub{font-size:12px;color:var(--wc-ink3);margin-top:4px}
+
+/* ── Metas ── */
+.meta-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
+  padding:18px 20px;margin-bottom:12px}
+.meta-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.meta-nombre{font-weight:700;font-size:15px}
+.meta-ventas{font-size:22px;font-weight:900;color:var(--wc-green);font-variant-numeric:tabular-nums}
+.meta-prog-wrap{margin:10px 0}
+.meta-prog-bar{height:10px;background:var(--wc-border);border-radius:5px;overflow:hidden}
+.meta-prog-fill{height:100%;border-radius:5px;transition:width .4s;background:var(--wc-green)}
+.meta-prog-fill.warn{background:var(--wc-warn)}
+.meta-prog-fill.danger{background:var(--wc-danger)}
+.meta-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--wc-ink3);margin-top:4px}
+
+#wc-toast{position:fixed;bottom:24px;right:20px;z-index:500;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:10px 16px;border-radius:var(--wc-r-md);font-size:13px;font-weight:600;color:#fff;
+  opacity:0;transform:translateY(8px);transition:all .25s;max-width:320px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{background:var(--wc-ok)}.toast.error{background:var(--wc-danger)}.toast.warn{background:var(--wc-warn)}
+</style>
+</head>
+<body>
+<div id="wc-toast"></div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">weCars</div>
+      <div class="sb-logo-sub">Panel Gerencia</div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-avatar">--</div>
+      <div>
+        <div class="sb-user-name" id="sb-nombre">Cargando...</div>
+        <div class="sb-user-role" id="sb-rol">Gerencia</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section-label">Resumen</div>
+      <button class="sb-item active" onclick="mostrarVista('dashboard',this)">
+        <i class="ti ti-layout-dashboard"></i>Dashboard ejecutivo
+      </button>
+      <div class="sb-section-label">Ventas y equipo</div>
+      <button class="sb-item" onclick="mostrarVista('ventas',this)">
+        <i class="ti ti-receipt"></i>Ventas del mes
+      </button>
+      <button class="sb-item" onclick="mostrarVista('equipo',this)">
+        <i class="ti ti-users"></i>Equipo / Ranking
+      </button>
+      <div class="sb-section-label">Operaciones</div>
+      <button class="sb-item" onclick="mostrarVista('pipeline',this)">
+        <i class="ti ti-list-check"></i>Pipeline completo
+        <span class="sb-badge" id="sb-badge-leads" style="display:none">0</span>
+      </button>
+      <button class="sb-item" onclick="mostrarVista('inventario',this)">
+        <i class="ti ti-car"></i>Inventario
+      </button>
+      <div class="sb-section-label">Finanzas y metas</div>
+      <button class="sb-item" onclick="mostrarVista('finanzas',this)">
+        <i class="ti ti-chart-bar"></i>Resumen financiero
+      </button>
+      <button class="sb-item" onclick="mostrarVista('metas',this)">
+        <i class="ti ti-target"></i>Metas y bonos
+      </button>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <div style="flex:1;min-width:0">
+        <div class="topbar-title" id="topbar-title">Dashboard Ejecutivo<span class="topbar-sub" id="topbar-sub"></span></div>
+      </div>
+      <select class="topbar-btn" id="filtro-mes" onchange="aplicarFiltroMes()" style="cursor:pointer">
+        <option value="">Este mes</option>
+      </select>
+    </div>
+
+    <!-- ══════════════ DASHBOARD ══════════════ -->
+    <div class="view view-wrap active" id="view-dashboard">
+      <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi-card">
+          <div class="kpi-label">Ventas del mes</div>
+          <div class="kpi-value" id="kpi-ventas-n" style="color:var(--wc-ok)">—</div>
+          <div class="kpi-sub" id="kpi-ventas-ing">— ingresos</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Utilidad neta</div>
+          <div class="kpi-value" id="kpi-utilidad">—</div>
+          <div class="kpi-sub" id="kpi-margen">margen —%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Leads activos</div>
+          <div class="kpi-value" id="kpi-leads-act" style="color:var(--wc-info)">—</div>
+          <div class="kpi-sub" id="kpi-tasa-cierre">tasa cierre —%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Inventario disponible</div>
+          <div class="kpi-value" id="kpi-inv-disp">—</div>
+          <div class="kpi-sub" id="kpi-inv-sub">— autos en lote</div>
+        </div>
+      </div>
+
+      <!-- Segunda fila KPIs -->
+      <div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-top:0">
+        <div class="kpi-card">
+          <div class="kpi-label">Promedio utilidad / venta</div>
+          <div class="kpi-value" id="kpi-prom-util" style="color:var(--wc-ok)">—</div>
+          <div class="kpi-sub" id="kpi-prom-pct">— margen prom.</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Auto más solicitado</div>
+          <div class="kpi-value" style="font-size:16px;font-weight:700" id="kpi-auto-top">—</div>
+          <div class="kpi-sub" id="kpi-auto-top-n">— solicitudes</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Mejor vendedor</div>
+          <div class="kpi-value" style="font-size:18px;font-weight:700" id="kpi-top-vendedor">—</div>
+          <div class="kpi-sub" id="kpi-top-vend-n">— ventas</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div class="kpi-section-label"><i class="ti ti-trophy" style="font-size:14px"></i>Top vendedores (mes)</div>
+          <div id="dash-ranking"></div>
+        </div>
+        <div>
+          <div class="kpi-section-label"><i class="ti ti-clock" style="font-size:14px"></i>Ventas recientes</div>
+          <div id="dash-ventas-recientes"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ VENTAS ══════════════ -->
+    <div class="view view-wrap" id="view-ventas">
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="search" id="ventas-q" placeholder="Buscar cliente, auto, vendedor..." oninput="renderVentas()">
+        </div>
+        <select class="field-input" id="ventas-f-vend" onchange="renderVentas()" style="width:auto;padding:7px 12px">
+          <option value="">Todos los vendedores</option>
+        </select>
+      </div>
+      <div id="ventas-kpis" style="margin-bottom:16px"></div>
+      <div id="ventas-list"></div>
+    </div>
+
+    <!-- ══════════════ EQUIPO ══════════════ -->
+    <div class="view view-wrap" id="view-equipo">
+      <div id="equipo-list"></div>
+    </div>
+
+    <!-- ══════════════ PIPELINE ══════════════ -->
+    <div class="view view-wrap" id="view-pipeline">
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="search" id="pipe-q" placeholder="Buscar por cliente, auto, vendedor..." oninput="renderPipeline()">
+        </div>
+        <select class="field-input" id="pipe-f-vend" onchange="renderPipeline()" style="width:auto;padding:7px 12px">
+          <option value="">Todos los vendedores</option>
+        </select>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-chip active" onclick="setFiltroPipe('todos',this)">Todos</button>
+        <button class="filter-chip" onclick="setFiltroPipe('Nuevo',this)">Nuevos</button>
+        <button class="filter-chip" onclick="setFiltroPipe('Contactado',this)">Contactados</button>
+        <button class="filter-chip" onclick="setFiltroPipe('Interesado',this)">Interesados</button>
+        <button class="filter-chip" onclick="setFiltroPipe('Negociando',this)">Negociando</button>
+        <button class="filter-chip" onclick="setFiltroPipe('Ganado',this)">Ganados</button>
+        <button class="filter-chip" onclick="setFiltroPipe('Perdido',this)">Perdidos</button>
+      </div>
+      <div id="pipe-list"></div>
+    </div>
+
+    <!-- ══════════════ INVENTARIO ══════════════ -->
+    <div class="view view-wrap" id="view-inventario">
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="search" id="inv-q" placeholder="Buscar por marca, modelo, año..." oninput="renderInventario()">
+        </div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-chip active" onclick="setFiltroInv('todos',this)">Todos</button>
+        <button class="filter-chip" onclick="setFiltroInv('Disponible',this)">Disponibles</button>
+        <button class="filter-chip" onclick="setFiltroInv('Apartado',this)">Apartados</button>
+        <button class="filter-chip" onclick="setFiltroInv('Vendido',this)">Vendidos</button>
+        <button class="filter-chip" onclick="setFiltroInv('consigna',this)">Consigna</button>
+      </div>
+      <div id="inv-kpis" style="margin-bottom:16px"></div>
+      <div id="inv-list"></div>
+    </div>
+
+    <!-- ══════════════ FINANZAS RESUMEN ══════════════ -->
+    <div class="view view-wrap" id="view-finanzas">
+      <div class="fin-res-grid">
+        <div class="fin-res-card ok">
+          <div class="fin-res-title">Ingresos totales</div>
+          <div class="fin-res-val" id="fin-ingresos" style="color:var(--wc-ok)">—</div>
+          <div class="fin-res-sub" id="fin-ventas-n">— ventas cerradas</div>
+        </div>
+        <div class="fin-res-card danger">
+          <div class="fin-res-title">Costos + egresos</div>
+          <div class="fin-res-val" id="fin-costos" style="color:var(--wc-danger)">—</div>
+          <div class="fin-res-sub" id="fin-egresos-n">— egresos registrados</div>
+        </div>
+        <div class="fin-res-card ok">
+          <div class="fin-res-title">Utilidad neta del mes</div>
+          <div class="fin-res-val" id="fin-utilidad">—</div>
+          <div class="fin-res-sub" id="fin-margen">margen —%</div>
+        </div>
+        <div class="fin-res-card">
+          <div class="fin-res-title">Comisiones a pagar</div>
+          <div class="fin-res-val" id="fin-comisiones" style="color:var(--wc-warn)">—</div>
+          <div class="fin-res-sub" id="fin-com-n">— comisiones pendientes</div>
+        </div>
+      </div>
+      <div class="kpi-section-label"><i class="ti ti-table" style="font-size:14px"></i>Desglose por venta</div>
+      <div id="fin-tabla"></div>
+    </div>
+
+    <!-- ══════════════ METAS ══════════════ -->
+    <div class="view view-wrap" id="view-metas">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-size:16px;font-weight:700">Metas del mes</div>
+          <div style="font-size:12px;color:var(--wc-ink3)" id="metas-periodo">—</div>
+        </div>
+        <button class="btn btn-primary" onclick="abrirOverlay('ov-meta')">
+          <i class="ti ti-settings"></i>Configurar metas
+        </button>
+      </div>
+      <div id="metas-list"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- BOTTOM NAV MÓVIL -->
+<nav class="bottom-nav">
+  <button class="bn-item active" onclick="mostrarVista('dashboard',this,'bn')">
+    <i class="ti ti-layout-dashboard"></i>Dashboard
+  </button>
+  <button class="bn-item" onclick="mostrarVista('ventas',this,'bn')">
+    <i class="ti ti-receipt"></i>Ventas
+  </button>
+  <button class="bn-item" onclick="mostrarVista('equipo',this,'bn')">
+    <i class="ti ti-users"></i>Equipo
+  </button>
+  <button class="bn-item" onclick="mostrarVista('pipeline',this,'bn')">
+    <i class="ti ti-list-check"></i>Pipeline
+  </button>
+  <button class="bn-item" onclick="mostrarVista('finanzas',this,'bn')">
+    <i class="ti ti-chart-bar"></i>Finanzas
+  </button>
+</nav>
+
+<!-- OVERLAY: Configurar meta -->
+<div class="overlay" id="ov-meta">
+  <div class="overlay-panel">
+    <div class="overlay-hdr">
+      <i class="ti ti-target" style="font-size:18px;color:var(--wc-green)"></i>
+      <div class="overlay-title">Configurar metas del mes</div>
+      <button class="overlay-close" onclick="cerrarOverlay('ov-meta')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="overlay-body">
+      <div class="field-group">
+        <div class="field-label">Meta de ventas del equipo (unidades)</div>
+        <input class="field-input" type="number" id="ov-meta-equipo" placeholder="Ej: 10">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Bono por alcanzar meta ($)</div>
+        <input class="field-input" type="number" id="ov-meta-bono" placeholder="Ej: 5000">
+      </div>
+      <hr style="border:none;border-top:1px solid var(--wc-border);margin:12px 0">
+      <div style="font-size:12px;font-weight:700;color:var(--wc-ink2);margin-bottom:10px">Meta individual por vendedor</div>
+      <div id="ov-meta-vendedores"></div>
+    </div>
+    <div class="overlay-footer">
+      <button class="btn" onclick="cerrarOverlay('ov-meta')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarMetas()"><i class="ti ti-device-floppy"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   WC PROTOCOL — GERENCIA
+══════════════════════════════════════════════════════ */
+const WC = {
+  OUT:{
+    DATOS_SOLICITAR: 'wecars-gerencia-solicitar',
+    META_GUARDAR:    'wecars-gerencia-meta-guardar',
+  },
+  IN:{
+    DATOS:           'wecars-gerencia-datos',
+    META_RESULTADO:  'wecars-gerencia-meta-resultado',
+  },
+  send(tipo,datos){try{window.parent.postMessage({type:tipo,...datos},'*');}catch(_){}}
+};
+window.addEventListener('message',e=>{
+  const msg=e.data;if(!msg||!msg.type)return;
+  switch(msg.type){
+    case WC.IN.DATOS:          recibirDatos(msg);break;
+    case WC.IN.META_RESULTADO: if(msg.ok)toast('✓ Meta guardada');break;
+  }
+});
+WC.send(WC.OUT.DATOS_SOLICITAR,{});
+
+/* ══ Estado global ══ */
+let CLIENTES=[],CREDITOS=[],VENDEDORES=[],CARS=[],EGRESOS=[],COMISIONES=[];
+let CTX={emailActual:'',rolActual:'',nombreActual:''};
+let _filtroMes='',_filtroVend='',_filtroPipe='todos',_filtroInv='todos';
+
+/* ══ Recibir datos ══ */
+function recibirDatos(msg){
+  CLIENTES=msg.clientes||[];CREDITOS=msg.creditos||[];VENDEDORES=msg.vendedores||[];
+  CARS=msg.cars||[];EGRESOS=msg.egresos||[];COMISIONES=msg.comisiones||[];
+  CTX={emailActual:msg.emailActual||'',rolActual:msg.rolActual||'',nombreActual:msg.nombreActual||''};
+  const ini=(CTX.nombreActual||'GR').slice(0,2).toUpperCase();
+  document.getElementById('sb-avatar').textContent=ini;
+  document.getElementById('sb-nombre').textContent=CTX.nombreActual||'Gerente';
+  document.getElementById('sb-rol').textContent=CTX.rolActual||'Gerencia';
+  _poblarFiltroMes();_poblarFiltroVendedores();
+  renderDashboard();renderVentas();renderEquipo();renderPipeline();renderInventario();renderFinanzas();renderMetas();
+}
+
+/* ══ Utilidades ══ */
+function M(v){if(!v&&v!==0)return'—';const n=parseFloat(v)||0;return'$'+n.toLocaleString('es-MX',{maximumFractionDigits:0});}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fechaCorta(d){if(!d)return'—';const f=new Date(d);return isNaN(f)?'—':f.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'});}
+function initials(s){return String(s||'').split(' ').map(w=>w[0]||'').slice(0,2).join('').toUpperCase()||'?';}
+function isVenta(c){return['Ganado','Vendido','Entregado'].includes(c.etapa||c.estatus||'');}
+function fechaVenta(c){return c.cierreFecha||c.fechaCierre||c.fechaVenta||c._updatedDate||c._createdDate||null;}
+function findVend(id){return VENDEDORES.find(v=>v._id===id||v.email===id)||null;}
+function calcUtil(c){
+  const precio=parseFloat(c._precioVenta||c.cierrePrecio||c.precioVenta||0);
+  const costo=parseFloat(c._costoAdquisicion||c.costoAdquisicion||0);
+  const com=parseFloat(c._comisionVendedor||c.cierreComision||0);
+  const egrs=EGRESOS.filter(e=>e.leadId===c._id||e.clienteId===c._id).reduce((s,e)=>s+parseFloat(e.monto||0),0);
+  return{precio,costo,com,egrs,util:precio-costo-com-egrs,margen:precio>0?Math.round((precio-costo-com-egrs)/precio*100):0};
+}
+function toast(msg,tipo='ok'){
+  const el=document.createElement('div');el.className='toast '+tipo;el.textContent=msg;
+  const cont=document.getElementById('wc-toast');cont.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},2800);
+}
+
+/* ══ Filtros globales ══ */
+function _poblarFiltroMes(){
+  const sel=document.getElementById('filtro-mes');
+  const meses=new Set();
+  CLIENTES.filter(isVenta).forEach(c=>{
+    const f=new Date(fechaVenta(c)||0);
+    if(!isNaN(f))meses.add(f.getFullYear()+'-'+(f.getMonth()+1).toString().padStart(2,'0'));
+  });
+  const ahora=new Date();
+  const mesActual=ahora.getFullYear()+'-'+(ahora.getMonth()+1).toString().padStart(2,'0');
+  sel.innerHTML=`<option value="">Este mes</option>`
+    +[...meses].sort().reverse().filter(m=>m!==mesActual).map(m=>{
+      const[y,mo]=m.split('-');const d=new Date(+y,+mo-1,1);
+      const lbl=d.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+      return`<option value="${m}">${lbl}</option>`;
+    }).join('');
+  _filtroMes=mesActual;
+}
+function _poblarFiltroVendedores(){
+  const opts=`<option value="">Todos los vendedores</option>`
+    +VENDEDORES.map(v=>`<option value="${esc(v._id)}">${esc(v.nombre||v.name||v.email||v._id)}</option>`).join('');
+  ['ventas-f-vend','pipe-f-vend'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+}
+function aplicarFiltroMes(){
+  const sel=document.getElementById('filtro-mes');
+  const ahora=new Date();_filtroMes=sel.value||(ahora.getFullYear()+'-'+(ahora.getMonth()+1).toString().padStart(2,'0'));
+  renderDashboard();renderVentas();renderFinanzas();
+}
+function _enMes(c){
+  if(!_filtroMes)return true;
+  const f=new Date(fechaVenta(c)||0);if(isNaN(f))return false;
+  const m=f.getFullYear()+'-'+(f.getMonth()+1).toString().padStart(2,'0');
+  return m===_filtroMes;
+}
+function ventasDelMes(){return CLIENTES.filter(c=>isVenta(c)&&_enMes(c));}
+
+/* ══ DASHBOARD ══ */
+function renderDashboard(){
+  const ventas=ventasDelMes();
+  const leads=CLIENTES.filter(c=>!isVenta(c)&&(c.etapa||c.estatus||'')!=='Perdido').length;
+  const totalLeads=CLIENTES.length;
+  const tasaCierre=totalLeads>0?Math.round(ventas.length/totalLeads*100):0;
+  const ingresos=ventas.reduce((s,c)=>s+parseFloat(c._precioVenta||c.cierrePrecio||0),0);
+  const utilidades=ventas.map(calcUtil);
+  const utilTotal=utilidades.reduce((s,u)=>s+u.util,0);
+  const margen=ingresos>0?Math.round(utilTotal/ingresos*100):0;
+  const promUtil=ventas.length>0?Math.round(utilTotal/ventas.length):0;
+  const promMargen=ventas.length>0?Math.round(utilidades.reduce((s,u)=>s+u.margen,0)/ventas.length):0;
+  // Inventario
+  const dispCars=CARS.filter(c=>(c.estatus||c.status||'Disponible')==='Disponible'||(c.estado||'')==='Disponible').length;
+  // Auto más solicitado
+  const autoCount={};
+  CLIENTES.forEach(c=>{const a=c.autoInteres||c._autoNombre||'';if(a)autoCount[a]=(autoCount[a]||0)+1;});
+  const autoTop=Object.entries(autoCount).sort((a,b)=>b[1]-a[1])[0];
+  // Mejor vendedor del mes
+  const vendCount={};
+  ventas.forEach(c=>{const id=c.vendedorId||c.vendedorAsignado||'sin-asignar';vendCount[id]=(vendCount[id]||0)+1;});
+  const topVendId=Object.entries(vendCount).sort((a,b)=>b[1]-a[1])[0];
+  const topVend=topVendId?findVend(topVendId[0]):null;
+
+  document.getElementById('kpi-ventas-n').textContent=ventas.length;
+  document.getElementById('kpi-ventas-ing').textContent=M(ingresos)+' ingresos';
+  document.getElementById('kpi-utilidad').textContent=M(utilTotal);
+  document.getElementById('kpi-utilidad').style.color=utilTotal>=0?'var(--wc-ok)':'var(--wc-danger)';
+  document.getElementById('kpi-margen').textContent='margen '+margen+'%';
+  document.getElementById('kpi-leads-act').textContent=leads;
+  document.getElementById('kpi-tasa-cierre').textContent='tasa cierre '+tasaCierre+'%';
+  document.getElementById('kpi-inv-disp').textContent=dispCars||CARS.length;
+  document.getElementById('kpi-inv-sub').textContent=CARS.length+' autos en lote';
+  document.getElementById('kpi-prom-util').textContent=M(promUtil);
+  document.getElementById('kpi-prom-pct').textContent=promMargen+'% margen prom.';
+  document.getElementById('kpi-auto-top').textContent=autoTop?autoTop[0].split(' ').slice(0,2).join(' '):'—';
+  document.getElementById('kpi-auto-top-n').textContent=autoTop?autoTop[1]+' solicitudes':'';
+  document.getElementById('kpi-top-vendedor').textContent=topVend?(topVend.nombre||topVend.name||'—'):(topVendId?topVendId[0]:'—');
+  document.getElementById('kpi-top-vend-n').textContent=topVendId?topVendId[1][1]+' ventas':'';
+
+  // Badge leads activos
+  const bEl=document.getElementById('sb-badge-leads');
+  if(bEl){bEl.textContent=leads;bEl.style.display=leads?'inline':'none';}
+
+  // Ranking
+  const rankMap={};
+  ventas.forEach(c=>{
+    const id=c.vendedorId||c.vendedorAsignado||'sin-asignar';
+    if(!rankMap[id])rankMap[id]={id,ventas:0,util:0};
+    rankMap[id].ventas++;rankMap[id].util+=calcUtil(c).util;
+  });
+  const ranks=Object.values(rankMap).sort((a,b)=>b.ventas-a.ventas);
+  const maxVentas=ranks[0]?.ventas||1;
+  const posCls=['gold','silver','bronze'];
+  document.getElementById('dash-ranking').innerHTML=ranks.length
+    ?ranks.slice(0,5).map((r,i)=>{
+      const v=findVend(r.id);const nombre=v?(v.nombre||v.name||v.email||r.id):r.id;
+      return`<div class="ranking-item">
+        <div class="rank-pos ${posCls[i]||'other'}">${i+1}</div>
+        <div class="rank-avatar">${initials(nombre)}</div>
+        <div class="rank-info">
+          <div class="rank-nombre">${esc(nombre)}</div>
+          <div class="rank-sub">${M(r.util)} utilidad</div>
+          <div class="rank-bar"><div class="rank-bar-fill" style="width:${Math.round(r.ventas/maxVentas*100)}%"></div></div>
+        </div>
+        <div class="rank-stats">
+          <div class="rank-ventas">${r.ventas}</div>
+          <div class="rank-bono">ventas</div>
+        </div>
+      </div>`;}).join('')
+    :'<div class="empty-state" style="padding:24px"><i class="ti ti-trophy"></i><p>Sin ventas este mes</p></div>';
+
+  // Ventas recientes
+  const rec=[...ventas].sort((a,b)=>new Date(fechaVenta(b)||0)-new Date(fechaVenta(a)||0)).slice(0,5);
+  document.getElementById('dash-ventas-recientes').innerHTML=rec.length
+    ?rec.map(c=>{
+      const u=calcUtil(c);const v=findVend(c.vendedorId||c.vendedorAsignado);
+      return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--wc-border)">
+        <div>
+          <div style="font-weight:600;font-size:13px">${esc(c.nombre||c.name||'Sin nombre')}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${esc(c._autoNombre||c.autoInteres||'—')} · ${esc(v?.nombre||v?.name||'—')}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:700;font-size:13px">${M(u.precio)}</div>
+          <div style="font-size:11px;color:${u.util>=0?'var(--wc-ok)':'var(--wc-danger)'}">${M(u.util)}</div>
+        </div>
+      </div>`;}).join('')
+    :'<div class="empty-state" style="padding:24px"><i class="ti ti-receipt"></i><p>Sin ventas este mes</p></div>';
+}
+
+/* ══ VENTAS ══ */
+function renderVentas(){
+  const q=(document.getElementById('ventas-q')?.value||'').toLowerCase();
+  const fVend=document.getElementById('ventas-f-vend')?.value||'';
+  let rows=ventasDelMes();
+  if(fVend)rows=rows.filter(c=>(c.vendedorId||c.vendedorAsignado)===fVend);
+  if(q)rows=rows.filter(c=>[c.nombre,c.name,c._autoNombre,c.autoInteres].some(v=>String(v||'').toLowerCase().includes(q)));
+  const total=rows.reduce((s,c)=>s+parseFloat(c._precioVenta||c.cierrePrecio||0),0);
+  const util=rows.reduce((s,c)=>s+calcUtil(c).util,0);
+  document.getElementById('ventas-kpis').innerHTML=`
+    <div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:0">
+      <div class="kpi-card"><div class="kpi-label">Ventas filtradas</div>
+        <div class="kpi-value" style="color:var(--wc-ok)">${rows.length}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Ingresos</div>
+        <div class="kpi-value" style="font-size:20px">${M(total)}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Utilidad total</div>
+        <div class="kpi-value" style="font-size:20px;color:${util>=0?'var(--wc-ok)':'var(--wc-danger)'}">${M(util)}</div></div>
+    </div>`;
+  const el=document.getElementById('ventas-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-receipt"></i><h3>Sin ventas</h3><p>No hay ventas con ese filtro</p></div>';return;}
+  rows.sort((a,b)=>new Date(fechaVenta(b)||0)-new Date(fechaVenta(a)||0));
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr>
+      <th>Cliente</th><th>Auto</th><th>Vendedor</th>
+      <th class="num">Precio</th><th class="num">Costo</th>
+      <th class="num">Utilidad</th><th>Margen</th><th>Fecha</th>
+    </tr></thead>
+    <tbody>${rows.map(c=>{
+      const u=calcUtil(c);const v=findVend(c.vendedorId||c.vendedorAsignado);
+      return`<tr>
+        <td><div style="font-weight:600">${esc(c.nombre||c.name||'—')}</div></td>
+        <td style="font-size:12px">${esc(c._autoNombre||c.autoInteres||'—')}</td>
+        <td style="font-size:12px">${esc(v?.nombre||v?.name||'—')}</td>
+        <td class="num">${M(u.precio)}</td>
+        <td class="num">${M(u.costo)}</td>
+        <td class="num" style="color:${u.util>=0?'var(--wc-ok)':'var(--wc-danger)'}">${M(u.util)}</td>
+        <td><span class="chip ${u.margen>=20?'chip-green':u.margen>=10?'chip-warn':'chip-danger'}">${u.margen}%</span></td>
+        <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(fechaVenta(c))}</td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+}
+
+/* ══ EQUIPO ══ */
+function renderEquipo(){
+  const allLeads=CLIENTES;
+  const vendMap={};
+  VENDEDORES.forEach(v=>{vendMap[v._id]={vend:v,leads:0,ventas:0,util:0,com:0};});
+  // Por si hay leads sin vendedor en mapa
+  allLeads.forEach(c=>{
+    const id=c.vendedorId||c.vendedorAsignado||'';
+    if(id&&!vendMap[id])vendMap[id]={vend:null,leads:0,ventas:0,util:0,com:0};
+    if(id&&vendMap[id]){
+      vendMap[id].leads++;
+      if(isVenta(c)){vendMap[id].ventas++;vendMap[id].util+=calcUtil(c).util;}
+    }
+  });
+  COMISIONES.forEach(co=>{
+    const id=co.vendedorId||'';
+    if(id&&vendMap[id])vendMap[id].com+=(parseFloat(co.monto||0));
+  });
+  const ranks=Object.values(vendMap).sort((a,b)=>b.ventas-a.ventas);
+  const maxVentas=Math.max(1,...ranks.map(r=>r.ventas));
+  const el=document.getElementById('equipo-list');
+  if(!ranks.length){el.innerHTML='<div class="empty-state"><i class="ti ti-users"></i><h3>Sin vendedores</h3></div>';return;}
+  const posCls=['gold','silver','bronze'];
+  el.innerHTML=ranks.map((r,i)=>{
+    const v=r.vend;const nombre=v?(v.nombre||v.name||v.email||'Vendedor'):'Vendedor sin registro';
+    const metaV=parseFloat(v?.metaMensual||10);const pctMeta=Math.min(100,Math.round(r.ventas/metaV*100));
+    const metaColor=pctMeta>=100?'':pctMeta>=70?'warn':'danger';
+    return`<div class="ranking-item">
+      <div class="rank-pos ${posCls[i]||'other'}">${i+1}</div>
+      <div class="rank-avatar">${initials(nombre)}</div>
+      <div class="rank-info" style="flex:2">
+        <div class="rank-nombre">${esc(nombre)}</div>
+        <div class="rank-sub">${r.leads} leads · ${M(r.util)} utilidad generada</div>
+        <div class="rank-bar-wrap" style="max-width:none;width:100%">
+          <div class="rank-bar"><div class="rank-bar-fill ${metaColor}" style="width:${pctMeta}%"></div></div>
+        </div>
+        <div class="meta-labels"><span>Meta: ${metaV} ventas</span><span>${pctMeta}% alcanzado</span></div>
+      </div>
+      <div class="rank-stats">
+        <div class="rank-ventas">${r.ventas}</div>
+        <div class="rank-bono">ventas</div>
+        <div style="margin-top:6px;font-size:12px;color:var(--wc-warn)">${M(r.com)}</div>
+        <div style="font-size:10px;color:var(--wc-ink3)">en comisiones</div>
+      </div>
+    </div>`;}).join('');
+}
+
+/* ══ PIPELINE ══ */
+function setFiltroPipe(f,btn){
+  _filtroPipe=f;
+  document.querySelectorAll('#view-pipeline .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderPipeline();
+}
+function renderPipeline(){
+  const q=(document.getElementById('pipe-q')?.value||'').toLowerCase();
+  const fVend=document.getElementById('pipe-f-vend')?.value||'';
+  const ETAPA_BADGE={Nuevo:'chip-info',Contactado:'chip-info',Interesado:'chip-warn',
+    Negociando:'chip-orange',Ganado:'chip-green',Vendido:'chip-green',Entregado:'chip-green',Perdido:'chip-gray'};
+  let rows=[...CLIENTES];
+  if(_filtroPipe!=='todos')rows=rows.filter(c=>(c.etapa||c.estatus||'')==_filtroPipe);
+  if(fVend)rows=rows.filter(c=>(c.vendedorId||c.vendedorAsignado)===fVend);
+  if(q)rows=rows.filter(c=>[c.nombre,c.name,c.autoInteres,c._autoNombre].some(v=>String(v||'').toLowerCase().includes(q)));
+  rows.sort((a,b)=>new Date(b._createdDate||0)-new Date(a._createdDate||0));
+  const el=document.getElementById('pipe-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-list-check"></i><h3>Sin leads</h3><p>No hay leads con ese filtro</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Cliente</th><th>Auto de interés</th><th>Vendedor</th><th>Etapa</th><th>Fecha</th></tr></thead>
+    <tbody>${rows.map(c=>{
+      const v=findVend(c.vendedorId||c.vendedorAsignado);
+      const etapa=c.etapa||c.estatus||'Nuevo';
+      return`<tr>
+        <td><div style="font-weight:600">${esc(c.nombre||c.name||'Sin nombre')}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||c.email||'')}</div></td>
+        <td style="font-size:12px">${esc(c.autoInteres||c._autoNombre||'—')}</td>
+        <td style="font-size:12px">${esc(v?.nombre||v?.name||'Sin asignar')}</td>
+        <td><span class="chip ${ETAPA_BADGE[etapa]||'chip-gray'}">${esc(etapa)}</span></td>
+        <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(c._createdDate)}</td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+}
+
+/* ══ INVENTARIO ══ */
+function setFiltroInv(f,btn){
+  _filtroInv=f;
+  document.querySelectorAll('#view-inventario .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderInventario();
+}
+function renderInventario(){
+  const q=(document.getElementById('inv-q')?.value||'').toLowerCase();
+  let rows=[...CARS];
+  if(_filtroInv==='consigna')rows=rows.filter(c=>(c.tipoAdquisicion||c.tipoOrigen||'').toLowerCase()==='consigna'||c.esConsigna);
+  else if(_filtroInv!=='todos')rows=rows.filter(c=>(c.estatus||c.status||c.estado||'Disponible')===_filtroInv);
+  if(q)rows=rows.filter(c=>[c.marca,c.brand,c.modelo,c.model,c.anio,c.year,c.vin].some(v=>String(v||'').toLowerCase().includes(q)));
+  // KPIs
+  const disp=CARS.filter(c=>(c.estatus||c.status||c.estado||'Disponible')==='Disponible').length;
+  const apart=CARS.filter(c=>(c.estatus||c.status||c.estado||'')===('Apartado')).length;
+  const vend=CARS.filter(c=>['Vendido','Entregado'].includes(c.estatus||c.status||c.estado||'')).length;
+  const costoTotal=CARS.filter(c=>(c.estatus||c.status||c.estado||'Disponible')==='Disponible')
+    .reduce((s,c)=>s+parseFloat(c.costoAdquisicion||c.costoCompra||c.costo||0),0);
+  document.getElementById('inv-kpis').innerHTML=`
+    <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:0">
+      <div class="kpi-card"><div class="kpi-label">Disponibles</div>
+        <div class="kpi-value" style="color:var(--wc-ok)">${disp}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Apartados</div>
+        <div class="kpi-value" style="color:var(--wc-warn)">${apart}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Vendidos</div>
+        <div class="kpi-value">${vend}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Costo inventario activo</div>
+        <div class="kpi-value" style="font-size:18px">${M(costoTotal)}</div></div>
+    </div>`;
+  const el=document.getElementById('inv-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-car"></i><h3>Sin autos</h3><p>No hay autos con ese filtro</p></div>';return;}
+  const EST_BADGE={Disponible:'chip-green',Apartado:'chip-warn',Vendido:'chip-gray',Entregado:'chip-gray'};
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr>
+      <th>Auto</th><th>VIN</th><th>Estatus</th><th>Tipo</th>
+      <th class="num">Costo</th><th class="num">Precio lista</th>
+    </tr></thead>
+    <tbody>${rows.map(c=>{
+      const marca=c.marca||c.brand||'—';const modelo=c.modelo||c.model||'—';const anio=c.anio||c.year||'';
+      const est=c.estatus||c.status||c.estado||'Disponible';
+      const tipo=(c.tipoAdquisicion||c.tipoOrigen||'compra').toLowerCase();
+      return`<tr>
+        <td><div style="font-weight:600">${esc(marca+' '+modelo)}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${anio}</div></td>
+        <td style="font-size:11px;color:var(--wc-ink3)">${esc(c.vin||c.VIN||'—')}</td>
+        <td><span class="chip ${EST_BADGE[est]||'chip-gray'}">${esc(est)}</span></td>
+        <td>${tipo==='consigna'?'<span class="chip chip-orange">Consigna</span>':'<span style="font-size:12px;color:var(--wc-ink3)">Compra</span>'}</td>
+        <td class="num">${M(c.costoAdquisicion||c.costoCompra||c.costo)}</td>
+        <td class="num">${M(c.priceNew||c.precioVenta||c.precio)}</td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+}
+
+/* ══ FINANZAS RESUMEN ══ */
+function renderFinanzas(){
+  const ventas=ventasDelMes();
+  const ingresos=ventas.reduce((s,c)=>s+parseFloat(c._precioVenta||c.cierrePrecio||0),0);
+  const costos=ventas.reduce((s,c)=>s+parseFloat(c._costoAdquisicion||c.costoAdquisicion||0),0);
+  const comTotal=ventas.reduce((s,c)=>s+parseFloat(c._comisionVendedor||c.cierreComision||0),0);
+  const egrs=EGRESOS.filter(e=>{if(!e.fecha)return false;const f=new Date(e.fecha);
+    if(isNaN(f))return false;
+    const m=f.getFullYear()+'-'+(f.getMonth()+1).toString().padStart(2,'0');
+    return m===(_filtroMes||(new Date().getFullYear()+'-'+(new Date().getMonth()+1).toString().padStart(2,'0')));
+  });
+  const totalEgrs=egrs.reduce((s,e)=>s+parseFloat(e.monto||0),0);
+  const totalCostos=costos+comTotal+totalEgrs;
+  const utilTotal=ingresos-totalCostos;
+  const margen=ingresos>0?Math.round(utilTotal/ingresos*100):0;
+  const comPend=COMISIONES.filter(co=>(co.estatusPago||'Pendiente')==='Pendiente').length;
+  const comPendMonto=COMISIONES.filter(co=>(co.estatusPago||'Pendiente')==='Pendiente').reduce((s,c)=>s+parseFloat(c.monto||0),0);
+
+  document.getElementById('fin-ingresos').textContent=M(ingresos);
+  document.getElementById('fin-ventas-n').textContent=ventas.length+' ventas cerradas';
+  document.getElementById('fin-costos').textContent=M(totalCostos);
+  document.getElementById('fin-egresos-n').textContent=egrs.length+' egresos registrados';
+  document.getElementById('fin-utilidad').textContent=M(utilTotal);
+  document.getElementById('fin-utilidad').style.color=utilTotal>=0?'var(--wc-ok)':'var(--wc-danger)';
+  document.getElementById('fin-margen').textContent='margen '+margen+'%';
+  document.getElementById('fin-comisiones').textContent=M(comPendMonto);
+  document.getElementById('fin-com-n').textContent=comPend+' comisiones pendientes';
+
+  const el=document.getElementById('fin-tabla');
+  if(!ventas.length){el.innerHTML='<div class="empty-state"><i class="ti ti-chart-bar"></i><h3>Sin ventas</h3></div>';return;}
+  const rows=ventas.map(c=>({...c,...calcUtil(c),_vend:findVend(c.vendedorId||c.vendedorAsignado)}));
+  rows.sort((a,b)=>new Date(fechaVenta(b)||0)-new Date(fechaVenta(a)||0));
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr>
+      <th>Cliente</th><th>Auto</th><th>Vendedor</th>
+      <th class="num">Precio</th><th class="num">Costo</th>
+      <th class="num">Comisión</th><th class="num">Egresos</th>
+      <th class="num">Utilidad</th><th>Margen</th>
+    </tr></thead>
+    <tbody>${rows.map(c=>`<tr>
+      <td style="font-weight:600">${esc(c.nombre||c.name||'—')}</td>
+      <td style="font-size:12px">${esc(c._autoNombre||c.autoInteres||'—')}</td>
+      <td style="font-size:12px">${esc(c._vend?.nombre||c._vend?.name||'—')}</td>
+      <td class="num">${M(c.precio)}</td><td class="num">${M(c.costo)}</td>
+      <td class="num">${M(c.com)}</td><td class="num">${M(c.egrs)}</td>
+      <td class="num" style="color:${c.util>=0?'var(--wc-ok)':'var(--wc-danger)'}">${M(c.util)}</td>
+      <td><span class="chip ${c.margen>=20?'chip-green':c.margen>=10?'chip-warn':'chip-danger'}">${c.margen}%</span></td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+/* ══ METAS ══ */
+function renderMetas(){
+  const ahora=new Date();
+  document.getElementById('metas-periodo').textContent=ahora.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+  const mes=ahora.getMonth(),anio=ahora.getFullYear();
+  const ventasMes=c=>{const f=new Date(fechaVenta(c)||0);return f.getMonth()===mes&&f.getFullYear()===anio;};
+  const el=document.getElementById('metas-list');
+  if(!VENDEDORES.length){el.innerHTML='<div class="empty-state"><i class="ti ti-target"></i><h3>Sin vendedores configurados</h3></div>';return;}
+  el.innerHTML=VENDEDORES.map(v=>{
+    const meta=parseFloat(v.metaMensual||10);
+    const ventas=CLIENTES.filter(c=>isVenta(c)&&ventasMes(c)&&(c.vendedorId||c.vendedorAsignado)===v._id).length;
+    const pct=Math.min(100,Math.round(ventas/meta*100));
+    const colorClass=pct>=100?'':pct>=70?'warn':'danger';
+    const bono=parseFloat(v.bonoMeta||0);
+    return`<div class="meta-card">
+      <div class="meta-header">
+        <div>
+          <div class="meta-nombre">${esc(v.nombre||v.name||v.email||'Vendedor')}</div>
+          <div style="font-size:12px;color:var(--wc-ink3)">Meta: ${meta} ventas · Bono: ${M(bono)}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="meta-ventas">${ventas} / ${meta}</div>
+          <span class="chip ${pct>=100?'chip-green':pct>=70?'chip-warn':'chip-danger'}">${pct}% alcanzado</span>
+        </div>
+      </div>
+      <div class="meta-prog-wrap">
+        <div class="meta-prog-bar"><div class="meta-prog-fill ${colorClass}" style="width:${pct}%"></div></div>
+      </div>
+      <div class="meta-labels"><span>0</span><span>${Math.round(meta/2)}</span><span>${meta}</span></div>
+    </div>`;}).join('');
+  // Llenar overlay
+  document.getElementById('ov-meta-vendedores').innerHTML=VENDEDORES.map(v=>`
+    <div class="field-grid" style="margin-bottom:8px">
+      <div class="field-label" style="display:flex;align-items:center;height:40px">${esc(v.nombre||v.name||v.email||'Vendedor')}</div>
+      <input class="field-input" type="number" id="meta-ind-${esc(v._id)}" value="${v.metaMensual||10}" placeholder="Meta unidades">
+    </div>`).join('');
+  document.getElementById('ov-meta-equipo').value=VENDEDORES[0]?.metaEquipo||'';
+  document.getElementById('ov-meta-bono').value=VENDEDORES[0]?.bonoMeta||'';
+}
+function guardarMetas(){
+  const metaEquipo=parseFloat(document.getElementById('ov-meta-equipo').value)||0;
+  const bono=parseFloat(document.getElementById('ov-meta-bono').value)||0;
+  const datos=VENDEDORES.map(v=>{
+    const meta=parseFloat(document.getElementById('meta-ind-'+v._id)?.value||10);
+    return{id:v._id,metaMensual:meta,metaEquipo,bonoMeta:bono};
+  });
+  WC.send(WC.OUT.META_GUARDAR,{vendedores:datos});
+  // Actualizar local
+  VENDEDORES.forEach(v=>{
+    const d=datos.find(x=>x.id===v._id);if(d){v.metaMensual=d.metaMensual;v.bonoMeta=d.bonoMeta;}
+  });
+  cerrarOverlay('ov-meta');renderMetas();toast('✓ Metas actualizadas');
+}
+
+/* ══ Nav ══ */
+const TOPBAR_LABELS={
+  dashboard:{title:'Dashboard Ejecutivo',sub:''},ventas:{title:'Ventas del mes',sub:''},
+  equipo:{title:'Equipo / Ranking',sub:''},pipeline:{title:'Pipeline completo',sub:''},
+  inventario:{title:'Inventario',sub:''},finanzas:{title:'Resumen financiero',sub:''},
+  metas:{title:'Metas y bonos',sub:''},
+};
+function mostrarVista(id,btn,nav){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id)?.classList.add('active');
+  if(nav==='bn'){document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');}
+  else{document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');}
+  const t=TOPBAR_LABELS[id]||{title:id,sub:''};
+  document.getElementById('topbar-title').innerHTML=t.title+(t.sub?`<span class="topbar-sub">${t.sub}</span>`:'');
+}
+function cerrarOverlay(id){document.getElementById(id)?.classList.remove('open');}
+function abrirOverlay(id){document.getElementById(id)?.classList.add('open');}
+
+// Resize observer para Wix
+try{new ResizeObserver(()=>{const h=document.body.scrollHeight;window.parent.postMessage({type:'wecars-height',height:h},'*');}).observe(document.body);}catch(_){}
+</script>
+</body>
+</html>

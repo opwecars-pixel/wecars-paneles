@@ -1,0 +1,93 @@
+// backend/fi-creditos.jsw
+// Panel F&I — carga y actualiza créditos + documentos
+import wixData  from 'wix-data';
+import wixUsers from 'wix-users-backend';
+
+const OPTS = { suppressAuth: true };
+const ROLES_FI = ['fi', 'finanzas', 'gerencia', 'administracion'];
+
+async function verificarAcceso() {
+  const user = wixUsers.currentUser;
+  if (!user.loggedIn) throw new Error('No autenticado');
+  const roles = await user.getRoles();
+  const nombres = roles.map(r => (r.name || '').toLowerCase());
+  if (!ROLES_FI.some(r => nombres.includes(r)))
+    throw new Error('Sin permiso para acceder a datos F&I');
+}
+
+async function safeQuery(coleccion, limite = 500) {
+  try {
+    const res = await wixData.query(coleccion).limit(limite).descending('_createdDate').find(OPTS);
+    return res.items || [];
+  } catch (e) {
+    console.warn('[FI] No se pudo cargar colección ' + coleccion + ':', e.message);
+    return [];
+  }
+}
+
+// ── Carga maestra ────────────────────────────────────────────────────────
+export async function obtenerDatosFI() {
+  await verificarAcceso();
+  const [clientes, creditos, carsRaw] = await Promise.all([
+    safeQuery('ALeads', 1000),
+    safeQuery('Creditos', 500),
+    safeQuery('Cars', 500),
+  ]);
+
+  const carMap = {};
+  carsRaw.forEach(car => { carMap[car._id] = car; });
+
+  // Enriquecer clientes con nombre del auto y precio de venta
+  const clientesEnriquecidos = clientes.map(lead => {
+    const autoId = lead.cierreAutoId || lead.autoInventarioId || lead.autoInteresId || lead.vehiculoId || '';
+    const car = autoId ? carMap[autoId] : null;
+    return {
+      ...lead,
+      _precioVenta: lead.cierrePrecio || lead.precioVenta || (car ? (car.precioVenta || car.priceNew || car.precio) : 0) || 0,
+      _autoNombre: car ? [car.marca||car.brand||'', car.modelo||car.model||'', car.anio||car.year||''].filter(Boolean).join(' ') : (lead.autoInteres || ''),
+    };
+  });
+
+  // Normalizar campos de crédito — distintas fuentes usan nombres distintos
+  // submitSolicitudPublica y panel vendedores usan precioVehiculo/engancheMonto
+  const creditosNormalizados = creditos.map(c => {
+    const precio  = parseFloat(c.precioVehiculo || 0);
+    const enganche = parseFloat(c.engancheMonto || c.enganche || c.anticipo || 0);
+    const montoCalculado = precio > 0 ? precio - enganche : 0;
+    return {
+      ...c,
+      monto:            parseFloat(c.monto || c.montoSolicitado || montoCalculado || 0),
+      montoSolicitado:  parseFloat(c.montoSolicitado || c.monto || montoCalculado || 0),
+      enganche:         enganche,
+      anticipo:         enganche,
+    };
+  });
+
+  return { clientes: clientesEnriquecidos, creditos: creditosNormalizados };
+}
+
+// ── Actualizar crédito ────────────────────────────────────────────────────
+export async function actualizarCredito(id, datos) {
+  await verificarAcceso();
+  try {
+    const existente = await wixData.get('Creditos', id, OPTS);
+    if (!existente) return { ok: false, error: 'Crédito no encontrado' };
+    const actualizado = await wixData.update('Creditos', { ...existente, ...datos, _id: id }, OPTS);
+    return { ok: true, credito: actualizado };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Guardar documentos del cliente (campo documentosFI en ALeads) ─────────
+export async function guardarDocumentosFI(clienteId, documentosFI) {
+  await verificarAcceso();
+  try {
+    const existente = await wixData.get('ALeads', clienteId, OPTS);
+    if (!existente) return { ok: false, error: 'Cliente no encontrado' };
+    const actualizado = await wixData.update('ALeads', { ...existente, documentosFI, _id: clienteId }, OPTS);
+    return { ok: true, cliente: actualizado };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}

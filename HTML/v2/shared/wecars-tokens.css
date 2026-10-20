@@ -1,0 +1,102 @@
+/* ═══════════════════════════════════════════════════════════════
+   weCars ERP v2 — Design Tokens
+   Fuente única de verdad para todos los paneles ERP.
+   Importar con: @import url('../shared/wecars-tokens.css');
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Marca ────────────────────────────────────────── */
+  --wc-green:        #56a900;
+  --wc-green-dark:   #3d7a00;
+  --wc-green-light:  #e8f5d6;
+  --wc-green-mid:    #a3d96a;
+
+  /* ── Superficie / Fondo ──────────────────────────── */
+  --wc-bg:           #f4f6f5;
+  --wc-surface:      #ffffff;
+  --wc-surface2:     #f0f2f1;
+  --wc-nav-bg:       #1a2a19;
+  --wc-nav-active:   #2d4a2b;
+  --wc-border:       #dde3de;
+
+  /* ── Texto ───────────────────────────────────────── */
+  --wc-ink:          #0d1a0d;
+  --wc-ink2:         #4a5e4a;
+  --wc-ink3:         #7a8e7a;
+  --wc-ink-invert:   #ffffff;
+
+  /* ── Semáforo / Estado ───────────────────────────── */
+  --wc-ok:           #16a34a;
+  --wc-ok-bg:        #f0fdf4;
+  --wc-warn:         #d97706;
+  --wc-warn-bg:      #fffbeb;
+  --wc-danger:       #dc2626;
+  --wc-danger-bg:    #fef2f2;
+  --wc-info:         #2563eb;
+  --wc-info-bg:      #eff6ff;
+
+  /* ── Etapas del pipeline ─────────────────────────── */
+  --wc-etapa-nuevo:      #6366f1;
+  --wc-etapa-contactado: #0ea5e9;
+  --wc-etapa-seguimiento:#f59e0b;
+  --wc-etapa-calificado: #10b981;
+  --wc-etapa-propuesta:  #8b5cf6;
+  --wc-etapa-ganado:     #16a34a;
+  --wc-etapa-perdido:    #ef4444;
+
+  /* ── Tipografía ──────────────────────────────────── */
+  --wc-font-body:    'Inter', system-ui, sans-serif;
+  --wc-font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --wc-font-mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  /* ── Escala tipográfica ──────────────────────────── */
+  --wc-text-xs:   11px;
+  --wc-text-sm:   12.5px;
+  --wc-text-base: 14px;
+  --wc-text-md:   15px;
+  --wc-text-lg:   17px;
+  --wc-text-xl:   20px;
+  --wc-text-2xl:  24px;
+  --wc-text-3xl:  30px;
+
+  /* ── Radio ───────────────────────────────────────── */
+  --wc-r-sm:   6px;
+  --wc-r-md:   10px;
+  --wc-r-lg:   14px;
+  --wc-r-xl:   20px;
+  --wc-r-full: 9999px;
+
+  /* ── Sombras ─────────────────────────────────────── */
+  --wc-shadow-sm: 0 1px 3px rgba(13,26,13,.08);
+  --wc-shadow-md: 0 4px 12px rgba(13,26,13,.10);
+  --wc-shadow-lg: 0 8px 24px rgba(13,26,13,.12);
+  --wc-shadow-drawer: -4px 0 24px rgba(13,26,13,.15);
+
+  /* ── Espaciado ───────────────────────────────────── */
+  --wc-space-1:  4px;
+  --wc-space-2:  8px;
+  --wc-space-3:  12px;
+  --wc-space-4:  16px;
+  --wc-space-5:  20px;
+  --wc-space-6:  24px;
+  --wc-space-8:  32px;
+  --wc-space-10: 40px;
+
+  /* ── Nav lateral (desktop) ───────────────────────── */
+  --wc-sidebar-w:       220px;
+  --wc-sidebar-w-mini:  64px;
+
+  /* ── Nav inferior (móvil) ────────────────────────── */
+  --wc-bottom-nav-h:    60px;
+
+  /* ── Transiciones ────────────────────────────────── */
+  --wc-ease:     cubic-bezier(.4,0,.2,1);
+  --wc-duration: 180ms;
+
+  /* ── Z-index ─────────────────────────────────────── */
+  --wc-z-dropdown:  100;
+  --wc-z-sticky:    200;
+  --wc-z-drawer:    300;
+  --wc-z-modal:     400;
+  --wc-z-toast:     500;
+}

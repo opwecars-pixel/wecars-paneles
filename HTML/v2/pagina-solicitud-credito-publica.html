@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Solicitud de Crédito — weCars Bajío</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/iconfont/tabler-icons.min.css">
+  <style>
+    :root {
+      --g:      #22c55e;
+      --g-dk:   #16a34a;
+      --g-pale: #f0fdf4;
+      --g-line: #bbf7d0;
+      --bg:     #f4f4f5;
+      --card:   #ffffff;
+      --border: #e4e4e7;
+      --ink:    #18181b;
+      --ink2:   #71717a;
+      --ink3:   #a1a1aa;
+      --r:      14px;
+      --r-sm:   8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100%;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: #0d1117;
+      padding: 14px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar-logo {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -.02em;
+    }
+    .topbar-logo em { color: var(--g); font-style: normal; }
+    .topbar-step {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink3);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    /* ── PROGRESS ── */
+    .prog-bar {
+      height: 3px;
+      background: #1f2937;
+      position: sticky;
+      top: 48px;
+      z-index: 9;
+    }
+    .prog-fill {
+      height: 100%;
+      background: var(--g);
+      transition: width .35s ease;
+      border-radius: 0 2px 2px 0;
+    }
+
+    /* ── HERO STRIP ── */
+    .hero-strip {
+      background: #0d1117;
+      padding: 0 20px 16px;
+    }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(34,197,94,.1);
+      border: 1px solid rgba(34,197,94,.2);
+      border-radius: 999px;
+      padding: 7px 14px 7px 10px;
+    }
+    .hero-pill-icon {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: rgba(34,197,94,.18);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--g);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .hero-pill-name {
+      font-size: 13px; font-weight: 600; color: #fff; line-height: 1.2;
+    }
+    .hero-pill-auto {
+      font-size: 11px; color: rgba(255,255,255,.45); margin-top: 1px;
+    }
+
+    /* ── PRIVACY NOTE ── */
+    .priv-note {
+      margin: 12px 16px;
+      background: #fff8f1;
+      border: 1px solid #fed7aa;
+      border-radius: var(--r-sm);
+      padding: 9px 12px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 11.5px;
+      color: #92400e;
+      line-height: 1.55;
+    }
+    .priv-note i { font-size: 14px; color: #f97316; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── STEP HEADER ── */
+    .step-hdr {
+      padding: 20px 16px 4px;
+    }
+    .step-hdr-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--g-dk);
+      margin-bottom: 4px;
+    }
+    .step-hdr-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      line-height: 1.2;
+    }
+    .step-hdr-desc {
+      font-size: 13px;
+      color: var(--ink2);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      margin: 14px 16px;
+      background: var(--card);
+      border-radius: var(--r);
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+    .form-card + .form-card { margin-top: 10px; }
+    .card-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--ink3);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .field-group { margin-bottom: 12px; }
+    .field-group:last-child { margin-bottom: 0; }
+    .field-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink2);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .req { color: #ef4444; }
+    .field-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--ink);
+      background: var(--card);
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .field-input:focus {
+      outline: none;
+      border-color: var(--g-dk);
+      box-shadow: 0 0 0 3px rgba(22,163,74,.1);
+    }
+    .field-input.error { border-color: #ef4444; }
+    select.field-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%2371717a' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* ── PLAZO GRID ── */
+    .plazo-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 7px;
+    }
+    .plazo-btn {
+      padding: 10px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      background: var(--card);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink2);
+      cursor: pointer;
+      text-align: center;
+      transition: all .12s;
+      font-family: inherit;
+    }
+    .plazo-btn span { display: block; font-size: 9px; font-weight: 500; color: var(--ink3); margin-top: 1px; letter-spacing: .02em; }
+    .plazo-btn.active {
+      background: var(--g-dk);
+      color: #fff;
+      border-color: var(--g-dk);
+    }
+    .plazo-btn.active span { color: rgba(255,255,255,.7); }
+
+    /* ── SLIDER ── */
+    .slider-wrap { padding: 4px 0 2px; }
+    .slider-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .slider-lbl { font-size: 13px; color: var(--ink2); }
+    .slider-val { font-size: 16px; font-weight: 700; color: var(--g-dk); }
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--g-dk);
+      height: 5px;
+      cursor: pointer;
+    }
+    .slider-ends {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--ink3);
+      margin-top: 5px;
+    }
+
+    /* ── CALC BOX ── */
+    .calc-box {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 1.5px solid var(--g-line);
+      border-radius: var(--r);
+      padding: 16px;
+      text-align: center;
+      margin: 10px 0 0;
+    }
+    .calc-label { font-size: 11px; color: var(--g-dk); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .calc-value { font-size: 30px; font-weight: 700; color: var(--g-dk); letter-spacing: -.03em; }
+    .calc-note { font-size: 11px; color: var(--ink3); margin-top: 4px; }
+
+    /* ── INFO BOX ── */
+    .info-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--g-pale);
+      border: 1px solid var(--g-line);
+      border-radius: var(--r-sm);
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .info-chip-icon { color: var(--g-dk); font-size: 16px; flex-shrink: 0; }
+    .info-chip-label { font-size: 10px; font-weight: 700; color: var(--g-dk); text-transform: uppercase; letter-spacing: .05em; }
+    .info-chip-val { font-size: 13px; font-weight: 600; color: var(--ink); }
+
+    /* ── BOTTOM NAV ── */
+    .nav-bottom {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      display: flex;
+      gap: 10px;
+      z-index: 20;
+    }
+    .btn-back {
+      width: 44px; height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      font-size: 18px;
+      color: var(--ink2);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background .12s;
+    }
+    .btn-back:active { background: var(--bg); }
+    .btn-next {
+      flex: 1;
+      height: 44px;
+      border: none;
+      border-radius: 10px;
+      background: var(--g-dk);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: 7px;
+      transition: opacity .15s, transform .1s;
+      letter-spacing: -.01em;
+    }
+    .btn-next:active { transform: scale(.98); }
+    .btn-next:disabled { opacity: .45; cursor: default; }
+
+    /* ── SPACER for fixed nav ── */
+    .nav-spacer { height: 72px; }
+
+    /* ── STATE SCREENS ── */
+    .state-screen {
+      display: none;
+      min-height: 60vh;
+      padding: 48px 24px 32px;
+      text-align: center;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .state-screen.active { display: flex; }
+    .state-icon-wrap {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 34px;
+      margin: 0 auto 20px;
+    }
+    .icon-error { background: #fef2f2; }
+    .icon-ok    { background: #f0fdf4; }
+    .state-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; letter-spacing: -.02em; }
+    .state-sub   { font-size: 14px; color: var(--ink2); line-height: 1.7; max-width: 280px; }
+    .folio-chip {
+      margin-top: 20px;
+      padding: 10px 22px;
+      background: var(--g-pale);
+      border: 1.5px solid var(--g-line);
+      border-radius: 999px;
+      font-weight: 700;
+      color: var(--g-dk);
+      font-size: 15px;
+      letter-spacing: .04em;
+    }
+    .folio-hint { margin-top: 14px; font-size: 12px; color: var(--ink3); }
+
+    /* ── STEP PANELS ── */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+
+    /* ── REF DIVIDER ── */
+    .ref-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--ink3);
+    }
+    .ref-divider::before, .ref-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── LEGAL NOTE ── */
+    .legal-note {
+      font-size: 11px;
+      color: var(--ink3);
+      line-height: 1.6;
+      text-align: center;
+      padding: 12px 16px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-logo">we<em>Cars</em> Bajío</div>
+    <div class="topbar-step" id="topbar-step">Solicitud de crédito</div>
+  </div>
+
+  <!-- Progress fill bar -->
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:20%"></div></div>
+
+  <!-- Hero strip (dark) -->
+  <div class="hero-strip">
+    <div class="hero-pill" id="hero-pill" style="display:none">
+      <div class="hero-pill-icon"><i class="ti ti-user"></i></div>
+      <div>
+        <div class="hero-pill-name" id="hero-nombre">—</div>
+        <div class="hero-pill-auto" id="hero-auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen: token inválido -->
+  <div class="state-screen" id="screen-error">
+    <div class="state-icon-wrap icon-error">⚠️</div>
+    <div class="state-title">Link inválido</div>
+    <div class="state-sub" id="error-msg">Este link no es válido o ya expiró. Solicita uno nuevo a tu asesor de weCars Bajío.</div>
+  </div>
+
+  <!-- Screen: éxito -->
+  <div class="state-screen" id="screen-exito">
+    <div class="state-icon-wrap icon-ok">🎉</div>
+    <div class="state-title">¡Solicitud enviada!</div>
+    <div class="state-sub">Tu información fue recibida de forma segura por nuestro departamento F&amp;I. Te contactaremos en un máximo de <strong>24 horas hábiles</strong>.</div>
+    <div class="folio-chip" id="exito-folio">WC-2024-XXXXX</div>
+    <div class="folio-hint">Guarda tu folio para cualquier consulta.</div>
+  </div>
+
+  <!-- Form principal -->
+  <div id="form-main" style="display:none">
+
+    <!-- Aviso de privacidad -->
+    <div class="priv-note">
+      <i class="ti ti-lock"></i>
+      <span>Tu información (RFC, CURP, datos financieros) es procesada directamente por nuestro departamento F&amp;I — nunca por el asesor de ventas.</span>
+    </div>
+
+    <!-- PASO 1 -->
+    <div class="step-panel active" id="step-1">
+      <div class="step-hdr">
+        <div class="step-hdr-label">Paso 1 de 5</div>
+        <div class="step-hdr-title">Datos personales</div>
+        <div class="step-hdr-desc">Tu información básica de identificación.</div>
+      </div>
+
+      <div class="form-card">
+        <div class="field-group">
+          <div class="field-label">Nombre(s) <span class="req">*</span></div>
+          <input class="field-input" id="p-nombres" type="text" placeholder="Tu(s) nombre(s)" autocomplete="given-name">
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Ap. paterno <span class="req">*</span></div>
+            <input class="field-input" id="p-apPat" type="text" placeholder="Paterno" autocomplete="family-name">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Ap. materno</div>
+            <input class="field-input" id="p-apMat" type="text" placeholder="Materno">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Celular <span class="req">*</span></div>
+            <input class="field-input" id="p-celular" type="tel" placeholder="10 dígitos" maxlength="10" autocomplete="tel">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Correo</div>
+            <input class="field-input" id="p-correo" type="email" placeholder="tu@correo.com" autocomplete="email">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="card-section-label">Identificación fiscal</div>
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">RFC <span class="req">*</span></div>
+            <input class="field-input" id="p-rfc" type="text" placeholder="13 caracteres" maxlength="13" style="text-transform:uppercase;letter-spacing:.04em">
+          </div>
+          <div class="field-group">
+            <div class="field-label">CURP <span class="req">*</span></div>
+            <input class="field-input" id="p-curp" type="text" placeholder="18 caracteres" maxlength="18" style="text-transform:uppercase;letter-spacing:.04em">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Nacimiento</div>
+            <input class="field-input" id="p-fechaNac" type="date">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Edad</div>
+            <input class="field-input" id="p-edad" type="number" placeholder="Años" min="18" max="85">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Sexo</div>
+            <select class="field-input" id="p-sexo">
+              <option value="">Seleccionar</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Estado civil</div>
+            <select class="field-input" id="p-estadoCivil">
+              <option value="">Seleccionar</option>
+              <option value="soltero">Soltero(a)</option>
+              <option value="casado">Casado(a)</option>
+              <option value="divorciado">Divorciado(a)</option>
+              <option value="viudo">Viudo(a)</option>
+              <option value="union_libre">Unión libre</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Dependientes económicos</div>
+          <input class="field-input" id="p-dependientes" type="number" placeholder="0" min="0" max="20">
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="step-panel" id="step-2">
+      <div class="step-hdr">
+        <div class="step-hdr-label">Paso 2 de 5</div>
+        <div class="step-hdr-title">Domicilio</div>
+        <div class="step-hdr-desc">Tu dirección actual de residencia.</div>
+      </div>
+      <div class="form-card">
+        <div class="field-group">
+          <div class="field-label">Calle <span class="req">*</span></div>
+          <input class="field-input" id="p-calle" type="text" placeholder="Nombre de la calle" autocomplete="address-line1">
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Núm. exterior</div>
+            <input class="field-input" id="p-numExt" type="text" placeholder="Núm.">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Código postal</div>
+            <input class="field-input" id="p-cp" type="text" placeholder="CP" maxlength="5" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Colonia</div>
+          <input class="field-input" id="p-colonia" type="text" placeholder="Colonia">
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Ciudad</div>
+            <input class="field-input" id="p-ciudad" type="text" value="León">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Estado</div>
+            <input class="field-input" id="p-estado" type="text" value="Guanajuato">
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Tipo de vivienda</div>
+          <select class="field-input" id="p-tipoVivienda">
+            <option value="">Seleccionar</option>
+            <option value="propia">Propia</option>
+            <option value="rentada">Rentada</option>
+            <option value="familiar">Familiar</option>
+            <option value="hipotecada">Hipotecada</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="step-panel" id="step-3">
+      <div class="step-hdr">
+        <div class="step-hdr-label">Paso 3 de 5</div>
+        <div class="step-hdr-title">Empleo e ingresos</div>
+        <div class="step-hdr-desc">Información sobre tu actividad económica.</div>
+      </div>
+      <div class="form-card">
+        <div class="field-group">
+          <div class="field-label">Tipo de empleo</div>
+          <select class="field-input" id="p-tipoEmpleo">
+            <option value="">Seleccionar</option>
+            <option value="empleado">Empleado</option>
+            <option value="independiente">Independiente / Freelance</option>
+            <option value="empresario">Empresario / Dueño de negocio</option>
+            <option value="pensionado">Pensionado / Jubilado</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Empresa / Negocio</div>
+          <input class="field-input" id="p-empresa" type="text" placeholder="Nombre de la empresa">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Puesto / Actividad</div>
+          <input class="field-input" id="p-puesto" type="text" placeholder="Tu puesto o actividad">
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Antigüedad (años)</div>
+            <input class="field-input" id="p-antiguedad" type="number" placeholder="0" min="0" inputmode="numeric">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Ingreso neto/mes <span class="req">*</span></div>
+            <input class="field-input" id="p-ingreso" type="number" placeholder="$0" min="0" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Otros ingresos/mes</div>
+          <input class="field-input" id="p-otrosIngresos" type="number" placeholder="$0" min="0" inputmode="numeric">
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 4 -->
+    <div class="step-panel" id="step-4">
+      <div class="step-hdr">
+        <div class="step-hdr-label">Paso 4 de 5</div>
+        <div class="step-hdr-title">Referencias personales</div>
+        <div class="step-hdr-desc">Dos personas que puedan confirmar tu información. No deben vivir contigo.</div>
+      </div>
+      <div class="form-card">
+        <div class="card-section-label">Referencia 1</div>
+        <div class="field-group">
+          <div class="field-label">Nombre completo</div>
+          <input class="field-input" id="p-ref1Nombre" type="text" placeholder="Nombre y apellidos">
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Celular</div>
+            <input class="field-input" id="p-ref1Celular" type="tel" placeholder="10 dígitos">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Relación</div>
+            <input class="field-input" id="p-ref1Relacion" type="text" placeholder="Ej: Hermano">
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="card-section-label">Referencia 2</div>
+        <div class="field-group">
+          <div class="field-label">Nombre completo</div>
+          <input class="field-input" id="p-ref2Nombre" type="text" placeholder="Nombre y apellidos">
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Celular</div>
+            <input class="field-input" id="p-ref2Celular" type="tel" placeholder="10 dígitos">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Relación</div>
+            <input class="field-input" id="p-ref2Relacion" type="text" placeholder="Ej: Amigo">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 5 -->
+    <div class="step-panel" id="step-5">
+      <div class="step-hdr">
+        <div class="step-hdr-label">Paso 5 de 5</div>
+        <div class="step-hdr-title">Condiciones del crédito</div>
+        <div class="step-hdr-desc">Configura cómo prefieres tu financiamiento.</div>
+      </div>
+
+      <div style="padding: 0 16px">
+        <!-- Auto de interés (read only) -->
+        <div class="info-chip" id="auto-info-box" style="display:none">
+          <i class="ti ti-car info-chip-icon"></i>
+          <div>
+            <div class="info-chip-label">Vehículo</div>
+            <div class="info-chip-val" id="info-auto-nombre"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="field-group">
+          <div class="field-label">Precio del vehículo <span class="req">*</span></div>
+          <input class="field-input" id="p-precio" type="number" placeholder="$0" inputmode="numeric" oninput="calcMensual()">
+        </div>
+
+        <div class="slider-wrap field-group">
+          <div class="slider-row">
+            <span class="slider-lbl">Enganche</span>
+            <div>
+              <span class="slider-val" id="lbl-eng-pct">20%</span>
+              <span style="font-size:13px;font-weight:600;color:var(--ink2);margin-left:8px" id="lbl-eng-monto">$0</span>
+            </div>
+          </div>
+          <input type="range" id="eng-slider" min="10" max="60" value="20" step="5" oninput="updEng(this.value)">
+          <div class="slider-ends"><span>10%</span><span>60%</span></div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Plazo</div>
+          <div class="plazo-grid">
+            <button class="plazo-btn active" data-val="12" onclick="selPlazo(this)">12<span>meses</span></button>
+            <button class="plazo-btn" data-val="24" onclick="selPlazo(this)">24<span>meses</span></button>
+            <button class="plazo-btn" data-val="36" onclick="selPlazo(this)">36<span>meses</span></button>
+            <button class="plazo-btn" data-val="48" onclick="selPlazo(this)">48<span>meses</span></button>
+            <button class="plazo-btn" data-val="60" onclick="selPlazo(this)">60<span>meses</span></button>
+            <button class="plazo-btn" data-val="72" onclick="selPlazo(this)">72<span>meses</span></button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Financiera de preferencia</div>
+          <select class="field-input" id="p-financiera">
+            <option value="">Sin preferencia</option>
+            <option value="bbva">BBVA</option>
+            <option value="santander">Santander</option>
+            <option value="banorte">Banorte</option>
+            <option value="hsbc">HSBC</option>
+            <option value="banamex">Banamex</option>
+            <option value="scotiabank">Scotiabank</option>
+            <option value="inbursa">Inbursa</option>
+            <option value="otro">Otra</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="legal-note">
+        Al enviar esta solicitud autorizas a weCars Bajío a consultar tu historial crediticio en las sociedades de información crediticia para fines de análisis de crédito.
+      </div>
+    </div>
+
+    <div class="nav-spacer"></div>
+
+    <!-- Nav fijo -->
+    <div class="nav-bottom">
+      <button class="btn-back" id="btn-back" onclick="stepBack()" style="display:none">
+        <i class="ti ti-arrow-left"></i>
+      </button>
+      <button class="btn-next" id="btn-next" onclick="stepNext()">
+        Continuar <i class="ti ti-arrow-right"></i>
+      </button>
+    </div>
+
+  </div><!-- /form-main -->
+
+  <script>
+    let paso = 1;
+    const TOTAL = 5;
+    let plazo = 12;
+    let engPct = 20;
+    let token = '';
+    let prefillData = {};
+
+    const PASOS = ['Datos personales','Domicilio','Empleo e ingresos','Referencias','Condiciones'];
+
+    function _iniciarConToken(t) {
+      if (!t) { mostrarError('No se encontró un token en el link. Solicita uno nuevo a tu asesor.'); return; }
+      token = t;
+      window.parent.postMessage({ type: 'wecars-validar-token', token }, '*');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const tUrl = params.get('t') || '';
+      if (tUrl) { _iniciarConToken(tUrl); return; }
+      window.parent.postMessage({ type: 'wecars-ready-credito' }, '*');
+      const timeout = setTimeout(() => {
+        if (!token) mostrarError('No se encontró un token en el link. Solicita uno nuevo a tu asesor.');
+      }, 4000);
+      window._pendingTokenTimeout = timeout;
+    });
+
+    window.addEventListener('message', (e) => {
+      const d = e.data;
+      if (!d || !d.type) return;
+
+      if (d.type === 'wecars-init' && d.token && !token) {
+        clearTimeout(window._pendingTokenTimeout);
+        _iniciarConToken(d.token);
+        return;
+      }
+      if (d.type === 'wecars-token-resultado') {
+        if (!d.ok) { mostrarError(d.error || 'Link inválido o expirado'); return; }
+        prefillData = d;
+        iniciarForm(d);
+      }
+      if (d.type === 'wecars-solicitud-resultado') {
+        if (d.ok) {
+          mostrarExito(d.folio);
+        } else {
+          alert(d.error || 'Ocurrió un error al enviar. Intenta de nuevo.');
+          const btn = document.getElementById('btn-next');
+          btn.disabled = false;
+          btn.innerHTML = 'Enviar solicitud <i class="ti ti-send"></i>';
+        }
+      }
+    });
+
+    function iniciarForm(data) {
+      const heroNombre = document.getElementById('hero-nombre');
+      const heroPill   = document.getElementById('hero-pill');
+      heroNombre.textContent = 'Hola, ' + (data.leadNombre || 'solicitante');
+      if (data.autoInteres) {
+        document.getElementById('hero-auto').textContent = data.autoInteres;
+        document.getElementById('auto-info-box').style.display = '';
+        document.getElementById('info-auto-nombre').textContent = data.autoInteres;
+        if (data.precioRef) document.getElementById('p-precio').value = data.precioRef;
+      }
+      heroPill.style.display = '';
+      document.getElementById('form-main').style.display = '';
+      calcMensual();
+      renderProgress();
+      // Resize parent iframe if in Wix
+      try { window.parent.postMessage({ type: 'wecars-resize', height: document.body.scrollHeight }, '*'); } catch(_){}
+    }
+
+    function mostrarError(msg) {
+      document.getElementById('screen-error').classList.add('active');
+      document.getElementById('error-msg').textContent = msg;
+    }
+
+    function mostrarExito(folio) {
+      document.getElementById('form-main').style.display = 'none';
+      document.getElementById('screen-exito').classList.add('active');
+      if (folio) document.getElementById('exito-folio').textContent = folio;
+    }
+
+    function renderProgress() {
+      const pct = (paso / TOTAL) * 100;
+      document.getElementById('prog-fill').style.width = pct + '%';
+      document.getElementById('topbar-step').textContent = PASOS[paso-1];
+      document.getElementById('btn-back').style.display = paso > 1 ? '' : 'none';
+      const btn = document.getElementById('btn-next');
+      btn.innerHTML = paso === TOTAL
+        ? 'Enviar solicitud <i class="ti ti-send"></i>'
+        : 'Continuar <i class="ti ti-arrow-right"></i>';
+    }
+
+    function stepNext() {
+      if (!validarPaso()) return;
+      if (paso === TOTAL) { enviarSolicitud(); return; }
+      document.getElementById('step-' + paso).classList.remove('active');
+      paso++;
+      document.getElementById('step-' + paso).classList.add('active');
+      renderProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function stepBack() {
+      if (paso <= 1) return;
+      document.getElementById('step-' + paso).classList.remove('active');
+      paso--;
+      document.getElementById('step-' + paso).classList.add('active');
+      renderProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function validarPaso() {
+      if (paso === 1) return !!(req('p-nombres') & req('p-apPat') & req('p-celular') & req('p-rfc') & req('p-curp'));
+      if (paso === 2) return !!req('p-calle');
+      if (paso === 3) return !!req('p-ingreso');
+      if (paso === 5) return !!req('p-precio');
+      return true;
+    }
+
+    function req(id) {
+      const el = document.getElementById(id);
+      if (!el) return true;
+      const val = el.value.trim();
+      el.classList.toggle('error', !val);
+      return !!val;
+    }
+
+    function updEng(val) {
+      engPct = parseInt(val);
+      document.getElementById('lbl-eng-pct').textContent = val + '%';
+      const precio = parseFloat(document.getElementById('p-precio')?.value) || 0;
+      const engMonto = precio * (engPct / 100);
+      document.getElementById('lbl-eng-monto').textContent = precio ? '$' + engMonto.toLocaleString('es-MX',{maximumFractionDigits:0}) : '';
+    }
+
+    function selPlazo(btn) {
+      document.querySelectorAll('.plazo-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      plazo = parseInt(btn.dataset.val);
+    }
+
+    function calcMensual() { updEng(engPct); }
+
+    function enviarSolicitud() {
+      const btn = document.getElementById('btn-next');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ti ti-loader-2"></i> Enviando…';
+
+      const g = id => document.getElementById(id)?.value?.trim() || '';
+      const n = id => parseFloat(document.getElementById(id)?.value) || 0;
+      const precio    = n('p-precio');
+      const engMonto  = precio * (engPct / 100);
+
+      const datos = {
+        nombres: g('p-nombres'), apPat: g('p-apPat'), apMat: g('p-apMat'),
+        celular: g('p-celular'), correo: g('p-correo'),
+        rfc:  g('p-rfc').toUpperCase(), curp: g('p-curp').toUpperCase(),
+        fechaNac: g('p-fechaNac'), edad: n('p-edad'),
+        sexo: g('p-sexo'), estadoCivil: g('p-estadoCivil'), dependientes: n('p-dependientes'),
+        calle: g('p-calle'), numExt: g('p-numExt'), cp: g('p-cp'),
+        colonia: g('p-colonia'), ciudad: g('p-ciudad'), estado: g('p-estado'),
+        tipoVivienda: g('p-tipoVivienda'),
+        tipoEmpleo: g('p-tipoEmpleo'), empresa: g('p-empresa'), puesto: g('p-puesto'),
+        antiguedad: n('p-antiguedad'), ingreso: n('p-ingreso'), otrosIngresos: n('p-otrosIngresos'),
+        ref1Nombre: g('p-ref1Nombre'), ref1Celular: g('p-ref1Celular'), ref1Relacion: g('p-ref1Relacion'),
+        ref2Nombre: g('p-ref2Nombre'), ref2Celular: g('p-ref2Celular'), ref2Relacion: g('p-ref2Relacion'),
+        precioVehiculo: precio, enganchePct: engPct, engancheMonto: engMonto,
+        plazoMeses: plazo, financiera: g('p-financiera'),
+      };
+
+      window.parent.postMessage({ type: 'wecars-submit-solicitud', token, datos }, '*');
+    }
+  </script>
+</body>
+</html>

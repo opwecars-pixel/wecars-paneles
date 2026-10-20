@@ -16,19 +16,57 @@ import wixData from 'wix-data';
 // ────────────────────────────────────────────────────────────────────────
 //  LEADS — todos los clientes de todos los vendedores
 // ────────────────────────────────────────────────────────────────────────
-export async function obtenerTodosLosLeads(limite = 500) {
-  try {
-    const r = await wixData
-      .query('ALeads')
-      .descending('_createdDate')
-      .limit(limite)
-      .find({ suppressAuth: true });
+async function _paginarColeccion(coleccion, limite) {
+  const PAGE = 1000;
+  let res = await wixData.query(coleccion).descending('_createdDate').limit(PAGE).find({ suppressAuth: true });
+  let todos = [...res.items];
+  while (res.hasNext() && todos.length < limite) {
+    res = await res.next();
+    todos = todos.concat(res.items);
+  }
+  return todos.slice(0, limite);
+}
 
-    const items = r.items.map(c => ({
+export async function obtenerTodosLosLeads(limite = 10000) {
+  try {
+    // Traer de ambas colecciones: ALeads (panel v2) + ClientRecords (panel v1 legado)
+    const [aleads, legado] = await Promise.all([
+      _paginarColeccion('ALeads', limite).catch(() => []),
+      _paginarColeccion('ClientRecords', limite).catch(() => []),
+    ]);
+
+    // Normalizar ClientRecords al formato ALeads para que el panel los muestre igual
+    const legadoNorm = legado.map(c => ({
       ...c,
-      etapa: c.etapa || c.estatus || 'Nuevo',
+      // Mapear campos del panel viejo al esquema nuevo
+      nombre:    c.nombre     || c.name || '',
+      telefono:  c.telefono   || c.phone || c.celular || '',
+      correo:    c.correo     || c.email || '',
+      etapa:     c.etapa      || c.estatus || c.status || 'Nuevo',
+      autoInteres: c.autoInteres || c.interesAuto || c.modeloInteres || '',
+      vendedorId:  c.vendedorId  || c.vendedorAsignado || '',
+      _origen:   'legado', // marca interna para distinguir origen
     }));
-    return { ok: true, items, total: r.totalCount };
+
+    // Fusionar: ALeads primero (tienen prioridad si hay duplicado por teléfono)
+    const mapaFusion = new Map();
+    aleads.forEach(c => { mapaFusion.set(c._id, { ...c, etapa: c.etapa || c.estatus || 'Nuevo' }); });
+
+    // Agregar legado solo si no hay ya un registro en ALeads con mismo teléfono
+    const telsFusion = new Set(aleads.map(c => (c.telefono||'').replace(/\D/g,'')).filter(Boolean));
+    legadoNorm.forEach(c => {
+      const tel = (c.telefono||'').replace(/\D/g,'');
+      if (!mapaFusion.has(c._id) && (!tel || !telsFusion.has(tel))) {
+        mapaFusion.set(c._id, c);
+      }
+    });
+
+    const items = [...mapaFusion.values()]
+      .sort((a, b) => new Date(b._createdDate || 0) - new Date(a._createdDate || 0))
+      .slice(0, limite);
+
+    console.log(`[operaciones-data] leads: ${aleads.length} ALeads + ${legado.length} ClientRecords → ${items.length} fusionados`);
+    return { ok: true, items, total: items.length };
   } catch (err) {
     console.error('[operaciones-data] obtenerTodosLosLeads error:', err);
     return { ok: false, items: [], total: 0, error: err.message };
@@ -38,14 +76,23 @@ export async function obtenerTodosLosLeads(limite = 500) {
 // ────────────────────────────────────────────────────────────────────────
 //  CARS — inventario completo
 // ────────────────────────────────────────────────────────────────────────
-export async function obtenerTodosLosCars(limite = 200) {
+export async function obtenerTodosLosCars(limite = 2000) {
   try {
-    const r = await wixData
+    const PAGE = 100;
+    let resultado = await wixData
       .query('Cars')
       .ascending('marca')
-      .limit(limite)
+      .limit(PAGE)
       .find({ suppressAuth: true });
-    return { ok: true, items: r.items, total: r.totalCount };
+
+    let todos = [...resultado.items];
+
+    while (resultado.hasNext() && todos.length < limite) {
+      resultado = await resultado.next();
+      todos = todos.concat(resultado.items);
+    }
+
+    return { ok: true, items: todos.slice(0, limite), total: resultado.totalCount };
   } catch (err) {
     console.error('[operaciones-data] obtenerTodosLosCars error:', err);
     return { ok: false, items: [], total: 0, error: err.message };
@@ -94,18 +141,61 @@ export async function obtenerCar(id) {
 }
 
 // ────────────────────────────────────────────────────────────────────────
+//  LEADS — crear nuevo lead
+// ────────────────────────────────────────────────────────────────────────
+export async function crearLead(datos) {
+  try {
+    const nuevo = await wixData.insert('ALeads', {
+      ...datos,
+      etapa:        datos.etapa || 'Nuevo',
+      _createdDate: new Date(),
+    }, { suppressAuth: true });
+    return { ok: true, lead: nuevo, creado: true };
+  } catch (err) {
+    console.error('[operaciones-data] crearLead error:', err);
+    return { ok: false, error: err.message };
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────
 //  LEADS — editar un lead (reasignar vendedor, cambiar etapa, etc.)
+//  Acepta `_origen: 'legado'` para enrutar a ClientRecords en vez de ALeads
 // ────────────────────────────────────────────────────────────────────────
 export async function editarLead(id, datos) {
+  // Si el caller indica origen legado, intentamos primero ClientRecords
+  const coleccion = datos._origen === 'legado' ? 'ClientRecords' : 'ALeads';
+  // Quitar _origen del payload antes de guardar
+  const { _origen, ...datosSinOrigen } = datos;
+
   try {
-    const actual = await wixData.get('ALeads', id, { suppressAuth: true });
-    if (!actual) return { ok: false, error: 'Cliente no encontrado' };
-    const actualizado = await wixData.update('ALeads', {
+    let actual = await wixData.get(coleccion, id, { suppressAuth: true }).catch(() => null);
+
+    // Fallback: si no se encontró en la colección esperada, buscar en la otra
+    if (!actual) {
+      const otra = coleccion === 'ALeads' ? 'ClientRecords' : 'ALeads';
+      actual = await wixData.get(otra, id, { suppressAuth: true }).catch(() => null);
+      if (!actual) return { ok: false, error: 'Cliente no encontrado en ninguna colección' };
+      // Usar la colección donde realmente existe
+      const actualizado = await wixData.update(otra, { ...actual, ...datosSinOrigen, _id: id }, { suppressAuth: true });
+      return { ok: true, lead: actualizado, coleccion: otra };
+    }
+
+    // Si se reasigna vendedor, también escribir vendedorAsignado (campo legado = email del vendedor)
+    // para que los cargadores legacy que filtran por email sigan funcionando
+    let datosFinales = { ...datosSinOrigen };
+    if (datosSinOrigen.vendedorId) {
+      try {
+        const v = await wixData.get('Vendedores', datosSinOrigen.vendedorId, { suppressAuth: true });
+        if (v?.email) datosFinales.vendedorAsignado = v.email;
+      } catch (_) {}
+    }
+
+    const actualizado = await wixData.update(coleccion, {
       ...actual,
-      ...datos,
+      ...datosFinales,
       _id: id,
     }, { suppressAuth: true });
-    return { ok: true, lead: actualizado };
+    return { ok: true, lead: actualizado, coleccion };
   } catch (err) {
     console.error('[operaciones-data] editarLead error:', err);
     return { ok: false, error: err.message };

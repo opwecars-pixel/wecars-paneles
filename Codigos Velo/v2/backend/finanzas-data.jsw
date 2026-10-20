@@ -1,0 +1,176 @@
+// backend/finanzas-data.jsw
+// Panel Finanzas v2 — carga y escribe datos financieros
+import wixData  from 'wix-data';
+import wixUsers from 'wix-users-backend';
+
+const OPTS = { suppressAuth: true };
+const ROLES_FINANZAS = ['finanzas', 'fi', 'gerencia', 'administracion'];
+
+async function verificarAcceso() {
+  const user = wixUsers.currentUser;
+  if (!user.loggedIn) throw new Error('No autenticado');
+  const roles = await user.getRoles();
+  const nombres = roles.map(r => (r.name || '').toLowerCase());
+  if (!ROLES_FINANZAS.some(r => nombres.includes(r)))
+    throw new Error('Sin permiso para acceder a datos de Finanzas');
+}
+
+// Query segura: devuelve [] si la colección no existe o falla
+async function safeQuery(coleccion, limite = 500) {
+  try {
+    const res = await wixData.query(coleccion).limit(limite).descending('_createdDate').find(OPTS);
+    return res.items || [];
+  } catch (e) {
+    console.warn('[Finanzas] No se pudo cargar colección ' + coleccion + ':', e.message);
+    return [];
+  }
+}
+
+// ── Carga maestra de datos financieros ─────────────────────────────────
+export async function obtenerDatosFinanzas() {
+  await verificarAcceso();
+  const [clientes, creditos, pagos, comisiones, egresos, carsRaw] = await Promise.all([
+    safeQuery('ALeads', 1000),
+    safeQuery('Creditos', 500),
+    safeQuery('Pagos', 500),
+    safeQuery('Comisiones', 500),
+    safeQuery('Egresos', 500),
+    safeQuery('Cars', 500),
+  ]);
+
+  // Mapa de autos por _id para join rápido
+  const carMap = {};
+  carsRaw.forEach(car => { carMap[car._id] = car; });
+
+  // Enriquecer cada lead con datos financieros del auto vinculado
+  const clientesEnriquecidos = clientes.map(lead => {
+    const autoId = lead.cierreAutoId || lead.autoInventarioId || lead.autoInteresId || lead.vehiculoId || '';
+    const car = autoId ? carMap[autoId] : null;
+
+    // Precio de venta: cierre registrado > expediente del auto > estimado del lead
+    const precioVenta = lead.cierrePrecio || lead.precioVenta
+      || (car ? (car.precioVenta || car.priceNew || car.precio) : null)
+      || 0;
+
+    // Costo de adquisición: siempre viene del auto
+    const costoAdquisicion = (car ? (car.costoAdquisicion || car.costoCompra || car.costPrice || car.costo) : null)
+      || lead.costoAdquisicion || 0;
+
+    // Comisión del vendedor: cierre (3%) > expediente del auto
+    const comisionVendedor = lead.cierreComision || lead.comisionVendedor
+      || (car ? car.comisionVendedor : null)
+      || 0;
+
+    // Gastos de preparación y traslado: vienen del auto
+    const gastosPreparacion = (car ? (car.gastosPreparacion || car.gastosPrep || car.costoPreparacion) : null)
+      || lead.gastosPreparacion || 0;
+    const gastosTraslado = (car ? (car.gastosTraslado || car.costoTraslado || car.precioTraslado) : null)
+      || lead.gastosTraslado || 0;
+
+    // Consigna: el costo es el precio mínimo pactado con el dueño
+    const tipoAdq = car ? (car.tipoAdquisicion||car.tipoOrigen||'compra').toLowerCase() : 'compra';
+    const esConsigna = tipoAdq === 'consigna' || car?.esConsigna === true;
+    const costoFinal = esConsigna
+      ? parseFloat(car?.precioConsignaMin || car?.costoConsigna || costoAdquisicion || 0)
+      : costoAdquisicion;
+
+    return {
+      ...lead,
+      // Campos financieros normalizados — prefijo _ para no colisionar con campos del lead
+      _precioVenta:       precioVenta,
+      _costoAdquisicion:  costoFinal,
+      _comisionVendedor:  comisionVendedor,
+      _gastosPreparacion: gastosPreparacion,
+      _gastosTraslado:    gastosTraslado,
+      // Info del auto
+      _autoNombre: car ? [car.marca||car.brand||'', car.modelo||car.model||'', car.anio||car.year||''].filter(Boolean).join(' ') : (lead.autoInteres || ''),
+      _autoVin:    car ? (car.vin || car.VIN || '') : '',
+      _autoCosto:  costoFinal,
+      _esConsigna: esConsigna,
+      _tipoAdquisicion: tipoAdq,
+      _precioLista: car ? parseFloat(car.priceNew||car.precioVenta||car.precio||0) : 0,
+    };
+  });
+
+  return { clientes: clientesEnriquecidos, creditos, pagos, comisiones, egresos };
+}
+
+// ── Actualizar campos financieros de un cliente ────────────────────────
+export async function actualizarClienteFinanzas(id, datos) {
+  await verificarAcceso();
+  try {
+    const existente = await wixData.get('ALeads', id, OPTS);
+    if (!existente) return { ok: false, error: 'Cliente no encontrado' };
+    const actualizado = await wixData.update('ALeads', { ...existente, ...datos, _id: id }, OPTS);
+    return { ok: true, cliente: actualizado };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Cambiar estatus de crédito ─────────────────────────────────────────
+export async function actualizarCredito(id, datos) {
+  await verificarAcceso();
+  try {
+    const existente = await wixData.get('Creditos', id, OPTS);
+    if (!existente) return { ok: false, error: 'Crédito no encontrado' };
+    const actualizado = await wixData.update('Creditos', { ...existente, ...datos, _id: id }, OPTS);
+    return { ok: true, credito: actualizado };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Cambiar estatus de comisión ────────────────────────────────────────
+export async function actualizarComision(id, datos) {
+  await verificarAcceso();
+  try {
+    const existente = await wixData.get('Comisiones', id, OPTS);
+    if (!existente) return { ok: false, error: 'Comisión no encontrada' };
+    const actualizado = await wixData.update('Comisiones', { ...existente, ...datos, _id: id }, OPTS);
+    return { ok: true, comision: actualizado };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Registrar pago ─────────────────────────────────────────────────────
+export async function registrarPago(datos) {
+  await verificarAcceso();
+  try {
+    const nuevo = await wixData.insert('Pagos', {
+      ...datos,
+      fecha: datos.fecha || new Date().toISOString(),
+    }, OPTS);
+    return { ok: true, pago: nuevo };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Actualizar datos del auto (Cars) — usado cuando Finanzas edita el costo ──
+export async function actualizarDatosCar(autoId, datos) {
+  await verificarAcceso();
+  try {
+    const existente = await wixData.get('Cars', autoId, OPTS);
+    if (!existente) return { ok: false, error: 'Auto no encontrado en Cars' };
+    const actualizado = await wixData.update('Cars', { ...existente, ...datos, _id: autoId }, OPTS);
+    return { ok: true, car: actualizado };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Registrar egreso ───────────────────────────────────────────────────
+export async function registrarEgreso(datos) {
+  await verificarAcceso();
+  try {
+    const nuevo = await wixData.insert('Egresos', {
+      ...datos,
+      fecha: datos.fecha || new Date().toISOString(),
+    }, OPTS);
+    return { ok: true, egreso: nuevo };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}

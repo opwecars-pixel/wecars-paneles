@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>weCars — Finanzas</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+/* ════════════════════════════════════════════════════════
+   TOKENS — idénticos a Panel Operaciones
+════════════════════════════════════════════════════════ */
+:root{
+  --wc-green:#56a900;--wc-green-dark:#3d7a00;--wc-green-light:#e8f5d6;--wc-green-mid:#a3d96a;
+  --wc-bg:#f4f6f5;--wc-surface:#ffffff;--wc-surface2:#f0f2f1;
+  --wc-nav-bg:#1a2a19;--wc-nav-active:#2d4a2b;--wc-border:#dde3de;
+  --wc-ink:#0d1a0d;--wc-ink2:#4a5e4a;--wc-ink3:#7a8e7a;--wc-ink-invert:#ffffff;
+  --wc-ok:#16a34a;--wc-ok-bg:#f0fdf4;--wc-warn:#d97706;--wc-warn-bg:#fffbeb;
+  --wc-danger:#dc2626;--wc-danger-bg:#fef2f2;--wc-info:#2563eb;--wc-info-bg:#eff6ff;
+  --wc-orange:#ea580c;--wc-orange-bg:#fff7ed;
+  --wc-purple:#7c3aed;--wc-purple-bg:#f5f3ff;
+  --wc-shadow-sm:0 1px 3px rgba(13,26,13,.08),0 1px 2px rgba(13,26,13,.05);
+  --wc-shadow-md:0 4px 12px rgba(13,26,13,.1),0 2px 4px rgba(13,26,13,.06);
+  --wc-r-sm:6px;--wc-r-md:10px;--wc-r-lg:14px;--wc-r-xl:20px;--wc-r-full:9999px;
+  --sb-w:220px;--topbar-h:56px;--bottom-nav-h:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:auto;overflow:visible;min-height:800px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;
+  color:var(--wc-ink);background:var(--wc-bg);-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+img{max-width:100%;display:block}
+
+.app{display:flex;flex-direction:column}
+@media(min-width:769px){.app{flex-direction:row;align-items:flex-start}}
+
+/* ── Sidebar ── */
+.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--wc-nav-bg);color:var(--wc-ink-invert);
+  display:none;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+@media(min-width:769px){.sidebar{display:flex}}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo-mark{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--wc-green-mid)}
+.sb-logo-sub{font-size:10px;opacity:.55;margin-top:2px;letter-spacing:.6px;text-transform:uppercase}
+.sb-user{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:var(--wc-green);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:600;line-height:1.2}
+.sb-user-role{font-size:11px;opacity:.6;margin-top:2px}
+.sb-nav{flex:1;padding:12px 0}
+.sb-section-label{padding:6px 16px 4px;font-size:10px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;opacity:.4;margin-top:8px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;
+  font-size:13px;font-weight:500;border-radius:0;transition:background .15s;
+  color:rgba(255,255,255,.75);border:none;background:none;width:100%;text-align:left}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-item.active{background:var(--wc-nav-active);color:var(--wc-green-mid);border-left:3px solid var(--wc-green)}
+.sb-item i{font-size:17px;flex-shrink:0;width:20px}
+.sb-badge{margin-left:auto;background:var(--wc-green);color:var(--wc-nav-bg);font-size:10px;font-weight:700;
+  padding:1px 6px;border-radius:var(--wc-r-full);min-width:18px;text-align:center}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;min-height:0;padding-bottom:80px}
+@media(min-width:769px){.main{padding-bottom:24px}}
+
+/* ── Topbar ── */
+.topbar{height:var(--topbar-h);background:var(--wc-surface);border-bottom:1px solid var(--wc-border);
+  display:flex;align-items:center;gap:12px;padding:0 16px;position:sticky;top:0;z-index:90}
+.topbar-title{font-size:15px;font-weight:700;color:var(--wc-green);flex:1}
+.topbar-sub{font-size:12px;color:var(--wc-ink3);font-weight:400;margin-left:6px}
+.topbar-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--wc-r-md);
+  border:1.5px solid var(--wc-border);background:var(--wc-surface);font-size:13px;font-weight:600;
+  cursor:pointer;color:var(--wc-ink2);transition:all .15s;white-space:nowrap}
+.topbar-btn:hover{border-color:var(--wc-green);color:var(--wc-green)}
+.topbar-btn.primary{background:var(--wc-green);color:var(--wc-ink-invert);border-color:var(--wc-green)}
+.topbar-btn.primary:hover{background:var(--wc-green-dark)}
+
+/* ── View padding ── */
+.view-wrap{padding:28px 32px}
+@media(max-width:1024px){.view-wrap{padding:20px 24px}}
+@media(max-width:768px){.view-wrap{padding:16px 18px}}
+.view{display:none}
+.view.active{display:block}
+
+/* ── Bottom nav (móvil) ── */
+.bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:var(--bottom-nav-h);
+  background:var(--wc-nav-bg);border-top:1px solid rgba(255,255,255,.1);z-index:100;
+  padding-bottom:env(safe-area-inset-bottom,0)}
+@media(min-width:769px){.bottom-nav{display:none}}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;font-size:10px;color:rgba(255,255,255,.55);cursor:pointer;border:none;background:none;
+  padding:6px 2px;min-height:44px;transition:color .15s}
+.bn-item.active{color:var(--wc-green-mid)}
+.bn-item i{font-size:20px}
+
+/* ══ Componentes ══════════════════════════════════════ */
+.card-box{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
+  padding:18px 20px;margin-bottom:16px}
+.card-box-title{font-size:13px;font-weight:700;color:var(--wc-ink2);display:flex;
+  align-items:center;gap:8px;margin-bottom:14px}
+.card-box-title i{font-size:16px;color:var(--wc-ink3)}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);padding:16px 18px}
+.kpi-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--wc-ink3);margin-bottom:6px}
+.kpi-value{font-size:26px;font-weight:800;line-height:1;color:var(--wc-ink);font-variant-numeric:tabular-nums}
+.kpi-sub{font-size:11px;color:var(--wc-ink3);margin-top:4px}
+.kpi-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--wc-ink3);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.kpi-section-label::after{content:'';flex:1;height:1px;background:var(--wc-border)}
+
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--wc-r-full);
+  font-size:11px;font-weight:700;white-space:nowrap}
+.chip-green{background:var(--wc-green-light);color:var(--wc-green-dark)}
+.chip-warn{background:var(--wc-warn-bg);color:var(--wc-warn)}
+.chip-info{background:var(--wc-info-bg);color:var(--wc-info)}
+.chip-orange{background:var(--wc-orange-bg);color:var(--wc-orange)}
+.chip-gray{background:var(--wc-surface2);color:var(--wc-ink3)}
+.chip-danger{background:var(--wc-danger-bg);color:var(--wc-danger)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--wc-r-md);
+  border:1.5px solid var(--wc-border);background:var(--wc-surface);font-size:13px;font-weight:600;
+  cursor:pointer;color:var(--wc-ink2);transition:all .15s}
+.btn:hover{border-color:var(--wc-green);color:var(--wc-green)}
+.btn-primary{background:var(--wc-green);color:var(--wc-ink-invert);border-color:var(--wc-green)}
+.btn-primary:hover{background:var(--wc-green-dark)}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+.field-group{margin-bottom:12px}
+.field-label{font-size:12px;font-weight:600;color:var(--wc-ink2);margin-bottom:5px}
+.field-input{width:100%;padding:9px 12px;border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);
+  background:var(--wc-surface);color:var(--wc-ink);font-size:13px;outline:none;transition:border .15s}
+.field-input:focus{border-color:var(--wc-green)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media(max-width:500px){.field-grid{grid-template-columns:1fr}}
+
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-chip{padding:6px 14px;border-radius:var(--wc-r-full);font-size:12px;font-weight:600;
+  border:1.5px solid var(--wc-border);background:var(--wc-surface);color:var(--wc-ink3);cursor:pointer;
+  transition:all .15s;white-space:nowrap}
+.filter-chip:hover{border-color:var(--wc-green);color:var(--wc-green)}
+.filter-chip.active{background:var(--wc-green);color:#fff;border-color:var(--wc-green)}
+
+.search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-wrap{flex:1;min-width:180px;display:flex;align-items:center;gap:8px;background:var(--wc-surface);
+  border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);padding:7px 12px}
+.search-wrap:focus-within{border-color:var(--wc-green)}
+.search-wrap input{border:none;background:none;outline:none;flex:1;font-size:13px;color:var(--wc-ink)}
+.search-wrap input::placeholder{color:var(--wc-ink3)}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 24px;text-align:center;color:var(--wc-ink3)}
+.empty-state i{font-size:40px;opacity:.3;margin-bottom:12px}
+.empty-state h3{font-size:15px;font-weight:700;color:var(--wc-ink2);margin-bottom:6px}
+.empty-state p{font-size:13px;max-width:280px;line-height:1.5}
+
+.table-wrap{overflow-x:auto;border-radius:var(--wc-r-lg);border:1px solid var(--wc-border);margin-bottom:16px}
+.data-table{width:100%;border-collapse:collapse;background:var(--wc-surface);font-size:13px}
+.data-table th{background:var(--wc-surface2);font-weight:700;font-size:11px;color:var(--wc-ink2);
+  text-align:left;padding:9px 14px;border-bottom:1px solid var(--wc-border);white-space:nowrap;
+  text-transform:uppercase;letter-spacing:.4px}
+.data-table td{padding:10px 14px;border-bottom:1px solid var(--wc-border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--wc-surface2)}
+.data-table td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+
+/* ── Cuadre card ── */
+.cuadre-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
+  overflow:hidden;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s}
+.cuadre-card:hover{box-shadow:var(--wc-shadow-md)}
+.cc-head{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.cc-avatar{width:38px;height:38px;border-radius:50%;background:var(--wc-green-light);color:var(--wc-green-dark);
+  font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cc-info{flex:1;min-width:0}
+.cc-nombre{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-sub{font-size:12px;color:var(--wc-ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-meta{text-align:right;flex-shrink:0}
+.cc-precio{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+.cc-util{font-size:12px;font-weight:700;margin-top:3px}
+.cc-detail{padding:0 16px 16px;border-top:1px solid var(--wc-border);display:none}
+.cc-detail.open{display:block}
+.cuadre-row{display:flex;justify-content:space-between;align-items:baseline;
+  padding:5px 0;border-bottom:1px dashed var(--wc-border);font-size:13px}
+.cuadre-row:last-child{border-bottom:none}
+.cuadre-row.total{border-top:2px solid var(--wc-border);border-bottom:none;
+  padding-top:8px;font-weight:800;font-size:14px;margin-top:4px}
+.cuadre-row.util-row{color:var(--wc-ok);font-weight:700}
+.cuadre-row.util-row.neg{color:var(--wc-danger)}
+.cuadre-group-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--wc-ink3);padding:10px 0 4px}
+
+/* ── Overlays centrados ── */
+.overlay{position:fixed;inset:0;background:rgba(13,26,13,.48);z-index:200;display:none;
+  align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.overlay-panel{width:min(480px,100%);max-height:90vh;background:var(--wc-surface);
+  border-radius:var(--wc-r-lg,12px);overflow-y:auto;display:flex;flex-direction:column;
+  box-shadow:0 8px 40px rgba(13,26,13,.28)}
+.overlay-hdr{display:flex;align-items:center;gap:12px;padding:16px 20px;
+  border-bottom:1px solid var(--wc-border);position:sticky;top:0;background:var(--wc-surface);z-index:1}
+.overlay-title{flex:1;font-size:15px;font-weight:700}
+.overlay-close{width:32px;height:32px;border-radius:var(--wc-r-full);border:1.5px solid var(--wc-border);
+  background:var(--wc-surface);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--wc-ink3)}
+.overlay-close:hover{background:var(--wc-danger-bg);color:var(--wc-danger);border-color:var(--wc-danger)}
+.overlay-body{padding:20px;flex:1}
+.overlay-footer{padding:14px 20px;border-top:1px solid var(--wc-border);
+  display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--wc-surface)}
+/* Ocultar overlay de cuadre de venta — se usa vista inline */
+#ov-venta{display:none!important}
+
+/* ── Cuadre inline ── */
+.cuadre-inline-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;
+  border-top:2px solid var(--wc-border);background:var(--wc-surface2)}
+@media(max-width:600px){.cuadre-inline-grid{grid-template-columns:1fr}}
+.ci-section{background:var(--wc-surface);border:1.5px solid var(--wc-border);
+  border-radius:var(--wc-r-md);padding:14px;display:flex;flex-direction:column;gap:4px}
+.ci-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--wc-ink3);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ci-section-title.ok{color:var(--wc-ok)}
+.ci-section-title.warn{color:var(--wc-warn,#d97706)}
+.ci-section-title.orange{color:#d97706}
+.ci-section-title.danger{color:var(--wc-danger)}
+.ci-row{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:13px;padding:3px 0;gap:8px}
+.ci-row.total{border-top:1.5px solid var(--wc-border);margin-top:4px;padding-top:6px;font-weight:800;font-size:14px}
+.ci-row.util{font-weight:700;font-size:13px}
+.muted-row{color:var(--wc-ink3);font-size:12px;font-style:italic}
+.ci-val{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;white-space:nowrap}
+.ci-val.ok{color:var(--wc-ok)}
+.ci-val.info{color:var(--wc-info,#0ea5e9)}
+.ci-val.danger{color:var(--wc-danger)}
+.ci-val.muted{color:var(--wc-ink3);font-weight:400;font-style:italic;font-size:11px}
+.utilidad-box{grid-column:1/-1;text-align:center;border-width:2px}
+.utilidad-box.pos{border-color:var(--wc-ok);background:rgba(86,169,0,.06)}
+.utilidad-box.neg{border-color:var(--wc-danger);background:rgba(220,38,38,.06)}
+.ci-util-display{font-size:32px;font-weight:900;padding:10px 0;font-variant-numeric:tabular-nums;
+  color:inherit}
+.ci-util-sub{font-size:13px;color:var(--wc-ink3)}
+.ci-editable-wrap{display:flex;align-items:center;gap:4px;margin-left:auto}
+.ci-input{background:var(--wc-surface2);border:1px solid var(--wc-border);border-radius:6px;
+  color:var(--wc-ink);padding:4px 8px;font-size:12px;font-family:inherit;
+  font-variant-numeric:tabular-nums}
+.ci-input:focus{outline:none;border-color:var(--wc-green)}
+.ci-egreso-form .field-input{font-size:12px;padding:6px 10px;height:auto}
+
+.cuadre-box{background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:14px;margin-bottom:12px}
+.cuadre-box-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--wc-ink3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cuadre-box-total{display:flex;justify-content:space-between;align-items:baseline;
+  padding:8px 0 0;border-top:2px solid var(--wc-border);margin-top:6px;font-size:14px;font-weight:800}
+.util-display{font-size:28px;font-weight:900;text-align:center;padding:10px 0;font-variant-numeric:tabular-nums}
+.util-display.pos{color:var(--wc-ok)}
+.util-display.neg{color:var(--wc-danger)}
+
+#wc-toast{position:fixed;bottom:24px;right:20px;z-index:500;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:10px 16px;border-radius:var(--wc-r-md);font-size:13px;font-weight:600;color:#fff;
+  opacity:0;transform:translateY(8px);transition:all .25s;max-width:320px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{background:var(--wc-ok)}.toast.error{background:var(--wc-danger)}.toast.warn{background:var(--wc-warn)}
+</style>
+</head>
+<body>
+<div id="wc-toast"></div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">weCars</div>
+      <div class="sb-logo-sub">Panel Finanzas</div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-avatar">--</div>
+      <div>
+        <div class="sb-user-name" id="sb-nombre">Cargando...</div>
+        <div class="sb-user-role" id="sb-rol">Finanzas</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section-label">Resumen</div>
+      <button class="sb-item active" onclick="mostrarVista('resumen',this)">
+        <i class="ti ti-layout-dashboard"></i>Resumen
+      </button>
+      <div class="sb-section-label">Ventas</div>
+      <button class="sb-item" onclick="mostrarVista('ventas',this)">
+        <i class="ti ti-receipt"></i>Cuadre de ventas
+        <span class="sb-badge" id="sb-badge-ventas" style="display:none">0</span>
+      </button>
+      <button class="sb-item" onclick="mostrarVista('pagos',this)">
+        <i class="ti ti-cash"></i>Pagos / Apartados
+      </button>
+      <button class="sb-item" onclick="mostrarVista('egresos',this)">
+        <i class="ti ti-arrow-down-circle"></i>Egresos
+      </button>
+      <div class="sb-section-label">Créditos y comisiones</div>
+      <button class="sb-item" onclick="mostrarVista('creditos',this)">
+        <i class="ti ti-building-bank"></i>Créditos F&amp;I
+        <span class="sb-badge" id="sb-badge-cred" style="display:none">0</span>
+      </button>
+      <button class="sb-item" onclick="mostrarVista('comisiones',this)">
+        <i class="ti ti-percentage"></i>Comisiones
+        <span class="sb-badge" id="sb-badge-com" style="display:none">0</span>
+      </button>
+      <div class="sb-section-label">Clientes</div>
+      <button class="sb-item" onclick="mostrarVista('clientes',this)">
+        <i class="ti ti-address-book"></i>Todos los clientes
+      </button>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <div style="flex:1;min-width:0">
+        <div class="topbar-title" id="topbar-title">Resumen Financiero<span class="topbar-sub" id="topbar-sub"></span></div>
+      </div>
+      <button class="topbar-btn primary" id="egr-cta-btn" style="display:none" onclick="ctaClick()">
+        <i class="ti ti-plus"></i><span id="topbar-cta-label">Nuevo</span>
+      </button>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="view view-wrap active" id="view-resumen">
+      <div class="kpi-row">
+        <div class="kpi-card"><div class="kpi-label">Ingresos del mes</div>
+          <div class="kpi-value" id="kpi-ingresos" style="color:var(--wc-ok)">—</div>
+          <div class="kpi-sub" id="kpi-ventas-n">— ventas</div></div>
+        <div class="kpi-card"><div class="kpi-label">Egresos del mes</div>
+          <div class="kpi-value" id="kpi-egresos-tot" style="color:var(--wc-danger)">—</div>
+          <div class="kpi-sub">gastos registrados</div></div>
+        <div class="kpi-card"><div class="kpi-label">Utilidad neta</div>
+          <div class="kpi-value" id="kpi-utilidad">—</div>
+          <div class="kpi-sub" id="kpi-margen">margen —%</div></div>
+        <div class="kpi-card"><div class="kpi-label">Comisiones pendientes</div>
+          <div class="kpi-value" id="kpi-com-pend">—</div>
+          <div class="kpi-sub" id="kpi-cred-act">— créditos en trámite</div></div>
+        <div class="kpi-card"><div class="kpi-label">Promedio por venta</div>
+          <div class="kpi-value" id="kpi-prom-util" style="color:var(--wc-ok)">—</div>
+          <div class="kpi-sub" id="kpi-prom-pct">margen promedio —%</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div class="kpi-section-label"><i class="ti ti-receipt" style="font-size:14px"></i>Ventas recientes</div>
+          <div id="resumen-ventas"></div>
+        </div>
+        <div>
+          <div class="kpi-section-label"><i class="ti ti-percentage" style="font-size:14px"></i>Comisiones pendientes</div>
+          <div id="resumen-comisiones"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENTAS -->
+    <div class="view view-wrap" id="view-ventas">
+      <div class="search-bar">
+        <div class="search-wrap"><i class="ti ti-search"></i>
+          <input type="search" id="ventas-q" placeholder="Buscar cliente, auto, vendedor..." oninput="renderVentas()">
+        </div>
+        <select class="field-input" id="ventas-f-mes" onchange="renderVentas()" style="width:auto;padding:7px 12px">
+          <option value="">Todos los meses</option>
+        </select>
+        <select class="field-input" id="ventas-f-vend" onchange="renderVentas()" style="width:auto;padding:7px 12px">
+          <option value="">Todos los vendedores</option>
+        </select>
+      </div>
+      <div id="ventas-list"></div>
+    </div>
+
+    <!-- CRÉDITOS -->
+    <div class="view view-wrap" id="view-creditos">
+      <div class="search-bar">
+        <div class="search-wrap"><i class="ti ti-search"></i>
+          <input type="search" id="cred-q" placeholder="Buscar cliente, banco, auto..." oninput="renderCreditos()">
+        </div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-chip active" onclick="setFiltroCred('todos',this)">Todos</button>
+        <button class="filter-chip" onclick="setFiltroCred('Pendiente',this)">Pendientes</button>
+        <button class="filter-chip" onclick="setFiltroCred('Enviado',this)">Enviados</button>
+        <button class="filter-chip" onclick="setFiltroCred('Aprobado',this)">Aprobados</button>
+        <button class="filter-chip" onclick="setFiltroCred('Rechazado',this)">Rechazados</button>
+      </div>
+      <div id="cred-list"></div>
+    </div>
+
+    <!-- COMISIONES -->
+    <div class="view view-wrap" id="view-comisiones">
+      <div class="search-bar">
+        <div class="search-wrap"><i class="ti ti-search"></i>
+          <input type="search" id="com-q" placeholder="Buscar vendedor, cliente..." oninput="renderComisiones()">
+        </div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-chip active" onclick="setFiltroComision('todos',this)">Todas</button>
+        <button class="filter-chip" onclick="setFiltroComision('Pendiente',this)">Pendientes</button>
+        <button class="filter-chip" onclick="setFiltroComision('Liberada',this)">Liberadas</button>
+        <button class="filter-chip" onclick="setFiltroComision('Pagada',this)">Pagadas</button>
+      </div>
+      <div id="com-list"></div>
+    </div>
+
+    <!-- PAGOS -->
+    <div class="view view-wrap" id="view-pagos">
+      <div class="search-bar">
+        <div class="search-wrap"><i class="ti ti-search"></i>
+          <input type="search" id="pag-q" placeholder="Buscar cliente, concepto..." oninput="renderPagos()">
+        </div>
+        <button class="btn btn-primary" onclick="abrirModalPago()"><i class="ti ti-plus"></i>Registrar pago</button>
+      </div>
+      <div id="pag-list"></div>
+    </div>
+
+    <!-- EGRESOS -->
+    <div class="view view-wrap" id="view-egresos">
+      <div class="search-bar">
+        <div class="search-wrap"><i class="ti ti-search"></i>
+          <input type="search" id="egr-q" placeholder="Buscar concepto, categoría..." oninput="renderEgresos()">
+        </div>
+        <button class="btn btn-primary" onclick="abrirModalEgreso()"><i class="ti ti-plus"></i>Registrar egreso</button>
+      </div>
+      <div id="egr-list"></div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="view view-wrap" id="view-clientes">
+      <div class="search-bar">
+        <div class="search-wrap"><i class="ti ti-search"></i>
+          <input type="search" id="cli-q" placeholder="Buscar cliente, vendedor, auto..." oninput="renderClientes()">
+        </div>
+        <select class="field-input" id="cli-f-etapa" onchange="renderClientes()" style="width:auto;padding:7px 12px">
+          <option value="">Todas las etapas</option>
+          <option>Nuevo</option><option>Contactado</option><option>Cita agendada</option>
+          <option>En negociación</option><option>Ganado</option><option>Perdido</option>
+        </select>
+      </div>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>Cliente</th><th>Auto de interés</th><th>Vendedor</th><th>Etapa</th><th class="num">Precio venta</th><th>Fecha</th></tr></thead>
+        <tbody id="cli-tbody"></tbody>
+      </table></div>
+    </div>
+
+  </main>
+
+  <!-- Bottom nav móvil -->
+  <nav class="bottom-nav">
+    <button class="bn-item active" onclick="mostrarVista('resumen',this)"><i class="ti ti-layout-dashboard"></i>Resumen</button>
+    <button class="bn-item" onclick="mostrarVista('ventas',this)"><i class="ti ti-receipt"></i>Ventas</button>
+    <button class="bn-item" onclick="mostrarVista('creditos',this)"><i class="ti ti-building-bank"></i>Créditos</button>
+    <button class="bn-item" onclick="mostrarVista('comisiones',this)"><i class="ti ti-percentage"></i>Comisiones</button>
+    <button class="bn-item" onclick="mostrarVista('clientes',this)"><i class="ti ti-address-book"></i>Clientes</button>
+  </nav>
+
+</div>
+
+<!-- Overlay: cuadre de venta -->
+<div class="overlay" id="ov-venta" onclick="if(event.target===this)cerrarOverlay('ov-venta')">
+  <div class="overlay-panel">
+    <div class="overlay-hdr">
+      <div><div class="overlay-title" id="ov-v-title">Cuadre de venta</div>
+        <div style="font-size:12px;color:var(--wc-ink3)" id="ov-v-sub"></div></div>
+      <button class="overlay-close" onclick="cerrarOverlay('ov-venta')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="overlay-body">
+      <div class="cuadre-box">
+        <div class="cuadre-box-title" style="color:var(--wc-ok)"><i class="ti ti-trending-up"></i>Ingreso</div>
+        <div class="cuadre-row"><span>Precio de venta</span><span id="ov-precio"></span></div>
+        <div class="cuadre-row"><span>Anticipo / Enganche</span><span id="ov-anticipo"></span></div>
+        <div class="cuadre-row"><span>Monto crédito</span><span id="ov-credito"></span></div>
+        <div class="cuadre-box-total"><span>Total ingreso</span><span id="ov-t-ingreso"></span></div>
+      </div>
+      <div class="cuadre-box">
+        <div class="cuadre-box-title"><i class="ti ti-package"></i>Costo de la unidad</div>
+        <div class="cuadre-row"><span>Precio adquisición</span><span id="ov-costo-adq"></span></div>
+        <div class="cuadre-row"><span>Gastos preparación</span><span id="ov-gastos-prep"></span></div>
+        <div class="cuadre-row"><span>Gastos traslado</span><span id="ov-gastos-tras"></span></div>
+        <div class="cuadre-row"><span>Otros costos</span><span id="ov-otros"></span></div>
+        <div class="cuadre-box-total"><span>Total costo</span><span id="ov-t-costo"></span></div>
+      </div>
+      <div class="cuadre-box">
+        <div class="cuadre-box-title"><i class="ti ti-percentage"></i>Comisiones</div>
+        <div class="cuadre-row"><span>Comisión vendedor</span><span id="ov-com-vend"></span></div>
+        <div class="cuadre-row"><span>Comisión F&amp;I</span><span id="ov-com-fi"></span></div>
+        <div class="cuadre-row"><span>Gastos banco/F&amp;I</span><span id="ov-gastos-fi"></span></div>
+        <div class="cuadre-box-total"><span>Total comisiones</span><span id="ov-t-comisiones"></span></div>
+      </div>
+      <div class="cuadre-box" style="border:2px solid var(--wc-green)">
+        <div class="cuadre-box-title" style="color:var(--wc-green)"><i class="ti ti-circle-check"></i>Utilidad neta</div>
+        <div class="util-display" id="ov-utilidad">—</div>
+        <div style="text-align:center;font-size:12px;color:var(--wc-ink3)" id="ov-margen"></div>
+      </div>
+      <div class="field-group" style="margin-top:16px">
+        <div class="field-label">Notas financieras</div>
+        <textarea class="field-input" id="ov-notas" rows="3" style="resize:vertical"></textarea>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Estatus financiero</div>
+        <select class="field-input" id="ov-estatus">
+          <option value="pendiente">Pendiente revisión</option>
+          <option value="en_proceso">En proceso</option>
+          <option value="facturado">Facturado</option>
+          <option value="cerrado">Cerrado / Liquidado</option>
+        </select>
+      </div>
+    </div>
+    <div class="overlay-footer">
+      <button class="btn" onclick="cerrarOverlay('ov-venta')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarVenta()"><i class="ti ti-device-floppy"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay: pago -->
+<div class="overlay" id="ov-pago" onclick="if(event.target===this)cerrarOverlay('ov-pago')">
+  <div class="overlay-panel">
+    <div class="overlay-hdr">
+      <div class="overlay-title">Registrar pago / apartado</div>
+      <button class="overlay-close" onclick="cerrarOverlay('ov-pago')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="overlay-body">
+      <div class="field-group"><div class="field-label">Cliente</div><input class="field-input" id="pago-cliente" placeholder="Nombre del cliente"></div>
+      <div class="field-group"><div class="field-label">Concepto</div>
+        <select class="field-input" id="pago-concepto"><option>Apartado</option><option>Enganche</option><option>Liquidación</option><option>Abono</option><option>Otro</option></select>
+      </div>
+      <div class="field-grid">
+        <div class="field-group"><div class="field-label">Monto</div><input class="field-input" type="number" id="pago-monto" placeholder="0"></div>
+        <div class="field-group"><div class="field-label">Forma de pago</div>
+          <select class="field-input" id="pago-forma"><option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option><option>Cheque</option></select>
+        </div>
+      </div>
+      <div class="field-group"><div class="field-label">Auto / Unidad</div><input class="field-input" id="pago-vehiculo" placeholder="Marca modelo año"></div>
+      <div class="field-group"><div class="field-label">Notas</div><textarea class="field-input" id="pago-notas" rows="2"></textarea></div>
+    </div>
+    <div class="overlay-footer">
+      <button class="btn" onclick="cerrarOverlay('ov-pago')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarPago()"><i class="ti ti-check"></i>Registrar pago</button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay: egreso -->
+<div class="overlay" id="ov-egreso" onclick="if(event.target===this)cerrarOverlay('ov-egreso')">
+  <div class="overlay-panel">
+    <div class="overlay-hdr">
+      <div class="overlay-title">Registrar egreso</div>
+      <button class="overlay-close" onclick="cerrarOverlay('ov-egreso')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="overlay-body">
+      <div class="field-group"><div class="field-label">Concepto</div><input class="field-input" id="egr-concepto" placeholder="¿En qué se gastó?"></div>
+      <div class="field-grid">
+        <div class="field-group"><div class="field-label">Categoría</div>
+          <select class="field-input" id="egr-categoria"><option>Preparación</option><option>Traslado</option><option>Comisión</option><option>Operativo</option><option>Marketing</option><option>Renta</option><option>Otro</option></select>
+        </div>
+        <div class="field-group"><div class="field-label">Monto</div><input class="field-input" type="number" id="egr-monto" placeholder="0"></div>
+      </div>
+      <div class="field-group"><div class="field-label">Referencia (cliente / auto)</div><input class="field-input" id="egr-ref" placeholder="Opcional"></div>
+      <div class="field-group"><div class="field-label">Notas</div><textarea class="field-input" id="egr-notas" rows="2"></textarea></div>
+      <input type="hidden" id="egr-lead-id" value="">
+    </div>
+    <div class="overlay-footer">
+      <button class="btn" onclick="cerrarOverlay('ov-egreso')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEgreso()"><i class="ti ti-check"></i>Registrar egreso</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  ESTADO
+// ════════════════════════════════════════════════════════
+let CLIENTES=[],CREDITOS=[],PAGOS=[],COMISIONES=[],EGRESOS=[],VENDEDORES=[];
+let _vistaActual='resumen',_filtroCredFin='todos',_filtroComFin='todos',_ventaId=null;
+let CTX={emailActual:'',rolActual:'',nombreActual:''};
+const ROLES_EGRESO=['finanzas','gerencia','administracion','operaciones'];
+const puedeEditarEgreso=()=>ROLES_EGRESO.includes(String(CTX.rolActual||'').toLowerCase());
+const VISTA_TITLES={resumen:'Resumen Financiero',ventas:'Cuadre de ventas',
+  creditos:'Créditos F&I',comisiones:'Comisiones',
+  pagos:'Pagos / Apartados',egresos:'Egresos',clientes:'Todos los clientes'};
+const VISTA_CTA={
+  pagos:{label:'+ Registrar pago',fn:'abrirModalPago'},
+  egresos:{label:'+ Registrar egreso',fn:'abrirModalEgreso'},
+};
+
+// ════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const M=v=>(v!=null&&v!=='')? '$'+Math.round(Number(v)||0).toLocaleString('es-MX'):'—';
+const g=id=>(document.getElementById(id)||{}).value||'';
+const sv=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+const st=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+const ini=n=>(n||'').split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase()||'??';
+const fechaCorta=d=>d?new Date(d).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'}):'—';
+const mesLabel=d=>d?new Date(d).toLocaleDateString('es-MX',{month:'short',year:'numeric'}):'';
+const findVend=id=>id?VENDEDORES.find(v=>v._id===id||(v.email||'').toLowerCase()===id.toLowerCase()||v.nombre===id)||null:null;
+
+function credEst(c){
+  const r=c.estatus||c.estado||'Pendiente';
+  if(['solicitud_enviada','en_proceso','documentos_pendientes','en_tramite_credito','en_finanzas','En trámite'].includes(r)) return 'Pendiente';
+  if(['enviado_banco','Enviado'].includes(r)) return 'Enviado';
+  if(['aprobado','Aprobado','Autorizado'].includes(r)) return 'Aprobado';
+  if(['rechazado','Rechazado','cancelado'].includes(r)) return 'Rechazado';
+  return r;
+}
+
+function calcCuadre(c){
+  // Campos normalizados por el backend (prefijo _) tienen prioridad
+  const precio=parseFloat(c._precioVenta||c.cierrePrecio||c.precioVenta||c.precioEstimado||c.precio||0);
+  const anticipo=parseFloat(c.anticipo||c.apartado||0);
+  const cred=CREDITOS.find(cr=>cr.leadId===c._id||cr.clienteId===c._id);
+  const creditoMonto=cred?parseFloat(cred.monto||cred.montoSolicitado||0):0;
+  const costoAdq=parseFloat(c._costoAdquisicion||c.costoAdquisicion||c.costoUnidad||c.precioCompra||0);
+  const gastosPrep=parseFloat(c._gastosPreparacion||c.gastosPreparacion||c.gastosPrep||0);
+  const gastosTras=parseFloat(c._gastosTraslado||c.gastosTraslado||c.gastosTras||0);
+  const otros=parseFloat(c.otrosCostos||0);
+  const totalCosto=costoAdq+gastosPrep+gastosTras+otros;
+  const comVend=parseFloat(c._comisionVendedor||c.cierreComision||c.comisionVendedor||c.comision||0);
+  const comFI=parseFloat(c.comisionFI||0);
+  const gastosFI=parseFloat(c.gastosFI||(cred?.gastosBanco)||0);
+  const egLead=EGRESOS.filter(e=>e.leadId===c._id||e.clienteId===c._id).reduce((s,e)=>s+parseFloat(e.monto||0),0);
+  const totalCom=comVend+comFI+gastosFI;
+  const totalGastos=totalCosto+totalCom+egLead;
+  const utilidad=precio-totalGastos;
+  const margen=precio>0?Math.round(utilidad/precio*100):0;
+  return{precio,anticipo,creditoMonto,costoAdq,gastosPrep,gastosTras,otros,totalCosto,
+         comVend,comFI,gastosFI,egLead,totalCom,totalGastos,utilidad,margen};
+}
+
+// ════════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════════
+function toast(msg,tipo='ok'){
+  const t=document.getElementById('wc-toast');
+  const el=document.createElement('div');el.className=`toast ${tipo}`;el.textContent=msg;t.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},3000);
+}
+
+// ════════════════════════════════════════════════════════
+//  NAVEGACIÓN
+// ════════════════════════════════════════════════════════
+function mostrarVista(vista,btn){
+  _vistaActual=vista;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el=document.getElementById('view-'+vista);if(el)el.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll(`.sb-item[onclick*="'${vista}'"]`).forEach(b=>b.classList.add('active'));
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  st('topbar-title',VISTA_TITLES[vista]||vista);
+  const sub=document.getElementById('topbar-sub');
+  if(sub){const mes=new Date().toLocaleString('es-MX',{month:'long',year:'numeric'});sub.textContent=' — '+mes;}
+  const cta=VISTA_CTA[vista];const ctaBtn=document.getElementById('topbar-cta');
+  if(cta){st('topbar-cta-label',cta.label);ctaBtn.style.display='flex';ctaBtn.onclick=window[cta.fn];}
+  else{ctaBtn.style.display='none';}
+  renderVista(vista);
+}
+function ctaClick(){}
+function renderVista(v){
+  if(v==='resumen')    renderResumen();
+  if(v==='ventas')     {poblarFiltrosVentas();renderVentas();}
+  if(v==='creditos')   renderCreditos();
+  if(v==='comisiones') renderComisiones();
+  if(v==='pagos')      renderPagos();
+  if(v==='egresos')    renderEgresos();
+  if(v==='clientes')   renderClientes();
+}
+
+// ════════════════════════════════════════════════════════
+//  RESUMEN
+// ════════════════════════════════════════════════════════
+// Fecha real de cierre de una venta (varios aliases según Panel Operaciones)
+function fechaVenta(c){return c.cierreFecha||c.fechaCierre||c.fechaVenta||c._updatedDate||c._createdDate||null;}
+// ¿Es una venta cerrada?
+function isVenta(c){return['Ganado','Vendido','Entregado'].includes(c.etapa||c.estatus||'');}
+
+function renderResumen(){
+  const ahora=new Date();
+  const mesIni=new Date(ahora.getFullYear(),ahora.getMonth(),1).getTime();
+  const mesFin=new Date(ahora.getFullYear(),ahora.getMonth()+1,1).getTime();
+  const ventasMes=CLIENTES.filter(c=>{
+    if(!isVenta(c))return false;
+    const t=new Date(fechaVenta(c)||0).getTime();
+    return t>=mesIni&&t<mesFin;
+  });
+  // Utilidad real usando calcCuadre (mismo cálculo que el cuadre de ventas)
+  const totales=ventasMes.reduce((acc,c)=>{const cur=calcCuadre(c);acc.i+=cur.precio;acc.u+=cur.utilidad;return acc;},{i:0,u:0});
+  const ingresos=totales.i,util=totales.u;
+  const egrMes=EGRESOS.filter(e=>{const t=new Date(e._createdDate||e.fecha||0).getTime();return t>=mesIni&&t<mesFin;}).reduce((s,e)=>s+parseFloat(e.monto||0),0);
+  const comPend=COMISIONES.filter(c=>(c.estatusPago||c.estatus||'Pendiente')==='Pendiente').length;
+  const credAct=CREDITOS.filter(c=>!['Aprobado','Rechazado','cerrado'].includes(credEst(c))).length;
+  const uEl=document.getElementById('kpi-utilidad');
+  const n=ventasMes.length;
+  const promUtil=n>0?Math.round(totales.u/n):0;
+  const promPct=ingresos>0?Math.round(totales.u/ingresos*100):0;
+  st('kpi-ingresos',M(ingresos));st('kpi-ventas-n',n+' venta'+(n!==1?'s':''));
+  st('kpi-egresos-tot',M(egrMes));st('kpi-utilidad',M(util));
+  if(uEl)uEl.style.color=util>=0?'var(--wc-ok)':'var(--wc-danger)';
+  st('kpi-margen',ingresos>0?'margen '+Math.round(util/ingresos*100)+'%':'margen —%');
+  st('kpi-com-pend',comPend);st('kpi-cred-act',credAct+' crédito'+(credAct!==1?'s':'')+' en trámite');
+  st('kpi-prom-util',n>0?M(promUtil):'—');
+  st('kpi-prom-pct',n>0?'margen promedio '+promPct+'%':'sin ventas este mes');
+  const vEl=document.getElementById('resumen-ventas');
+  const top5=[...ventasMes].sort((a,b)=>new Date(fechaVenta(b)||0)-new Date(fechaVenta(a)||0)).slice(0,5);
+  vEl.innerHTML=top5.length?top5.map(c=>{
+    const cur=calcCuadre(c);
+    return`<div class="cuadre-card" onclick="abrirCuadre('${esc(c._id)}')">
+      <div class="cc-head">
+        <div class="cc-avatar">${esc(ini(c.nombre||c.name))}</div>
+        <div class="cc-info"><div class="cc-nombre">${esc(c.nombre||c.name||'—')}</div>
+          <div class="cc-sub">${esc(c.autoVendido||c.autoInteres||'—')}</div></div>
+        <div class="cc-meta"><div class="cc-precio">${M(cur.precio)}</div>
+          <div class="cc-util" style="color:${cur.utilidad>=0?'var(--wc-ok)':'var(--wc-danger)'}">${M(cur.utilidad)}</div></div>
+      </div></div>`;}).join('')
+    :'<div class="empty-state" style="padding:20px"><i class="ti ti-receipt"></i><p>Sin ventas este mes</p></div>';
+  const cEl=document.getElementById('resumen-comisiones');
+  const cpList=COMISIONES.filter(c=>(c.estatusPago||'Pendiente')==='Pendiente').slice(0,5);
+  cEl.innerHTML=cpList.length?cpList.map(c=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--wc-border)">
+      <div><div style="font-weight:600;font-size:13px">${esc(c.vendedor||c.vendedorNombre||'—')}</div>
+        <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.clienteNombre||c.concepto||'—')}</div></div>
+      <span style="font-weight:800;font-size:14px;font-variant-numeric:tabular-nums">${M(c.monto)}</span>
+    </div>`).join('')
+    :'<p style="color:var(--wc-ink3);font-size:13px;padding:8px 0">Sin comisiones pendientes</p>';
+}
+
+// ════════════════════════════════════════════════════════
+//  VENTAS
+// ════════════════════════════════════════════════════════
+function poblarFiltrosVentas(){
+  const ventas=CLIENTES.filter(c=>['Ganado','Vendido','Entregado'].includes(c.etapa||c.estatus||''));
+  const meses=[...new Set(ventas.map(c=>mesLabel(fechaVenta(c))).filter(Boolean))];
+  const mEl=document.getElementById('ventas-f-mes');const pM=mEl.value;
+  mEl.innerHTML='<option value="">Todos los meses</option>'+meses.map(m=>`<option${m===pM?' selected':''}>${esc(m)}</option>`).join('');
+  const vEl=document.getElementById('ventas-f-vend');const pV=vEl.value;
+  vEl.innerHTML='<option value="">Todos los vendedores</option>'+VENDEDORES.map(v=>`<option value="${esc(v._id)}"${v._id===pV?' selected':''}>${esc(v.nombre)}</option>`).join('');
+}
+
+function renderVentas(){
+  const q=g('ventas-q').toLowerCase(),mes=g('ventas-f-mes'),vid=g('ventas-f-vend');
+  let rows=CLIENTES.filter(c=>isVenta(c));
+  if(q)rows=rows.filter(c=>[c.nombre,c.name,c.autoInteres,c.autoVendido,c.vendedorNombre,findVend(c.vendedorId)?.nombre].some(v=>String(v||'').toLowerCase().includes(q)));
+  if(mes)rows=rows.filter(c=>mesLabel(fechaVenta(c))===mes);
+  if(vid)rows=rows.filter(c=>c.vendedorId===vid||c.vendedorAsignado===vid);
+  const el=document.getElementById('ventas-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-receipt"></i><h3>Sin ventas</h3><p>No hay ventas con esos filtros</p></div>';return;}
+  el.innerHTML=rows.map(c=>{
+    const cur=calcCuadre(c);const vend=findVend(c.vendedorId||c.vendedorAsignado);
+    return`<div class="cuadre-card" id="cc-${esc(c._id)}">
+      <div class="cc-head" onclick="toggleCuadreInline('${esc(c._id)}')">
+        <div class="cc-avatar">${esc(ini(c.nombre||c.name))}</div>
+        <div class="cc-info"><div class="cc-nombre">${esc(c.nombre||c.name||'—')}</div>
+          <div class="cc-sub">${esc(c.autoVendido||c.autoInteres||'—')} · ${esc(vend?.nombre||c.vendedorNombre||'—')} · ${fechaCorta(fechaVenta(c))}</div></div>
+        <div class="cc-meta"><div class="cc-precio">${M(cur.precio)}</div>
+          <div class="cc-util" style="color:${cur.utilidad>=0?'var(--wc-ok)':'var(--wc-danger)'}">${M(cur.utilidad)} (${cur.margen}%)</div></div>
+        <i class="ti ti-chevron-down" style="color:var(--wc-ink3);font-size:16px;flex-shrink:0"></i>
+      </div>
+      <div class="cc-detail" id="cc-detail-${esc(c._id)}"></div>
+    </div>`;}).join('');
+}
+
+// Navega a ventas y expande el cuadre inline (no overlay lateral)
+function abrirCuadre(id){
+  mostrarVista('ventas');
+  // Esperar a que renderVentas() termine antes de expandir
+  requestAnimationFrame(()=>{
+    const el=document.getElementById('cc-detail-'+id);
+    if(el&&!el.classList.contains('open'))el.classList.add('open');
+    const card=document.getElementById('cc-'+id);
+    if(card)card.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+}
+
+function toggleCuadreInline(id){
+  const el=document.getElementById('cc-detail-'+id);
+  if(!el)return;
+  const open=el.classList.toggle('open');
+  if(open)_rellenarCuadreInline(id);
+}
+
+function _rellenarCuadreInline(id){
+  const c=CLIENTES.find(x=>x._id===id);if(!c)return;
+  const cur=calcCuadre(c);
+  const vend=findVend(c.vendedorId||c.vendedorAsignado);
+  const cred=CREDITOS.find(cr=>cr.leadId===c._id||cr.clienteId===c._id);
+  const egresosLead=EGRESOS.filter(e=>e.leadId===c._id||e.clienteId===c._id);
+  const utilBruta=cur.precio-cur.totalCosto;
+  const margenBruto=cur.precio>0?Math.round(utilBruta/cur.precio*100):0;
+  const autoId=c.cierreAutoId||c.autoInventarioId||c.autoInteresId||'';
+  // Comisión: cierreComision fue calculada como 3% pero puede estar mal — la mostramos editable
+  const pctComision=cur.precio>0&&cur.comVend>0?Math.round(cur.comVend/cur.precio*100*10)/10:0;
+
+  const det=document.getElementById('cc-detail-'+id);
+  det.innerHTML=`
+  <div class="cuadre-inline-grid">
+
+    <!-- INGRESO -->
+    <div class="ci-section">
+      <div class="ci-section-title ok"><i class="ti ti-trending-up"></i>Ingreso real</div>
+      <div class="ci-row"><span>Precio de venta</span><span class="ci-val ok">${M(cur.precio)}</span></div>
+      ${cur.anticipo?`<div class="ci-row ok"><span>Pago inicial / Anticipo</span><span class="ci-val ok">+${M(cur.anticipo)}</span></div>`:''}
+      ${cred?`<div class="ci-row"><span>Banco / Financiera</span><span class="ci-val info">${esc(cred.banco||cred.financiera||'—')}${cred.plazo||cred.plazoMeses?' · '+(cred.plazo||cred.plazoMeses)+'m':''}</span></div>`:''}
+      ${cur.creditoMonto?`<div class="ci-row"><span>Desembolso financiera</span><span class="ci-val ok">+${M(cur.creditoMonto)}</span></div>`:''}
+      ${!cur.anticipo&&!cur.creditoMonto?`<div class="ci-row muted-row"><span>Contado — pago único</span></div>`:''}
+    </div>
+
+    <!-- COSTO -->
+    <div class="ci-section">
+      <div class="ci-section-title warn"><i class="ti ti-package"></i>Costo de la unidad
+        ${c._esConsigna?'<span style="background:#fef3c7;color:#92400e;font-size:10px;padding:2px 6px;border-radius:4px;margin-left:4px">CONSIGNA</span>':''}
+      </div>
+      <div class="ci-row" style="align-items:center">
+        <span>${c._esConsigna?'Precio consigna':'Precio adquisición'}</span>
+        <span class="ci-editable-wrap">
+          <input type="number" class="ci-input" id="ci-costo-${esc(id)}" value="${cur.costoAdq||''}" placeholder="0" style="text-align:right;width:110px">
+          <button class="btn btn-sm" onclick="guardarCostoAuto('${esc(id)}','${esc(autoId)}')" title="Actualizar en todos los paneles"><i class="ti ti-device-floppy"></i></button>
+        </span>
+      </div>
+      ${cur.gastosPrep?`<div class="ci-row"><span>Preparación</span><span class="ci-val">${M(cur.gastosPrep)}</span></div>`:''}
+      ${cur.gastosTras?`<div class="ci-row"><span>Traslado</span><span class="ci-val">${M(cur.gastosTras)}</span></div>`:''}
+      ${cur.otros?`<div class="ci-row"><span>Otros costos</span><span class="ci-val">${M(cur.otros)}</span></div>`:''}
+      <div class="ci-row total"><span>Total costo</span><span class="ci-val">${M(cur.totalCosto)}</span></div>
+      <div class="ci-row util"><span>Utilidad bruta</span><span class="ci-val ${utilBruta>=0?'ok':'danger'}">${M(utilBruta)} (${margenBruto}%)</span></div>
+    </div>
+
+    <!-- COMISIONES -->
+    <div class="ci-section">
+      <div class="ci-section-title orange"><i class="ti ti-percentage"></i>Comisiones</div>
+      <div class="ci-row" style="align-items:center">
+        <span>Comisión vendedor</span>
+        <span class="ci-editable-wrap" style="gap:4px">
+          <input type="number" class="ci-input" id="ci-com-pct-${esc(id)}" value="${pctComision||''}" placeholder="%" step="0.5" style="width:54px;text-align:center" oninput="ci_calcComision('${esc(id)}')">
+          <span style="font-size:11px;color:var(--wc-ink3)">%</span>
+          <input type="number" class="ci-input" id="ci-com-monto-${esc(id)}" value="${cur.comVend||''}" placeholder="$" style="width:90px;text-align:right" oninput="ci_syncPct('${esc(id)}')">
+          <button class="btn btn-sm" onclick="guardarComisionVendedor('${esc(id)}')" title="Guardar comisión"><i class="ti ti-device-floppy"></i></button>
+        </span>
+      </div>
+      ${cur.comFI?`<div class="ci-row"><span>Comisión F&I</span><span class="ci-val">${M(cur.comFI)}</span></div>`:''}
+      ${cur.gastosFI?`<div class="ci-row"><span>Gastos banco/F&I</span><span class="ci-val">${M(cur.gastosFI)}</span></div>`:''}
+      <div class="ci-row total"><span>Total comisiones</span><span class="ci-val">${M(cur.totalCom)}</span></div>
+    </div>
+
+    <!-- GASTOS DEL VEHÍCULO (inline) -->
+    <div class="ci-section">
+      <div class="ci-section-title orange"><i class="ti ti-receipt-off"></i>Gastos del vehículo</div>
+      <div id="ci-egresos-${esc(id)}">
+        ${egresosLead.length
+          ?egresosLead.map(e=>`<div class="ci-row"><span>${esc(e.concepto||e.categoria||'Gasto')}</span><span class="ci-val danger">-${M(e.monto)}</span></div>`).join('')
+          :'<div class="ci-row muted-row"><span>Sin gastos registrados</span></div>'}
+        ${cur.egLead?`<div class="ci-row total"><span>Total gastos</span><span class="ci-val danger">-${M(cur.egLead)}</span></div>`:''}
+      </div>
+      ${puedeEditarEgreso()?`
+      <div class="ci-egreso-form" id="ci-egr-form-${esc(id)}" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--wc-border)">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:6px;margin-bottom:6px">
+          <input class="field-input" id="ci-egr-concepto-${esc(id)}" placeholder="Concepto (ej: Gasolina)" style="font-size:12px">
+          <input class="field-input" type="number" id="ci-egr-monto-${esc(id)}" placeholder="$0" style="width:90px;font-size:12px">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:6px">
+          <select class="field-input" id="ci-egr-cat-${esc(id)}" style="font-size:12px">
+            <option>Preparación</option><option>Traslado</option><option>Gasolina</option>
+            <option>Comisión apertura</option><option>Trámites</option><option>Otro</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="guardarEgresoInline('${esc(id)}')"><i class="ti ti-plus"></i>Agregar</button>
+        </div>
+      </div>
+      `:''}
+    </div>
+
+    <!-- UTILIDAD NETA -->
+    <div class="ci-section utilidad-box ${cur.utilidad>=0?'pos':'neg'}">
+      <div class="ci-section-title ${cur.utilidad>=0?'ok':'danger'}"><i class="ti ti-circle-check"></i>Utilidad neta</div>
+      <div class="ci-util-display" id="ci-util-${esc(id)}">${M(cur.utilidad)}</div>
+      <div class="ci-util-sub" id="ci-util-sub-${esc(id)}">Margen: ${cur.margen}%</div>
+    </div>
+
+    <!-- NOTAS Y ESTATUS -->
+    <div class="ci-section" style="grid-column:1/-1">
+      <div class="ci-section-title"><i class="ti ti-notes"></i>Notas y estatus financiero</div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start">
+        <textarea class="field-input" id="ci-notas-${esc(id)}" rows="2" style="resize:vertical">${esc(c.notasFinanzas||c.notas||'')}</textarea>
+        <select class="field-input" id="ci-estatus-${esc(id)}" style="width:160px">
+          <option value="pendiente"${(c.estatusFinanciero||'pendiente')==='pendiente'?' selected':''}>Pendiente revisión</option>
+          <option value="en_proceso"${c.estatusFinanciero==='en_proceso'?' selected':''}>En proceso</option>
+          <option value="facturado"${c.estatusFinanciero==='facturado'?' selected':''}>Facturado</option>
+          <option value="cerrado"${c.estatusFinanciero==='cerrado'?' selected':''}>Cerrado / Liquidado</option>
+        </select>
+      </div>
+      <div style="margin-top:8px;text-align:right">
+        <button class="btn btn-primary" onclick="guardarCuadreInline('${esc(id)}')"><i class="ti ti-device-floppy"></i>Guardar notas y estatus</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function guardarCuadreInline(id){
+  const c=CLIENTES.find(x=>x._id===id);if(!c)return;
+  const notasEl=document.getElementById('ci-notas-'+id);
+  const estatusEl=document.getElementById('ci-estatus-'+id);
+  const datos={notasFinanzas:notasEl?.value||'',estatusFinanciero:estatusEl?.value||'pendiente'};
+  Object.assign(c,datos);
+  WC.send(WC.OUT.CLIENTE_EDITAR,{id,datos});
+  toast('✓ Notas y estatus guardados');
+}
+
+// Guardar costo de adquisición → actualiza Cars collection en todos los paneles
+function guardarCostoAuto(leadId, autoId){
+  if(!autoId){toast('⚠ Este lead no tiene auto vinculado','warn');return;}
+  const costoEl=document.getElementById('ci-costo-'+leadId);
+  const nuevoCosto=parseFloat(costoEl?.value||0);
+  if(!nuevoCosto){toast('⚠ Ingresa un costo válido','warn');return;}
+  // Actualizar localmente
+  const c=CLIENTES.find(x=>x._id===leadId);
+  if(c){c._costoAdquisicion=nuevoCosto;c._autoCosto=nuevoCosto;}
+  // Mandar al Velo para actualizar Cars collection
+  WC.send(WC.OUT.CAR_EDITAR,{autoId,datos:{costoAdquisicion:nuevoCosto}});
+  toast('✓ Costo actualizado en inventario');
+  // Recalcular utilidad mostrada
+  _actualizarUtilidad(leadId);
+}
+
+// Guardar comisión del vendedor → actualiza cierreComision en ALeads
+function guardarComisionVendedor(leadId){
+  const montoEl=document.getElementById('ci-com-monto-'+leadId);
+  const nuevaCom=parseFloat(montoEl?.value||0);
+  const c=CLIENTES.find(x=>x._id===leadId);if(!c)return;
+  c._comisionVendedor=nuevaCom;c.cierreComision=nuevaCom;
+  WC.send(WC.OUT.CLIENTE_EDITAR,{id:leadId,datos:{cierreComision:nuevaCom}});
+  toast('✓ Comisión guardada');
+  _actualizarUtilidad(leadId);
+}
+
+// Sincronizar: cuando cambia %, recalcular monto
+function ci_calcComision(id){
+  const c=CLIENTES.find(x=>x._id===id);if(!c)return;
+  const precio=parseFloat(c._precioVenta||c.cierrePrecio||0);
+  const pctEl=document.getElementById('ci-com-pct-'+id);
+  const montoEl=document.getElementById('ci-com-monto-'+id);
+  const pct=parseFloat(pctEl?.value||0);
+  if(montoEl&&precio>0)montoEl.value=Math.round(precio*pct/100);
+}
+
+// Sincronizar: cuando cambia monto, recalcular %
+function ci_syncPct(id){
+  const c=CLIENTES.find(x=>x._id===id);if(!c)return;
+  const precio=parseFloat(c._precioVenta||c.cierrePrecio||0);
+  const pctEl=document.getElementById('ci-com-pct-'+id);
+  const montoEl=document.getElementById('ci-com-monto-'+id);
+  const monto=parseFloat(montoEl?.value||0);
+  if(pctEl&&precio>0)pctEl.value=Math.round(monto/precio*1000)/10;
+}
+
+// Agregar egreso directamente desde el cuadre inline (sin overlay)
+function guardarEgresoInline(leadId){
+  const concEl=document.getElementById('ci-egr-concepto-'+leadId);
+  const montoEl=document.getElementById('ci-egr-monto-'+leadId);
+  const catEl=document.getElementById('ci-egr-cat-'+leadId);
+  const concepto=concEl?.value?.trim()||catEl?.value||'Gasto';
+  const monto=parseFloat(montoEl?.value||0);
+  if(!monto){toast('⚠ Ingresa el monto','warn');return;}
+  const c=CLIENTES.find(x=>x._id===leadId);
+  const nuevoEgreso={leadId,clienteId:leadId,concepto,categoria:catEl?.value||'Otro',
+    monto,fecha:new Date().toISOString(),
+    autoNombre:c?._autoNombre||'',clienteNombre:c?.nombre||c?.name||''};
+  EGRESOS.push(nuevoEgreso);
+  WC.send(WC.OUT.EGRESO_REGISTRAR,nuevoEgreso);
+  // Limpiar campos
+  if(concEl)concEl.value='';if(montoEl)montoEl.value='';
+  // Re-renderizar lista de egresos dentro del cuadre
+  const egresosLead=EGRESOS.filter(e=>e.leadId===leadId||e.clienteId===leadId);
+  const cont=document.getElementById('ci-egresos-'+leadId);
+  if(cont){
+    const total=egresosLead.reduce((s,e)=>s+parseFloat(e.monto||0),0);
+    cont.innerHTML=egresosLead.map(e=>`<div class="ci-row"><span>${esc(e.concepto||e.categoria||'Gasto')}</span><span class="ci-val danger">-${M(e.monto)}</span></div>`).join('')
+      +(total?`<div class="ci-row total"><span>Total gastos</span><span class="ci-val danger">-${M(total)}</span></div>`:'');
+  }
+  toast('✓ Gasto registrado');
+  _actualizarUtilidad(leadId);
+}
+
+// Recalcular y mostrar utilidad neta en tiempo real
+function _actualizarUtilidad(id){
+  const c=CLIENTES.find(x=>x._id===id);if(!c)return;
+  const cur=calcCuadre(c);
+  const el=document.getElementById('ci-util-'+id);
+  const sub=document.getElementById('ci-util-sub-'+id);
+  if(el)el.textContent=M(cur.utilidad);
+  if(sub)sub.textContent='Margen: '+cur.margen+'%';
+  // Actualizar color de la caja
+  const box=el?.closest('.utilidad-box');
+  if(box){box.classList.toggle('pos',cur.utilidad>=0);box.classList.toggle('neg',cur.utilidad<0);}
+}
+
+// ════════════════════════════════════════════════════════
+//  CRÉDITOS
+// ════════════════════════════════════════════════════════
+function renderCreditos(){
+  const q=g('cred-q').toLowerCase();
+  let rows=CREDITOS.map(c=>{
+    // Join con cliente para nombre y auto
+    const lead=CLIENTES.find(l=>l._id===(c.leadId||c.clienteId));
+    return{...c,
+      _clienteNombre:c.clienteNombre||c.nombre||lead?.nombre||lead?.name||'—',
+      _autoNombre:c.autoInteres||lead?.autoInteres||lead?.autoVendido||'—',
+      _vendedorId:c.vendedorId||lead?.vendedorId||lead?.vendedorAsignado||''};
+  }).filter(c=>_filtroCredFin==='todos'||credEst(c)===_filtroCredFin);
+  if(q)rows=rows.filter(c=>[c._clienteNombre,c.banco,c.financiera,c._autoNombre].some(v=>String(v||'').toLowerCase().includes(q)));
+  const pend=CREDITOS.filter(c=>credEst(c)==='Pendiente').length;
+  const bEl=document.getElementById('sb-badge-cred');if(bEl){bEl.textContent=pend;bEl.style.display=pend?'inline':'none';}
+  const BADGE={Pendiente:'chip-warn',Enviado:'chip-info',Aprobado:'chip-green',Rechazado:'chip-gray'};
+  const el=document.getElementById('cred-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-building-bank"></i><h3>Sin créditos</h3><p>No hay créditos con ese filtro</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Cliente</th><th>Auto</th><th>Banco</th><th>Vendedor</th><th class="num">Monto</th><th>Estatus</th><th>Cambiar</th></tr></thead>
+    <tbody>${rows.map(c=>{
+      const est=credEst(c),vend=findVend(c._vendedorId||c.vendedorId);
+      return`<tr>
+        <td><div style="font-weight:600">${esc(c._clienteNombre)}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${fechaCorta(c._createdDate||c.fechaSolicitud)}</div></td>
+        <td style="font-size:12px">${esc(c._autoNombre)}</td>
+        <td style="font-size:12px">${esc(c.banco||c.financiera||'—')}${c.plazo||c.plazoMeses?' · '+(c.plazo||c.plazoMeses)+'m':''}</td>
+        <td style="font-size:12px">${esc(vend?.nombre||c.vendedorNombre||'—')}</td>
+        <td class="num">${M(c.monto||c.montoSolicitado)}</td>
+        <td><span class="chip ${BADGE[est]||'chip-warn'}">${esc(est)}</span></td>
+        <td><select class="field-input" style="font-size:11px;padding:4px 8px;height:auto;width:auto"
+              onchange="cambiarEstatusCred('${esc(c._id)}',this.value)">
+          ${['Pendiente','Enviado','Aprobado','Rechazado'].map(o=>`<option${o===est?' selected':''}>${o}</option>`).join('')}
+        </select></td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+}
+
+function setFiltroCred(f,btn){
+  _filtroCredFin=f;
+  document.querySelectorAll('#view-creditos .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderCreditos();
+}
+function cambiarEstatusCred(id,est){
+  const idx=CREDITOS.findIndex(c=>c._id===id);if(idx>=0)CREDITOS[idx].estatus=est;
+  WC.send(WC.OUT.CREDITO_EDITAR,{id,datos:{estatus:est}});
+  toast('Crédito → '+est);renderCreditos();
+}
+
+// ════════════════════════════════════════════════════════
+//  COMISIONES
+// ════════════════════════════════════════════════════════
+function renderComisiones(){
+  const q=g('com-q').toLowerCase();
+  let rows=COMISIONES.filter(c=>_filtroComFin==='todos'||(c.estatus||'Pendiente')===_filtroComFin);
+  if(q)rows=rows.filter(c=>(c.vendedor||c.vendedorNombre||''+(c.clienteNombre||'')).toLowerCase().includes(q));
+  // Combinar estatus y estatusPago: estatus es el flujo de liberación, estatusPago es si se cobró
+  const pendCount=COMISIONES.filter(c=>(c.estatusPago||'Pendiente')==='Pendiente').length;
+  const bEl=document.getElementById('sb-badge-com');if(bEl){bEl.textContent=pendCount;bEl.style.display=pendCount?'inline':'none';}
+  const BADGE_EST={Pendiente:'chip-warn',Liberada:'chip-info',Pagada:'chip-green'};
+  const BADGE_PAGO={Pendiente:'chip-warn',Pagado:'chip-green'};
+  const el=document.getElementById('com-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-percentage"></i><h3>Sin comisiones</h3><p>No hay comisiones con ese filtro</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Vendedor</th><th>Cliente / Concepto</th><th>Auto</th><th class="num">Monto</th><th>Flujo</th><th>Pago</th><th>Acciones</th></tr></thead>
+    <tbody>${rows.map(c=>{
+      const est=c.estatus||'Pendiente';
+      const pago=c.estatusPago||'Pendiente';
+      return`<tr>
+        <td style="font-weight:600">${esc(c.vendedor||c.vendedorNombre||'—')}</td>
+        <td style="font-size:12px">${esc(c.clienteNombre||c.concepto||'—')}</td>
+        <td style="font-size:11px;color:var(--wc-ink3)">${esc(c.vehiculo||c.autoVendido||'—')}</td>
+        <td class="num">${M(c.monto)}</td>
+        <td><span class="chip ${BADGE_EST[est]||'chip-gray'}">${esc(est)}</span></td>
+        <td><span class="chip ${BADGE_PAGO[pago]||'chip-warn'}">${esc(pago)}</span></td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          ${est==='Pendiente'?`<button class="btn btn-sm" onclick="liberarComision('${esc(c._id)}')"><i class="ti ti-lock-open"></i>Liberar</button>`:''}
+          ${est==='Liberada'?`<button class="btn btn-sm btn-primary" onclick="pagarComision('${esc(c._id)}')"><i class="ti ti-check"></i>Marcar pagada</button>`:''}
+          ${pago==='Pendiente'&&est!=='Rechazada'?`<button class="btn btn-sm" style="background:var(--wc-green-mid);color:#fff" onclick="marcarPagoCom('${esc(c._id)}','Pagado')"><i class="ti ti-cash"></i>Pagado</button>`:''}
+          ${pago==='Pagado'?`<button class="btn btn-sm" style="opacity:.6" onclick="marcarPagoCom('${esc(c._id)}','Pendiente')"><i class="ti ti-refresh"></i>Deshacer</button>`:''}
+        </td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+}
+
+function setFiltroComision(f,btn){
+  _filtroComFin=f;
+  document.querySelectorAll('#view-comisiones .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderComisiones();
+}
+function liberarComision(id){
+  const idx=COMISIONES.findIndex(c=>c._id===id);if(idx<0)return;
+  COMISIONES[idx].estatus='Liberada';
+  WC.send(WC.OUT.COMISION_EDITAR,{id,datos:{estatus:'Liberada'}});
+  toast('Comisión liberada ✓');renderComisiones();
+}
+function pagarComision(id){
+  const idx=COMISIONES.findIndex(c=>c._id===id);if(idx<0)return;
+  COMISIONES[idx].estatus='Pagada';COMISIONES[idx].estatusPago='Pagado';
+  WC.send(WC.OUT.COMISION_EDITAR,{id,datos:{estatus:'Pagada',estatusPago:'Pagado'}});
+  toast('Comisión pagada ✓');renderComisiones();
+}
+function marcarPagoCom(id,nuevoPago){
+  const idx=COMISIONES.findIndex(c=>c._id===id);if(idx<0)return;
+  COMISIONES[idx].estatusPago=nuevoPago;
+  WC.send(WC.OUT.COMISION_EDITAR,{id,datos:{estatusPago:nuevoPago}});
+  toast(nuevoPago==='Pagado'?'Pago registrado ✓':'Pago deshecho');renderComisiones();
+}
+
+// ════════════════════════════════════════════════════════
+//  PAGOS
+// ════════════════════════════════════════════════════════
+function renderPagos(){
+  const q=g('pag-q').toLowerCase();
+  let rows=[...PAGOS].sort((a,b)=>new Date(b._createdDate||0)-new Date(a._createdDate||0));
+  if(q)rows=rows.filter(p=>(p.clienteNombre||p.concepto||p.vehiculo||'').toLowerCase().includes(q));
+  const el=document.getElementById('pag-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-cash"></i><h3>Sin pagos</h3><p>Registra el primer pago</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Cliente</th><th>Concepto</th><th>Auto</th><th>Forma</th><th class="num">Monto</th><th>Fecha</th></tr></thead>
+    <tbody>${rows.map(p=>`<tr>
+      <td style="font-weight:600">${esc(p.clienteNombre||p.nombre||'—')}</td>
+      <td><span class="chip chip-green">${esc(p.concepto||'Pago')}</span></td>
+      <td style="font-size:12px;color:var(--wc-ink3)">${esc(p.vehiculo||'—')}</td>
+      <td style="font-size:12px">${esc(p.formaPago||p.forma||'—')}</td>
+      <td class="num" style="color:var(--wc-ok)">${M(p.monto)}</td>
+      <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(p._createdDate||p.fecha)}</td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+function abrirModalPago(){
+  ['pago-cliente','pago-vehiculo','pago-notas'].forEach(id=>sv(id,''));sv('pago-monto','');
+  document.getElementById('ov-pago').classList.add('open');
+}
+function guardarPago(){
+  const monto=parseFloat(g('pago-monto'));if(!monto||monto<=0){toast('Ingresa un monto válido','warn');return;}
+  const p={clienteNombre:g('pago-cliente'),concepto:g('pago-concepto'),monto,
+           formaPago:g('pago-forma'),vehiculo:g('pago-vehiculo'),notas:g('pago-notas'),fecha:new Date().toISOString()};
+  WC.send(WC.OUT.PAGO_REGISTRAR,p);PAGOS.unshift({...p,_id:'tmp_'+Date.now(),_createdDate:new Date()});
+  toast('Pago registrado ✓');cerrarOverlay('ov-pago');renderPagos();
+}
+
+// ════════════════════════════════════════════════════════
+//  EGRESOS
+// ════════════════════════════════════════════════════════
+function renderEgresos(){
+  const q=g('egr-q').toLowerCase();
+  let rows=[...EGRESOS].sort((a,b)=>new Date(b._createdDate||b.fecha||0)-new Date(a._createdDate||a.fecha||0));
+  if(q)rows=rows.filter(e=>(e.concepto||e.categoria||e.ref||'').toLowerCase().includes(q));
+  const el=document.getElementById('egr-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-arrow-down-circle"></i><h3>Sin egresos</h3><p>Registra el primer egreso</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Concepto</th><th>Categoría</th><th>Referencia</th><th class="num">Monto</th><th>Fecha</th></tr></thead>
+    <tbody>${rows.map(e=>`<tr>
+      <td style="font-weight:600">${esc(e.concepto||'—')}</td>
+      <td><span class="chip chip-orange">${esc(e.categoria||e.tipo||'—')}</span></td>
+      <td style="font-size:12px;color:var(--wc-ink3)">${esc(e.ref||e.clienteNombre||'—')}</td>
+      <td class="num" style="color:var(--wc-danger)">${M(e.monto)}</td>
+      <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(e._createdDate||e.fecha)}</td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+function abrirModalEgreso(leadId){
+  if(!puedeEditarEgreso()){toast('Sin permisos para registrar egresos','warn');return;}
+  ['egr-concepto','egr-ref','egr-notas'].forEach(id=>sv(id,''));sv('egr-monto','');
+  const hidLead=document.getElementById('egr-lead-id');if(hidLead)hidLead.value=leadId||'';
+  document.getElementById('ov-egreso').classList.add('open');
+}
+function guardarEgreso(){
+  if(!puedeEditarEgreso()){toast('Sin permisos para registrar egresos','warn');return;}
+  const monto=parseFloat(g('egr-monto'));if(!monto||monto<=0){toast('Ingresa un monto válido','warn');return;}
+  const leadId=g('egr-lead-id')||'';
+  const e={concepto:g('egr-concepto'),categoria:g('egr-categoria'),monto,
+           ref:g('egr-ref'),notas:g('egr-notas'),fecha:new Date().toISOString(),
+           leadId,clienteId:leadId,registradoPor:CTX.emailActual};
+  WC.send(WC.OUT.EGRESO_REGISTRAR,e);EGRESOS.unshift({...e,_id:'tmp_'+Date.now(),_createdDate:new Date()});
+  toast('Egreso registrado ✓');cerrarOverlay('ov-egreso');renderEgresos();
+}
+
+// ════════════════════════════════════════════════════════
+//  CLIENTES
+// ════════════════════════════════════════════════════════
+function renderClientes(){
+  const q=g('cli-q').toLowerCase(),et=g('cli-f-etapa');
+  let rows=[...CLIENTES];
+  if(q)rows=rows.filter(c=>(c.nombre||c.name||''+(c.autoInteres||'')+''+(c.vendedorNombre||'')).toLowerCase().includes(q));
+  if(et)rows=rows.filter(c=>(c.etapa||c.estatus||'Nuevo')===et);
+  const BADGE={'Nuevo':'chip-gray','Contactado':'chip-info','Cita agendada':'chip-warn',
+    'En negociación':'chip-orange','Ganado':'chip-green','Perdido':'chip-danger'};
+  const tbody=document.getElementById('cli-tbody');
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--wc-ink3)">Sin resultados</td></tr>';return;}
+  tbody.innerHTML=rows.map(c=>{
+    const etapa=c.etapa||c.estatus||'Nuevo';const vend=findVend(c.vendedorId||c.vendedorAsignado);
+    return`<tr>
+      <td><div style="font-weight:600">${esc(c.nombre||c.name||'—')}</div>
+        <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||'')}</div></td>
+      <td style="font-size:12px">${esc(c.autoInteres||c.autoVendido||'—')}</td>
+      <td style="font-size:12px">${esc(vend?.nombre||c.vendedorNombre||'—')}</td>
+      <td><span class="chip ${BADGE[etapa]||'chip-gray'}">${esc(etapa)}</span></td>
+      <td class="num">${(c._precioVenta||c.cierrePrecio||c.precioVenta||c.precio)?M(c._precioVenta||c.cierrePrecio||c.precioVenta||c.precio):'—'}</td>
+      <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(c._createdDate)}</td>
+    </tr>`;}).join('');
+}
+
+// ════════════════════════════════════════════════════════
+//  OVERLAY UTILS
+// ════════════════════════════════════════════════════════
+function cerrarOverlay(id){document.getElementById(id)?.classList.remove('open');}
+
+// ════════════════════════════════════════════════════════
+//  PROTOCOLO WC
+// ════════════════════════════════════════════════════════
+const WC={
+  OUT:{
+    DATOS_SOLICITAR:'wecars-finanzas-solicitar',
+    CLIENTE_EDITAR:'wecars-cliente-actualizar',
+    CAR_EDITAR:'wecars-car-editar-fin',        // actualiza Cars (costo, comisión)
+    CREDITO_EDITAR:'wecars-credito-editar',
+    COMISION_EDITAR:'wecars-comision-editar',
+    PAGO_REGISTRAR:'wecars-pago-registrado',
+    EGRESO_REGISTRAR:'wecars-egreso-registrado',
+  },
+  IN:{
+    DATOS:'wecars-finanzas',
+    PAGO_RESULTADO:'wecars-pago-resultado',
+    COMISION_EDITADA:'wecars-comision-editada',
+    CREDITO_RESULTADO:'wecars-credito-resultado',
+    CLIENTE_ACTUALIZADO:'wecars-cliente-actualizado-fin',
+    CAR_RESULTADO:'wecars-car-resultado-fin',
+    EGRESO_RESULTADO:'wecars-egreso-resultado',
+  },
+  send(tipo,datos){try{window.parent.postMessage({type:tipo,...datos},'*');}catch(_){}}
+};
+
+window.addEventListener('message',e=>{
+  const d=e.data;if(!d||!d.type)return;
+  if(d.type===WC.IN.DATOS){
+    CLIENTES=Array.isArray(d.clientes)?d.clientes:[];
+    CREDITOS=Array.isArray(d.creditos)?d.creditos:[];
+    PAGOS=Array.isArray(d.pagos)?d.pagos:[];
+    COMISIONES=Array.isArray(d.comisiones)?d.comisiones:[];
+    EGRESOS=Array.isArray(d.egresos)?d.egresos:[];
+    // Llenar CTX con identidad del usuario
+    CTX={emailActual:d.emailActual||'',rolActual:d.rolActual||'',nombreActual:d.nombreActual||''};
+    if(d.vendedores?.length){VENDEDORES=d.vendedores;}
+    else{
+      const map={};
+      CLIENTES.forEach(c=>{const id=c.vendedorId||c.vendedorAsignado||'';if(!id||map[id])return;map[id]=c.vendedorNombre||id.split('@')[0]||id;});
+      VENDEDORES=Object.entries(map).map(([_id,nombre])=>({_id,nombre,email:_id.includes('@')?_id:''}));
+    }
+    const nombre=d.nombreActual||d.emailActual||'—';
+    st('sb-nombre',nombre);st('sb-rol',d.rolActual||'Finanzas');
+    const av=document.getElementById('sb-avatar');if(av)av.textContent=ini(nombre);
+    const mes=new Date().toLocaleString('es-MX',{month:'long',year:'numeric'});
+    st('topbar-sub',' — '+mes);
+    // Mostrar/ocultar botón de egreso según rol
+    const eBtn=document.getElementById('egr-cta-btn');
+    if(eBtn)eBtn.style.display=puedeEditarEgreso()?'':'none';
+    renderVista(_vistaActual);
+  }
+  if(d.type===WC.IN.COMISION_EDITADA){
+    if(d.ok&&d.comision){const idx=COMISIONES.findIndex(c=>c._id===d.comision._id);if(idx>=0)COMISIONES[idx]=d.comision;}
+    renderComisiones();
+  }
+  if(d.type===WC.IN.CREDITO_RESULTADO){
+    if(d.ok&&d.credito){const idx=CREDITOS.findIndex(c=>c._id===d.credito._id);if(idx>=0)CREDITOS[idx]=d.credito;}
+    renderCreditos();
+  }
+  if(d.type===WC.IN.PAGO_RESULTADO){
+    if(d.ok&&d.pago){
+      // Reemplazar el registro temporal con el real
+      const idx=PAGOS.findIndex(p=>p._id?.startsWith('tmp_'));
+      if(idx>=0)PAGOS[idx]=d.pago;else PAGOS.unshift(d.pago);
+    }else if(!d.ok){toast('Error al guardar pago','error');}
+    renderPagos();
+  }
+  if(d.type===WC.IN.EGRESO_RESULTADO){
+    if(d.ok&&d.egreso){
+      // Reemplazar el registro temporal con el real
+      const idx=EGRESOS.findIndex(e=>e._id?.startsWith('tmp_'));
+      if(idx>=0)EGRESOS[idx]=d.egreso;else EGRESOS.unshift(d.egreso);
+    }else if(!d.ok){
+      // Revertir entrada optimista
+      const idx=EGRESOS.findIndex(e=>e._id?.startsWith('tmp_'));
+      if(idx>=0)EGRESOS.splice(idx,1);
+      toast('Error al guardar egreso','error');
+    }
+    renderEgresos?.();
+  }
+  if(d.type===WC.IN.CLIENTE_ACTUALIZADO&&d.ok&&d.cliente){
+    const idx=CLIENTES.findIndex(c=>c._id===d.cliente._id);if(idx>=0)CLIENTES[idx]={...CLIENTES[idx],...d.cliente};
+  }
+});
+
+WC.send(WC.OUT.DATOS_SOLICITAR,{});
+
+// Reportar altura al contenedor Wix (evita scrollbar dentro del iframe)
+function enviarAltura(){WC.send('wecars-resize',{height:document.body.scrollHeight});}
+if(typeof ResizeObserver!=='undefined'){
+  new ResizeObserver(enviarAltura).observe(document.body);
+}else{window.addEventListener('resize',enviarAltura);}
+</script>
+</body>
+</html>

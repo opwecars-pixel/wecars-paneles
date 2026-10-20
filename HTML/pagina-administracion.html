@@ -514,6 +514,7 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
   gap: var(--sp-4);
   height: 62px;
   flex-shrink: 0;
+  position: relative;
   border-bottom: 1px solid rgba(255,255,255,.06);
   box-shadow: 0 2px 12px rgba(13,26,13,.18);
   z-index: 50;
@@ -1811,6 +1812,14 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
 @media(max-width:900px){.ge-leads-kanban{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.leads-kpi-row{grid-template-columns:repeat(2,1fr)}.ge-leads-kanban{grid-template-columns:1fr}}
 
+/* ── wcConfirm dialog ───────────────────────────────────────────────── */
+.wc-confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:9999}
+.wc-confirm-box{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg,12px);padding:28px 28px 22px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.wc-confirm-msg{margin:0 0 20px;font-size:.95rem;color:var(--ink);line-height:1.5}
+.wc-confirm-actions{display:flex;gap:10px;justify-content:flex-end}
+.wc-confirm-cancel{padding:8px 18px;border-radius:var(--r-sm,6px);border:1.5px solid var(--line);background:transparent;color:var(--ink);font-size:.88rem;font-weight:600;cursor:pointer}
+.wc-confirm-ok{padding:8px 18px;border-radius:var(--r-sm,6px);border:none;background:var(--c-red,#dc2626);color:#fff;font-size:.88rem;font-weight:700;cursor:pointer}
+
 </style>
 </head>
 <body class="wc-loading">
@@ -1958,6 +1967,22 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
         </div>
       </div>
       <button class="wc-theme-btn" id="wc-theme-btn" title="Modo oscuro" type="button"><i class="ti ti-moon"></i></button>
+      <!-- Gap 5: Notification bell -->
+      <button id="notif-bell-btn" type="button" title="Notificaciones internas"
+        style="position:relative;width:36px;height:36px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:18px;border-radius:var(--r-sm)"
+        onclick="toggleNotifDropdown()">
+        <i class="ti ti-bell"></i>
+        <span id="notif-badge" style="display:none;position:absolute;top:4px;right:4px;min-width:16px;height:16px;padding:0 3px;background:#ef4444;color:#fff;font-size:.6rem;font-weight:900;border-radius:8px;line-height:16px;text-align:center"></span>
+      </button>
+      <!-- Notif dropdown -->
+      <div id="notif-dropdown" style="display:none;position:absolute;top:56px;right:12px;width:320px;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:8000;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--line);font-size:.78rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px">
+          <i class="ti ti-bell-ringing" style="color:#ef4444"></i> Alertas internas
+        </div>
+        <div id="notif-lista" style="max-height:320px;overflow-y:auto;padding:8px 0">
+          <div style="padding:16px;text-align:center;color:var(--muted);font-size:.82rem">Sin alertas pendientes</div>
+        </div>
+      </div>
     </header>
 
     <!-- Sin acceso -->
@@ -2205,6 +2230,13 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
                 <option value="Vendido">Vendido</option>
                 <option value="Consigna">Consigna</option>
               </select>
+              <select id="inv-filtro-sucursal" style="padding:7px 12px;border:1.5px solid var(--line);border-radius:var(--r-sm);font-size:.82rem;font-family:inherit;background:var(--paper);color:var(--ink)">
+                <option value="">Todas las sucursales</option>
+                <option value="Bajío">Bajío (León)</option>
+                <option value="Chihuahua">Chihuahua</option>
+                <option value="Delicias">Delicias, Chih.</option>
+                <option value="CiudadJuarez">Cd. Juárez, Chih.</option>
+              </select>
               <span id="inv-resultado-cnt" style="font-size:.78rem;color:var(--muted);font-weight:700;align-self:center;white-space:nowrap"></span>
               <button class="pend-save-btn" id="inv-nuevo-btn" type="button" style="gap:6px"><i class="ti ti-plus"></i> Agregar auto</button>
               <button class="pend-cancel-btn" id="inv-refresh-btn" type="button" style="gap:6px"><i class="ti ti-refresh"></i></button>
@@ -2261,6 +2293,14 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
 
             <!-- TAB: Resumen -->
             <div class="exp-panel active" id="exp-panel-resumen" style="padding:20px;display:flex;flex-direction:column;gap:18px">
+              <!-- Gap 1: Fotos pendientes banner -->
+              <div id="exp-fotos-alerta" style="display:none;background:#fef3c7;border:1.5px solid #fde68a;border-radius:var(--r-sm);padding:10px 14px;align-items:center;gap:10px;font-size:.8rem;color:#92400e">
+                <i class="ti ti-photo-off" style="font-size:20px;flex-shrink:0;color:#d97706"></i>
+                <div style="flex:1"><strong>Este vehículo no tiene fotos.</strong> Sube las fotografías para que aparezca en el catálogo de ventas.</div>
+                <button type="button" onclick="irAFotografo()" style="flex-shrink:0;padding:5px 10px;border:none;background:#d97706;color:#fff;border-radius:var(--r-sm);font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">
+                  <i class="ti ti-camera"></i> Ir a Fotografía
+                </button>
+              </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
                 <div class="exp-field-group" style="grid-column:1/-1">
                   <label class="exp-label">Número de inventario</label>
@@ -2346,6 +2386,40 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
                 <div class="exp-field-group" style="grid-column:1/-1">
                   <label class="exp-label">VIN / Número de serie</label>
                   <input type="text" id="exp-vin" class="exp-input" placeholder="17 caracteres" style="text-transform:uppercase;letter-spacing:.06em;font-size:.82rem">
+                </div>
+              </div>
+
+              <!-- ── Ubicación / Sucursal ──────────────────────────── -->
+              <div class="exp-section-title"><i class="ti ti-map-pin"></i> Ubicación</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="exp-field-group">
+                  <label class="exp-label">Sucursal</label>
+                  <select id="exp-sucursal" class="exp-input">
+                    <option value="Bajío">Bajío (León, Gto.)</option>
+                    <option value="Chihuahua">Chihuahua</option>
+                    <option value="Delicias">Delicias, Chih.</option>
+                    <option value="CiudadJuarez">Cd. Juárez, Chih.</option>
+                  </select>
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Estado de traslado</label>
+                  <select id="exp-estado-traslado" class="exp-input">
+                    <option value="local">Local — en sucursal</option>
+                    <option value="disponible_remoto">Disponible en otra sucursal</option>
+                    <option value="en_traslado">En traslado</option>
+                    <option value="trasladado">Trasladado (ya llegó)</option>
+                  </select>
+                </div>
+                <div class="exp-field-group">
+                  <label class="exp-label">Costo de traslado estimado ($)</label>
+                  <input type="number" id="exp-precio-traslado" class="exp-input" placeholder="0" min="0">
+                </div>
+                <div class="exp-field-group" style="display:flex;align-items:center;gap:10px;padding-top:22px">
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--ink)">
+                    <input type="checkbox" id="exp-datos-completos" style="width:16px;height:16px;accent-color:var(--lime-dark)">
+                    Ficha completa
+                  </label>
+                  <span style="font-size:.72rem;color:var(--muted)">Tiene precio, fotos y descripción</span>
                 </div>
               </div>
             </div>
@@ -2498,14 +2572,39 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
           </div><!-- /body scrollable -->
 
           <!-- footer -->
-          <div style="padding:14px 20px;border-top:1.5px solid var(--line);flex-shrink:0;display:flex;align-items:center;gap:10px;background:var(--surface)">
-            <div id="exp-save-status" style="flex:1;font-size:.78rem;color:var(--muted)"></div>
+          <div style="padding:14px 20px;border-top:1.5px solid var(--line);flex-shrink:0;display:flex;align-items:center;gap:10px;background:var(--surface);flex-wrap:wrap">
+            <div id="exp-save-status" style="flex:1;min-width:100px;font-size:.78rem;color:var(--muted)"></div>
+            <!-- Gap 4: Acta de entrega -->
+            <button class="pend-cancel-btn" type="button" onclick="abrirActaEntrega()" style="min-height:38px;gap:5px"><i class="ti ti-clipboard-check"></i> Acta</button>
             <button class="pend-cancel-btn" type="button" onclick="cerrarExpediente()" style="min-height:38px">Cancelar</button>
             <button class="pend-save-btn" type="button" onclick="expGuardar()" id="exp-guardar-btn" style="min-height:38px"><i class="ti ti-device-floppy"></i> Guardar expediente</button>
           </div>
 
         </div><!-- /drawer -->
       </div><!-- /exp-overlay -->
+
+      <!-- ── ACTA DE ENTREGA overlay (Gap 4) ── -->
+      <div id="acta-overlay" style="display:none;position:fixed;inset:0;z-index:9300;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);overflow-y:auto">
+        <div id="acta-modal" style="margin:40px auto;max-width:680px;background:#fff;border-radius:12px;box-shadow:0 12px 48px rgba(0,0,0,.3);padding:0;overflow:hidden">
+          <!-- header -->
+          <div style="background:#1a2332;color:#fff;padding:20px 28px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:1rem;font-weight:900;letter-spacing:.05em">ACTA DE ENTREGA VEHICULAR</div>
+              <div id="acta-agencia-nombre" style="font-size:.78rem;opacity:.7;margin-top:3px">weCars Bajío · Celaya, Gto.</div>
+            </div>
+            <button type="button" onclick="cerrarActaEntrega()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center"><i class="ti ti-x"></i></button>
+          </div>
+          <!-- cuerpo del acta -->
+          <div id="acta-cuerpo" style="padding:28px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:.85rem;color:#1a2332;line-height:1.6">
+            <!-- Se llena dinámicamente -->
+          </div>
+          <!-- footer botones (no se imprimen) -->
+          <div class="acta-no-print" style="padding:16px 28px;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:10px;background:#f9fafb">
+            <button type="button" onclick="cerrarActaEntrega()" style="padding:9px 18px;border:1.5px solid #d1d5db;background:#fff;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:600">Cerrar</button>
+            <button type="button" onclick="imprimirActa()" style="padding:9px 18px;background:#1a2332;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:700"><i class="ti ti-printer"></i> Imprimir / Guardar PDF</button>
+          </div>
+        </div>
+      </div><!-- /acta-overlay -->
 
       <!-- ── VISTA PERMISOS ─────────────────── -->
       <div id="ad-vista-permisos" class="ad-vista">
@@ -2669,18 +2768,19 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
       <div id="ad-vista-creditos" class="ad-vista">
         <div style="padding:20px 0 60px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
-            <h2 style="margin:0;font-size:1.15rem;font-weight:900">Créditos — Vista Admin</h2>
+            <h2 style="margin:0;font-size:1.15rem;font-weight:900">Créditos — por solicitante</h2>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <button class="ad-cr-f-btn active" data-cr-f="" onclick="adCrFiltro(this)">Todos</button>
-              <button class="ad-cr-f-btn" data-cr-f="solicitud_enviada" onclick="adCrFiltro(this)">Nuevos</button>
-              <button class="ad-cr-f-btn" data-cr-f="documentos_en_revision" onclick="adCrFiltro(this)">En revisión</button>
-              <button class="ad-cr-f-btn" data-cr-f="expediente_completo" onclick="adCrFiltro(this)">Completos</button>
+              <button class="ad-cr-f-btn" data-cr-f="solicitud_enviada" onclick="adCrFiltro(this)">Nuevas</button>
+              <button class="ad-cr-f-btn" data-cr-f="en_revision" onclick="adCrFiltro(this)">En revisión F&amp;I</button>
+              <button class="ad-cr-f-btn" data-cr-f="aprobado" onclick="adCrFiltro(this)">Aprobados</button>
+              <button class="ad-cr-f-btn" data-cr-f="rechazado" onclick="adCrFiltro(this)">Rechazados</button>
             </div>
           </div>
           <div class="ad-cr-kpi-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
             <div class="ad-card" style="padding:14px 16px"><div style="font-size:1.5rem;font-weight:900" id="ad-cr-stat-total">0</div><div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;font-weight:700">Total</div></div>
             <div class="ad-card" style="padding:14px 16px"><div style="font-size:1.5rem;font-weight:900;color:#d97706" id="ad-cr-stat-rev">0</div><div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;font-weight:700">En revisión</div></div>
-            <div class="ad-card" style="padding:14px 16px"><div style="font-size:1.5rem;font-weight:900;color:#0284c7" id="ad-cr-stat-comp">0</div><div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;font-weight:700">Expediente completo</div></div>
+            <div class="ad-card" style="padding:14px 16px"><div style="font-size:1.5rem;font-weight:900;color:#c2410c" id="ad-cr-stat-comp">0</div><div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;font-weight:700">Condicionados</div></div>
             <div class="ad-card" style="padding:14px 16px"><div style="font-size:1.5rem;font-weight:900;color:#16a34a" id="ad-cr-stat-apr">0</div><div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;font-weight:700">Aprobados</div></div>
           </div>
           <div class="ad-card" style="padding:0;overflow:hidden">
@@ -2936,17 +3036,45 @@ body.wc-loading .ad-kpi-icon { background: var(--line) !important; color: transp
         <div class="pend-field"><label>Estatus</label><select id="inv-edit-estatus"><option value="Disponible">Disponible</option><option value="Apartado">Apartado</option><option value="Vendido">Vendido</option><option value="Consigna">Consigna</option></select></div>
         <div class="pend-field"><label>VIN / No. de serie</label><input type="text" id="inv-edit-vin" placeholder="Ej. 3VWFE21C04M000001"></div>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="pend-field">
+          <label>Sucursal / Ubicación</label>
+          <select id="inv-edit-sucursal">
+            <option value="Bajío">Bajío — León, Gto.</option>
+            <option value="Chihuahua">Chihuahua — Chihuahua, Chih.</option>
+            <option value="Delicias">Delicias — Delicias, Chih.</option>
+            <option value="CiudadJuarez">Ciudad Juárez — Cd. Juárez, Chih.</option>
+          </select>
+        </div>
+        <div class="pend-field" id="inv-edit-traslado-wrap" style="display:none">
+          <label>Estado traslado</label>
+          <select id="inv-edit-estado-traslado">
+            <option value="disponible_remoto">Disponible (envío a solicitud)</option>
+            <option value="en_traslado">En traslado activo</option>
+            <option value="local">Ya llegó / Local</option>
+          </select>
+        </div>
+      </div>
       <div class="pend-field"><label>URL de imagen principal</label><input type="text" id="inv-edit-imagen-url" placeholder="https://... (URL del Media Manager de Wix)"></div>
       <div class="pend-field"><label>Descripción pública</label><textarea id="inv-edit-desc" rows="2" placeholder="Descripción del vehículo para el cliente..."></textarea></div>
       <div class="pend-field"><label>Notas internas</label><textarea id="inv-edit-notas" rows="2" placeholder="Condición, detalles de compra, contactos..."></textarea></div>
-      <div class="pend-field" id="inv-foto-section" style="display:none">
-        <label>Foto principal del vehículo</label>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <input type="file" id="inv-foto-input" accept="image/*" style="font-size:.8rem;font-family:inherit">
-          <button class="pend-cancel-btn" id="inv-foto-btn" type="button" style="padding:6px 14px;font-size:.78rem"><i class="ti ti-upload" style="font-size:13px"></i> Subir foto</button>
+      <div class="pend-field" id="inv-foto-section">
+        <label style="display:flex;align-items:center;gap:8px">
+          Foto principal del vehículo
+          <span id="inv-foto-badge-nuevo" style="font-size:.65rem;font-weight:700;background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:20px;display:none">Se subirá al guardar</span>
+        </label>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px">
+          <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:7px 14px;border:1.5px solid var(--line);border-radius:var(--r-sm,6px);font-size:.8rem;font-weight:600;color:var(--ink);background:var(--surface,#fff)">
+            <i class="ti ti-photo" style="font-size:14px"></i> Seleccionar imagen
+            <input type="file" id="inv-foto-input" accept="image/*" style="display:none">
+          </label>
+          <button class="pend-cancel-btn" id="inv-foto-btn" type="button" style="padding:7px 14px;font-size:.78rem;display:none"><i class="ti ti-upload" style="font-size:13px"></i> Subir ahora</button>
           <span id="inv-foto-status" style="font-size:.75rem;color:var(--muted)"></span>
         </div>
-        <div id="inv-foto-preview" style="margin-top:8px;display:none"><img id="inv-foto-img" style="max-width:100%;max-height:160px;border-radius:var(--r-sm);object-fit:cover" alt="Preview"></div>
+        <div id="inv-foto-preview" style="margin-top:8px;display:none;position:relative">
+          <img id="inv-foto-img" style="max-width:100%;max-height:180px;border-radius:var(--r-sm);object-fit:cover;border:1.5px solid var(--line)" alt="Preview">
+          <button type="button" id="inv-foto-clear" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+        </div>
       </div>
     </div>
     <div style="display:flex;gap:10px;padding:0 26px 22px">
@@ -3440,6 +3568,7 @@ html { overscroll-behavior: none !important; background-color: var(--bg) !import
   window.addEventListener('message', function(ev) {
     var _h = window._wcMsgHandlers;
     for (var _i = 0; _i < _h.length; _i++) {
+      if (typeof _h[_i] !== 'function') continue;
       try { _h[_i](ev); } catch(e) { console.error('[WC dispatcher]', e); }
     }
   });
@@ -3615,7 +3744,7 @@ window.mostrarVista = function mostrarVista(v){
   if(v==='perfil') renderPerfil();
   if(v==='permisos') renderPermisos();
   if(v==='directorio'){ window.parent.postMessage({type:'wecars-empleados-solicitar'},'*'); renderDirectorio(); }
-  if(v==='pendientes') renderPendientes();
+  if(v==='pendientes'){ window.parent.postMessage({type:'wecars-tareas-solicitar'},'*'); renderPendientes(); }
   if(v==='compras') renderCompras();
   if(v==='inventario'){ if(!inventario.length) window.parent.postMessage({type:'wecars-inventario-solicitar'},'*'); renderInventario(); }
   if(v==='consignas'){ if(!consignas.length) window.parent.postMessage({type:'wecars-consignas-solicitar'},'*'); renderConsignas(); }
@@ -3838,6 +3967,19 @@ window._wcMsgHandlers.push(function(e) {
       fiActual         = d.fechaIngresoActual     || fiActual;
       /* GAP-H fix: quitar skeleton de carga al recibir datos confirmados */
       document.body.classList.remove('wc-loading');
+      /* Poblar sidebar con la navegación del panel */
+      renderSidebar(rolActual, emailActual, nombreActual, puestoActual, fiActual);
+      /* Mostrar contenido o pantalla de acceso restringido según rol */
+      var _rolesAdmin = ['Administración','Gerencia','Admin','admin'];
+      var _elContent  = document.getElementById('ad-contenido');
+      var _elNoAccess = document.getElementById('ad-noaccess');
+      if (_rolesAdmin.indexOf(rolActual) !== -1) {
+        if (_elContent)  { _elContent.style.display = '';       }
+        if (_elNoAccess) { _elNoAccess.style.display = 'none';  }
+      } else {
+        if (_elContent)  { _elContent.style.display = 'none';   }
+        if (_elNoAccess) { _elNoAccess.style.display = 'flex';  }
+      }
       poblarSelectResponsable();
       poblarSelectLeadVendedor();
       if (vistaActual === 'directorio') renderDirectorio();
@@ -3879,6 +4021,28 @@ window._wcMsgHandlers.push(function(e) {
       }
       break;
 
+    /* ── Confirmaciones y errores de leads ─────────────────────── */
+    case 'wecars-lead-nota-ok':
+      toast('Nota registrada en el lead');
+      break;
+
+    case 'wecars-lead-nota-error':
+      toast('Error al guardar nota' + (d.error ? ': ' + d.error : ''));
+      break;
+
+    case 'wecars-lead-estatus-ok':
+      // El render ya ocurre cuando llegan wecars-leads-datos; solo confirmamos
+      toast('Estatus actualizado');
+      break;
+
+    case 'wecars-lead-estatus-error':
+      toast('Error al actualizar estatus' + (d.error ? ': ' + d.error : ''));
+      break;
+
+    case 'wecars-tarea-error':
+      toast('Error en operación de tarea' + (d.error ? ': ' + d.error : ''));
+      break;
+
     /* ── BUG-A01 Fix: handlers de datos faltantes ──────────────── */
     case 'wecars-inventario-datos':
       inventario = Array.isArray(d.items) ? d.items : [];
@@ -3917,6 +4081,21 @@ window._wcMsgHandlers.push(function(e) {
     case 'wecars-solicitudes-compra-datos':
       solicitudesCompra = Array.isArray(d.items) ? d.items : [];
       if (vistaActual === 'compras') renderCompras();
+      break;
+
+    case 'wecars-solicitud-actualizada':
+      if (d.solicitud) {
+        const _sidx = solicitudesCompra.findIndex(s => s._id === d.solicitudId);
+        if (_sidx >= 0) solicitudesCompra[_sidx] = d.solicitud;
+        else solicitudesCompra.unshift(d.solicitud);
+        if (vistaActual === 'compras') renderCompras();
+        // Cerrar modal si está abierto para esta solicitud
+        if (typeof cerrarModalCompra === 'function') cerrarModalCompra();
+      }
+      break;
+
+    case 'wecars-solicitud-error':
+      toast('Error al actualizar solicitud' + (d.error ? ': ' + d.error : ''));
       break;
 
     case 'wecars-leads-datos':
@@ -3972,15 +4151,20 @@ window._wcMsgHandlers.push(function(e) {
     /* ── GAP-A nuevos (auditoría transversal) ─────────────────────── */
 
     case 'wecars-foto-resultado':
+      document.getElementById('inv-foto-btn').disabled = false;
       if (d.ok) {
-        toast('Foto actualizada correctamente');
         if (d.carro) {
           inventario = inventario.map(function(c){ return c._id === d.carro._id ? d.carro : c; });
           window._inventarioAdmin = inventario;
           if (vistaActual === 'inventario') renderInventario();
         }
+        toast('✓ Vehículo guardado con foto');
+        cerrarModalCarro();
       } else {
-        toast('Error al subir foto: ' + (d.error || ''));
+        document.getElementById('inv-foto-status').textContent = 'Error al subir foto';
+        toast('Vehículo guardado, pero la foto falló: ' + (d.error || 'intenta subirla de nuevo'));
+        // No cerrar el modal — el usuario puede reintentar subir la foto
+        document.getElementById('inv-save-status').textContent = 'Vehículo creado. Reintenta la foto.';
       }
       break;
 
@@ -4088,8 +4272,18 @@ window._wcMsgHandlers.push(function(e) {
         }
         window._inventarioAdmin = inventario;
         if (vistaActual === 'inventario') renderInventario();
-        if (!d.desdeConsigna) toast(d.creado ? 'Vehículo creado' : 'Vehículo actualizado');
+        // Si hay foto pendiente (nuevo vehículo con foto seleccionada), dispararla ahora
+        if (d.creado && typeof _pendingFotoFile !== 'undefined' && _pendingFotoFile) {
+          carroEditandoId = d.carro._id;
+          document.getElementById('inv-save-status').textContent = 'Subiendo foto…';
+          _dispararUploadFoto(d.carro._id, _pendingFotoFile);
+          _pendingFotoFile = null;
+          break; // No cerrar el modal hasta que confirme la foto
+        }
+        if (!d.desdeConsigna) toast(d.creado ? '✓ Vehículo creado' : '✓ Vehículo actualizado');
+        cerrarModalCarro();
       } else {
+        document.getElementById('inv-save-status').textContent = 'Error: ' + (d.error || 'intenta de nuevo');
         toast('Error en inventario: ' + (d.error || ''));
       }
       break;
@@ -4229,6 +4423,17 @@ window._wcMsgHandlers.push(function(e) {
       if (d.ok) toast('Lead creado');
       else toast('Error al crear lead: ' + (d.error || ''));
       break;
+
+    case 'wecars-admin-sin-acceso': {
+      document.body.classList.remove('wc-loading');
+      var _elC2 = document.getElementById('ad-contenido');
+      var _elN2 = document.getElementById('ad-noaccess');
+      if (_elC2)  _elC2.style.display  = 'none';
+      if (_elN2)  _elN2.style.display  = 'flex';
+      /* Mostrar al menos el nombre/rol en sidebar aunque sin acceso */
+      renderSidebar(d.rolActual||'', d.emailActual||'', d.nombreActual||'', '', '');
+      break;
+    }
   }
 });
 
@@ -4335,16 +4540,36 @@ window.guardarResultadosVTA = function(){ guardarResultadosVTA(); };
 window.imprimirReporteVTA   = function(){ imprimirReporteVTA(); };
 window.iniciarEditarCierre  = function(){ iniciarEditarCierre(); };
 
+/* ── Expediente vehicular ───────────────────────────────────── */
+window.expCambiarTab       = function(btn){ expCambiarTab(btn); };
+window.cerrarExpediente    = function(){ cerrarExpediente(); };
+window.expGuardar          = function(){ expGuardar(); };
+window.expAgregarHistorial = function(){ expAgregarHistorial(); };
+window._expSetDoc          = function(docId,estado,btn){ _expSetDoc(docId,estado,btn); };
+/* Acta de entrega */
+window.abrirActaEntrega    = function(){ abrirActaEntrega(); };
+window.cerrarActaEntrega   = function(){ cerrarActaEntrega(); };
+window.imprimirActa        = function(){ imprimirActa(); };
+/* Inventario — ir al fotógrafo */
+window.irAFotografo        = function(id){ irAFotografo(id); };
+/* Notificaciones */
+window.toggleNotifDropdown = function(){ toggleNotifDropdown(); };
+
 /* ── Créditos Admin ─────────────────────────────────────────── */
 const AD_CR_ESTADOS = {
-  solicitud_enviada:       { label:'Solicitud enviada',       color:'#2a78d6', bg:'#dbeafe' },
-  documentos_pendientes:   { label:'Documentos pendientes',   color:'#d97706', bg:'#fef3c7' },
-  documentos_en_revision:  { label:'En revisión',             color:'#7c3aed', bg:'#f3e8ff' },
-  expediente_completo:     { label:'Expediente completo',     color:'#0284c7', bg:'#e0f2fe' },
-  en_analisis_financiero:  { label:'Análisis financiero',     color:'#9333ea', bg:'#faf5ff' },
+  // Nuevos estados F&I
+  nueva:                   { label:'Nueva',                   color:'#1d4ed8', bg:'#eff6ff' },
+  solicitud_enviada:       { label:'Nueva',                   color:'#1d4ed8', bg:'#eff6ff' },
+  en_revision:             { label:'En revisión F&I',         color:'#b45309', bg:'#fffbeb' },
+  pendiente_info:          { label:'Pendiente info',          color:'#7c3aed', bg:'#fdf4ff' },
   aprobado:                { label:'Aprobado',                color:'#16a34a', bg:'#dcfce7' },
+  condicionado:            { label:'Condicionado',            color:'#c2410c', bg:'#fff7ed' },
   rechazado:               { label:'Rechazado',               color:'#dc2626', bg:'#fee2e2' },
-  asignado_a_vendedor:     { label:'Asignado a vendedor',     color:'#0891b2', bg:'#cffafe' },
+  // Estados legacy (compatibilidad)
+  documentos_pendientes:   { label:'Doc. pendientes',         color:'#d97706', bg:'#fef3c7' },
+  documentos_en_revision:  { label:'Doc. en revisión',        color:'#7c3aed', bg:'#f3e8ff' },
+  expediente_completo:     { label:'Expediente completo',     color:'#0284c7', bg:'#e0f2fe' },
+  en_analisis_financiero:  { label:'Análisis F&I',            color:'#9333ea', bg:'#faf5ff' },
   cerrado:                 { label:'Cerrado',                 color:'#15803d', bg:'#bbf7d0' },
   cancelado:               { label:'Cancelado',               color:'#6b7280', bg:'#f3f4f6' },
 };
@@ -4355,45 +4580,64 @@ function renderAdmCreditos() {
   const todos = window._adCreditos || [];
   const filtroBtn = document.querySelector('.ad-cr-f-btn.active');
   const filtro = filtroBtn ? (filtroBtn.dataset.crF || '') : '';
-  const items = filtro ? todos.filter(c => c.estatus === filtro) : todos;
+
+  // Normalizar: soportar campo 'estado' (nuevo) y 'estatus' (legacy)
+  const getEstado = c => c.estado || c.estatus || '';
+  const items = filtro ? todos.filter(c => {
+    const est = getEstado(c);
+    if (filtro === 'solicitud_enviada') return est === 'nueva' || est === 'solicitud_enviada';
+    if (filtro === 'en_revision') return est === 'en_revision' || est === 'pendiente_info';
+    return est === filtro;
+  }) : todos;
 
   // KPIs
-  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  set('ad-cr-stat-total', todos.length);
-  set('ad-cr-stat-rev',   todos.filter(c => c.estatus === 'documentos_en_revision').length);
-  set('ad-cr-stat-comp',  todos.filter(c => c.estatus === 'expediente_completo').length);
-  set('ad-cr-stat-apr',   todos.filter(c => c.estatus === 'aprobado').length);
+  const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setEl('ad-cr-stat-total', todos.length);
+  setEl('ad-cr-stat-rev',   todos.filter(c => { const e=getEstado(c); return e==='en_revision'||e==='pendiente_info'||e==='documentos_en_revision'; }).length);
+  setEl('ad-cr-stat-comp',  todos.filter(c => { const e=getEstado(c); return e==='condicionado'||e==='expediente_completo'; }).length);
+  setEl('ad-cr-stat-apr',   todos.filter(c => getEstado(c)==='aprobado').length);
 
   if (!items.length) {
     lista.innerHTML = `<div style="padding:36px;text-align:center;color:var(--muted);font-size:.88rem">
-      ${todos.length ? 'Sin créditos con ese filtro.' : 'No hay créditos activos.'}</div>`;
+      ${todos.length ? 'Sin créditos con ese filtro.' : 'No hay créditos registrados.'}</div>`;
     return;
   }
 
   const q = ((document.getElementById('ad-cr-q') || {}).value || '').toLowerCase();
   const filtrados = q ? items.filter(c =>
-    (c.clienteNombre||'').toLowerCase().includes(q) ||
-    (c.clienteTelefono||'').includes(q) ||
-    (c.folioInterno||'').toLowerCase().includes(q)
+    (c.nombre||c.clienteNombre||'').toLowerCase().includes(q) ||
+    (c.folio||c.folioInterno||'').toLowerCase().includes(q) ||
+    (c.autoNombre||'').toLowerCase().includes(q)
   ) : items;
 
-  lista.innerHTML = filtrados.map(c => {
-    const est = AD_CR_ESTADOS[c.estatus] || { label: c.estatus || 'Sin estado', color:'#6b7280', bg:'#f3f4f6' };
-    const fmt$ = n => n ? '$' + Number(n).toLocaleString('es-MX') : '—';
-    const fmtF = f => f ? new Date(f).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' }) : '—';
-    return `<div class="ad-cr-row" onclick="adAbrirCredito('${c._id}')" style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s" onmouseover="this.style.background='var(--lime-bg)'" onmouseout="this.style.background=''">
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adEsc(c.clienteNombre || 'Sin nombre')}</div>
-        <div style="font-size:.77rem;color:var(--muted);margin-top:2px">${c.folioInterno ? c.folioInterno + ' · ' : ''}${fmtF(c._createdDate)}</div>
-      </div>
-      <div style="min-width:0;flex:0 0 auto;text-align:right">
-        <div style="font-weight:800;font-size:.92rem">${fmt$(c.monto)}</div>
-        <div style="font-size:.74rem;color:var(--muted)">${c.banco || 'Sin banco'}</div>
-      </div>
-      <span style="flex:0 0 auto;padding:4px 10px;border-radius:999px;font-size:.73rem;font-weight:700;background:${est.bg};color:${est.color}">${est.label}</span>
-      <button type="button" onclick="event.stopPropagation();adAvanzarCredito('${c._id}','${c.estatus}')" style="flex:0 0 auto;padding:5px 10px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);cursor:pointer;font-size:.75rem;font-weight:700;font-family:inherit" title="Cambiar estado"><i class="ti ti-arrow-right"></i></button>
-    </div>`;
-  }).join('') || `<div style="padding:28px;text-align:center;color:var(--muted);font-size:.88rem">Sin resultados para esa búsqueda.</div>`;
+  const fmt$ = n => n ? '$' + Number(n).toLocaleString('es-MX', { maximumFractionDigits:0 }) : '—';
+  const fmtF = f => f ? new Date(f).toLocaleDateString('es-MX', { day:'2-digit', month:'short' }) : '—';
+
+  lista.innerHTML = filtrados
+    .sort((a,b) => new Date(b.fechaSolicitud||b._createdDate||0) - new Date(a.fechaSolicitud||a._createdDate||0))
+    .map(c => {
+      const estado = getEstado(c);
+      const est = AD_CR_ESTADOS[estado] || { label: estado || '—', color:'#6b7280', bg:'#f3f4f6' };
+      const nombre = c.nombre || c.clienteNombre || 'Sin nombre';
+      const auto   = c.autoNombre || c.vehiculoNombre || '—';
+      const precio = c.precioVehiculo || c.monto || 0;
+      const eng    = c.enganchePct ? `${c.enganchePct}% eng.` : '';
+      const plazo  = c.plazoMeses ? `${c.plazoMeses} m` : '';
+      const folio  = c.folio || c.folioInterno || '';
+      return `<div onclick="adAbrirCredito('${c._id}')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer;transition:.1s" onmouseover="this.style.background='var(--lime-bg)'" onmouseout="this.style.background=''">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${adEsc(nombre.charAt(0).toUpperCase())}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adEsc(nombre)}</div>
+          <div style="font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adEsc(auto)}</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:1px">${folio ? folio+' · ' : ''}${fmtF(c.fechaSolicitud||c._createdDate)}</div>
+        </div>
+        <div style="flex:0 0 auto;text-align:right">
+          <div style="font-weight:800;font-size:.88rem">${fmt$(precio)}</div>
+          <div style="font-size:.72rem;color:var(--muted)">${[eng,plazo].filter(Boolean).join(' · ')||'—'}</div>
+        </div>
+        <span style="flex:0 0 auto;padding:3px 9px;border-radius:999px;font-size:.72rem;font-weight:700;background:${est.bg};color:${est.color}">${est.label}</span>
+      </div>`;
+    }).join('') || `<div style="padding:28px;text-align:center;color:var(--muted);font-size:.88rem">Sin resultados para esa búsqueda.</div>`;
 }
 window.renderAdmCreditos = renderAdmCreditos;
 window.adRenderCreditos  = renderAdmCreditos;
@@ -4412,22 +4656,55 @@ function adAbrirCredito(id) {
 function renderAdmCreditoDetalle(c) {
   const wrap = document.getElementById('ad-cr-validar-lista');
   if (!wrap || !c) return;
-  const est = AD_CR_ESTADOS[c.estatus] || { label: c.estatus, color:'#6b7280', bg:'#f3f4f6' };
-  const fmt$ = n => n ? '$' + Number(n).toLocaleString('es-MX') : '—';
-  const siguientes = (est.siguientes || []);
-  const botones = siguientes.map(s => {
-    const e2 = AD_CR_ESTADOS[s] || { label: s, color:'#6b7280', bg:'#f3f4f6' };
-    return `<button type="button" onclick="adAvanzarCredito('${c._id}','${s}')" style="padding:8px 14px;border:1.5px solid ${e2.color};border-radius:var(--r-sm);background:${e2.bg};color:${e2.color};font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit">${e2.label}</button>`;
-  }).join('');
+  const estado = c.estado || c.estatus || '';
+  const est = AD_CR_ESTADOS[estado] || { label: estado || '—', color:'#6b7280', bg:'#f3f4f6' };
+  const fmt$ = n => n ? '$' + Number(n).toLocaleString('es-MX', {maximumFractionDigits:0}) : '—';
+  const fmtF = f => f ? new Date(f).toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' }) : '—';
+  const nombre  = c.nombre || c.clienteNombre || '—';
+  const auto    = c.autoNombre || c.vehiculoNombre || '—';
+  const s       = c.solicitudDatos || {};
+  const isDictaminado = ['aprobado','rechazado','condicionado'].includes(estado);
+
+  const dictamenHtml = isDictaminado ? `
+    <div class="ad-card" style="padding:14px;margin-top:12px;border-left:4px solid ${est.color}">
+      <div style="font-size:.73rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Dictamen F&amp;I</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.83rem">
+        ${c.bancoAprobado   ? `<div><span style="color:var(--muted)">Banco</span><br><b>${adEsc(c.bancoAprobado)}</b></div>` : ''}
+        ${c.montoAprobado   ? `<div><span style="color:var(--muted)">Monto aprobado</span><br><b>${fmt$(c.montoAprobado)}</b></div>` : ''}
+        ${c.tasa            ? `<div><span style="color:var(--muted)">Tasa anual</span><br><b>${c.tasa}%</b></div>` : ''}
+        ${c.plazoFinal      ? `<div><span style="color:var(--muted)">Plazo</span><br><b>${c.plazoFinal} meses</b></div>` : ''}
+        ${c.motivoRechazo   ? `<div style="grid-column:1/-1"><span style="color:var(--muted)">Motivo</span><br><b>${adEsc(c.motivoRechazo)}</b></div>` : ''}
+        ${c.condicionesTexto? `<div style="grid-column:1/-1"><span style="color:var(--muted)">Condiciones</span><br><b>${adEsc(c.condicionesTexto)}</b></div>` : ''}
+        <div style="grid-column:1/-1"><span style="color:var(--muted)">Dictaminado</span><br><b>${fmtF(c.fechaDictamen)}</b></div>
+      </div>
+    </div>` : `<div class="ad-card" style="padding:14px;margin-top:12px;font-size:.84rem;color:var(--muted)"><i class="ti ti-clock-hour-4"></i> Pendiente de dictamen por F&amp;I.</div>`;
+
   wrap.innerHTML = `<div style="padding:20px">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-      <div class="ad-card" style="padding:14px"><div style="font-size:.73rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Cliente</div><div style="font-weight:800">${adEsc(c.clienteNombre||'—')}</div><div style="font-size:.8rem;color:var(--muted)">${adEsc(c.clienteTelefono||'')}</div></div>
-      <div class="ad-card" style="padding:14px"><div style="font-size:.73rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Monto</div><div style="font-weight:800">${fmt$(c.monto)}</div><div style="font-size:.8rem;color:var(--muted)">${c.banco||'Sin banco'} · ${c.plazoMeses ? c.plazoMeses + ' meses' : '—'}</div></div>
-      <div class="ad-card" style="padding:14px"><div style="font-size:.73rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Vendedor</div><div style="font-weight:800">${adEsc(c.vendedorNombre||c.vendedorEmail||'—')}</div></div>
-      <div class="ad-card" style="padding:14px"><div style="font-size:.73rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Estado actual</div><span style="padding:4px 10px;border-radius:999px;font-size:.8rem;font-weight:700;background:${est.bg};color:${est.color}">${est.label}</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0">
+      <div class="ad-card" style="padding:14px">
+        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Solicitante</div>
+        <div style="font-weight:800;font-size:.95rem">${adEsc(nombre)}</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:2px">${adEsc(s.celular||'')}</div>
+      </div>
+      <div class="ad-card" style="padding:14px">
+        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Vehículo solicitado</div>
+        <div style="font-weight:800;font-size:.88rem">${adEsc(auto)}</div>
+        <div style="font-size:.8rem;color:var(--muted)">${fmt$(c.precioVehiculo||c.monto)}</div>
+      </div>
+      <div class="ad-card" style="padding:14px">
+        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Enganche / Plazo</div>
+        <div style="font-weight:800">${c.enganchePct ? c.enganchePct+'%' : '—'} · ${c.plazoMeses ? c.plazoMeses+' meses' : '—'}</div>
+        <div style="font-size:.78rem;color:var(--muted)">${c.financiera || 'Sin preferencia'}</div>
+      </div>
+      <div class="ad-card" style="padding:14px">
+        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Estado F&amp;I</div>
+        <span style="padding:3px 9px;border-radius:999px;font-size:.78rem;font-weight:700;background:${est.bg};color:${est.color}">${est.label}</span>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:4px">${c.folio || ''}</div>
+      </div>
     </div>
-    ${c.notasAdmin ? `<div class="ad-card" style="padding:14px;margin-bottom:12px"><div style="font-size:.73rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px">Notas</div><div style="font-size:.88rem">${adEsc(c.notasAdmin)}</div></div>` : ''}
-    ${botones ? `<div style="margin-top:4px"><div style="font-size:.77rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:8px">Avanzar a:</div><div style="display:flex;gap:8px;flex-wrap:wrap">${botones}</div></div>` : '<div style="font-size:.84rem;color:var(--muted)">Estado terminal — sin pasos siguientes.</div>'}
+    ${dictamenHtml}
+    ${s.ingreso ? `<div class="ad-card" style="padding:14px;margin-top:10px"><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:6px">Datos financieros (del solicitante)</div><div style="display:flex;gap:20px;font-size:.83rem;flex-wrap:wrap"><span><span style="color:var(--muted)">Ingreso neto/mes</span> <b>${fmt$(s.ingreso)}</b></span>${s.otrosIngresos?`<span><span style="color:var(--muted)">Otros</span> <b>${fmt$(s.otrosIngresos)}</b></span>`:''}<span><span style="color:var(--muted)">Empleo</span> <b>${adEsc(s.tipoEmpleo||'—')}</b></span><span><span style="color:var(--muted)">Empresa</span> <b>${adEsc(s.empresa||'—')}</b></span></div></div>` : ''}
+    <div style="font-size:.78rem;color:var(--muted);margin-top:12px">Solicitud recibida: ${fmtF(c.fechaSolicitud||c._createdDate)}</div>
   </div>`;
 }
 
@@ -5039,11 +5316,13 @@ const INV_ESTATUS_STYLE = {
   'Consigna':   'background:#dbeafe;color:#1e40af',
 };
 function renderInventario(){
-  const q = (document.getElementById('inv-buscar')||{value:''}).value.toLowerCase();
+  const q  = (document.getElementById('inv-buscar')||{value:''}).value.toLowerCase();
   const ef = (document.getElementById('inv-filtro-estatus')||{value:''}).value;
+  const es = (document.getElementById('inv-filtro-sucursal')||{value:''}).value;
   const lista = inventario.filter(c=>{
     const txt = [c.nombre||c.nombreCarro||c.title||'', c.marca||c.brand||'', c.modelo||'', c.version||''].join(' ').toLowerCase();
-    return (!q||txt.includes(q)) && (!ef||(c.estatusVenta||'Disponible')===ef);
+    const sucOk = !es || (c.sucursal||'Bajío')===es;
+    return (!q||txt.includes(q)) && (!ef||(c.estatusVenta||'Disponible')===ef) && sucOk;
   });
 
   // KPIs
@@ -5069,6 +5348,9 @@ function renderInventario(){
   const cntEl = document.getElementById('inv-resultado-cnt');
   if(cntEl) cntEl.textContent = lista.length+' auto'+(lista.length!==1?'s':'')+' · '+disp+' disponible'+(disp!==1?'s':'');
 
+  // Gap 5: actualizar badge de notificaciones
+  if(typeof actualizarNotifBell === 'function') actualizarNotifBell();
+
   const tbody = document.getElementById('inv-tbody');
   const empty = document.getElementById('inv-empty');
   if(!lista.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
@@ -5077,22 +5359,30 @@ function renderInventario(){
     const marca  = esc(c.marca||c.brand||'');
     const modelo = esc(c.modelo||c.version||c.nombre||c.nombreCarro||c.title||'Sin nombre');
     const anio   = c.año||c.anio||c.year||'';
-    const km     = c.kilometraje!=null ? Number(c.kilometraje).toLocaleString('es-MX')+' km' : '—';
-    const precio = (c.precioVenta||c.priceNew||c.precio||c.price) ? fmtMoney(c.precioVenta||c.priceNew||c.precio||c.price) : '—';
+    const kmVal  = c.statusDescription||c.km||c.kilometraje;
+    const km     = kmVal!=null&&kmVal!=='' ? Number(kmVal).toLocaleString('es-MX')+' km' : '—';
+    const precio = (c.priceNew||c.precioVenta||c.precio||c.price) ? fmtMoney(c.priceNew||c.precioVenta||c.precio||c.price) : '—';
     const est    = c.estatusVenta||'Disponible';
     const estStyle = INV_ESTATUS_STYLE[est]||'background:#e5e7eb;color:#374151';
     const fotoUrl = resolveWixImg(c.fotoPrincipal||c.imagenUrl||c.imagen||c.image||c.imageUrl||(Array.isArray(c.fotos)&&c.fotos[0])||'');
     const fotoHtml = fotoUrl
       ? `<img src="${esc(fotoUrl)}" style="width:40px;height:40px;border-radius:var(--r-sm);object-fit:cover;border:1px solid var(--line);display:block" loading="lazy" onerror="this.style.display='none'">`
       : `<div style="width:40px;height:40px;border-radius:var(--r-sm);background:var(--paper);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px"><i class="ti ti-car"></i></div>`;
+    // Badge de sucursal si es remota
+    const sucursal = c.sucursal||'Bajío';
+    const traslado = c.estadoTraslado||'local';
+    const sucBadge = sucursal!=='Bajío'||traslado==='en_traslado'
+      ? `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:12px;font-size:.64rem;font-weight:800;background:#ede9fe;color:#6d28d9;margin-top:3px"><i class="ti ti-map-pin" style="font-size:10px"></i>${esc(sucursal)}${traslado==='en_traslado'?' · En traslado':''}</span>`
+      : '';
     return `<tr style="border-bottom:1px solid var(--line);transition:background .12s" onmouseover="this.style.background='var(--lime-bg)'" onmouseout="this.style.background=''">
       <td style="padding:8px 8px 8px 12px">${fotoHtml}</td>
       <td style="padding:8px 12px">
         <div style="font-weight:700;font-size:.85rem">${marca?`<span style="color:var(--muted);font-size:.76rem;font-weight:600">${marca} </span>`:''}${modelo}</div>
-        ${c.color?`<div style="font-size:.72rem;color:var(--muted);margin-top:1px">${esc(c.color)}${c.tipo?` · ${esc(c.tipo)}`:''}${c.combustible?` · ${esc(c.combustible)}`:''}</div>`:''}
+        ${c.color?`<div style="font-size:.72rem;color:var(--muted);margin-top:1px">${esc(c.color)}${c.tipo||c.type?` · ${esc(c.tipo||c.type)}`:''}${c.combustible?` · ${esc(c.combustible)}`:''}</div>`:''}
+        ${sucBadge}
       </td>
       <td style="padding:8px 12px;font-size:.82rem">${anio||'—'}<br><span style="font-size:.72rem;color:var(--muted)">${km}</span></td>
-      <td style="padding:8px 12px;text-align:right;font-size:.85rem;font-weight:700;font-variant-numeric:tabular-nums">${precio}</td>
+      <td style="padding:8px 12px;text-align:right;font-size:.85rem;font-weight:700;font-variant-numeric:tabular-nums">${precio}${!c.datosCompletos&&sucursal!=='Bajío'?`<br><span style="font-size:.65rem;color:var(--muted);font-weight:500">est.</span>`:''}</td>
       <td style="padding:8px 12px;text-align:center"><span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:800;${estStyle}">${esc(est)}</span></td>
       <td style="padding:8px 12px;text-align:center">
         <div style="display:flex;gap:6px;justify-content:center">
@@ -5111,11 +5401,15 @@ function renderInventario(){
   }).join('');
 }
 
+let _pendingFotoFile = null;
+
 function abrirModalCarro(c){
   carroEditandoId = c?._id||null;
+  _pendingFotoFile = null;
   document.getElementById('inv-modal-titulo').textContent = carroEditandoId ? 'Editar vehículo' : 'Nuevo vehículo';
-  // Sección de foto solo al editar un vehículo existente
-  document.getElementById('inv-foto-section').style.display = carroEditandoId ? '' : 'none';
+  // Foto: siempre visible. Nuevo = "Se subirá al guardar", Edición = botón "Subir ahora"
+  document.getElementById('inv-foto-btn').style.display        = carroEditandoId ? '' : 'none';
+  document.getElementById('inv-foto-badge-nuevo').style.display = carroEditandoId ? 'none' : '';
   document.getElementById('inv-foto-preview').style.display = 'none';
   document.getElementById('inv-foto-input').value = '';
   document.getElementById('inv-foto-status').textContent = '';
@@ -5128,15 +5422,19 @@ function abrirModalCarro(c){
   document.getElementById('inv-edit-marca').value        = c?.marca||c?.brand||'';
   document.getElementById('inv-edit-modelo').value       = c?.modelo||c?.version||'';
   document.getElementById('inv-edit-anio').value         = c?.año||c?.anio||c?.year||'';
-  document.getElementById('inv-edit-precio').value       = c?.precioVenta||c?.priceNew||c?.precio||'';
-  document.getElementById('inv-edit-costo').value        = c?.costoAdquisicion||'';
-  document.getElementById('inv-edit-km').value           = c?.km||c?.kilometraje||'';
+  document.getElementById('inv-edit-precio').value       = c?.priceNew||c?.precioVenta||c?.precio||'';
+  document.getElementById('inv-edit-costo').value        = c?.costoAdquisicion||c?.costoCompra||'';
+  document.getElementById('inv-edit-km').value           = c?.statusDescription||c?.km||c?.kilometraje||'';
   document.getElementById('inv-edit-color').value        = c?.color||'';
-  document.getElementById('inv-edit-tipo').value         = c?.tipo||c?.carroceria||'';
-  document.getElementById('inv-edit-transmision').value  = c?.transmision||'';
-  document.getElementById('inv-edit-combustible').value  = c?.combustible||'';
-  document.getElementById('inv-edit-estatus').value      = c?.estatus||c?.estatusVenta||'Disponible';
-  document.getElementById('inv-edit-vin').value          = c?.vin||c?.noSerie||'';
+  document.getElementById('inv-edit-tipo').value         = c?.tipo||c?.type||c?.carroceria||'';
+  document.getElementById('inv-edit-transmision').value  = c?.transmision||c?.transmission||'';
+  document.getElementById('inv-edit-combustible').value  = c?.combustible||c?.fuel||'';
+  document.getElementById('inv-edit-estatus').value      = c?.estatusVenta||c?.estatus||'Disponible';
+  document.getElementById('inv-edit-vin').value          = c?.vin||c?.noSerie||c?.serialNumber||'';
+  const _editSuc = c?.sucursal||'Bajío';
+  document.getElementById('inv-edit-sucursal').value     = _editSuc;
+  document.getElementById('inv-edit-estado-traslado').value = c?.estadoTraslado||'disponible_remoto';
+  document.getElementById('inv-edit-traslado-wrap').style.display = _editSuc !== 'Bajío' ? '' : 'none';
   document.getElementById('inv-edit-imagen-url').value   = fotoActual;
   const descRaw = c?.descripcion||c?.description||'';
   const descTmp = document.createElement('div'); descTmp.innerHTML = descRaw;
@@ -5145,9 +5443,16 @@ function abrirModalCarro(c){
   document.getElementById('inv-save-status').textContent = '';
   document.getElementById('inv-overlay').style.display='flex';
 }
-// Preview de foto antes de subir
+// Mostrar/ocultar traslado según sucursal seleccionada
+document.getElementById('inv-edit-sucursal').addEventListener('change', function(){
+  document.getElementById('inv-edit-traslado-wrap').style.display = this.value !== 'Bajío' ? '' : 'none';
+});
+
+// Preview de foto — funciona para nuevos (pending) y edición
 document.getElementById('inv-foto-input').addEventListener('change', function(){
   const file = this.files[0]; if(!file) return;
+  if(file.size > 6*1024*1024){ toast('La imagen es muy grande (máx. 6 MB).'); this.value=''; return; }
+  _pendingFotoFile = file;
   const reader = new FileReader();
   reader.onload = e => {
     document.getElementById('inv-foto-img').src = e.target.result;
@@ -5157,21 +5462,32 @@ document.getElementById('inv-foto-input').addEventListener('change', function(){
   reader.readAsDataURL(file);
 });
 
-// Subir foto al CMS
-document.getElementById('inv-foto-btn').addEventListener('click', function(){
-  const file = document.getElementById('inv-foto-input').files[0];
-  if(!file){ toast('Selecciona una imagen primero.'); return; }
-  if(!carroEditandoId){ toast('Guarda el vehículo primero.'); return; }
-  if(file.size > 6*1024*1024){ toast('La imagen es muy grande (máx. 6 MB).'); return; }
-  document.getElementById('inv-foto-status').textContent = 'Subiendo…';
+// Botón ×  para quitar la foto seleccionada
+document.getElementById('inv-foto-clear').addEventListener('click', function(){
+  _pendingFotoFile = null;
+  document.getElementById('inv-foto-input').value = '';
+  document.getElementById('inv-foto-preview').style.display = 'none';
+  document.getElementById('inv-foto-status').textContent = '';
+});
+
+// Función reutilizable para disparar el upload con un carroId conocido
+function _dispararUploadFoto(carroId, file){
+  document.getElementById('inv-foto-status').textContent = 'Subiendo foto…';
   document.getElementById('inv-foto-btn').disabled = true;
   const reader = new FileReader();
   reader.onload = e => {
-    // Quitar el prefijo "data:image/jpeg;base64," — solo enviamos el base64 puro
     const base64 = e.target.result.split(',')[1];
-    window.parent.postMessage({ type:'wecars-foto-subir', carroId:carroEditandoId, base64, fileName:file.name, mimeType:file.type }, '*');
+    window.parent.postMessage({ type:'wecars-foto-subir', carroId, base64, fileName:file.name, mimeType:file.type }, '*');
   };
   reader.readAsDataURL(file);
+}
+
+// Botón "Subir ahora" — solo visible al editar (nuevo usa auto-upload al guardar)
+document.getElementById('inv-foto-btn').addEventListener('click', function(){
+  const file = _pendingFotoFile || document.getElementById('inv-foto-input').files[0];
+  if(!file){ toast('Selecciona una imagen primero.'); return; }
+  if(!carroEditandoId){ toast('Guarda el vehículo primero.'); return; }
+  _dispararUploadFoto(carroEditandoId, file);
 });
 
 function cerrarModalCarro(){ document.getElementById('inv-overlay').style.display='none'; carroEditandoId=null; }
@@ -5238,17 +5554,23 @@ function abrirExpediente(c){
   document.getElementById('exp-modelo').value         = modelo;
   document.getElementById('exp-anio').value           = anio;
   document.getElementById('exp-color').value          = c.color||'';
-  document.getElementById('exp-km').value             = c.km||c.kilometraje||'';
-  document.getElementById('exp-trans').value          = c.transmision||'';
-  document.getElementById('exp-combustible').value    = c.combustible||'';
-  document.getElementById('exp-tipo-carr').value      = c.tipo||c.carroceria||'';
-  document.getElementById('exp-vin').value            = c.vin||c.noSerie||'';
+  document.getElementById('exp-km').value             = c.statusDescription||c.km||c.kilometraje||'';
+  document.getElementById('exp-trans').value          = c.transmision||c.transmission||'';
+  document.getElementById('exp-combustible').value    = c.combustible||c.fuel||'';
+  document.getElementById('exp-tipo-carr').value      = c.tipo||c.type||c.carroceria||'';
+  document.getElementById('exp-vin').value            = c.vin||c.noSerie||c.serialNumber||'';
+
+  // Ubicación
+  document.getElementById('exp-sucursal').value          = c.sucursal||'Bajío';
+  document.getElementById('exp-estado-traslado').value   = c.estadoTraslado||'local';
+  document.getElementById('exp-precio-traslado').value   = c.precioTraslado||'';
+  document.getElementById('exp-datos-completos').checked = !!c.datosCompletos;
 
   // Financiero fields
   document.getElementById('exp-costo-compra').value   = c.costoAdquisicion||c.costoCompra||'';
   document.getElementById('exp-gastos-entrada').value = c.gastosEntrada||'';
   document.getElementById('exp-gastos-detalle').value = c.gastosDetalle||'';
-  document.getElementById('exp-precio-lista').value   = c.precioVenta||c.priceNew||c.precio||'';
+  document.getElementById('exp-precio-lista').value   = c.priceNew||c.precioVenta||c.precio||'';
   document.getElementById('exp-precio-piso').value    = c.precioMinimo||'';
   expCalcMargen();
 
@@ -5278,6 +5600,9 @@ function abrirExpediente(c){
 
   // Tab consigna visible solo si aplica
   expToggleConsignaTab();
+
+  // Gap 1: mostrar alerta de fotos si no tiene
+  _expCheckFotos(c);
 
   // Reset tab y status
   expCambiarTab(document.querySelector('.exp-tab[data-tab="resumen"]'));
@@ -5399,6 +5724,8 @@ function expGuardar(){
   const stat = document.getElementById('exp-save-status');
   btn.disabled=true;
   stat.textContent='Guardando…';
+  // Gap 3: detectar cambio a Vendido para auto-comisión
+  const _estatusAnterior = _expCarroActual.estatusVenta||'Disponible';
 
   // Recopilar datos resumen
   const marca  = document.getElementById('exp-marca').value.trim();
@@ -5410,18 +5737,28 @@ function expGuardar(){
     // Resumen
     marca, brand:marca, modelo, version:modelo,
     año: anio, anio,
-    color:      document.getElementById('exp-color').value,
-    kilometraje:Number(document.getElementById('exp-km').value)||0,
-    km:         Number(document.getElementById('exp-km').value)||0,
-    transmision:document.getElementById('exp-trans').value,
-    combustible:document.getElementById('exp-combustible').value,
-    tipo:       document.getElementById('exp-tipo-carr').value,
-    carroceria: document.getElementById('exp-tipo-carr').value,
+    color:             document.getElementById('exp-color').value,
+    statusDescription: Number(document.getElementById('exp-km').value)||0,
+    kilometraje:       Number(document.getElementById('exp-km').value)||0,
+    km:                Number(document.getElementById('exp-km').value)||0,
+    transmision:       document.getElementById('exp-trans').value,
+    transmission:      document.getElementById('exp-trans').value,
+    combustible:       document.getElementById('exp-combustible').value,
+    fuel:              document.getElementById('exp-combustible').value,
+    tipo:              document.getElementById('exp-tipo-carr').value,
+    type:              document.getElementById('exp-tipo-carr').value,
+    carroceria:        document.getElementById('exp-tipo-carr').value,
     vin:        document.getElementById('exp-vin').value.trim().toUpperCase(),
     noSerie:    document.getElementById('exp-vin').value.trim().toUpperCase(),
     estatusVenta:document.getElementById('exp-estatus').value,
     tipoAdquisicion:document.getElementById('exp-tipo-adq').value,
     notasInternas:document.getElementById('exp-notas').value,
+    // Ubicación / sucursal
+    sucursal:        document.getElementById('exp-sucursal').value,
+    ciudadUbicacion: ({ Bajío:'León, Gto.', Chihuahua:'Chihuahua, Chih.', Delicias:'Delicias, Chih.', CiudadJuarez:'Cd. Juárez, Chih.' })[document.getElementById('exp-sucursal').value] || 'León, Gto.',
+    estadoTraslado:  document.getElementById('exp-estado-traslado').value,
+    precioTraslado:  Number(document.getElementById('exp-precio-traslado').value)||0,
+    datosCompletos:  document.getElementById('exp-datos-completos').checked,
     ...(titulo ? {nombreCarro:titulo, title:titulo} : {}),
     // Financiero
     costoAdquisicion:Number(document.getElementById('exp-costo-compra').value)||0,
@@ -5429,6 +5766,7 @@ function expGuardar(){
     gastosEntrada:   Number(document.getElementById('exp-gastos-entrada').value)||0,
     gastosDetalle:   document.getElementById('exp-gastos-detalle').value,
     precioVenta:     Number(document.getElementById('exp-precio-lista').value)||0,
+    priceNew:        Number(document.getElementById('exp-precio-lista').value)||0,
     precioMinimo:    Number(document.getElementById('exp-precio-piso').value)||0,
     // Documentos
     documentos:     _expDocs,
@@ -5462,6 +5800,11 @@ function expGuardar(){
     cambios,
   }, '*');
 
+  // Gap 3 (aviso): recordar cierre de operación al marcar Vendido
+  if(cambios.estatusVenta==='Vendido' && _estatusAnterior!=='Vendido'){
+    setTimeout(()=> toast('Vehículo marcado como Vendido — registra el cierre de operación para generar la comisión'), 800);
+  }
+
   // Actualiza local para que la tabla se refresque sin esperar respuesta
   const idx = inventario.findIndex(x=>x._id===_expCarroActual._id);
   if(idx>=0){
@@ -5477,6 +5820,187 @@ function expGuardar(){
     setTimeout(()=>{ stat.textContent=''; }, 2500);
   }, 1200);
 }
+// ── Gap 1: Fotos pendientes ──────────────────────────────────────────
+function _expCheckFotos(c){
+  const fotos = Array.isArray(c.fotos) ? c.fotos : [];
+  const sinFoto = fotos.length===0 && !(c.fotoPrincipal||c.imagenUrl||c.imagen||c.image||c.imageUrl);
+  const alerta = document.getElementById('exp-fotos-alerta');
+  if(!alerta) return;
+  alerta.style.display = sinFoto ? 'flex' : 'none';
+}
+function irAFotografo(){
+  window.parent.postMessage({ type:'wecars-navegar-panel', panel:'cargador', carroId: _expCarroActual&&_expCarroActual._id||null }, '*');
+  cerrarExpediente();
+}
+
+// ── Gap 4: Acta de entrega ───────────────────────────────────────────
+(function(){
+  const ov=document.getElementById('acta-overlay');
+  if(ov && ov.parentElement!==document.body) document.body.appendChild(ov);
+  // Click outside cierra
+  if(ov) ov.addEventListener('click', e=>{ if(e.target===ov) cerrarActaEntrega(); });
+})();
+
+function abrirActaEntrega(){
+  if(!_expCarroActual) return;
+  const c = _expCarroActual;
+  const marca  = c.marca||c.brand||'';
+  const modelo = c.modelo||c.version||c.nombreCarro||'';
+  const anio   = c.año||c.anio||c.year||'';
+  const vin    = c.vin||c.noSerie||'—';
+  const km     = (c.km||c.kilometraje||0).toLocaleString('es-MX');
+  const color  = c.color||'—';
+  const numInv = c.numeroInventario||c._id||'—';
+  const precio = fmtMoney(c.precioVenta||c.priceNew||c.precio||0);
+  const fecha  = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+
+  // Documentos checklist
+  const docsHtml = _EXP_DOCS.map(d=>{
+    const est = _expDocs[d.id]||'pendiente';
+    const icon = est==='entregado'?'☑':est==='noaplica'?'—':'☐';
+    return `<tr><td style="padding:4px 8px">${icon}</td><td style="padding:4px 8px">${d.label}</td><td style="padding:4px 8px;text-transform:capitalize;color:${est==='entregado'?'#065f46':est==='noaplica'?'#6b7280':'#92400e'}">${est}</td></tr>`;
+  }).join('');
+
+  document.getElementById('acta-cuerpo').innerHTML = `
+    <div style="text-align:center;margin-bottom:20px;color:#6b7280;font-size:.78rem;border:1px dashed #d1d5db;padding:6px;border-radius:4px">
+      Folio: ${numInv} &nbsp;·&nbsp; Fecha de entrega: ${fecha}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <div>
+        <div style="font-weight:800;color:#374151;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Datos del vehículo</div>
+        <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+          <tr><td style="padding:3px 0;color:#6b7280;width:40%">Marca/Modelo</td><td style="padding:3px 0;font-weight:700">${esc(marca)} ${esc(modelo)} ${esc(String(anio))}</td></tr>
+          <tr><td style="padding:3px 0;color:#6b7280">Color</td><td style="padding:3px 0">${esc(color)}</td></tr>
+          <tr><td style="padding:3px 0;color:#6b7280">No. Serie (VIN)</td><td style="padding:3px 0;font-family:monospace">${esc(vin)}</td></tr>
+          <tr><td style="padding:3px 0;color:#6b7280">Kilometraje</td><td style="padding:3px 0">${km} km</td></tr>
+          <tr><td style="padding:3px 0;color:#6b7280">No. Inventario</td><td style="padding:3px 0">${esc(numInv)}</td></tr>
+          <tr><td style="padding:3px 0;color:#6b7280">Precio de venta</td><td style="padding:3px 0;font-weight:700">${precio}</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-weight:800;color:#374151;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Datos del comprador</div>
+        <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+          <tr><td style="padding:3px 0;color:#6b7280;width:40%">Nombre</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb">&nbsp;</td></tr>
+          <tr><td style="padding:3px 0;color:#6b7280">RFC / CURP</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb">&nbsp;</td></tr>
+          <tr><td style="padding:3px 0;color:#6b7280">Teléfono</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb">&nbsp;</td></tr>
+          <tr><td style="padding:3px 0;color:#6b7280">Domicilio</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb">&nbsp;</td></tr>
+        </table>
+      </div>
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="font-weight:800;color:#374151;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Documentos entregados</div>
+      <table style="width:100%;border-collapse:collapse;font-size:.82rem;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden">
+        <thead><tr style="background:#f3f4f6"><th style="padding:6px 8px;text-align:left;font-weight:700">Est.</th><th style="padding:6px 8px;text-align:left;font-weight:700">Documento</th><th style="padding:6px 8px;text-align:left;font-weight:700">Estado</th></tr></thead>
+        <tbody>${docsHtml}</tbody>
+      </table>
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="font-weight:800;color:#374151;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Accesorios entregados</div>
+      <div style="display:flex;gap:20px;font-size:.82rem;flex-wrap:wrap">
+        <span>Llaves: <strong>${c.llaves!=null?c.llaves:'—'}</strong></span>
+        <span>Manual: <strong>${c.manual||'—'}</strong></span>
+        <span>Holograma: <strong>${c.holograma||'—'}</strong></span>
+        <span>Carpeta docs: <strong>${c.carpetaDocumentos||'—'}</strong></span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px">
+      <div style="text-align:center">
+        <div style="border-top:1.5px solid #374151;padding-top:8px;font-size:.78rem;color:#6b7280">Firma del vendedor</div>
+        <div style="font-size:.78rem;color:#374151;margin-top:4px">${esc(nombreActual||'')}</div>
+      </div>
+      <div style="text-align:center">
+        <div style="border-top:1.5px solid #374151;padding-top:8px;font-size:.78rem;color:#6b7280">Firma del comprador</div>
+        <div style="font-size:.78rem;color:#374151;margin-top:4px">Nombre y fecha</div>
+      </div>
+    </div>
+    <div style="margin-top:24px;font-size:.72rem;color:#9ca3af;text-align:center;border-top:1px solid #e5e7eb;padding-top:12px">
+      weCars Bajío · El presente documento certifica la entrega del vehículo en las condiciones descritas. Ambas partes aceptan conformes.
+    </div>`;
+
+  const ov = document.getElementById('acta-overlay');
+  ov.style.display='block';
+}
+
+function cerrarActaEntrega(){
+  document.getElementById('acta-overlay').style.display='none';
+}
+
+function imprimirActa(){
+  const contenido = document.getElementById('acta-modal').innerHTML;
+  const w = window.open('','_blank','width=760,height=900');
+  if(!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Acta de Entrega</title>
+    <style>body{font-family:'Segoe UI',system-ui,sans-serif;padding:32px;max-width:680px;margin:0 auto;color:#1a2332;font-size:14px}
+    .acta-no-print{display:none!important}@media print{.acta-no-print{display:none!important}}</style>
+    </head><body>${contenido}</body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(), 400);
+}
+
+// ── Gap 5: Notification bell ──────────────────────────────────────────
+function toggleNotifDropdown(){
+  const dd = document.getElementById('notif-dropdown');
+  dd.style.display = dd.style.display==='none' ? 'block' : 'none';
+  if(dd.style.display==='block') _calcNotifAlertas();
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('#notif-bell-btn') && !e.target.closest('#notif-dropdown')){
+    const dd = document.getElementById('notif-dropdown');
+    if(dd) dd.style.display='none';
+  }
+});
+
+function _calcNotifAlertas(){
+  const alertas = [];
+  const inv = inventario||[];
+
+  // Vehículos sin fotos
+  const sinFotos = inv.filter(c=> (!Array.isArray(c.fotos)||c.fotos.length===0) && c.estatusVenta!=='Vendido');
+  if(sinFotos.length) alertas.push({ tipo:'warn', msg:`${sinFotos.length} vehículo${sinFotos.length>1?'s':''} sin fotografías`, accion:'inventario' });
+
+  // Documentos pendientes (facturaOriginal pendiente)
+  const sinFactura = inv.filter(c=>{
+    const docs = c.documentos||{};
+    return docs.facturaOriginal!=='entregado' && c.estatusVenta!=='Vendido';
+  });
+  if(sinFactura.length) alertas.push({ tipo:'warn', msg:`${sinFactura.length} vehículo${sinFactura.length>1?'s':''} sin factura original confirmada`, accion:'inventario' });
+
+  // Apartados recientes (sin cierre en 7 días)
+  const apartados = inv.filter(c=> c.estatusVenta==='Apartado');
+  if(apartados.length) alertas.push({ tipo:'info', msg:`${apartados.length} vehículo${apartados.length>1?'s':''} en estado Apartado`, accion:'inventario' });
+
+  // Actualizar badge
+  const badge = document.getElementById('notif-badge');
+  if(badge){
+    badge.style.display = alertas.length>0 ? '' : 'none';
+    badge.textContent = alertas.length>9 ? '9+' : alertas.length;
+  }
+
+  // Render lista
+  const lista = document.getElementById('notif-lista');
+  if(!lista) return;
+  if(!alertas.length){
+    lista.innerHTML='<div style="padding:16px;text-align:center;color:var(--muted);font-size:.82rem">Sin alertas pendientes</div>';
+    return;
+  }
+  lista.innerHTML = alertas.map(a=>`
+    <div onclick="mostrarVista('${a.accion}');toggleNotifDropdown()" style="padding:10px 16px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .15s" onmouseover="this.style.background='var(--paper)'" onmouseout="this.style.background=''">
+      <i class="ti ti-${a.tipo==='warn'?'alert-triangle':'info-circle'}" style="font-size:18px;flex-shrink:0;color:${a.tipo==='warn'?'#d97706':'#3b82f6'}"></i>
+      <span style="font-size:.8rem;color:var(--ink)">${esc(a.msg)}</span>
+    </div>`).join('');
+}
+
+function actualizarNotifBell(){
+  const inv = inventario||[];
+  let total = 0;
+  total += inv.filter(c=> (!Array.isArray(c.fotos)||c.fotos.length===0) && c.estatusVenta!=='Vendido').length;
+  total += inv.filter(c=>{ const d=c.documentos||{}; return d.facturaOriginal!=='entregado' && c.estatusVenta!=='Vendido'; }).length;
+  total += inv.filter(c=> c.estatusVenta==='Apartado').length;
+  const badge = document.getElementById('notif-badge');
+  if(badge){ badge.style.display=total>0?'':'none'; badge.textContent=total>9?'9+':total; }
+}
+
 document.getElementById('inv-cancel-btn').addEventListener('click', cerrarModalCarro);
 document.getElementById('inv-overlay').addEventListener('click', e=>{ if(e.target===document.getElementById('inv-overlay')) cerrarModalCarro(); });
 document.getElementById('inv-nuevo-btn').addEventListener('click', ()=>abrirModalCarro(null));
@@ -5485,7 +6009,7 @@ document.getElementById('inv-tbody').addEventListener('click', e=>{
   const expBtn = e.target.closest('.inv-exp-btn');
   if(expBtn){ const c=inventario.find(x=>x._id===expBtn.dataset.invId); if(c) abrirExpediente(c); return; }
   const editBtn = e.target.closest('.inv-editar-btn');
-  if(editBtn){ const c=inventario.find(x=>x._id===editBtn.dataset.invId); if(c) abrirModalCarro(c); }
+  if(editBtn){ const c=inventario.find(x=>x._id===editBtn.dataset.invId); if(c) abrirModalCarro(c); return; }
   const delBtn = e.target.closest('.inv-eliminar-btn');
   if(delBtn){
     const nombre = delBtn.dataset.invNombre||'este vehículo';
@@ -5498,6 +6022,7 @@ document.getElementById('inv-tbody').addEventListener('click', e=>{
 });
 document.getElementById('inv-buscar').addEventListener('input', renderInventario);
 document.getElementById('inv-filtro-estatus').addEventListener('change', renderInventario);
+document.getElementById('inv-filtro-sucursal').addEventListener('change', renderInventario);
 
 document.getElementById('inv-guardar-btn').addEventListener('click', ()=>{
   const marca  = document.getElementById('inv-edit-marca').value.trim();
@@ -5536,6 +6061,15 @@ document.getElementById('inv-guardar-btn').addEventListener('click', ()=>{
     estatusVenta:     document.getElementById('inv-edit-estatus').value,
     vin:              document.getElementById('inv-edit-vin').value.trim(),
     noSerie:          document.getElementById('inv-edit-vin').value.trim(),
+    sucursal:         document.getElementById('inv-edit-sucursal').value,
+    ciudadUbicacion:  (function(){
+      const s = document.getElementById('inv-edit-sucursal').value;
+      const map = { Bajío:'León, Gto.', Chihuahua:'Chihuahua, Chih.', Delicias:'Delicias, Chih.', CiudadJuarez:'Cd. Juárez, Chih.' };
+      return map[s]||'León, Gto.';
+    })(),
+    estadoTraslado:   document.getElementById('inv-edit-sucursal').value !== 'Bajío'
+                        ? document.getElementById('inv-edit-estado-traslado').value
+                        : 'local',
     ...(imgUrl ? { imagenUrl: imgUrl, fotoPrincipal: imgUrl, image: imgUrl } : {}),
     descripcion:      document.getElementById('inv-edit-desc').value.trim(),
     description:      document.getElementById('inv-edit-desc').value.trim(),
@@ -6470,11 +7004,15 @@ function imprimirReporteVTA() {
   if (!pw) { toast('Permite ventanas emergentes para imprimir'); return; }
   pw.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Verifica tu Auto — weCars Bajío</title>'
     +'<style>body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}@media print{@page{margin:16mm 12mm}}</style>'
-    +'</head><body>' + (area ? area.innerHTML : '') + '<!-- weCars Mobile Lead Sheet — shared module v3
-     Inject this block (style + script) before </body> in each panel.
-     Then call: window.wcLeadSheetAbrir(cliente, cfg)
-     cfg = { sheetId, overlayId, cerrar, actividades, onEtapaChange, vendedorNombre, vendedorRol }
--->
+    +'</head><body>' + (area ? area.innerHTML : '') + '</body></html>');
+  pw.document.close();
+  pw.focus();
+  try { pw.print(); } catch(e) {}
+}
+
+})();
+</script>
+
 <style id="wc-lead-sheet-css">
 /* ── SHEET CONTAINER OVERRIDES ── */
 /* Asegurar que el sheet cubra completamente y no se vea el panel detrás */
@@ -6815,14 +7353,6 @@ window._adMobileAbrirLead = function(id) {
     }
   });
 };
-</script>
-</body></html>');
-  pw.document.close();
-  pw.focus();
-  try { pw.print(); } catch(e) {}
-}
-
-})();
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -7487,7 +8017,7 @@ function _initAdMobile(){
   window._wcMsgHandlers.push(function(e){
     if(!_isMobile()) return;
     var t=(e.data||{}).type||'';
-    if(t==='wecars-leads-datos'||t==='wecars-empleados-datos'||t==='wecars-inventario-datos'){
+    if(t==='wecars-leads-datos'||t==='wecars-empleados'||t==='wecars-inventario-datos'){
       setTimeout(function(){ if(document.getElementById('ad-mobile-home').style.display!=='none') renderAdMobileHome(); },300);
     }
   });
