@@ -246,24 +246,135 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 .toast.ok{background:var(--wc-ok)}.toast.error{background:var(--wc-danger)}.toast.warn{background:var(--wc-warn)}
 
 /* ══ EDIT FORM ══ */
-.ge-edit-form{display:none;flex-direction:column;gap:14px}
+.ge-edit-form{display:none;flex-direction:column;gap:0}
 .ge-edit-form.open{display:flex}
-.ge-edit-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ge-edit-wrap{padding:16px 20px 0;display:flex;flex-direction:column;gap:14px}
+.ge-edit-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .ge-edit-row.full{grid-template-columns:1fr}
-.ge-edit-field{display:flex;flex-direction:column;gap:4px}
+.ge-edit-row.three{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:480px){.ge-edit-row{grid-template-columns:1fr}.ge-edit-row.three{grid-template-columns:1fr 1fr}}
+.ge-edit-field{display:flex;flex-direction:column;gap:5px}
 .ge-edit-field label{font-size:11px;font-weight:700;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px}
-.ge-edit-field input,.ge-edit-field select{border:1.5px solid var(--wc-border);border-radius:var(--wc-r-sm);
-  padding:9px 11px;font-size:14px;background:var(--wc-surface);color:var(--wc-ink);width:100%;
-  transition:border-color .15s}
-.ge-edit-field input:focus,.ge-edit-field select:focus{outline:none;border-color:var(--wc-green)}
-.ge-edit-actions{display:flex;gap:10px;padding-top:4px}
+.ge-edit-field input,.ge-edit-field select,.ge-edit-field textarea{border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);
+  padding:10px 12px;font-size:14px;background:var(--wc-surface);color:var(--wc-ink);width:100%;
+  transition:border-color .15s;font-family:inherit}
+.ge-edit-field input:focus,.ge-edit-field select:focus,.ge-edit-field textarea:focus{outline:none;border-color:var(--wc-green)}
+.ge-edit-field textarea{resize:vertical;min-height:72px}
+.ge-edit-field .ef-hint{font-size:11px;color:var(--wc-ink3);margin-top:2px}
+.ge-edit-sep{height:1px;background:var(--wc-border);margin:4px 0}
+.ge-edit-section-lbl{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--wc-ink3);margin-bottom:2px;padding-top:4px}
+.ge-edit-com-wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:flex-end}
+.ge-edit-com-sep{display:flex;align-items:flex-end;padding-bottom:11px;color:var(--wc-ink3);font-size:12px;font-weight:600}
+.ge-edit-actions{display:flex;gap:10px;padding:16px 20px;border-top:1px solid var(--wc-border)}
 .ge-edit-actions .btn-save{flex:1;background:var(--wc-green);color:#fff;border:none;
-  border-radius:var(--wc-r-md);padding:11px;font-size:14px;font-weight:700;cursor:pointer}
-.ge-edit-actions .btn-cancel{padding:11px 16px;border:1.5px solid var(--wc-border);background:none;
-  border-radius:var(--wc-r-md);font-size:14px;cursor:pointer;color:var(--wc-ink2)}
+  border-radius:var(--wc-r-md);padding:12px;font-size:14px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.ge-edit-actions .btn-save:hover{background:var(--wc-green-dark)}
+.ge-edit-actions .btn-cancel{padding:12px 18px;border:1.5px solid var(--wc-border);background:none;
+  border-radius:var(--wc-r-md);font-size:14px;cursor:pointer;color:var(--wc-ink2);font-weight:600}
 .ge-det-edit-btn{padding:7px 14px;border:1.5px solid var(--wc-green);color:var(--wc-green);
   background:none;border-radius:var(--wc-r-md);font-size:13px;font-weight:600;cursor:pointer;
   display:flex;align-items:center;gap:6px}
+
+/* ══ CLIENTES TABLE/KANBAN ══ */
+.ge-cli-table{width:100%;border-collapse:collapse;background:var(--wc-surface);font-size:13px}
+.ge-cli-table th{background:var(--wc-surface2);font-weight:700;font-size:11px;color:var(--wc-ink2);
+  text-align:left;padding:9px 14px;border-bottom:1px solid var(--wc-border);white-space:nowrap;
+  text-transform:uppercase;letter-spacing:.4px}
+.ge-cli-table td{padding:11px 14px;border-bottom:1px solid var(--wc-border);vertical-align:middle}
+.ge-cli-table tr:last-child td{border-bottom:none}
+.ge-cli-table tr:hover td{background:var(--wc-surface2);cursor:pointer}
+.ge-cli-row-name{font-weight:700;font-size:13px}
+.ge-cli-row-phone{font-size:12px;color:var(--wc-ink3);margin-top:2px}
+.ge-cli-row-actions{display:flex;align-items:center;gap:5px;justify-content:flex-end}
+.ge-cli-wa-btn,.ge-cli-call-btn,.ge-cli-exp-btn{
+  width:30px;height:30px;border-radius:var(--wc-r-sm);border:none;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;font-size:14px;transition:transform .15s}
+.ge-cli-wa-btn{background:rgba(37,211,102,.12);color:#25d366}
+.ge-cli-call-btn{background:rgba(37,99,235,.10);color:#2563eb}
+.ge-cli-exp-btn{background:var(--wc-surface2);color:var(--wc-ink3);border:1px solid var(--wc-border)}
+.ge-cli-wa-btn:hover{background:rgba(37,211,102,.22);transform:scale(1.08)}
+.ge-cli-call-btn:hover{background:rgba(37,99,235,.18);transform:scale(1.08)}
+.ge-cli-exp-btn:hover{color:var(--wc-ink);border-color:var(--wc-green)}
+
+/* Badge estatus para clientes */
+.ge-cli-badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:var(--wc-r-full);
+  font-size:11px;font-weight:700;white-space:nowrap}
+.ge-cli-badge.nuevo{background:var(--wc-info-bg);color:var(--wc-info)}
+.ge-cli-badge.contactado{background:var(--wc-green-light);color:var(--wc-green-dark)}
+.ge-cli-badge.interesado,.ge-cli-badge.enproceso{background:var(--wc-warn-bg);color:var(--wc-warn)}
+.ge-cli-badge.negociando{background:var(--wc-orange-bg);color:var(--wc-orange)}
+.ge-cli-badge.ganado,.ge-cli-badge.vendido,.ge-cli-badge.entregado{background:var(--wc-ok-bg);color:var(--wc-ok)}
+.ge-cli-badge.perdido{background:var(--wc-danger-bg);color:var(--wc-danger)}
+.ge-cli-badge.default{background:var(--wc-surface2);color:var(--wc-ink3);border:1px solid var(--wc-border)}
+.ge-cli-badge-origen{display:inline-flex;align-items:center;padding:2px 7px;border-radius:var(--wc-r-full);
+  font-size:10px;font-weight:700}
+.ge-cli-origen-web{background:rgba(37,99,235,.10);color:#1d4ed8}
+.ge-cli-origen-fb{background:rgba(37,99,235,.15);color:#1877f2}
+.ge-cli-origen-ig{background:rgba(217,70,239,.10);color:#a21caf}
+.ge-cli-origen-wa{background:rgba(37,211,102,.12);color:#166534}
+.ge-cli-origen-ref{background:rgba(245,158,11,.12);color:#92400e}
+.ge-cli-origen-otro{background:var(--wc-surface2);color:var(--wc-ink3)}
+
+/* Kanban clientes */
+.ge-cli-kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;min-height:300px}
+.ge-cli-kanban-col{flex:0 0 220px;background:var(--wc-surface2);border-radius:var(--wc-r-lg);
+  display:flex;flex-direction:column;overflow:hidden}
+.ge-cli-kanban-head{padding:10px 14px;font-size:12px;font-weight:700;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid var(--wc-border);background:var(--wc-surface)}
+.ge-cli-kanban-count{background:var(--wc-green);color:#fff;font-size:10px;font-weight:700;
+  padding:1px 6px;border-radius:var(--wc-r-full);min-width:18px;text-align:center}
+.ge-cli-kanban-drop{flex:1;padding:8px;display:flex;flex-direction:column;gap:8px;
+  min-height:120px;transition:background .15s}
+.ge-cli-kanban-drop.drag-over{background:rgba(86,169,0,.08);border-radius:var(--wc-r-md)}
+.ge-cli-kanban-card{background:var(--wc-surface);border:1px solid var(--wc-border);
+  border-left-width:3px;border-left-color:var(--wc-green);border-radius:var(--wc-r-md);
+  padding:10px 12px;cursor:pointer;transition:box-shadow .2s}
+.ge-cli-kanban-card:hover{box-shadow:var(--wc-shadow-md)}
+.ge-cli-kanban-card b{font-size:13px;font-weight:700;display:block;margin-bottom:4px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.ge-cli-kanban-phone{font-size:12px;color:var(--wc-ink3);margin-top:2px}
+.ge-cli-kanban-meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.ge-cli-kanban-empty{font-size:12px;color:var(--wc-ink3);text-align:center;padding:16px 8px;opacity:.6}
+.ge-cli-inactivo{display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:var(--wc-danger);margin-left:5px;vertical-align:middle}
+
+/* Overlay clientes (bottom-sheet igual que el detalle de ventas) */
+#ge-cli-overlay{position:fixed;inset:0;z-index:700;display:flex;align-items:flex-end;justify-content:center;
+  background:rgba(13,26,13,.45);opacity:0;pointer-events:none;transition:opacity .25s}
+#ge-cli-overlay.open{opacity:1;pointer-events:all}
+#ge-cli-overlay.open .ge-cli-panel{transform:translateY(0)}
+.ge-cli-panel{background:var(--wc-surface);border-radius:var(--wc-r-xl) var(--wc-r-xl) 0 0;
+  width:100%;max-width:640px;max-height:92vh;overflow-y:auto;padding:0 0 40px;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);
+  box-shadow:0 -4px 32px rgba(13,26,13,.18)}
+.ge-cli-handle{width:36px;height:4px;border-radius:2px;background:var(--wc-border);margin:12px auto 0}
+.ge-cli-hdr{padding:14px 20px 12px;border-bottom:1px solid var(--wc-border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ge-cli-title{font-size:18px;font-weight:700;line-height:1.2}
+.ge-cli-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--wc-surface2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
+.ge-cli-body{padding:16px 20px}
+.ge-cli-tabs{display:flex;gap:0;border-bottom:1px solid var(--wc-border);margin:0 20px}
+.ge-cli-tab-btn{padding:10px 16px;font-size:13px;font-weight:600;background:none;border:none;
+  border-bottom:2px solid transparent;cursor:pointer;color:var(--wc-ink3);margin-bottom:-1px;transition:all .15s}
+.ge-cli-tab-btn.active{color:var(--wc-green-dark);border-bottom-color:var(--wc-green)}
+.ge-cli-tab-panel{display:none;padding:16px 20px;flex-direction:column;gap:14px}
+.ge-cli-tab-panel.active{display:flex}
+.ge-cli-sec-title{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--wc-ink3);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--wc-border)}
+.ge-cli-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ge-cli-item{display:flex;flex-direction:column;gap:2px}
+.ge-cli-label{font-size:11px;color:var(--wc-ink3)}
+.ge-cli-val{font-size:14px;font-weight:600;color:var(--wc-ink)}
+.ge-cli-notas-box{background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:12px;
+  font-size:13px;color:var(--wc-ink2);white-space:pre-wrap;line-height:1.5}
+.ge-cli-tl-item{display:flex;gap:10px;margin-bottom:10px}
+.ge-cli-tl-dot{width:10px;height:10px;border-radius:50%;background:var(--wc-green);margin-top:4px;flex-shrink:0}
+.ge-cli-tl-body{flex:1;background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:8px 12px;font-size:13px}
+/* Edit inline en overlay clientes */
+.ge-cli-edit-form{display:none;flex-direction:column;gap:14px;padding:16px 20px}
+.ge-cli-edit-form.open{display:flex}
 
 /* ══ DETALLE LEAD OVERLAY ══ */
 #ge-det-overlay{position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;
@@ -279,7 +390,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 .ge-det-title{font-size:18px;font-weight:700;line-height:1.2}
 .ge-det-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--wc-surface2);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
-.ge-det-body{padding:16px 20px}
+/* tabs del detalle */
+.ge-det-tabs{display:flex;gap:0;border-bottom:1px solid var(--wc-border);padding:0 20px;background:var(--wc-surface);position:sticky;top:0;z-index:2}
+.ge-det-tab{padding:11px 14px;font-size:13px;font-weight:600;background:none;border:none;border-bottom:2.5px solid transparent;color:var(--wc-ink3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.ge-det-tab.active{color:var(--wc-green-dark);border-bottom-color:var(--wc-green)}
+.ge-det-body{padding:0}
+.ge-det-tab-panel{display:none;flex-direction:column;gap:0;padding:16px 20px}
+.ge-det-tab-panel.active{display:flex}
 .ge-det-section{margin-bottom:20px}
 .ge-det-section-title{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
   color:var(--wc-ink3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--wc-border)}
@@ -322,6 +439,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
         <i class="ti ti-users"></i>Equipo / Ranking
       </button>
       <div class="sb-section-label">Operaciones</div>
+      <button class="sb-item" onclick="mostrarVista('clientes',this)">
+        <i class="ti ti-users"></i>Todos los clientes
+        <span class="sb-badge" id="sb-badge-clientes" style="display:none">0</span>
+      </button>
       <button class="sb-item" onclick="mostrarVista('pipeline',this)">
         <i class="ti ti-list-check"></i>Pipeline completo
         <span class="sb-badge" id="sb-badge-leads" style="display:none">0</span>
@@ -450,6 +571,34 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
       <div id="pipe-list"></div>
     </div>
 
+    <!-- ══════════════ CLIENTES ══════════════ -->
+    <div class="view view-wrap" id="view-clientes">
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="search" id="cli-q" placeholder="Buscar por nombre, teléfono..." oninput="renderClientes()">
+        </div>
+        <select class="field-input" id="cli-f-estatus" onchange="renderClientes()" style="width:auto;padding:7px 12px">
+          <option value="">Todos los estatus</option>
+          <option value="Nuevo">Nuevo</option>
+          <option value="Contactado">Contactado</option>
+          <option value="Interesado">Interesado</option>
+          <option value="Negociando">Negociando</option>
+          <option value="Ganado">Ganado</option>
+          <option value="Perdido">Perdido</option>
+        </select>
+        <select class="field-input" id="cli-f-vend" onchange="renderClientes()" style="width:auto;padding:7px 12px">
+          <option value="">Todos los vendedores</option>
+        </select>
+        <div class="inv-view-toggle">
+          <button class="inv-view-btn active" id="cli-btn-tabla" onclick="setCliView('tabla')" title="Tabla"><i class="ti ti-list"></i></button>
+          <button class="inv-view-btn" id="cli-btn-kanban" onclick="setCliView('kanban')" title="Kanban"><i class="ti ti-layout-columns"></i></button>
+        </div>
+      </div>
+      <div id="cli-stats" style="margin-bottom:12px"></div>
+      <div id="cli-list"></div>
+    </div>
+
     <!-- ══════════════ INVENTARIO ══════════════ -->
     <div class="view view-wrap" id="view-inventario">
       <div class="search-bar">
@@ -526,11 +675,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
   <button class="bn-item" onclick="mostrarVista('ventas',this,'bn')">
     <i class="ti ti-receipt"></i>Ventas
   </button>
-  <button class="bn-item" onclick="mostrarVista('equipo',this,'bn')">
-    <i class="ti ti-users"></i>Equipo
+  <button class="bn-item" onclick="mostrarVista('clientes',this,'bn')">
+    <i class="ti ti-users"></i>Clientes
   </button>
   <button class="bn-item" onclick="mostrarVista('pipeline',this,'bn')">
     <i class="ti ti-list-check"></i>Pipeline
+  </button>
+  <button class="bn-item" onclick="mostrarVista('equipo',this,'bn')">
+    <i class="ti ti-trophy"></i>Equipo
   </button>
   <button class="bn-item" onclick="mostrarVista('finanzas',this,'bn')">
     <i class="ti ti-chart-bar"></i>Finanzas
@@ -608,8 +760,8 @@ function recibirDatos(msg){
   document.getElementById('sb-avatar').textContent=ini;
   document.getElementById('sb-nombre').textContent=CTX.nombreActual||'Gerente';
   document.getElementById('sb-rol').textContent=CTX.rolActual||'Gerencia';
-  _poblarFiltroMes();_poblarFiltroVendedores();
-  renderDashboard();renderVentas();renderEquipo();renderPipeline();renderInventario();renderFinanzas();renderMetas();
+  _poblarFiltroMes();_poblarFiltroVendedores();_poblarFiltroCliVend();
+  renderDashboard();renderVentas();renderEquipo();renderPipeline();renderInventario();renderFinanzas();renderMetas();renderClientes();
 }
 
 /* ══ Utilidades ══ */
@@ -657,6 +809,11 @@ function _poblarFiltroVendedores(){
     +VENDEDORES.map(v=>`<option value="${esc(v._id)}">${esc(v.nombre||v.name||v.email||v._id)}</option>`).join('');
   ['ventas-f-vend','pipe-f-vend'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
 }
+function _poblarFiltroCliVend(){
+  const opts=`<option value="">Todos los vendedores</option>`
+    +VENDEDORES.map(v=>`<option value="${esc(v._id)}">${esc(v.nombre||v.name||v.email||v._id)}</option>`).join('');
+  const el=document.getElementById('cli-f-vend');if(el)el.innerHTML=opts;
+}
 function aplicarFiltroMes(){
   const sel=document.getElementById('filtro-mes');
   const ahora=new Date();_filtroMes=sel.value||(ahora.getFullYear()+'-'+(ahora.getMonth()+1).toString().padStart(2,'0'));
@@ -700,6 +857,13 @@ function renderDashboard(){
   ventas.forEach(c=>{const id=c.vendedorId||c.vendedorAsignado||'sin-asignar';vendCount[id]=(vendCount[id]||0)+1;});
   const topVendId=Object.entries(vendCount).sort((a,b)=>b[1]-a[1])[0];
   const topVend=topVendId?findVend(topVendId[0]):null;
+
+  // Advertencia de costos sin datos (KPI utilidad puede estar inflada)
+  const totalCostosDb=ventas.reduce((s,c)=>s+parseFloat(c._costoAdquisicion||c.costoAdquisicion||0),0);
+  const sinCostosDash=totalCostosDb===0&&ventas.length>0;
+  const kpiUtilEl=document.getElementById('kpi-utilidad');
+  if(kpiUtilEl&&sinCostosDash)kpiUtilEl.title='⚠ Costos sin registrar en CMS — utilidad sobreestimada';
+  else if(kpiUtilEl)kpiUtilEl.title='';
 
   document.getElementById('kpi-ventas-n').textContent=ventas.length;
   document.getElementById('kpi-ventas-ing').textContent=M(ingresos)+' ingresos';
@@ -819,7 +983,8 @@ function renderEquipo(){
     if(id&&!vendMap[id])vendMap[id]={vend:null,leads:0,ventas:0,util:0,com:0};
     if(id&&vendMap[id]){
       vendMap[id].leads++;
-      if(isVenta(c)){vendMap[id].ventas++;vendMap[id].util+=calcUtil(c).util;}
+      // Ventas y utilidad sólo del mes filtrado (para comparar contra meta mensual)
+      if(isVenta(c)&&_enMes(c)){vendMap[id].ventas++;vendMap[id].util+=calcUtil(c).util;}
     }
   });
   COMISIONES.forEach(co=>{
@@ -840,11 +1005,11 @@ function renderEquipo(){
       <div class="rank-avatar">${initials(nombre)}</div>
       <div class="rank-info" style="flex:2">
         <div class="rank-nombre">${esc(nombre)}</div>
-        <div class="rank-sub">${r.leads} leads · ${M(r.util)} utilidad generada</div>
+        <div class="rank-sub">${r.leads} leads totales · ${M(r.util)} utilidad este mes</div>
         <div class="rank-bar-wrap" style="max-width:none;width:100%">
           <div class="rank-bar"><div class="rank-bar-fill ${metaColor}" style="width:${pctMeta}%"></div></div>
         </div>
-        <div class="meta-labels"><span>Meta: ${metaV} ventas</span><span>${pctMeta}% alcanzado</span></div>
+        <div class="meta-labels"><span>Meta mensual: ${metaV} ventas</span><span>${r.ventas} alcanzadas · ${pctMeta}%</span></div>
       </div>
       <div class="rank-stats">
         <div class="rank-ventas">${r.ventas}</div>
@@ -900,6 +1065,13 @@ function renderPipeline(){
 }
 
 /* ══ DETALLE LEAD / VENTA ══ */
+function geDetTab(tab, btn){
+  document.querySelectorAll('.ge-det-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.ge-det-tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ge-tab-'+tab).classList.add('active');
+}
+
 function recibirLeadActualizado(msg){
   const btn=document.querySelector('#ge-edit-form .btn-save');
   if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy"></i> Guardar cambios';}
@@ -907,16 +1079,32 @@ function recibirLeadActualizado(msg){
     // Actualizar en memoria para que re-render sea inmediato
     if(msg.lead&&_editLeadId){
       const idx=CLIENTES.findIndex(c=>c._id===_editLeadId);
-      if(idx>=0)CLIENTES[idx]={...CLIENTES[idx],...msg.lead};
+      if(idx>=0){
+        CLIENTES[idx]={...CLIENTES[idx],...msg.lead};
+        const m=CLIENTES[idx];
+        // Sincronizar campos enriquecidos (_) que el backend no devuelve con prefijo
+        if(msg.lead.cierreComision!==undefined)  m._comisionVendedor = parseFloat(msg.lead.cierreComision)||0;
+        if(msg.lead.cierrePrecio!==undefined)    m._precioVenta      = parseFloat(msg.lead.cierrePrecio)||0;
+        if(msg.lead.precioConvenido!==undefined) m._precioConsignado = parseFloat(msg.lead.precioConvenido)||0;
+      }
     }
     toast('✓ Operación actualizada');
     // cerrar form, reabrir detalle con datos nuevos
     document.getElementById('ge-edit-form').classList.remove('open');
     document.getElementById('ge-det-overlay').querySelector('.ge-det-body').style.display='';
     document.getElementById('ge-det-edit-label').textContent='Editar';
-    abrirDetalleLead(_editLeadId);
+    // reset botón clientes si estaba activo
+    const btnCli=document.getElementById('ge-cli-save-btn');
+    if(btnCli){btnCli.disabled=false;btnCli.innerHTML='<i class="ti ti-device-floppy"></i> Guardar';}
+    if(_cliAbierto&&msg.lead){
+      const idxCli=CLIENTES.findIndex(c=>c._id===_cliAbierto);
+      if(idxCli>=0)CLIENTES[idxCli]={...CLIENTES[idxCli],...msg.lead};
+      abrirDetalleCli(_cliAbierto); // reabrir con datos actualizados
+    } else {
+      abrirDetalleLead(_editLeadId);
+    }
     // refrescar tablas
-    renderVentas();renderDashboard();
+    renderVentas();renderDashboard();renderClientes();
   } else {
     toast('Error al guardar: '+(msg.error||'inténtalo de nuevo'),'error');
   }
@@ -945,7 +1133,7 @@ function abrirDetalleLead(id){
 
   // Consigna: cuánto hay que liquidar al dueño
   const esConsigna=c._esConsigna||false;
-  const precioConvenido=parseFloat(c._precioConsignado||(car?.precioConvenido)||0);
+  const precioConvenido=parseFloat(c._precioConsignado||c.precioConvenido||(car?.precioConvenido)||0);
   // Liquidación = precio convenido con dueño (o costo base si es consigna sin campo específico)
   const liquidacionDueno=esConsigna?precioConvenido:0;
 
@@ -964,6 +1152,10 @@ function abrirDetalleLead(id){
   // ── Render del overlay ──
   const o=document.getElementById('ge-det-overlay');
 
+  // Resetear al tab Resumen al abrir nuevo lead
+  document.querySelectorAll('.ge-det-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.querySelectorAll('.ge-det-tab-panel').forEach((p,i)=>p.classList.toggle('active',i===0));
+
   // Header
   o.querySelector('#ge-det-nombre').textContent=c.nombre||c.name||'Sin nombre';
   const etapaEl=o.querySelector('#ge-det-etapa');
@@ -971,9 +1163,20 @@ function abrirDetalleLead(id){
   etapaEl.textContent=etapa;
   o.querySelector('#ge-det-consigna-badge').style.display=esConsigna?'inline':'none';
 
-  // Datos cliente
-  o.querySelector('#ge-det-tel').textContent=c.telefono||'—';
+  // Tab Cliente — datos de contacto
+  o.querySelector('#ge-det-nombre-full').textContent=c.nombre||c.name||'Sin nombre';
+  o.querySelector('#ge-det-tel').textContent=c.telefono||c.phone||'—';
   o.querySelector('#ge-det-email').textContent=c.email||'—';
+  o.querySelector('#ge-det-ciudad').textContent=c.ciudad||c.city||'—';
+  o.querySelector('#ge-det-origen').textContent=c.origen||c.origenLead||c.leadSource||'—';
+  // Tab Cliente — perfil financiero
+  const ingreso=parseFloat(c.ingresoMensual||c.ingreso||0);
+  const presupuesto=parseFloat(c.presupuesto||c.budgetMax||c.budget||0);
+  o.querySelector('#ge-det-ingreso').textContent=ingreso?M(ingreso):'—';
+  o.querySelector('#ge-det-presupuesto').textContent=presupuesto?M(presupuesto):'—';
+  o.querySelector('#ge-det-rfc').textContent=c.rfc||c.RFC||'—';
+  o.querySelector('#ge-det-curp').textContent=c.curp||c.CURP||'—';
+  // Tab Operación — auto y registro
   o.querySelector('#ge-det-auto').textContent=c._autoNombre||c.autoInteres||'—';
   o.querySelector('#ge-det-vin').textContent=(car?.vin)||'—';
   o.querySelector('#ge-det-vendedor').textContent=v?.nombre||v?.name||'Sin asignar';
@@ -988,7 +1191,9 @@ function abrirDetalleLead(id){
 
   // Costos / Inversión
   o.querySelector('#ge-det-precio').textContent=M(precio);
-  o.querySelector('#ge-det-costo-base').textContent=M(costoBase);
+  const costoBaseEl=o.querySelector('#ge-det-costo-base');
+  costoBaseEl.textContent=costoBase?M(costoBase):'Sin registro';
+  costoBaseEl.style.color=costoBase?'':'var(--wc-warn)';
   o.querySelector('#ge-det-gastos-rep').textContent=gastosRep?M(gastosRep):'—';
   o.querySelector('#ge-det-gastos-leg').textContent=gastosLeg?M(gastosLeg):'—';
   o.querySelector('#ge-det-gastos-extra').textContent=gastosExtra?M(gastosExtra):'—';
@@ -1000,12 +1205,18 @@ function abrirDetalleLead(id){
   const consignaSection=o.querySelector('#ge-det-consigna-section');
   consignaSection.style.display=esConsigna?'block':'none';
   if(esConsigna){
-    o.querySelector('#ge-det-precio-convenido').textContent=precioConvenido?M(precioConvenido):'—';
-    const saldoConsigna=precio-precioConvenido;
-    o.querySelector('#ge-det-saldo-consigna').textContent=M(saldoConsigna);
-    o.querySelector('#ge-det-saldo-consigna').style.color=saldoConsigna>=0?'var(--wc-ok)':'var(--wc-danger)';
-    o.querySelector('#ge-det-dueno').textContent=(car?.duenioNombre)||'—';
-    o.querySelector('#ge-det-dueno-tel').textContent=(car?.duenioTel)||'—';
+    o.querySelector('#ge-det-dueno').textContent=(car?.duenioNombre)||c.duenioNombre||'—';
+    o.querySelector('#ge-det-dueno-tel').textContent=(car?.duenioTel)||c.duenioTel||'—';
+    if(precioConvenido>0){
+      o.querySelector('#ge-det-precio-convenido').textContent=M(precioConvenido);
+      const saldoConsigna=precio-precioConvenido;
+      o.querySelector('#ge-det-saldo-consigna').textContent=M(saldoConsigna);
+      o.querySelector('#ge-det-saldo-consigna').style.color=saldoConsigna>=0?'var(--wc-ok)':'var(--wc-danger)';
+    } else {
+      o.querySelector('#ge-det-precio-convenido').textContent='Sin definir';
+      o.querySelector('#ge-det-saldo-consigna').textContent='—';
+      o.querySelector('#ge-det-saldo-consigna').style.color='var(--wc-ink3)';
+    }
   }
 
   // Resultado
@@ -1068,15 +1279,24 @@ function toggleEditLead(){
     const formaPago=c.formaPago||c.tipoPago||(financiado?'Financiado':'Contado');
     const folio=c.folio||c.folioVenta||c.cierreFolio||'';
     const notas=c.notas||c.cierreNotas||c.comentarios||'';
+    const comApertura=parseFloat(c.comisionApertura||0);
+    const precioConsigna=parseFloat(c._precioConsignado||c.precioConvenido||(c._car?.precioConvenido)||0);
     document.getElementById('ef-precio').value=precio||'';
     document.getElementById('ef-comision').value=comision||'';
+    document.getElementById('ef-comision-pct').value=precio>0?(comision/precio*100).toFixed(1):'';
     document.getElementById('ef-enganche').value=enganche||'';
     document.getElementById('ef-financiado').value=financiado||'';
     document.getElementById('ef-folio').value=folio;
     document.getElementById('ef-notas').value=notas;
+    document.getElementById('ef-comision-apertura').value=comApertura||'';
+    // Consigna
+    const esConsigna=c._esConsigna||false;
+    document.getElementById('ef-row-consigna').style.display=esConsigna?'':'none';
+    if(esConsigna)document.getElementById('ef-precio-consigna').value=precioConsigna||'';
     // set select values
     const selPago=document.getElementById('ef-forma-pago');
     [...selPago.options].forEach(o=>o.selected=o.value===formaPago);
+    efToggleBanco();
     const selBanco=document.getElementById('ef-banco');
     const bancoOpt=[...selBanco.options].find(o=>o.value===banco||o.textContent===banco);
     if(bancoOpt)bancoOpt.selected=true;else selBanco.value='';
@@ -1085,6 +1305,30 @@ function toggleEditLead(){
     label.textContent='Ver detalle';
   }
 }
+/* ══ Comisión bidireccional ══ */
+function efCalcComision(){
+  const precio=parseFloat(document.getElementById('ef-precio').value)||0;
+  const pct=parseFloat(document.getElementById('ef-comision-pct').value);
+  if(!isNaN(pct)&&pct>0&&precio>0){
+    document.getElementById('ef-comision').value=Math.round(precio*pct/100);
+  }
+}
+function efComisionPctToMonto(){
+  const precio=parseFloat(document.getElementById('ef-precio').value)||0;
+  const pct=parseFloat(document.getElementById('ef-comision-pct').value)||0;
+  if(precio>0)document.getElementById('ef-comision').value=Math.round(precio*pct/100);
+}
+function efComisionMontoToPct(){
+  const precio=parseFloat(document.getElementById('ef-precio').value)||0;
+  const monto=parseFloat(document.getElementById('ef-comision').value)||0;
+  if(precio>0)document.getElementById('ef-comision-pct').value=(monto/precio*100).toFixed(1);
+}
+function efToggleBanco(){
+  const v=document.getElementById('ef-forma-pago').value;
+  const esCredito=['Financiado','Crédito weCars','Arrendamiento'].includes(v);
+  document.getElementById('ef-row-financiado').style.display=esCredito?'':'none';
+}
+
 function guardarEdicionLead(){
   if(!_editLeadId){toast('Sin lead seleccionado','error');return;}
   const precio=parseFloat(document.getElementById('ef-precio').value)||0;
@@ -1095,8 +1339,10 @@ function guardarEdicionLead(){
   const formaPago=document.getElementById('ef-forma-pago').value;
   const folio=document.getElementById('ef-folio').value.trim();
   const notas=document.getElementById('ef-notas').value.trim();
+  const comApertura=parseFloat(document.getElementById('ef-comision-apertura').value)||0;
+  const precioConsigna=parseFloat(document.getElementById('ef-precio-consigna').value)||0;
   const btn=document.querySelector('#ge-edit-form .btn-save');
-  btn.disabled=true;btn.textContent='Guardando...';
+  btn.disabled=true;btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Guardando...';
   WC.send('wecars-gerencia-lead-actualizar',{
     leadId:_editLeadId,
     campos:{
@@ -1108,6 +1354,8 @@ function guardarEdicionLead(){
       formaPago, tipoPago:formaPago,
       folio, folioVenta:folio, cierreFolio:folio,
       notas, cierreNotas:notas,
+      comisionApertura:comApertura,
+      ...(precioConsigna>0?{precioConvenido:precioConsigna}:{}),
     }
   });
 }
@@ -1229,9 +1477,12 @@ function renderFinanzas(){
 
   const el=document.getElementById('fin-tabla');
   if(!ventas.length){el.innerHTML='<div class="empty-state"><i class="ti ti-chart-bar"></i><h3>Sin ventas</h3></div>';return;}
+  // Advertencia cuando todos los costos son $0 (Cars CMS sin datos)
+  const sinCostos=costos===0&&ventas.length>0;
+  const warnHtml=sinCostos?`<div style="background:var(--wc-warn-bg,#fffbe6);border:1px solid var(--wc-warn);border-radius:var(--wc-r-md);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--wc-ink2);display:flex;align-items:center;gap:8px"><i class="ti ti-alert-triangle" style="color:var(--wc-warn);font-size:16px;flex-shrink:0"></i><span>Los costos de adquisición no están registrados en el CMS (Cars). La utilidad puede estar sobreestimada — registra los costos en cada auto para ver números reales.</span></div>`:'';
   const rows=ventas.map(c=>({...c,...calcUtil(c),_vend:findVend(c.vendedorId||c.vendedorAsignado)}));
   rows.sort((a,b)=>new Date(fechaVenta(b)||0)-new Date(fechaVenta(a)||0));
-  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+  el.innerHTML=warnHtml+`<div class="table-wrap"><table class="data-table">
     <thead><tr>
       <th>Cliente</th><th>Auto</th><th>Vendedor</th>
       <th class="num">Precio</th><th class="num">Costo</th>
@@ -1303,10 +1554,263 @@ function guardarMetas(){
   cerrarOverlay('ov-meta');renderMetas();toast('✓ Metas actualizadas');
 }
 
+/* ══ CLIENTES ══ */
+const CLI_ESTATUS=['Nuevo','Contactado','Interesado','Negociando','Ganado','Perdido'];
+let _cliView='tabla';
+let _cliAbierto=null;
+let _cliTab='resumen';
+
+function setCliView(v){
+  _cliView=v;
+  document.getElementById('cli-btn-tabla').classList.toggle('active',v==='tabla');
+  document.getElementById('cli-btn-kanban').classList.toggle('active',v==='kanban');
+  renderClientes();
+}
+
+function geCliOrigenClass(o){
+  const s=(o||'').toLowerCase();
+  if(s.includes('facebook')||s.includes('fb'))return'ge-cli-origen-fb';
+  if(s.includes('instagram')||s.includes('ig'))return'ge-cli-origen-ig';
+  if(s.includes('whatsapp')||s.includes('wa'))return'ge-cli-origen-wa';
+  if(s.includes('referido')||s.includes('ref'))return'ge-cli-origen-ref';
+  if(s.includes('sitio')||s.includes('web')||s.includes('landing'))return'ge-cli-origen-web';
+  return'ge-cli-origen-otro';
+}
+function geCliBadgeClass(e){
+  const s=(e||'').toLowerCase();
+  if(s==='nuevo')return'nuevo';
+  if(s==='contactado')return'contactado';
+  if(s==='interesado')return'interesado';
+  if(s==='negociando')return'negociando';
+  if(['ganado','vendido','entregado'].includes(s))return'ganado';
+  if(s==='perdido')return'perdido';
+  return'default';
+}
+function diasSinActCli(c){
+  const ua=c.ultimaActividad||c._updatedDate||c._createdDate;
+  if(!ua)return0;
+  return Math.floor((Date.now()-new Date(ua).getTime())/86400000);
+}
+function filteredClientes(){
+  const q=(document.getElementById('cli-q')?.value||'').toLowerCase();
+  const est=document.getElementById('cli-f-estatus')?.value||'';
+  const vend=document.getElementById('cli-f-vend')?.value||'';
+  return CLIENTES.filter(c=>{
+    if(q&&![c.nombre,c.telefono,c.correo,c.autoInteres].some(v=>String(v||'').toLowerCase().includes(q)))return false;
+    if(est&&(c.estatus||c.etapa||'')!==est)return false;
+    if(vend&&(c.vendedorId||c.vendedorAsignado||'')!==vend)return false;
+    return true;
+  });
+}
+function renderClientes(){
+  const shown=filteredClientes();
+  // badge
+  const bdg=document.getElementById('sb-badge-clientes');
+  const activos=CLIENTES.filter(c=>!['Ganado','Vendido','Perdido'].includes(c.estatus||c.etapa||'')).length;
+  if(bdg){bdg.textContent=activos;bdg.style.display=activos?'':'none';}
+  // stats bar
+  const byEst={};CLI_ESTATUS.forEach(e=>{byEst[e]=0;});
+  CLIENTES.forEach(c=>{const e=c.estatus||c.etapa||'Nuevo';if(byEst[e]!==undefined)byEst[e]++;});
+  document.getElementById('cli-stats').innerHTML=`
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${CLI_ESTATUS.map(e=>`<span class="ge-cli-badge ${geCliBadgeClass(e)}">${esc(e)}: ${byEst[e]||0}</span>`).join('')}
+    </div>`;
+  // list
+  if(_cliView==='tabla')renderCliTabla(shown);
+  else renderCliKanban(shown);
+}
+function renderCliTabla(shown){
+  const el=document.getElementById('cli-list');
+  if(!shown.length){
+    el.innerHTML='<div class="empty-state"><i class="ti ti-users"></i><h3>Sin clientes</h3><p>No hay clientes que coincidan con los filtros</p></div>';
+    return;
+  }
+  el.innerHTML=`<div class="table-wrap"><table class="ge-cli-table">
+    <thead><tr>
+      <th>Cliente</th><th>Estatus</th><th>Acciones</th>
+    </tr></thead>
+    <tbody>${shown.map(c=>{
+      const e=c.estatus||c.etapa||'Nuevo';
+      const dias=diasSinActCli(c);
+      const urgente=dias>=3&&!['Ganado','Vendido','Perdido'].includes(e);
+      const vend=findVend(c.vendedorId||c.vendedorAsignado);
+      const _avColors=['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#10b981'];
+      const _avClr=_avColors[(c.nombre||'?').charCodeAt(0)%_avColors.length];
+      const _ini=(c.nombre||'?').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
+      const waHref=c.telefono?`https://wa.me/52${c.telefono.replace(/\D/g,'')}`:'';
+      const telHref=c.telefono?`tel:${c.telefono}`:'';
+      return`<tr data-id="${esc(c._id)}" onclick="abrirDetalleCli('${esc(c._id)}')"
+        style="cursor:pointer;border-left:3px solid ${urgente?'#f97316':'transparent'}">
+        <td style="padding-left:${urgente?'13px':'14px'}">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:50%;background:${_avClr};color:#fff;
+              font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(_ini)}</div>
+            <div style="min-width:0">
+              <div class="ge-cli-row-name">${esc(c.nombre||'Sin nombre')}${urgente?'<span class="ge-cli-inactivo" title="'+dias+'d sin actividad"></span>':''}</div>
+              <div class="ge-cli-row-phone">${esc(c.telefono||'—')}${vend?` · <span style="color:var(--wc-ink3)">${esc(vend.nombre||vend.name||'')}</span>`:''}</div>
+              <div style="margin-top:3px">
+                <span class="ge-cli-badge-origen ${geCliOrigenClass(c.origen)}">${esc(c.origen||'Web')}</span>
+                ${c.autoInteres?`<span style="font-size:11px;color:var(--wc-ink3);margin-left:4px">${esc(c.autoInteres)}</span>`:''}
+              </div>
+            </div>
+          </div>
+        </td>
+        <td style="white-space:nowrap">
+          <span class="ge-cli-badge ${geCliBadgeClass(e)}">${esc(e)}</span>
+          ${urgente?`<div style="font-size:11px;color:#f97316;margin-top:4px;font-weight:600">${dias}d sin seguimiento</div>`:''}
+        </td>
+        <td style="white-space:nowrap">
+          <div class="ge-cli-row-actions" onclick="event.stopPropagation()">
+            ${waHref?`<a href="${waHref}" class="ge-cli-wa-btn" target="_blank" rel="noreferrer" title="WhatsApp"><i class="ti ti-brand-whatsapp"></i></a>`:''}
+            ${telHref?`<a href="${telHref}" class="ge-cli-call-btn" title="Llamar"><i class="ti ti-phone"></i></a>`:''}
+            <button class="ge-cli-exp-btn" onclick="abrirDetalleCli('${esc(c._id)}')" title="Ver expediente"><i class="ti ti-file-text"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+function renderCliKanban(shown){
+  const el=document.getElementById('cli-list');
+  // Build columns
+  const porEst={};CLI_ESTATUS.forEach(e=>{porEst[e]=[];});
+  shown.forEach(c=>{const e=CLI_ESTATUS.includes(c.estatus||c.etapa||'')?c.estatus||c.etapa:'Nuevo';porEst[e].push(c);});
+  el.innerHTML=`<div class="ge-cli-kanban" id="ge-cli-kanban-wrap">
+    ${CLI_ESTATUS.map(e=>{
+      const items=porEst[e];
+      const borderColor=e==='Ganado'?'var(--wc-ok)':e==='Perdido'?'var(--wc-danger)':e==='Negociando'?'var(--wc-orange)':'var(--wc-green)';
+      return`<div class="ge-cli-kanban-col">
+        <div class="ge-cli-kanban-head">
+          <span>${esc(e)}</span>
+          <span class="ge-cli-kanban-count">${items.length}</span>
+        </div>
+        <div class="ge-cli-kanban-drop" data-estatus="${esc(e)}">
+          ${items.length?items.map(c=>{
+            const dias=diasSinActCli(c);
+            const urgente=dias>=3&&!['Ganado','Vendido','Perdido'].includes(e);
+            const borde=urgente?'#f97316':borderColor;
+            const _avColors=['#3d7a00','#1d4ed8','#9333ea','#0e7490','#be185d'];
+            const _avClr=_avColors[c.nombre?c.nombre.charCodeAt(0)%5:0];
+            const _ini=(c.nombre||'?').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
+            const waHref=c.telefono?`https://wa.me/52${c.telefono.replace(/\D/g,'')}`:'';
+            return`<div class="ge-cli-kanban-card" draggable="true" data-id="${esc(c._id)}"
+              style="border-left-color:${borde}" onclick="abrirDetalleCli('${esc(c._id)}')">
+              <div style="display:flex;align-items:flex-start;gap:8px">
+                <div style="width:28px;height:28px;border-radius:50%;background:${_avClr};color:#fff;
+                  font-size:.63rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(_ini)}</div>
+                <div style="flex:1;min-width:0">
+                  <b>${esc(c.nombre||'Sin nombre')}</b>
+                  ${urgente?`<span style="font-size:.6rem;font-weight:800;padding:1px 6px;border-radius:8px;background:rgba(249,115,22,.12);color:#c2410c">${dias}d</span>`:''}
+                  ${c.autoInteres?`<div style="font-size:.72rem;color:var(--wc-ink3);margin-top:2px"><i class="ti ti-car" style="font-size:.75rem"></i> ${esc(c.autoInteres)}</div>`:''}
+                  <div class="ge-cli-kanban-phone">${esc(c.telefono||'')}</div>
+                </div>
+              </div>
+              <div class="ge-cli-kanban-meta">
+                <span class="ge-cli-badge-origen ${geCliOrigenClass(c.origen)}">${esc(c.origen||'Web')}</span>
+                ${waHref?`<a href="${waHref}" target="_blank" rel="noreferrer" onclick="event.stopPropagation()"
+                  style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;
+                  border-radius:6px;background:rgba(86,169,0,.10);color:#56a900;text-decoration:none">
+                  <i class="ti ti-brand-whatsapp" style="font-size:.85rem"></i></a>`:''}
+              </div>
+            </div>`;
+          }).join(''):`<div class="ge-cli-kanban-empty">Sin clientes</div>`}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+  // Drag and drop
+  document.querySelectorAll('.ge-cli-kanban-drop').forEach(zone=>{
+    zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+    zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+    zone.addEventListener('drop',e=>{
+      e.preventDefault();zone.classList.remove('drag-over');
+      const id=e.dataTransfer.getData('text/plain');
+      const nuevoEst=zone.dataset.estatus;
+      if(!id||!nuevoEst)return;
+      const cli=CLIENTES.find(c=>c._id===id);
+      if(!cli||cli.estatus===nuevoEst)return;
+      cli.estatus=nuevoEst;cli.etapa=nuevoEst;cli.ultimaActividad=new Date().toISOString();
+      WC.send(WC.OUT.LEAD_ACTUALIZAR,{leadId:id,campos:{estatus:nuevoEst,etapa:nuevoEst}});
+      renderClientes();
+      toast(`Estatus → "${nuevoEst}"`);
+    });
+  });
+  document.querySelectorAll('.ge-cli-kanban-card[draggable]').forEach(card=>{
+    card.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',card.dataset.id);});
+  });
+}
+
+/* ══ Detalle cliente ══ */
+function abrirDetalleCli(id){
+  const c=CLIENTES.find(x=>x._id===id);if(!c)return;
+  _cliAbierto=id;
+  const e=c.estatus||c.etapa||'Nuevo';
+  const vend=findVend(c.vendedorId||c.vendedorAsignado);
+  const dias=diasSinActCli(c);
+  // Header
+  document.getElementById('ge-cli-nombre').textContent=c.nombre||'Sin nombre';
+  document.getElementById('ge-cli-etapa-badge').textContent=e;
+  document.getElementById('ge-cli-etapa-badge').className='chip '+({'Ganado':'chip-green','Vendido':'chip-green','Entregado':'chip-green','Nuevo':'chip-info','Contactado':'chip-green','Interesado':'chip-warn','Negociando':'chip-orange','Perdido':'chip-danger'}[e]||'chip-gray');
+  // Tab Resumen — datos
+  document.getElementById('ge-cli-tel').textContent=c.telefono||'—';
+  document.getElementById('ge-cli-email').textContent=c.correo||c.email||'—';
+  document.getElementById('ge-cli-origen-val').textContent=c.origen||'—';
+  document.getElementById('ge-cli-vend-val').textContent=vend?(vend.nombre||vend.name||'—'):(c.vendedorAsignado||'Sin asignar');
+  document.getElementById('ge-cli-auto-val').textContent=c.autoInteres||c._autoNombre||'—';
+  document.getElementById('ge-cli-presup-val').textContent=c.presupuestoMax?M(c.presupuestoMax):'—';
+  document.getElementById('ge-cli-dias-val').textContent=dias>0?(dias+'d sin actividad'):'Reciente';
+  document.getElementById('ge-cli-dias-val').style.color=dias>=3?'var(--wc-danger)':dias>=1?'var(--wc-warn)':'var(--wc-ok)';
+  document.getElementById('ge-cli-prox-val').textContent=c.proximoSeguimiento?fechaCorta(c.proximoSeguimiento):'Sin programar';
+  document.getElementById('ge-cli-notas-val').textContent=c.notas||c.comentarios||'Sin notas.';
+  // Tab edit
+  document.getElementById('ge-cli-ef-estatus').value=e;
+  document.getElementById('ge-cli-ef-vend').innerHTML=
+    `<option value="">Sin asignar</option>`+
+    VENDEDORES.map(v=>`<option value="${esc(v._id)}" ${(c.vendedorId||c.vendedorAsignado)===v._id?'selected':''}>
+      ${esc(v.nombre||v.name||v.email||v._id)}</option>`).join('');
+  document.getElementById('ge-cli-ef-notas').value=c.notas||c.comentarios||'';
+  document.getElementById('ge-cli-ef-prox').value=c.proximoSeguimiento?c.proximoSeguimiento.split('T')[0]:'';
+  // Show tab
+  geCliMostrarTab('resumen');
+  // WhatsApp / tel buttons
+  const waHref=c.telefono?`https://wa.me/52${c.telefono.replace(/\D/g,'')}`:'';
+  const telHref=c.telefono?`tel:${c.telefono}`:'';
+  const waBtnEl=document.getElementById('ge-cli-wa-hdr');
+  const telBtnEl=document.getElementById('ge-cli-tel-hdr');
+  if(waBtnEl){waBtnEl.href=waHref||'#';waBtnEl.style.display=waHref?'':'none';}
+  if(telBtnEl){telBtnEl.href=telHref||'#';telBtnEl.style.display=telHref?'':'none';}
+  // Open
+  document.getElementById('ge-cli-overlay').classList.add('open');
+  window.parent.postMessage({type:'wecars-modal-abierto'},'*');
+}
+function cerrarDetalleCli(){
+  document.getElementById('ge-cli-overlay').classList.remove('open');
+  _cliAbierto=null;
+  window.parent.postMessage({type:'wecars-modal-cerrado'},'*');
+}
+function geCliMostrarTab(tab){
+  _cliTab=tab;
+  document.querySelectorAll('.ge-cli-tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  document.querySelectorAll('.ge-cli-tab-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===tab));
+}
+function guardarEdicionCli(){
+  if(!_cliAbierto)return;
+  const estatus=document.getElementById('ge-cli-ef-estatus').value;
+  const vendedorId=document.getElementById('ge-cli-ef-vend').value;
+  const notas=document.getElementById('ge-cli-ef-notas').value.trim();
+  const prox=document.getElementById('ge-cli-ef-prox').value;
+  const btn=document.getElementById('ge-cli-save-btn');
+  btn.disabled=true;btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Guardando...';
+  WC.send(WC.OUT.LEAD_ACTUALIZAR,{
+    leadId:_cliAbierto,
+    campos:{estatus,etapa:estatus,...(vendedorId?{vendedorId,vendedorAsignado:vendedorId}:{}),notas,proximoSeguimiento:prox||null}
+  });
+}
+
 /* ══ Nav ══ */
 const TOPBAR_LABELS={
   dashboard:{title:'Dashboard Ejecutivo',sub:''},ventas:{title:'Ventas del mes',sub:''},
   equipo:{title:'Equipo / Ranking',sub:''},pipeline:{title:'Pipeline completo',sub:''},
+  clientes:{title:'Todos los clientes',sub:''},
   inventario:{title:'Inventario',sub:''},finanzas:{title:'Resumen financiero',sub:''},
   metas:{title:'Metas y bonos',sub:''},
 };
@@ -1323,6 +1827,7 @@ function abrirOverlay(id){document.getElementById(id)?.classList.add('open');}
 
 // Overlay click-outside
 document.getElementById('ge-det-overlay')?.addEventListener('click',e=>{if(e.target===e.currentTarget)cerrarDetalleLead();});
+document.getElementById('ge-cli-overlay')?.addEventListener('click',e=>{if(e.target===e.currentTarget)cerrarDetalleCli();});
 
 // Resize observer para Wix
 try{new ResizeObserver(()=>{const h=document.body.scrollHeight;window.parent.postMessage({type:'wecars-height',height:h},'*');}).observe(document.body);}catch(_){}
@@ -1349,123 +1854,171 @@ try{new ResizeObserver(()=>{const h=document.body.scrollHeight;window.parent.pos
     </div>
     <div class="ge-det-body">
 
-      <!-- 1. Datos del cliente y la operación -->
-      <div class="ge-det-section">
-        <div class="ge-det-section-title">Cliente y operación</div>
-        <div class="ge-det-grid">
-          <div class="ge-det-item"><div class="ge-det-label">Teléfono</div><div class="ge-det-val" id="ge-det-tel">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Email</div><div class="ge-det-val" id="ge-det-email">—</div></div>
-          <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Auto vendido</div><div class="ge-det-val" id="ge-det-auto">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">VIN</div><div class="ge-det-val" style="font-size:12px;font-family:monospace" id="ge-det-vin">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Vendedor</div><div class="ge-det-val" id="ge-det-vendedor">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Folio</div><div class="ge-det-val" id="ge-det-folio">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Fecha de venta</div><div class="ge-det-val" id="ge-det-fecha">—</div></div>
+      <!-- ══ TABS NAV ══ -->
+      <div class="ge-det-tabs">
+        <button class="ge-det-tab active" onclick="geDetTab('resumen',this)"><i class="ti ti-chart-bar" style="font-size:13px;margin-right:4px"></i>Resumen</button>
+        <button class="ge-det-tab" onclick="geDetTab('cliente',this)"><i class="ti ti-user" style="font-size:13px;margin-right:4px"></i>Cliente</button>
+        <button class="ge-det-tab" onclick="geDetTab('operacion',this)"><i class="ti ti-car" style="font-size:13px;margin-right:4px"></i>Operación</button>
+      </div>
+
+      <!-- ══ TAB: RESUMEN FINANCIERO ══ -->
+      <div class="ge-det-tab-panel active" id="ge-tab-resumen">
+
+        <!-- Costos e inversión total -->
+        <div class="ge-det-section">
+          <div class="ge-det-section-title">Costos e inversión</div>
+          <div class="ge-det-grid">
+            <div class="ge-det-item"><div class="ge-det-label">Precio de venta</div><div class="ge-det-val" style="color:var(--wc-ok)" id="ge-det-precio">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Costo adquisición</div><div class="ge-det-val" id="ge-det-costo-base">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Reparaciones</div><div class="ge-det-val" id="ge-det-gastos-rep">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Gastos legales / aduanas</div><div class="ge-det-val" id="ge-det-gastos-leg">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Gastos extras</div><div class="ge-det-val" id="ge-det-gastos-extra">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Egresos en sistema</div><div class="ge-det-val" id="ge-det-egresos-col">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Comisión vendedor</div><div class="ge-det-val" id="ge-det-comision">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label" style="font-weight:700">Total invertido</div><div class="ge-det-val" style="font-weight:700" id="ge-det-total-inv">—</div></div>
+          </div>
         </div>
-      </div>
 
-      <!-- 2. Forma de pago -->
-      <div class="ge-det-section">
-        <div class="ge-det-section-title">Forma de pago</div>
-        <div class="ge-det-grid">
-          <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Tipo</div><div class="ge-det-val" id="ge-det-forma-pago">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Enganche</div><div class="ge-det-val" id="ge-det-enganche">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Monto financiado</div><div class="ge-det-val" id="ge-det-financiado">—</div></div>
-          <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Banco / Financiera</div><div class="ge-det-val" id="ge-det-banco">—</div></div>
+        <!-- Consigna: liquidación al dueño -->
+        <div class="ge-det-section" id="ge-det-consigna-section" style="display:none">
+          <div class="ge-det-section-title" style="color:var(--wc-orange)">Consigna — Liquidación al dueño</div>
+          <div class="ge-det-grid">
+            <div class="ge-det-item"><div class="ge-det-label">Dueño del auto</div><div class="ge-det-val" id="ge-det-dueno">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Teléfono dueño</div><div class="ge-det-val" id="ge-det-dueno-tel">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Precio convenido con dueño</div><div class="ge-det-val" id="ge-det-precio-convenido">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Saldo a liquidar / ganancia weCars</div>
+              <div class="ge-det-val" id="ge-det-saldo-consigna">—</div></div>
+          </div>
         </div>
-      </div>
 
-      <!-- 3. Costos e inversión total -->
-      <div class="ge-det-section">
-        <div class="ge-det-section-title">Costos e inversión</div>
-        <div class="ge-det-grid">
-          <div class="ge-det-item"><div class="ge-det-label">Precio de venta</div><div class="ge-det-val" style="color:var(--wc-ok)" id="ge-det-precio">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Costo adquisición</div><div class="ge-det-val" id="ge-det-costo-base">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Reparaciones</div><div class="ge-det-val" id="ge-det-gastos-rep">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Gastos legales / aduanas</div><div class="ge-det-val" id="ge-det-gastos-leg">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Gastos extras</div><div class="ge-det-val" id="ge-det-gastos-extra">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Egresos en sistema</div><div class="ge-det-val" id="ge-det-egresos-col">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Comisión vendedor</div><div class="ge-det-val" id="ge-det-comision">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label" style="font-weight:700">Total invertido</div><div class="ge-det-val" style="font-weight:700" id="ge-det-total-inv">—</div></div>
+        <!-- Resultado final -->
+        <div class="ge-det-section" style="background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:14px">
+          <div class="ge-det-section-title">Resultado de la operación</div>
+          <div class="ge-det-grid">
+            <div class="ge-det-item"><div class="ge-det-label">Utilidad bruta (antes comisión)</div><div class="ge-det-val" id="ge-det-utilidad-bruta">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label" style="font-weight:700">Utilidad neta</div>
+              <div class="ge-det-val" style="font-size:20px;font-weight:800" id="ge-det-utilidad">—</div></div>
+            <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Margen</div><div class="ge-det-val" id="ge-det-margen">—</div></div>
+          </div>
         </div>
-      </div>
 
-      <!-- 4. Consigna: liquidación al dueño -->
-      <div class="ge-det-section" id="ge-det-consigna-section" style="display:none">
-        <div class="ge-det-section-title" style="color:var(--wc-orange)">Consigna — Liquidación al dueño</div>
-        <div class="ge-det-grid">
-          <div class="ge-det-item"><div class="ge-det-label">Dueño del auto</div><div class="ge-det-val" id="ge-det-dueno">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Teléfono dueño</div><div class="ge-det-val" id="ge-det-dueno-tel">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Precio convenido con dueño</div><div class="ge-det-val" id="ge-det-precio-convenido">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Saldo a liquidar / ganancia weCars</div>
-            <div class="ge-det-val" id="ge-det-saldo-consigna">—</div></div>
+        <!-- Egresos detallados -->
+        <div class="ge-det-section">
+          <div class="ge-det-section-title">Egresos registrados en sistema</div>
+          <div id="ge-det-egrs-list"></div>
         </div>
-      </div>
 
-      <!-- 5. Resultado final -->
-      <div class="ge-det-section" style="background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:14px">
-        <div class="ge-det-section-title">Resultado de la operación</div>
-        <div class="ge-det-grid">
-          <div class="ge-det-item"><div class="ge-det-label">Utilidad bruta (antes comisión)</div><div class="ge-det-val" id="ge-det-utilidad-bruta">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label" style="font-weight:700">Utilidad neta</div>
-            <div class="ge-det-val" style="font-size:20px;font-weight:800" id="ge-det-utilidad">—</div></div>
-          <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Margen</div><div class="ge-det-val" id="ge-det-margen">—</div></div>
+      </div><!-- /tab resumen -->
+
+      <!-- ══ TAB: CLIENTE ══ -->
+      <div class="ge-det-tab-panel" id="ge-tab-cliente">
+
+        <div class="ge-det-section">
+          <div class="ge-det-section-title">Datos de contacto</div>
+          <div class="ge-det-grid">
+            <div class="ge-det-item" style="grid-column:span 2">
+              <div class="ge-det-label">Nombre completo</div>
+              <div class="ge-det-val" id="ge-det-nombre-full">—</div>
+            </div>
+            <div class="ge-det-item"><div class="ge-det-label">Teléfono</div><div class="ge-det-val" id="ge-det-tel">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Email</div><div class="ge-det-val" style="font-size:12px;word-break:break-all" id="ge-det-email">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Ciudad</div><div class="ge-det-val" id="ge-det-ciudad">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Origen del lead</div><div class="ge-det-val" id="ge-det-origen">—</div></div>
+          </div>
         </div>
-      </div>
 
-      <!-- 6. Egresos detallados -->
-      <div class="ge-det-section">
-        <div class="ge-det-section-title">Egresos registrados en sistema</div>
-        <div id="ge-det-egrs-list"></div>
-      </div>
+        <div class="ge-det-section">
+          <div class="ge-det-section-title">Perfil financiero</div>
+          <div class="ge-det-grid">
+            <div class="ge-det-item"><div class="ge-det-label">Ingreso mensual</div><div class="ge-det-val" id="ge-det-ingreso">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Presupuesto para auto</div><div class="ge-det-val" id="ge-det-presupuesto">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">RFC</div><div class="ge-det-val" style="font-family:monospace;font-size:13px" id="ge-det-rfc">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">CURP</div><div class="ge-det-val" style="font-family:monospace;font-size:11px" id="ge-det-curp">—</div></div>
+          </div>
+        </div>
 
-      <!-- 7. Notas -->
-      <div class="ge-det-section">
-        <div class="ge-det-section-title">Notas / Historial</div>
-        <div class="ge-det-notas-box" id="ge-det-notas">Sin notas</div>
-      </div>
+        <div class="ge-det-section">
+          <div class="ge-det-section-title">Notas / Historial</div>
+          <div class="ge-det-notas-box" id="ge-det-notas">Sin notas</div>
+        </div>
+
+      </div><!-- /tab cliente -->
+
+      <!-- ══ TAB: OPERACIÓN ══ -->
+      <div class="ge-det-tab-panel" id="ge-tab-operacion">
+
+        <div class="ge-det-section">
+          <div class="ge-det-section-title">Auto y registro</div>
+          <div class="ge-det-grid">
+            <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Auto vendido</div><div class="ge-det-val" id="ge-det-auto">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">VIN</div><div class="ge-det-val" style="font-size:12px;font-family:monospace" id="ge-det-vin">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Vendedor</div><div class="ge-det-val" id="ge-det-vendedor">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Folio de venta</div><div class="ge-det-val" id="ge-det-folio">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Fecha de venta</div><div class="ge-det-val" id="ge-det-fecha">—</div></div>
+          </div>
+        </div>
+
+        <div class="ge-det-section">
+          <div class="ge-det-section-title">Forma de pago</div>
+          <div class="ge-det-grid">
+            <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Tipo</div><div class="ge-det-val" id="ge-det-forma-pago">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Enganche / Pago inicial</div><div class="ge-det-val" id="ge-det-enganche">—</div></div>
+            <div class="ge-det-item"><div class="ge-det-label">Monto financiado</div><div class="ge-det-val" id="ge-det-financiado">—</div></div>
+            <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Banco / Financiera</div><div class="ge-det-val" id="ge-det-banco">—</div></div>
+          </div>
+        </div>
+
+      </div><!-- /tab operacion -->
 
     </div>
 
     <!-- ══ FORM EDICIÓN (solo Gerencia / Operaciones) ══ -->
     <div class="ge-edit-form" id="ge-edit-form">
-      <div style="padding:0 20px">
-        <div style="font-size:13px;font-weight:700;color:var(--wc-ink2);margin-bottom:14px;
-          padding-bottom:10px;border-bottom:1px solid var(--wc-border)">
-          Editar operación
-        </div>
+      <div class="ge-edit-wrap">
+        <div class="ge-edit-section-lbl"><i class="ti ti-cash" style="font-size:11px"></i> Precio y comisión</div>
 
         <div class="ge-edit-row">
           <div class="ge-edit-field">
             <label>Precio de venta</label>
-            <input type="number" id="ef-precio" placeholder="0" min="0" step="1000">
+            <input type="number" id="ef-precio" placeholder="0" min="0" step="1000" oninput="efCalcComision()">
           </div>
           <div class="ge-edit-field">
-            <label>Comisión vendedor</label>
-            <input type="number" id="ef-comision" placeholder="0" min="0" step="100">
+            <label>Pago inicial / Enganche</label>
+            <input type="number" id="ef-enganche" placeholder="0" min="0" step="1000">
           </div>
         </div>
 
+        <!-- Comisión bidireccional % ↔ monto -->
+        <div class="ge-edit-field">
+          <label>Comisión vendedor</label>
+          <div style="display:grid;grid-template-columns:1fr 36px 1fr;gap:8px;align-items:flex-end">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <input type="number" id="ef-comision-pct" placeholder="%" min="0" max="100" step="0.5"
+                oninput="efComisionPctToMonto()" style="border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);padding:10px 12px;font-size:14px;background:var(--wc-surface);color:var(--wc-ink);width:100%;transition:border-color .15s">
+              <span style="font-size:10px;color:var(--wc-ink3);text-align:center">Porcentaje %</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;padding-bottom:18px;color:var(--wc-ink3);font-size:14px;font-weight:700">↔</div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <input type="number" id="ef-comision" placeholder="$0" min="0" step="100"
+                oninput="efComisionMontoToPct()" style="border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);padding:10px 12px;font-size:14px;background:var(--wc-surface);color:var(--wc-ink);width:100%;transition:border-color .15s">
+              <span style="font-size:10px;color:var(--wc-ink3);text-align:center">Monto $</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ge-edit-sep"></div>
+        <div class="ge-edit-section-lbl"><i class="ti ti-building-bank" style="font-size:11px"></i> Forma de pago</div>
+
         <div class="ge-edit-row">
           <div class="ge-edit-field">
-            <label>Forma de pago</label>
-            <select id="ef-forma-pago">
+            <label>Tipo de pago</label>
+            <select id="ef-forma-pago" onchange="efToggleBanco()">
               <option value="Contado">Contado</option>
               <option value="Financiado">Financiado (banco)</option>
               <option value="Crédito weCars">Crédito weCars</option>
               <option value="Arrendamiento">Arrendamiento</option>
               <option value="Parte de pago">Parte de pago</option>
             </select>
-          </div>
-          <div class="ge-edit-field">
-            <label>Enganche</label>
-            <input type="number" id="ef-enganche" placeholder="0" min="0" step="1000">
-          </div>
-        </div>
-
-        <div class="ge-edit-row">
-          <div class="ge-edit-field">
-            <label>Monto financiado</label>
-            <input type="number" id="ef-financiado" placeholder="0" min="0" step="1000">
           </div>
           <div class="ge-edit-field">
             <label>Banco / Financiera</label>
@@ -1486,30 +2039,136 @@ try{new ResizeObserver(()=>{const h=document.body.scrollHeight;window.parent.pos
           </div>
         </div>
 
-        <div class="ge-edit-row full">
+        <div class="ge-edit-row" id="ef-row-financiado">
+          <div class="ge-edit-field">
+            <label>Monto financiado</label>
+            <input type="number" id="ef-financiado" placeholder="0" min="0" step="1000">
+          </div>
+          <div class="ge-edit-field" id="ef-row-apertura">
+            <label>Comisión apertura crédito</label>
+            <input type="number" id="ef-comision-apertura" placeholder="0" min="0" step="100">
+            <span class="ef-hint">Cargo del banco al cliente</span>
+          </div>
+        </div>
+
+        <div class="ge-edit-sep"></div>
+        <div class="ge-edit-section-lbl"><i class="ti ti-file-text" style="font-size:11px"></i> Registro y notas</div>
+
+        <div class="ge-edit-row">
           <div class="ge-edit-field">
             <label>Folio de venta</label>
             <input type="text" id="ef-folio" placeholder="Ej. VTA-2026-001">
+          </div>
+          <div class="ge-edit-field" id="ef-row-consigna" style="display:none">
+            <label>Precio consigna (convenido dueño)</label>
+            <input type="number" id="ef-precio-consigna" placeholder="0" min="0" step="1000">
           </div>
         </div>
 
         <div class="ge-edit-row full">
           <div class="ge-edit-field">
             <label>Notas de la operación</label>
-            <input type="text" id="ef-notas" placeholder="Observaciones, condiciones especiales...">
+            <textarea id="ef-notas" placeholder="Observaciones, condiciones especiales, acuerdos..."></textarea>
           </div>
         </div>
+      </div>
 
-        <div class="ge-edit-actions">
-          <button class="btn-cancel" onclick="toggleEditLead()">Cancelar</button>
-          <button class="btn-save" onclick="guardarEdicionLead()">
-            <i class="ti ti-device-floppy"></i> Guardar cambios
-          </button>
-        </div>
+      <div class="ge-edit-actions">
+        <button class="btn-cancel" onclick="toggleEditLead()">Cancelar</button>
+        <button class="btn-save" onclick="guardarEdicionLead()">
+          <i class="ti ti-device-floppy"></i> Guardar cambios
+        </button>
       </div>
     </div>
 
   </div>
 </div>
+<!-- ══ OVERLAY DETALLE CLIENTE ══ -->
+<div id="ge-cli-overlay">
+  <div class="ge-cli-panel">
+    <div class="ge-cli-handle"></div>
+    <div class="ge-cli-hdr">
+      <div style="flex:1;min-width:0">
+        <div class="ge-cli-title" id="ge-cli-nombre">—</div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="chip chip-info" id="ge-cli-etapa-badge">Nuevo</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;align-items:center">
+        <a id="ge-cli-wa-hdr" href="#" target="_blank" rel="noreferrer"
+          style="width:32px;height:32px;border-radius:50%;background:rgba(37,211,102,.12);color:#25d366;
+          display:flex;align-items:center;justify-content:center;text-decoration:none">
+          <i class="ti ti-brand-whatsapp" style="font-size:15px"></i></a>
+        <a id="ge-cli-tel-hdr" href="#"
+          style="width:32px;height:32px;border-radius:50%;background:rgba(37,99,235,.10);color:#2563eb;
+          display:flex;align-items:center;justify-content:center;text-decoration:none">
+          <i class="ti ti-phone" style="font-size:15px"></i></a>
+        <button class="ge-cli-close" onclick="cerrarDetalleCli()"><i class="ti ti-x" style="font-size:14px"></i></button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="ge-cli-tabs">
+      <button class="ge-cli-tab-btn active" data-tab="resumen" onclick="geCliMostrarTab('resumen')">Resumen</button>
+      <button class="ge-cli-tab-btn" data-tab="editar" onclick="geCliMostrarTab('editar')">Editar</button>
+    </div>
+
+    <!-- Tab Resumen -->
+    <div class="ge-cli-tab-panel active" data-panel="resumen">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="ge-cli-item"><div class="ge-cli-label">Teléfono</div><div class="ge-cli-val" id="ge-cli-tel">—</div></div>
+        <div class="ge-cli-item"><div class="ge-cli-label">Email</div><div class="ge-cli-val" id="ge-cli-email">—</div></div>
+        <div class="ge-cli-item"><div class="ge-cli-label">Origen</div><div class="ge-cli-val" id="ge-cli-origen-val">—</div></div>
+        <div class="ge-cli-item"><div class="ge-cli-label">Vendedor asignado</div><div class="ge-cli-val" id="ge-cli-vend-val">—</div></div>
+        <div class="ge-cli-item" style="grid-column:span 2"><div class="ge-cli-label">Auto de interés</div><div class="ge-cli-val" id="ge-cli-auto-val">—</div></div>
+        <div class="ge-cli-item"><div class="ge-cli-label">Presupuesto</div><div class="ge-cli-val" id="ge-cli-presup-val">—</div></div>
+        <div class="ge-cli-item"><div class="ge-cli-label">Última actividad</div><div class="ge-cli-val" id="ge-cli-dias-val">—</div></div>
+        <div class="ge-cli-item" style="grid-column:span 2"><div class="ge-cli-label">Próximo seguimiento</div><div class="ge-cli-val" id="ge-cli-prox-val">—</div></div>
+      </div>
+      <div>
+        <div class="ge-cli-sec-title">Notas</div>
+        <div class="ge-cli-notas-box" id="ge-cli-notas-val">—</div>
+      </div>
+    </div>
+
+    <!-- Tab Editar -->
+    <div class="ge-cli-tab-panel" data-panel="editar">
+      <div class="field-group">
+        <div class="field-label">Estatus</div>
+        <select class="field-input" id="ge-cli-ef-estatus">
+          <option value="Nuevo">Nuevo</option>
+          <option value="Contactado">Contactado</option>
+          <option value="Interesado">Interesado</option>
+          <option value="Negociando">Negociando</option>
+          <option value="Ganado">Ganado</option>
+          <option value="Perdido">Perdido</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Vendedor asignado</div>
+        <select class="field-input" id="ge-cli-ef-vend"></select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Próximo seguimiento</div>
+        <input class="field-input" type="date" id="ge-cli-ef-prox">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Notas</div>
+        <textarea class="field-input" id="ge-cli-ef-notas" rows="3" placeholder="Observaciones, acuerdos..." style="resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn" onclick="geCliMostrarTab('resumen')">Cancelar</button>
+        <button class="btn btn-primary" id="ge-cli-save-btn" onclick="guardarEdicionCli()" style="flex:1">
+          <i class="ti ti-device-floppy"></i> Guardar
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
 </body>
 </html>
