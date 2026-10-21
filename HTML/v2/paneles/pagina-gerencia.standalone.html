@@ -244,6 +244,31 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
   opacity:0;transform:translateY(8px);transition:all .25s;max-width:320px}
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.ok{background:var(--wc-ok)}.toast.error{background:var(--wc-danger)}.toast.warn{background:var(--wc-warn)}
+
+/* ══ DETALLE LEAD OVERLAY ══ */
+#ge-det-overlay{position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;
+  background:rgba(13,26,13,.45);opacity:0;pointer-events:none;transition:opacity .25s}
+#ge-det-overlay.open{opacity:1;pointer-events:all}
+#ge-det-overlay.open .ge-det-panel{transform:translateY(0)}
+.ge-det-panel{background:var(--wc-surface);border-radius:var(--wc-r-xl) var(--wc-r-xl) 0 0;
+  width:100%;max-width:640px;max-height:90vh;overflow-y:auto;padding:0 0 40px;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);
+  box-shadow:0 -4px 32px rgba(13,26,13,.18)}
+.ge-det-handle{width:36px;height:4px;border-radius:2px;background:var(--wc-border);margin:12px auto 0}
+.ge-det-header{padding:16px 20px 12px;border-bottom:1px solid var(--wc-border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ge-det-title{font-size:18px;font-weight:700;line-height:1.2}
+.ge-det-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--wc-surface2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
+.ge-det-body{padding:16px 20px}
+.ge-det-section{margin-bottom:20px}
+.ge-det-section-title{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--wc-ink3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--wc-border)}
+.ge-det-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ge-det-item{display:flex;flex-direction:column;gap:2px}
+.ge-det-label{font-size:11px;color:var(--wc-ink3)}
+.ge-det-val{font-size:14px;font-weight:600;color:var(--wc-ink)}
+.ge-det-notas-box{background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:12px;
+  font-size:13px;color:var(--wc-ink2);white-space:pre-wrap;line-height:1.5}
 </style>
 </head>
 <body>
@@ -811,6 +836,17 @@ function setFiltroPipe(f,btn){
   document.querySelectorAll('#view-pipeline .filter-chip').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');renderPipeline();
 }
+function wixImg(raw){
+  if(!raw)return null;
+  const url=typeof raw==='string'?raw:(Array.isArray(raw)&&raw[0]?raw[0]:'');
+  if(!url)return null;
+  if(url.startsWith('wix:image://')){
+    const fileId=url.replace('wix:image://v1/','').split('/')[0].split('#')[0];
+    return 'https://static.wixstatic.com/media/'+fileId+'/v1/fill/w_400,h_280,al_c,q_80,usm_0.33_1.00_0.00,enc_auto/'+fileId;
+  }
+  return url;
+}
+
 function renderPipeline(){
   const q=(document.getElementById('pipe-q')?.value||'').toLowerCase();
   const fVend=document.getElementById('pipe-f-vend')?.value||'';
@@ -828,7 +864,7 @@ function renderPipeline(){
     <tbody>${rows.map(c=>{
       const v=findVend(c.vendedorId||c.vendedorAsignado);
       const etapa=c.etapa||c.estatus||'Nuevo';
-      return`<tr>
+      return`<tr style="cursor:pointer" onclick="abrirDetalleLead('${esc(c._id||'')}')">
         <td><div style="font-weight:600">${esc(c.nombre||c.name||'Sin nombre')}</div>
           <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||c.email||'')}</div></td>
         <td style="font-size:12px">${esc(c.autoInteres||c._autoNombre||'—')}</td>
@@ -837,6 +873,62 @@ function renderPipeline(){
         <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(c._createdDate)}</td>
       </tr>`;}).join('')}</tbody></table></div>`;
 }
+
+/* ══ DETALLE LEAD ══ */
+function abrirDetalleLead(id){
+  const c=CLIENTES.find(x=>x._id===id);if(!c)return;
+  const v=findVend(c.vendedorId||c.vendedorAsignado);
+  const etapa=c.etapa||c.estatus||'Nuevo';
+  const ETAPA_BADGE={Nuevo:'chip-info',Contactado:'chip-info',Interesado:'chip-warn',
+    Negociando:'chip-orange',Ganado:'chip-green',Vendido:'chip-green',Entregado:'chip-green',Perdido:'chip-gray'};
+  const precio=parseFloat(c._precioVenta||c.cierrePrecio||c.precioVenta||0);
+  const costo=parseFloat(c._costoAdquisicion||c.costoAdquisicion||0);
+  const comision=parseFloat(c._comisionVendedor||c.cierreComision||c.comisionVendedor||0);
+  const utilidad=precio-costo-comision;
+  const margen=precio>0?Math.round(utilidad/precio*100):0;
+  const enganche=parseFloat(c.enganche||c.cierreEnganche||0);
+  const financiado=parseFloat(c.montoFinanciado||c.cierreFinanciado||0);
+  const banco=c.banco||c.bancoFinanciador||c.cierre_banco||'—';
+  const folio=c.folio||c.folioVenta||c.cierreFolio||'—';
+  const fechaV=fechaCorta(c.fechaVenta||c.cierreFecha||c.fechaCierre||c._createdDate);
+  // egresos relacionados al lead
+  const egrsLead=EGRESOS.filter(e=>(e.leadId||e.clienteId||e.referenciaId)===id);
+  const totalEgrs=egrsLead.reduce((s,e)=>s+parseFloat(e.monto||e.amount||0),0);
+  const o=document.getElementById('ge-det-overlay');
+  o.querySelector('#ge-det-nombre').textContent=c.nombre||c.name||'Sin nombre';
+  o.querySelector('#ge-det-etapa').className='chip '+( ETAPA_BADGE[etapa]||'chip-gray');
+  o.querySelector('#ge-det-etapa').textContent=etapa;
+  o.querySelector('#ge-det-auto').textContent=c._autoNombre||c.autoInteres||'—';
+  o.querySelector('#ge-det-vendedor').textContent=v?.nombre||v?.name||'Sin asignar';
+  o.querySelector('#ge-det-tel').textContent=c.telefono||'—';
+  o.querySelector('#ge-det-email').textContent=c.email||'—';
+  o.querySelector('#ge-det-folio').textContent=folio;
+  o.querySelector('#ge-det-fecha').textContent=fechaV;
+  o.querySelector('#ge-det-precio').textContent=M(precio);
+  o.querySelector('#ge-det-costo').textContent=M(costo);
+  o.querySelector('#ge-det-comision').textContent=M(comision);
+  o.querySelector('#ge-det-egresos').textContent=M(totalEgrs);
+  o.querySelector('#ge-det-utilidad').textContent=M(utilidad);
+  o.querySelector('#ge-det-utilidad').style.color=utilidad>=0?'var(--wc-ok)':'var(--wc-danger)';
+  o.querySelector('#ge-det-margen').textContent=margen+'%';
+  o.querySelector('#ge-det-enganche').textContent=enganche?M(enganche):'—';
+  o.querySelector('#ge-det-financiado').textContent=financiado?M(financiado):'—';
+  o.querySelector('#ge-det-banco').textContent=banco;
+  // lista egresos
+  const egrsEl=o.querySelector('#ge-det-egrs-list');
+  if(egrsLead.length){
+    egrsEl.innerHTML=`<table class="data-table" style="margin-top:8px"><thead><tr><th>Concepto</th><th>Fecha</th><th class="num">Monto</th></tr></thead><tbody>${
+      egrsLead.map(e=>`<tr><td>${esc(e.concepto||e.descripcion||e.tipo||'Egreso')}</td><td style="font-size:11px">${fechaCorta(e.fecha)}</td><td class="num">${M(e.monto||e.amount)}</td></tr>`).join('')
+    }</tbody></table>`;
+  } else {
+    egrsEl.innerHTML='<div style="font-size:12px;color:var(--wc-ink3);padding:8px 0">Sin egresos registrados para este lead</div>';
+  }
+  // notas / historial
+  const notas=c.notas||c.comentarios||c.historial||'';
+  o.querySelector('#ge-det-notas').textContent=notas||'Sin notas';
+  o.classList.add('open');
+}
+function cerrarDetalleLead(){document.getElementById('ge-det-overlay').classList.remove('open');}
 
 /* ══ INVENTARIO ══ */
 let _invView='grid';
@@ -885,13 +977,14 @@ function renderInventario(){
       const est=c.estatus||c.status||c.estado||'Disponible';
       const tipo=(c.tipoAdquisicion||c.tipoOrigen||'').toLowerCase();
       const precio=c.priceNew||c.precioVenta||c.precio||0;
-      // Foto: campo fotos (array), foto (string), image (string)
-      const fotos=c.fotos||c.images||[];
-      const fotoUrl=typeof fotos==='string'?fotos:(Array.isArray(fotos)&&fotos.length?fotos[0]:null)||c.foto||c.image||null;
-      const fotoSrc=fotoUrl?`<img class="inv-card-foto" src="${esc(fotoUrl)}" alt="${esc(nombre)}" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`:'';
+      // Foto: convertir wix:image:// a URL HTTP
+      const fotoRaw=(Array.isArray(c.fotos)&&c.fotos[0])||c.fotos||c.foto||c.fotoPrincipal||c.imagenUrl||c.image||null;
+      const fotoUrl=wixImg(fotoRaw);
+      const uid='inv-'+c._id;
+      const fotoSrc=fotoUrl?`<img class="inv-card-foto" id="${uid}" src="${esc(fotoUrl)}" alt="${esc(nombre)}" loading="lazy" onerror="var p=document.getElementById('ph-${uid}');if(p){this.style.display='none';p.style.display='flex';}">`:'';
       return`<div class="inv-card">
         ${fotoSrc}
-        <div class="inv-card-foto-placeholder" style="${fotoUrl?'display:none':''}"><i class="ti ti-car" style="font-size:32px;opacity:.25"></i></div>
+        <div class="inv-card-foto-placeholder" id="ph-${uid}" style="${fotoUrl?'display:none':''}"><i class="ti ti-car" style="font-size:32px;opacity:.25"></i></div>
         <div class="inv-card-body">
           <div class="inv-card-nombre" title="${esc(nombre)}">${esc(nombre)}</div>
           <div class="inv-card-anio">${anio}</div>
@@ -1046,8 +1139,78 @@ function mostrarVista(id,btn,nav){
 function cerrarOverlay(id){document.getElementById(id)?.classList.remove('open');}
 function abrirOverlay(id){document.getElementById(id)?.classList.add('open');}
 
+// Overlay click-outside
+document.getElementById('ge-det-overlay')?.addEventListener('click',e=>{if(e.target===e.currentTarget)cerrarDetalleLead();});
+
 // Resize observer para Wix
 try{new ResizeObserver(()=>{const h=document.body.scrollHeight;window.parent.postMessage({type:'wecars-height',height:h},'*');}).observe(document.body);}catch(_){}
 </script>
+
+<!-- ══ DETALLE LEAD OVERLAY ══ -->
+<div id="ge-det-overlay">
+  <div class="ge-det-panel">
+    <div class="ge-det-handle"></div>
+    <div class="ge-det-header">
+      <div>
+        <div class="ge-det-title" id="ge-det-nombre">—</div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+          <span class="chip chip-info" id="ge-det-etapa">Nuevo</span>
+        </div>
+      </div>
+      <button class="ge-det-close" onclick="cerrarDetalleLead()"><i class="ti ti-x" style="font-size:14px"></i></button>
+    </div>
+    <div class="ge-det-body">
+
+      <!-- Info general -->
+      <div class="ge-det-section">
+        <div class="ge-det-section-title">Información del cliente</div>
+        <div class="ge-det-grid">
+          <div class="ge-det-item"><div class="ge-det-label">Teléfono</div><div class="ge-det-val" id="ge-det-tel">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Email</div><div class="ge-det-val" id="ge-det-email">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Auto de interés</div><div class="ge-det-val" id="ge-det-auto">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Vendedor asignado</div><div class="ge-det-val" id="ge-det-vendedor">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Folio / ID</div><div class="ge-det-val" id="ge-det-folio">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Fecha</div><div class="ge-det-val" id="ge-det-fecha">—</div></div>
+        </div>
+      </div>
+
+      <!-- Finanzas de la venta -->
+      <div class="ge-det-section">
+        <div class="ge-det-section-title">Finanzas de la venta</div>
+        <div class="ge-det-grid">
+          <div class="ge-det-item"><div class="ge-det-label">Precio de venta</div><div class="ge-det-val" id="ge-det-precio">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Costo adquisición</div><div class="ge-det-val" id="ge-det-costo">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Comisión vendedor</div><div class="ge-det-val" id="ge-det-comision">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Egresos adicionales</div><div class="ge-det-val" id="ge-det-egresos">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Utilidad neta</div><div class="ge-det-val" id="ge-det-utilidad">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Margen</div><div class="ge-det-val" id="ge-det-margen">—</div></div>
+        </div>
+      </div>
+
+      <!-- Financiamiento -->
+      <div class="ge-det-section">
+        <div class="ge-det-section-title">Financiamiento</div>
+        <div class="ge-det-grid">
+          <div class="ge-det-item"><div class="ge-det-label">Enganche</div><div class="ge-det-val" id="ge-det-enganche">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Monto financiado</div><div class="ge-det-val" id="ge-det-financiado">—</div></div>
+          <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Banco / Financiera</div><div class="ge-det-val" id="ge-det-banco">—</div></div>
+        </div>
+      </div>
+
+      <!-- Egresos del lead -->
+      <div class="ge-det-section">
+        <div class="ge-det-section-title">Egresos asociados</div>
+        <div id="ge-det-egrs-list"></div>
+      </div>
+
+      <!-- Notas -->
+      <div class="ge-det-section">
+        <div class="ge-det-section-title">Notas / Historial</div>
+        <div class="ge-det-notas-box" id="ge-det-notas">Sin notas</div>
+      </div>
+
+    </div>
+  </div>
+</div>
 </body>
 </html>
