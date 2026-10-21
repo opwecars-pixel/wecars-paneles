@@ -675,6 +675,128 @@ img{max-width:100%;display:block}
 #toast.ok{background:var(--wc-ok)}
 #toast.error{background:var(--wc-danger)}
 
+/* ════════════════════════════════════════════════════════
+   PENDIENTES / KANBAN
+════════════════════════════════════════════════════════ */
+.pend-header{display:flex;align-items:center;gap:10px;padding:14px 16px 0}
+.pend-filter-wrap{display:flex;align-items:center;gap:8px;padding:8px 16px 0;flex-wrap:wrap}
+.pend-filter-select{padding:5px 10px;border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);
+  background:var(--wc-surface);font-size:12px;color:var(--wc-ink2);cursor:pointer}
+.pend-board{display:flex;gap:12px;padding:12px 16px 80px;overflow-x:auto;align-items:flex-start;min-height:60vh}
+.pend-col{flex:0 0 280px;background:var(--wc-bg);border-radius:var(--wc-r-lg);
+  border:1.5px solid var(--wc-border);display:flex;flex-direction:column;gap:0;overflow:hidden}
+.pend-col-hdr{display:flex;align-items:center;gap:8px;padding:10px 12px;
+  background:var(--wc-surface);border-bottom:1px solid var(--wc-border);cursor:pointer}
+.pend-col-hdr .pend-col-title{font-size:12px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--wc-ink2);flex:1}
+.pend-col-hdr .pend-col-count{font-size:11px;font-weight:700;color:#fff;
+  background:var(--wc-green);border-radius:9px;padding:1px 7px;min-width:20px;text-align:center}
+.pend-col-body{display:flex;flex-direction:column;gap:8px;padding:10px;min-height:60px}
+.pend-col[data-col="pendiente"] .pend-col-count{background:#6366f1}
+.pend-col[data-col="en-proceso"] .pend-col-count{background:#f59e0b}
+.pend-col[data-col="completado"] .pend-col-count{background:var(--wc-ok)}
+.pend-card{background:var(--wc-surface);border:1.5px solid var(--wc-border);
+  border-radius:var(--wc-r-md);padding:10px 12px;cursor:grab;transition:box-shadow .2s,border-color .2s;
+  box-shadow:0 1px 4px rgba(13,26,13,.06)}
+.pend-card:hover{border-color:var(--wc-green);box-shadow:0 3px 10px rgba(13,26,13,.12)}
+.pend-card.dragging{opacity:.4;box-shadow:0 6px 18px rgba(13,26,13,.18)}
+.pend-card.drag-over{border-color:var(--wc-green);background:var(--wc-green-bg,#f0fdf4)}
+.pend-card-title{font-size:13px;font-weight:600;color:var(--wc-ink);margin-bottom:4px}
+.pend-card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px}
+.pend-prior{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  padding:2px 7px;border-radius:var(--wc-r-full)}
+.pend-prior.alta{background:#fef2f2;color:#dc2626}
+.pend-prior.media{background:#fffbeb;color:#d97706}
+.pend-prior.baja{background:#f0fdf4;color:var(--wc-ok)}
+.pend-card-resp{font-size:11px;color:var(--wc-ink2);display:flex;align-items:center;gap:3px}
+.pend-card-fecha{font-size:11px;color:var(--wc-ink3);margin-left:auto}
+.pend-card-check{font-size:11px;color:var(--wc-ink3)}
+.pend-col-add{width:100%;padding:8px;border:none;background:none;color:var(--wc-ink3);
+  font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;
+  border-top:1px solid var(--wc-border)}
+.pend-col-add:hover{color:var(--wc-green);background:var(--wc-bg)}
+/* Pend overlay (modal nueva tarea) */
+.pend-overlay{position:fixed;inset:0;background:rgba(13,26,13,.48);z-index:300;
+  display:flex;align-items:flex-end;justify-content:center}
+.pend-overlay.hidden{display:none}
+.pend-modal{width:100%;max-width:520px;background:var(--wc-surface);border-radius:var(--wc-r-lg) var(--wc-r-lg) 0 0;
+  padding:20px 20px 32px;box-shadow:0 -4px 24px rgba(13,26,13,.18);max-height:90vh;overflow-y:auto}
+@media(min-width:600px){
+  .pend-overlay{align-items:center}
+  .pend-modal{border-radius:var(--wc-r-lg);max-height:80vh}
+}
+.pend-modal-hdr{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.pend-modal-title{font-size:16px;font-weight:700;color:var(--wc-ink);flex:1}
+.pend-modal-close{background:none;border:none;cursor:pointer;color:var(--wc-ink3);
+  font-size:18px;padding:4px;border-radius:var(--wc-r-sm)}
+.pend-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:480px){.pend-form-row{grid-template-columns:1fr}}
+.pend-form-group{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.pend-form-group label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--wc-ink3)}
+.pend-form-group input,.pend-form-group select,.pend-form-group textarea{
+  padding:8px 10px;border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);
+  background:var(--wc-bg);font-size:13px;color:var(--wc-ink);transition:border-color .2s}
+.pend-form-group input:focus,.pend-form-group select:focus,.pend-form-group textarea:focus{
+  border-color:var(--wc-green);outline:none}
+.pend-save-btn{width:100%;padding:11px;background:var(--wc-green);color:#fff;border:none;
+  border-radius:var(--wc-r-md);font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.pend-save-btn:hover{background:var(--wc-green-d,#3d7a00)}
+.pend-cancel-btn{width:100%;padding:10px;background:none;color:var(--wc-ink2);border:1.5px solid var(--wc-border);
+  border-radius:var(--wc-r-md);font-size:13px;cursor:pointer;margin-top:8px}
+/* Tarea detalle overlay */
+.td-overlay{position:fixed;inset:0;background:rgba(13,26,13,.48);z-index:300;
+  display:flex;align-items:flex-end;justify-content:center}
+.td-overlay.hidden{display:none}
+.td-modal{width:100%;max-width:560px;background:var(--wc-surface);
+  border-radius:var(--wc-r-lg) var(--wc-r-lg) 0 0;
+  box-shadow:0 -4px 24px rgba(13,26,13,.18);max-height:90vh;overflow-y:auto;
+  display:flex;flex-direction:column}
+@media(min-width:600px){
+  .td-overlay{align-items:center}
+  .td-modal{border-radius:var(--wc-r-lg);max-height:85vh}
+}
+.td-hdr{display:flex;align-items:center;gap:8px;padding:16px 16px 12px;
+  border-bottom:1px solid var(--wc-border);flex-shrink:0}
+.td-title-input{flex:1;font-size:15px;font-weight:700;color:var(--wc-ink);
+  background:none;border:none;outline:none;padding:0}
+.td-close{background:none;border:none;cursor:pointer;color:var(--wc-ink3);font-size:18px;padding:4px}
+.td-body{flex:1;overflow-y:auto;padding:14px 16px}
+.td-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--wc-ink3);margin-bottom:8px;margin-top:12px}
+.td-meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.td-meta-select{flex:1;min-width:120px;padding:6px 10px;border:1.5px solid var(--wc-border);
+  border-radius:var(--wc-r-md);background:var(--wc-bg);font-size:12px;color:var(--wc-ink2)}
+.td-desc-input{width:100%;padding:8px 10px;border:1.5px solid var(--wc-border);
+  border-radius:var(--wc-r-md);background:var(--wc-bg);font-size:13px;color:var(--wc-ink);
+  resize:none;min-height:60px;box-sizing:border-box}
+.td-check-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.td-check-item{display:flex;align-items:center;gap:8px;padding:6px 8px;
+  background:var(--wc-bg);border-radius:var(--wc-r-sm);border:1px solid var(--wc-border)}
+.td-check-item input[type=checkbox]{accent-color:var(--wc-green);width:15px;height:15px;flex-shrink:0}
+.td-check-item span{flex:1;font-size:13px;color:var(--wc-ink)}
+.td-check-item.done span{text-decoration:line-through;color:var(--wc-ink3)}
+.td-add-check-row{display:flex;gap:6px;margin-top:4px}
+.td-add-check-input{flex:1;padding:6px 10px;border:1.5px solid var(--wc-border);
+  border-radius:var(--wc-r-md);background:var(--wc-bg);font-size:12px;color:var(--wc-ink)}
+.td-add-check-btn{padding:6px 12px;background:var(--wc-green);color:#fff;border:none;
+  border-radius:var(--wc-r-md);font-size:12px;font-weight:600;cursor:pointer}
+.td-hist-item{font-size:12px;color:var(--wc-ink2);padding:4px 0;
+  border-bottom:1px solid var(--wc-border);display:flex;gap:8px}
+.td-hist-ts{font-size:11px;color:var(--wc-ink3);white-space:nowrap}
+.td-footer{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--wc-border);flex-shrink:0}
+.td-save-btn{flex:1;padding:10px;background:var(--wc-green);color:#fff;border:none;
+  border-radius:var(--wc-r-md);font-size:13px;font-weight:700;cursor:pointer}
+.td-cancel-btn{padding:10px 16px;background:none;color:var(--wc-ink2);
+  border:1.5px solid var(--wc-border);border-radius:var(--wc-r-md);font-size:13px;cursor:pointer}
+/* Context menu tareas */
+.pend-menu{position:fixed;background:var(--wc-surface);border:1px solid var(--wc-border);
+  border-radius:var(--wc-r-md);box-shadow:0 4px 16px rgba(13,26,13,.14);z-index:400;min-width:160px;padding:4px 0}
+.pend-menu-item{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;
+  color:var(--wc-ink);cursor:pointer}
+.pend-menu-item:hover{background:var(--wc-bg)}
+.pend-menu-item.danger{color:var(--wc-danger)}
+.pend-menu-sep{height:1px;background:var(--wc-border);margin:4px 0}
+
 </style>
 </head>
 <body>
@@ -726,6 +848,10 @@ img{max-width:100%;display:block}
       </button>
       <button class="sb-item" onclick="mostrarVista('reportes',this)">
         <i class="ti ti-report-analytics" aria-hidden="true"></i>Reportes
+      </button>
+      <button class="sb-item" onclick="mostrarVista('pendientes',this)">
+        <i class="ti ti-checkbox" aria-hidden="true"></i>Pendientes
+        <span class="sb-badge" id="sb-badge-pend" style="display:none"></span>
       </button>
     </nav>
   </aside>
@@ -1992,6 +2118,52 @@ img{max-width:100%;display:block}
       </div>
     </div>
 
+    <!-- ─── VIEW: PENDIENTES ─── -->
+    <div class="view hidden" id="view-pendientes" style="overflow:auto;height:100%">
+      <div class="pend-header">
+        <div style="flex:1"></div>
+        <button class="btn btn-primary btn-sm" id="pend-nueva-btn" onclick="abrirModalPend()">
+          <i class="ti ti-plus"></i><span class="hidden-xs">Nueva tarea</span>
+        </button>
+      </div>
+      <div class="pend-filter-wrap">
+        <select class="pend-filter-select" id="pend-filter-resp" onchange="renderPendientes()">
+          <option value="">Todos los responsables</option>
+        </select>
+        <select class="pend-filter-select" id="pend-filter-prior" onchange="renderPendientes()">
+          <option value="">Todas las prioridades</option>
+          <option value="alta">Alta</option>
+          <option value="media">Media</option>
+          <option value="baja">Baja</option>
+        </select>
+      </div>
+      <div class="pend-board" id="pend-board">
+        <div class="pend-col" id="pend-col-pendiente" data-col="pendiente">
+          <div class="pend-col-hdr">
+            <span class="pend-col-title">Por hacer</span>
+            <span class="pend-col-count" id="pend-cnt-pendiente">0</span>
+          </div>
+          <div class="pend-col-body" id="pend-body-pendiente"></div>
+          <button class="pend-col-add" data-col-add="pendiente"><i class="ti ti-plus"></i>Agregar</button>
+        </div>
+        <div class="pend-col" id="pend-col-en-proceso" data-col="en-proceso">
+          <div class="pend-col-hdr">
+            <span class="pend-col-title">En proceso</span>
+            <span class="pend-col-count" id="pend-cnt-en-proceso">0</span>
+          </div>
+          <div class="pend-col-body" id="pend-body-en-proceso"></div>
+          <button class="pend-col-add" data-col-add="en-proceso"><i class="ti ti-plus"></i>Agregar</button>
+        </div>
+        <div class="pend-col" id="pend-col-completado" data-col="completado">
+          <div class="pend-col-hdr">
+            <span class="pend-col-title">Completado</span>
+            <span class="pend-col-count" id="pend-cnt-completado">0</span>
+          </div>
+          <div class="pend-col-body" id="pend-body-completado"></div>
+          <button class="pend-col-add" data-col-add="completado"><i class="ti ti-plus"></i>Agregar</button>
+        </div>
+      </div>
+    </div>
 
   </main>
 </div>
@@ -2014,6 +2186,103 @@ img{max-width:100%;display:block}
     <i class="ti ti-report-analytics"></i>Reportes
   </button>
 </nav>
+
+<!-- ═══════════════ MODAL: NUEVA TAREA ════════════════════════════════════ -->
+<div class="pend-overlay hidden" id="pend-overlay">
+  <div class="pend-modal">
+    <div class="pend-modal-hdr">
+      <span class="pend-modal-title"><i class="ti ti-checkbox" style="color:var(--wc-green);margin-right:6px"></i>Nueva tarea</span>
+      <button class="pend-modal-close" id="pend-close"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="pend-form-group">
+      <label>Título *</label>
+      <input type="text" id="pend-titulo" placeholder="¿Qué hay que hacer?">
+    </div>
+    <div class="pend-form-group">
+      <label>Descripción</label>
+      <textarea id="pend-desc" rows="2" placeholder="Detalles opcionales..."></textarea>
+    </div>
+    <div class="pend-form-row">
+      <div class="pend-form-group" style="margin-bottom:0">
+        <label>Prioridad</label>
+        <select id="pend-prior-sel">
+          <option value="alta">Alta</option>
+          <option value="media" selected>Media</option>
+          <option value="baja">Baja</option>
+        </select>
+      </div>
+      <div class="pend-form-group" style="margin-bottom:0">
+        <label>Fecha límite</label>
+        <input type="date" id="pend-fecha">
+      </div>
+    </div>
+    <div class="pend-form-row" style="margin-top:12px">
+      <div class="pend-form-group" style="margin-bottom:0">
+        <label>Responsable</label>
+        <input type="text" id="pend-resp" placeholder="Nombre o email">
+      </div>
+      <div class="pend-form-group" style="margin-bottom:0">
+        <label>Categoría</label>
+        <input type="text" id="pend-cat" placeholder="Opcional">
+      </div>
+    </div>
+    <div class="pend-form-group" style="margin-top:12px">
+      <label>Columna inicial</label>
+      <select id="pend-col-init">
+        <option value="pendiente">Por hacer</option>
+        <option value="en-proceso">En proceso</option>
+        <option value="completado">Completado</option>
+      </select>
+    </div>
+    <button class="pend-save-btn" id="pend-save">Crear tarea</button>
+    <button class="pend-cancel-btn" id="pend-cancel">Cancelar</button>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: DETALLE TAREA ══════════════════════════════════ -->
+<div class="td-overlay hidden" id="td-overlay">
+  <div class="td-modal">
+    <div class="td-hdr">
+      <input class="td-title-input" id="td-title-input" type="text" placeholder="Título de la tarea">
+      <button class="td-close" id="td-close"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="td-body">
+      <div class="td-meta-row">
+        <select class="td-meta-select" id="td-prior-sel">
+          <option value="alta">🔴 Alta</option>
+          <option value="media">🟡 Media</option>
+          <option value="baja">🟢 Baja</option>
+        </select>
+        <select class="td-meta-select" id="td-col-sel">
+          <option value="pendiente">Por hacer</option>
+          <option value="en-proceso">En proceso</option>
+          <option value="completado">Completado</option>
+        </select>
+        <input class="td-meta-select" type="date" id="td-fecha-input" style="min-width:130px">
+      </div>
+      <div class="pend-form-group">
+        <label>Responsable</label>
+        <input class="td-meta-select" type="text" id="td-resp-input" placeholder="Responsable" style="width:100%;box-sizing:border-box">
+      </div>
+      <div class="pend-form-group">
+        <label>Descripción</label>
+        <textarea class="td-desc-input" id="td-desc-input" rows="3" placeholder="Detalles..."></textarea>
+      </div>
+      <div class="td-section-label">Checklist</div>
+      <div class="td-check-list" id="td-check-list"></div>
+      <div class="td-add-check-row">
+        <input class="td-add-check-input" type="text" id="td-add-check-input" placeholder="Agregar ítem...">
+        <button class="td-add-check-btn" id="td-add-check-btn">+</button>
+      </div>
+      <div class="td-section-label" style="margin-top:16px">Historial</div>
+      <div id="td-hist-list"></div>
+    </div>
+    <div class="td-footer">
+      <button class="td-cancel-btn" id="td-cancel">Cancelar</button>
+      <button class="td-save-btn" id="td-save">Guardar cambios</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════ MODAL: SELECTOR TIPO ══════════════════════════════════ -->
 <div class="overlay hidden" id="overlay-tipo" onclick="if(event.target===this)cerrarModalTipo()">
@@ -2130,6 +2399,7 @@ const WC = {
     LEAD_CREAR:        'wecars-lead-crear',
     LEAD_EDITAR:       'wecars-lead-editar',
     CREDITOS_LISTAR:  'wecars-creditos-listar',
+    CREDITO_CREAR:    'wecars-credito-crear',
     CREDITO_EDITAR:   'wecars-credito-editar',
     DOC_SUBIR:        'wecars-doc-subir',
     DOC_URL_SOLICITAR:'wecars-doc-url-solicitar',
@@ -2260,7 +2530,7 @@ function fmt(n) {
 /* ════════════════════════════════════════════════════════
    NAVEGACIÓN
 ════════════════════════════════════════════════════════ */
-const VISTAS = ['inventario','rentabilidad','vendedores','clientes','creditos','expedientes','reportes'];
+const VISTAS = ['inventario','rentabilidad','vendedores','clientes','creditos','expedientes','reportes','pendientes'];
 const VISTA_CONFIG = {
   inventario:    { title: 'Inventario',              cta: '+ Vehículo',   ctaFn: 'abrirModalNuevoVehiculo' },
   rentabilidad:  { title: 'Rentabilidad',            cta: null },
@@ -2269,6 +2539,7 @@ const VISTA_CONFIG = {
   creditos:      { title: 'Créditos F&I',            cta: null },
   expedientes:   { title: 'Expedientes de ventas',   cta: null },
   reportes:      { title: 'Reportes',                cta: null },
+  pendientes:    { title: 'Pendientes',              cta: '+ Tarea',      ctaFn: 'abrirModalPend' },
 };
 
 function mostrarVista(key, btn, origen) {
@@ -2320,6 +2591,7 @@ function mostrarVista(key, btn, origen) {
   if (key === 'rentabilidad')                        renderRentabilidad();
   if (key === 'expedientes' && INVENTARIO.length)    renderExpedientes();
   if (key === 'reportes')                            renderReportes();
+  if (key === 'pendientes')                          solicitarTareas();
 }
 
 /* ════════════════════════════════════════════════════════
@@ -5246,9 +5518,14 @@ function opAbrirDetalle(leadId) {
 
   const vendInfo = document.getElementById('det-vendedor-info');
   if (vendInfo) {
-    const vId = c.vendedorId || '';
-    const vend = VENDEDORES.find(v=>v._id===vId||v.email===vId||v.nombre===vId);
-    const vendNmFallback = c.vendedorNombre || (vId && !vId.includes('-') && !vId.includes('@') ? vId : '');
+    const vId = c.vendedorId || c.vendedorAsignado || '';
+    const vIdLow = vId.toLowerCase();
+    const vend = VENDEDORES.find(v =>
+      v._id === vId || v._id === c.vendedorAsignado ||
+      (v.email||'').toLowerCase() === vIdLow ||
+      v.nombre === vId
+    );
+    const vendNmFallback = c.vendedorNombre || (vId && !vId.includes('-') ? vId : '');
     vendInfo.textContent = vend ? `Vendedor: ${vend.nombre||vend.email}` : (vendNmFallback ? `Vendedor: ${vendNmFallback}` : 'Sin vendedor asignado');
   }
 
@@ -6428,6 +6705,23 @@ function opEnviarSolicitudCredito() {
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2"></i>Guardando...'; }
   _opCredEnviandoSolicitud = true;
   _opLeadEditar(datos);
+  // Crear registro en colección Creditos para que aparezca en Créditos F&I
+  WC.send(WC.OUT.CREDITO_CREAR, {
+    datos: {
+      leadId:          _opCliActual._id,
+      clienteNombre:   _opCliActual.nombre || _opCliActual.name || '',
+      telefono:        _opCliActual.telefono || _opCliActual.tel || '',
+      vendedorId:      _opCliActual.vendedorId || _opCliActual.vendedorAsignado || CTX?.email || '',
+      vendedorNombre:  _opCliActual.vendedorNombre || '',
+      autoInteres:     _opCliActual.autoInteres || _opCliActual.interes || '',
+      autoInventarioId:_opCliActual.autoInventarioId || _opCliActual.autoInteresId || '',
+      monto:           datos.creditoPrecioVehiculo || 0,
+      montoSolicitado: datos.creditoPrecioVehiculo || 0,
+      banco:           datos.creditoFinanciera || '',
+      plazo:           datos.creditoPlazo || null,
+      notas:           datos.creditoProposito || '',
+    }
+  });
   // Resultado manejado en el handler global LEAD_RESULTADO con flag _opCredEnviandoSolicitud
   setTimeout(() => {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i>Enviar Solicitud'; }
@@ -6600,6 +6894,15 @@ function opImprimirRecibo() {
 /* ════════════════════════════════════════════════════════
    CRÉDITOS
 ════════════════════════════════════════════════════════ */
+// Normaliza campo estatus de distintos paneles → Pendiente/Enviado/Aprobado/Rechazado
+function _credEstatus(c) {
+  const raw = c.estatus || c.estado || 'Pendiente';
+  if (raw === 'solicitud_enviada' || raw === 'en_proceso') return 'Pendiente';
+  if (raw === 'enviado_banco') return 'Enviado';
+  if (raw === 'aprobado') return 'Aprobado';
+  if (raw === 'rechazado') return 'Rechazado';
+  return raw;
+}
 function cargarCreditos() {
   mostrarLoading('cred');
   WC.send(WC.OUT.CREDITOS_LISTAR, {});
@@ -6620,7 +6923,7 @@ function filtrarCreditos() {
   const el   = document.getElementById('cred-list');
   const rows = _credFiltro === 'todos'
     ? CREDITOS
-    : CREDITOS.filter(c => (c.estatus||'Pendiente') === _credFiltro);
+    : CREDITOS.filter(c => _credEstatus(c) === _credFiltro);
 
   if (!rows.length) {
     el.innerHTML = '<div class="empty-state" style="padding:32px"><p>Sin créditos con ese filtro</p></div>';
@@ -6637,7 +6940,7 @@ function filtrarCreditos() {
   const ESTATUS_OPCIONES = ['Pendiente','Enviado','Aprobado','Rechazado'];
 
   el.innerHTML = rows.map(c => {
-    const est      = c.estatus || 'Pendiente';
+    const est      = _credEstatus(c);
     const vend     = VENDEDORES.find(v => v._id === c.vendedorId || v.email === c.vendedorId);
     const fecha    = c._createdDate ? new Date(c._createdDate).toLocaleDateString('es-MX',{day:'2-digit',month:'short'}) : '';
     const monto    = parsePrice(c.montoSolicitado || c.monto || 0);
@@ -6901,10 +7204,12 @@ function renderReportes() {
         return txt && c.marca && c.modelo && txt.includes(c.marca.toLowerCase()) && txt.includes(c.modelo.toLowerCase());
       });
 
-      // Agrupar por vendedor
+      // Agrupar por vendedor — normalizar usando VENDEDORES para evitar duplicados email/nombre
       const porVendedor = {};
       interesados.forEach(cl => {
-        const vKey = cl.vendedorNombre || cl.vendedorId || 'Sin asignar';
+        const vid = (cl.vendedorId || cl.vendedorAsignado || '').trim();
+        const vObj = VENDEDORES.find(v => v._id === vid || (v.email||'').toLowerCase() === vid.toLowerCase() || v.nombre === vid);
+        const vKey = vObj?.nombre || cl.vendedorNombre || (vid && !vid.includes('@') ? vid : '') || vid.split('@')[0] || 'Sin asignar';
         if (!porVendedor[vKey]) porVendedor[vKey] = [];
         porVendedor[vKey].push(cl);
       });
@@ -6982,6 +7287,292 @@ function renderReportes() {
     <div style="font-size:13px;color:var(--wc-ink3);margin-top:8px">Sin datos de autos más solicitados.<br>Se calcula cuando los leads incluyen el campo <em>Auto de interés</em>.</div>
   </div>`}`;
 }
+
+/* ════════════════════════════════════════════════════════
+   PENDIENTES / KANBAN
+════════════════════════════════════════════════════════ */
+let TAREAS = [];
+let _tdActual = null;  // tarea abierta en detalle
+let _dragId   = null;  // id de tarjeta en drag
+let _pendContextMenu = null;
+
+function solicitarTareas() {
+  WC.send('wecars-tareas-solicitar', {});
+  renderPendientes();
+}
+
+function renderPendientes() {
+  const filterResp  = document.getElementById('pend-filter-resp')?.value  || '';
+  const filterPrior = document.getElementById('pend-filter-prior')?.value || '';
+  const cols = ['pendiente','en-proceso','completado'];
+  const filtradas = TAREAS.filter(t => {
+    if (filterResp  && t.responsable !== filterResp)  return false;
+    if (filterPrior && (t.prioridad || 'media') !== filterPrior) return false;
+    return true;
+  });
+  cols.forEach(col => {
+    const body = document.getElementById('pend-body-' + col);
+    const cnt  = document.getElementById('pend-cnt-'  + col);
+    if (!body || !cnt) return;
+    const tarjetas = filtradas.filter(t => (t.columna || 'pendiente') === col);
+    cnt.textContent = tarjetas.length;
+    body.innerHTML = '';
+    tarjetas.forEach(t => {
+      const card = document.createElement('div');
+      card.className = 'pend-card';
+      card.dataset.id = t._id || t.id || '';
+      card.draggable = true;
+      const checkTotal = (t.checklist||[]).length;
+      const checkDone  = (t.checklist||[]).filter(c=>c.done).length;
+      const vencido    = t.fechaLimite && new Date(t.fechaLimite) < new Date() && col !== 'completado';
+      card.innerHTML = `
+        <div class="pend-card-title">${esc(t.titulo||'Sin título')}</div>
+        ${t.descripcion ? `<div style="font-size:12px;color:var(--wc-ink2);margin-bottom:4px;line-height:1.4">${esc(t.descripcion.slice(0,80))}${t.descripcion.length>80?'…':''}</div>` : ''}
+        <div class="pend-card-meta">
+          <span class="pend-prior ${t.prioridad||'media'}">${t.prioridad||'media'}</span>
+          ${t.responsable ? `<span class="pend-card-resp"><i class="ti ti-user"></i>${esc(t.responsable)}</span>` : ''}
+          ${checkTotal ? `<span class="pend-card-check"><i class="ti ti-check"></i>${checkDone}/${checkTotal}</span>` : ''}
+          ${t.fechaLimite ? `<span class="pend-card-fecha" style="${vencido?'color:var(--wc-danger)':''}">${fmtFecha(t.fechaLimite)}</span>` : ''}
+        </div>`;
+      card.addEventListener('click', () => abrirDetalleTarea(t._id||t.id));
+      card.addEventListener('contextmenu', e => { e.preventDefault(); mostrarMenuTarea(e, t._id||t.id); });
+      // Drag & Drop
+      card.addEventListener('dragstart', e => { _dragId = t._id||t.id; card.classList.add('dragging'); });
+      card.addEventListener('dragend',   () => { _dragId = null; card.classList.remove('dragging'); });
+      // Touch (long press → drag)
+      let _touchTimer = null;
+      card.addEventListener('touchstart', () => {
+        _touchTimer = setTimeout(() => { _dragId = t._id||t.id; card.classList.add('dragging'); }, 400);
+      }, {passive:true});
+      card.addEventListener('touchend', () => { clearTimeout(_touchTimer); card.classList.remove('dragging'); _dragId = null; });
+      body.appendChild(card);
+    });
+    // Drop zone
+    body.addEventListener('dragover',  e => { e.preventDefault(); });
+    body.addEventListener('drop', e => {
+      e.preventDefault();
+      if (!_dragId) return;
+      moverTarea(_dragId, col);
+    });
+  });
+  // Actualizar select responsables
+  const select = document.getElementById('pend-filter-resp');
+  if (select) {
+    const resps = [...new Set(TAREAS.map(t=>t.responsable).filter(Boolean))];
+    const val = select.value;
+    select.innerHTML = '<option value="">Todos los responsables</option>' +
+      resps.map(r=>`<option value="${esc(r)}"${r===val?' selected':''}>${esc(r)}</option>`).join('');
+  }
+}
+
+function fmtFecha(s) {
+  if (!s) return '';
+  try {
+    const d = new Date(s);
+    return d.toLocaleDateString('es-MX',{day:'2-digit',month:'short'});
+  } catch { return s; }
+}
+
+function abrirModalPend(colInicial) {
+  const ov = document.getElementById('pend-overlay');
+  if (!ov) return;
+  ov.querySelector('#pend-titulo').value = '';
+  ov.querySelector('#pend-desc').value   = '';
+  ov.querySelector('#pend-prior-sel').value = 'media';
+  ov.querySelector('#pend-fecha').value  = '';
+  ov.querySelector('#pend-resp').value   = '';
+  ov.querySelector('#pend-cat').value    = '';
+  ov.querySelector('#pend-col-init').value = colInicial || 'pendiente';
+  ov.classList.remove('hidden');
+}
+
+function cerrarPend() {
+  document.getElementById('pend-overlay')?.classList.add('hidden');
+}
+
+function guardarNuevaTarea() {
+  const titulo = document.getElementById('pend-titulo').value.trim();
+  if (!titulo) { toast('Escribe un título para la tarea','error'); return; }
+  const tarea = {
+    titulo,
+    descripcion: document.getElementById('pend-desc').value.trim(),
+    prioridad:   document.getElementById('pend-prior-sel').value,
+    fechaLimite: document.getElementById('pend-fecha').value,
+    responsable: document.getElementById('pend-resp').value.trim(),
+    categoria:   document.getElementById('pend-cat').value.trim(),
+    columna:     document.getElementById('pend-col-init').value,
+    checklist:   [],
+    historial:   [],
+  };
+  WC.send('wecars-tarea-crear', tarea);
+  cerrarPend();
+  toast('Tarea creada','ok');
+}
+
+function moverTarea(id, nuevaCol) {
+  const t = TAREAS.find(t=>(t._id||t.id)===id);
+  if (!t || t.columna === nuevaCol) return;
+  t.columna = nuevaCol;
+  WC.send('wecars-tarea-actualizar', { _id: id, columna: nuevaCol });
+  renderPendientes();
+}
+
+function abrirDetalleTarea(id) {
+  const t = TAREAS.find(t=>(t._id||t.id)===id);
+  if (!t) return;
+  _tdActual = t;
+  const ov = document.getElementById('td-overlay');
+  if (!ov) return;
+  ov.querySelector('#td-title-input').value     = t.titulo || '';
+  ov.querySelector('#td-prior-sel').value       = t.prioridad || 'media';
+  ov.querySelector('#td-col-sel').value         = t.columna || 'pendiente';
+  ov.querySelector('#td-resp-input').value      = t.responsable || '';
+  ov.querySelector('#td-fecha-input').value     = t.fechaLimite || '';
+  ov.querySelector('#td-desc-input').value      = t.descripcion || '';
+  renderTdChecklist();
+  renderTdHistorial();
+  ov.classList.remove('hidden');
+}
+
+function cerrarDetalleTarea() {
+  document.getElementById('td-overlay')?.classList.add('hidden');
+  _tdActual = null;
+}
+
+function renderTdChecklist() {
+  const list = document.getElementById('td-check-list');
+  if (!list || !_tdActual) return;
+  list.innerHTML = (_tdActual.checklist||[]).map((c,i) => `
+    <div class="td-check-item ${c.done?'done':''}">
+      <input type="checkbox" ${c.done?'checked':''} onchange="toggleCheck(${i},this.checked)">
+      <span>${esc(c.texto||c.text||'')}</span>
+    </div>`).join('');
+}
+
+function toggleCheck(idx, done) {
+  if (!_tdActual) return;
+  _tdActual.checklist[idx].done = done;
+  renderTdChecklist();
+}
+
+function agregarCheck() {
+  const inp = document.getElementById('td-add-check-input');
+  if (!inp || !_tdActual) return;
+  const txt = inp.value.trim();
+  if (!txt) return;
+  _tdActual.checklist = _tdActual.checklist || [];
+  _tdActual.checklist.push({ texto: txt, done: false });
+  inp.value = '';
+  renderTdChecklist();
+}
+
+function renderTdHistorial() {
+  const list = document.getElementById('td-hist-list');
+  if (!list || !_tdActual) return;
+  const hist = (_tdActual.historial||[]).slice().reverse();
+  list.innerHTML = hist.length
+    ? hist.map(h=>`<div class="td-hist-item"><span class="td-hist-ts">${fmtFecha(h.fecha||h.ts)}</span><span>${esc(h.texto||h.text||'')}</span></div>`).join('')
+    : '<div style="font-size:12px;color:var(--wc-ink3)">Sin historial</div>';
+}
+
+function tdGuardar() {
+  if (!_tdActual) return;
+  const id = _tdActual._id || _tdActual.id;
+  const cambios = {
+    _id:         id,
+    titulo:      document.getElementById('td-title-input').value.trim(),
+    prioridad:   document.getElementById('td-prior-sel').value,
+    columna:     document.getElementById('td-col-sel').value,
+    responsable: document.getElementById('td-resp-input').value.trim(),
+    fechaLimite: document.getElementById('td-fecha-input').value,
+    descripcion: document.getElementById('td-desc-input').value.trim(),
+    checklist:   _tdActual.checklist || [],
+  };
+  Object.assign(_tdActual, cambios);
+  WC.send('wecars-tarea-actualizar', cambios);
+  renderPendientes();
+  cerrarDetalleTarea();
+  toast('Tarea actualizada','ok');
+}
+
+function mostrarMenuTarea(e, id) {
+  if (_pendContextMenu) _pendContextMenu.remove();
+  const menu = document.createElement('div');
+  menu.className = 'pend-menu';
+  menu.style.cssText = `top:${e.clientY}px;left:${Math.min(e.clientX, innerWidth-170)}px`;
+  menu.innerHTML = `
+    <div class="pend-menu-item" onclick="moverTarea('${id}','pendiente');cerrarMenu()"><i class="ti ti-arrow-left"></i>Por hacer</div>
+    <div class="pend-menu-item" onclick="moverTarea('${id}','en-proceso');cerrarMenu()"><i class="ti ti-clock"></i>En proceso</div>
+    <div class="pend-menu-item" onclick="moverTarea('${id}','completado');cerrarMenu()"><i class="ti ti-check"></i>Completado</div>
+    <div class="pend-menu-sep"></div>
+    <div class="pend-menu-item danger" onclick="eliminarTarea('${id}');cerrarMenu()"><i class="ti ti-trash"></i>Eliminar</div>`;
+  document.body.appendChild(menu);
+  _pendContextMenu = menu;
+  setTimeout(() => document.addEventListener('click', cerrarMenu, {once:true}), 0);
+}
+
+function cerrarMenu() { _pendContextMenu?.remove(); _pendContextMenu = null; }
+
+function eliminarTarea(id) {
+  if (!confirm('¿Eliminar esta tarea?')) return;
+  TAREAS = TAREAS.filter(t=>(t._id||t.id)!==id);
+  WC.send('wecars-tarea-eliminar', { _id: id });
+  renderPendientes();
+  toast('Tarea eliminada');
+}
+
+// Mensajes desde Velo para tareas
+WC.onMany({
+  'wecars-tareas-datos': (d) => {
+    TAREAS = Array.isArray(d.tareas) ? d.tareas : (Array.isArray(d) ? d : []);
+    renderPendientes();
+    // Actualizar badge
+    const pendCount = TAREAS.filter(t=>(t.columna||'pendiente') !== 'completado').length;
+    const badge = document.getElementById('sb-badge-pend');
+    if (badge) { badge.textContent = pendCount||''; badge.style.display = pendCount?'':'none'; }
+  },
+  'wecars-tarea-creada': (d) => {
+    if (d._id || d.id) { TAREAS = TAREAS.filter(t=>(t._id||t.id)!==(d._id||d.id)); TAREAS.unshift(d); }
+    renderPendientes();
+  },
+  'wecars-tarea-actualizada': (d) => {
+    const idx = TAREAS.findIndex(t=>(t._id||t.id)===(d._id||d.id));
+    if (idx>=0) Object.assign(TAREAS[idx], d); else TAREAS.unshift(d);
+    renderPendientes();
+  },
+  'wecars-tarea-eliminada': (d) => {
+    TAREAS = TAREAS.filter(t=>(t._id||t.id)!==(d._id||d.id));
+    renderPendientes();
+  },
+  'wecars-tarea-asignada': (d) => {
+    const idx = TAREAS.findIndex(t=>(t._id||t.id)===(d._id||d.id));
+    if (idx>=0) Object.assign(TAREAS[idx], d); else TAREAS.unshift(d);
+    renderPendientes();
+  },
+});
+
+// Event listeners para modales pendientes
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pend-close')?.addEventListener('click', cerrarPend);
+  document.getElementById('pend-cancel')?.addEventListener('click', cerrarPend);
+  document.getElementById('pend-save')?.addEventListener('click', guardarNuevaTarea);
+  document.getElementById('pend-overlay')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('pend-overlay')) cerrarPend();
+  });
+  document.getElementById('td-close')?.addEventListener('click', cerrarDetalleTarea);
+  document.getElementById('td-cancel')?.addEventListener('click', cerrarDetalleTarea);
+  document.getElementById('td-save')?.addEventListener('click', tdGuardar);
+  document.getElementById('td-overlay')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('td-overlay')) cerrarDetalleTarea();
+  });
+  document.getElementById('td-add-check-btn')?.addEventListener('click', agregarCheck);
+  document.getElementById('td-add-check-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); agregarCheck(); }
+  });
+  document.querySelectorAll('[data-col-add]').forEach(btn => {
+    btn.addEventListener('click', () => abrirModalPend(btn.dataset.colAdd));
+  });
+});
 
 /* ════════════════════════════════════════════════════════
    INIT

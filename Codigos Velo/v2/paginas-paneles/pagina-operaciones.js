@@ -25,6 +25,10 @@ const HTML_ID = '#htmlOperaciones';
 const OUT = {
   READY:             'wecars-ready',
   RESIZE:            'wecars-resize',
+  TAREAS_SOLICITAR:  'wecars-tareas-solicitar',
+  TAREA_CREAR:       'wecars-tarea-crear',
+  TAREA_ACTUALIZAR:  'wecars-tarea-actualizar',
+  TAREA_ELIMINAR:    'wecars-tarea-eliminar',
   CARS_LISTAR:       'wecars-cars-listar',
   CAR_CREAR:         'wecars-car-crear',
   CAR_EDITAR:        'wecars-car-editar',
@@ -36,6 +40,7 @@ const OUT = {
   LEAD_CREAR:        'wecars-lead-crear',
   LEAD_EDITAR:       'wecars-lead-editar',
   CREDITOS_LISTAR:   'wecars-creditos-listar',
+  CREDITO_CREAR:     'wecars-credito-crear',
   CREDITO_EDITAR:    'wecars-credito-editar',
   DOC_SUBIR:         'wecars-doc-subir',
   DOC_URL_SOLICITAR: 'wecars-doc-url-solicitar',
@@ -67,6 +72,10 @@ const IN = {
   VIDEO_URL_RESULTADO: 'wecars-video-url-resultado',
   ALIADOS_LISTA:     'wecars-aliados-lista',
   TOKEN_GENERADO:    'wecars-token-generado',
+  TAREAS_DATOS:      'wecars-tareas-datos',
+  TAREA_CREADA:      'wecars-tarea-creada',
+  TAREA_ACTUALIZADA: 'wecars-tarea-actualizada',
+  TAREA_ELIMINADA:   'wecars-tarea-eliminada',
 };
 
 let _htmlComp = null;
@@ -108,6 +117,7 @@ $w.onReady(() => {
         case OUT.LEAD_CREAR:        await manejarLeadCrear(msg);            break;
         case OUT.LEAD_EDITAR:       await manejarLeadEditar(msg);           break;
         case OUT.CREDITOS_LISTAR:   await manejarCreditosListar(msg);       break;
+        case OUT.CREDITO_CREAR:     await manejarCreditoCrear(msg);         break;
         case OUT.CREDITO_EDITAR:    await manejarCreditoEditar(msg);        break;
         case OUT.ALIADOS_LISTAR:    await manejarAliadosListar(msg);        break;
         case OUT.DOC_SUBIR:          await manejarDocSubir(msg);              break;
@@ -118,6 +128,10 @@ $w.onReady(() => {
         case OUT.FOTO_URL_SOLICITAR:   await manejarFotoUrlSolicitar(msg);     break;
         case OUT.FOTO_URL_CONFIRMAR:   await manejarFotoUrlConfirmar(msg);     break;
         case OUT.VIDEO_URL_SOLICITAR:  await manejarVideoUrlSolicitar(msg);    break;
+        case OUT.TAREAS_SOLICITAR:     await manejarTareasSolicitar();          break;
+        case OUT.TAREA_CREAR:          await manejarTareaCrear(msg);            break;
+        case OUT.TAREA_ACTUALIZAR:     await manejarTareaActualizar(msg);       break;
+        case OUT.TAREA_ELIMINAR:       await manejarTareaEliminar(msg);         break;
         default: break;
       }
     } catch (err) {
@@ -317,6 +331,24 @@ async function manejarCreditosListar(msg) {
 }
 
 // ════════════════════════════════════════════════════════════════════════
+//  10b. CREDITO_CREAR — insertar nueva solicitud en colección Creditos
+// ════════════════════════════════════════════════════════════════════════
+async function manejarCreditoCrear(msg) {
+  if (!msg.datos) return;
+  try {
+    const nuevo = await wixData.insert('Creditos', {
+      ...msg.datos,
+      estatus:   'Pendiente',
+      estado:    'solicitud_enviada',
+      origen:    'operaciones',
+    }, { suppressAuth: true });
+    enviar(IN.CREDITO_RESULTADO, { ok: true, credito: nuevo });
+  } catch (err) {
+    enviar(IN.CREDITO_RESULTADO, { ok: false, error: err.message });
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
 //  11. CREDITO_EDITAR — actualizar estatus del crédito (F&I)
 // ════════════════════════════════════════════════════════════════════════
 async function manejarCreditoEditar(msg) {
@@ -472,5 +504,57 @@ async function manejarAliadosListar(msg) {
     enviar(IN.ALIADOS_LISTA, { items: r.items });
   } catch (err) {
     enviar(IN.ALIADOS_LISTA, { items: [] });
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  TAREAS / PENDIENTES  (colección Tasks en CMS)
+// ════════════════════════════════════════════════════════════════════════
+async function manejarTareasSolicitar() {
+  try {
+    const r = await wixData.query('Tasks').descending('_createdDate').limit(200).find({ suppressAuth: true });
+    enviar(IN.TAREAS_DATOS, { tareas: r.items });
+  } catch (err) {
+    enviar(IN.TAREAS_DATOS, { tareas: [] });
+  }
+}
+
+async function manejarTareaCrear(msg) {
+  try {
+    const { type, ...datos } = msg;
+    delete datos._id;
+    datos.columna = datos.columna || 'pendiente';
+    datos.prioridad = datos.prioridad || 'media';
+    const item = await wixData.insert('Tasks', datos, { suppressAuth: true });
+    enviar(IN.TAREA_CREADA, { ...item });
+  } catch (err) {
+    console.error('[Operaciones] Error creando tarea:', err);
+    enviarError('Error al crear tarea', err.message);
+  }
+}
+
+async function manejarTareaActualizar(msg) {
+  try {
+    const { type, _id, ...cambios } = msg;
+    if (!_id) return;
+    const actual = await wixData.get('Tasks', _id, { suppressAuth: true });
+    if (!actual) { enviarError('Tarea no encontrada', _id); return; }
+    const item = await wixData.update('Tasks', { ...actual, ...cambios, _id }, { suppressAuth: true });
+    enviar(IN.TAREA_ACTUALIZADA, { ...item });
+  } catch (err) {
+    console.error('[Operaciones] Error actualizando tarea:', err);
+    enviarError('Error al actualizar tarea', err.message);
+  }
+}
+
+async function manejarTareaEliminar(msg) {
+  try {
+    const _id = msg._id;
+    if (!_id) return;
+    await wixData.remove('Tasks', _id, { suppressAuth: true });
+    enviar(IN.TAREA_ELIMINADA, { _id });
+  } catch (err) {
+    console.error('[Operaciones] Error eliminando tarea:', err);
+    enviarError('Error al eliminar tarea', err.message);
   }
 }
