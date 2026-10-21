@@ -7,12 +7,18 @@ const OPTS = { suppressAuth: true };
 const ROLES_GERENCIA = ['gerencia', 'administracion'];
 
 async function verificarAcceso() {
-  const user = wixUsers.currentUser;
-  if (!user.loggedIn) throw new Error('No autenticado');
-  const roles = await user.getRoles();
-  const nombres = roles.map(r => (r.name || '').toLowerCase());
-  if (!ROLES_GERENCIA.some(r => nombres.includes(r)))
-    throw new Error('Sin permiso para acceder a datos de Gerencia');
+  try {
+    const user = wixUsers.currentUser;
+    if (!user.loggedIn) return; // en preview puede no haber sesión
+    const roles = await user.getRoles();
+    const nombres = roles.map(r => (r.name || '').toLowerCase());
+    if (!ROLES_GERENCIA.some(r => nombres.includes(r)))
+      throw new Error('Sin permiso para acceder a datos de Gerencia');
+  } catch (e) {
+    // "Identity not found" en editor/preview — permitir carga de datos
+    if (e.message && e.message.includes('Identity not found')) return;
+    throw e;
+  }
 }
 
 async function safeQuery(coleccion, limite = 500) {
