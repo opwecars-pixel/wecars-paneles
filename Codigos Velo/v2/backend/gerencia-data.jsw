@@ -72,6 +72,9 @@ export async function obtenerDatosGerencia() {
     const costoFinal = esConsigna
       ? parseFloat(car?.precioConsignaMin || car?.costoConsigna || costoAdquisicion || 0)
       : costoAdquisicion;
+    const precioConsignado = esConsigna
+      ? parseFloat(car?.precioConvenido || car?.precioConsignaMin || car?.costoConsigna || costoAdquisicion || 0)
+      : 0;
     return {
       ...lead,
       _precioVenta: precioVenta,
@@ -81,6 +84,22 @@ export async function obtenerDatosGerencia() {
         ? [car.marca||car.brand||'', car.modelo||car.model||'', car.anio||car.year||''].filter(Boolean).join(' ')
         : (lead.autoInteres || ''),
       _esConsigna: esConsigna,
+      _precioConsignado: precioConsignado,
+      // Datos del carro para expediente
+      _car: car ? {
+        _id: car._id,
+        vin: car.vin || car.VIN || '',
+        fotos: car.fotos || car.images || [],
+        foto: car.foto || car.fotoPrincipal || car.imagenUrl || '',
+        tipoAdquisicion: car.tipoAdquisicion || car.tipoOrigen || 'compra',
+        duenioNombre: car.duenioNombre || car.propietario || car.nombreDueno || '',
+        duenioTel: car.duenioTelefono || car.telefonoDueno || '',
+        precioConvenido: car.precioConvenido || car.precioConsignaMin || car.costoConsigna || 0,
+        costoAdquisicion: car.costoAdquisicion || car.costoCompra || car.costo || 0,
+        gastoReparacion: car.gastoReparacion || car.gastosReparacion || car.reparacion || 0,
+        gastoLegalAduanas: car.gastoLegalAduanas || car.gastoLegal || 0,
+        gastosExtras: car.gastosExtras || car.gastoAdicional || 0,
+      } : null,
     };
   });
 

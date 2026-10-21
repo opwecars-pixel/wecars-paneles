@@ -766,17 +766,17 @@ function renderVentas(){
   el.innerHTML=`<div class="table-wrap"><table class="data-table">
     <thead><tr>
       <th>Cliente</th><th>Auto</th><th>Vendedor</th>
-      <th class="num">Precio</th><th class="num">Costo</th>
-      <th class="num">Utilidad</th><th>Margen</th><th>Fecha</th>
+      <th class="num">Precio</th><th class="num">Utilidad</th><th>Margen</th><th>Fecha</th>
     </tr></thead>
     <tbody>${rows.map(c=>{
       const u=calcUtil(c);const v=findVend(c.vendedorId||c.vendedorAsignado);
-      return`<tr>
-        <td><div style="font-weight:600">${esc(c.nombre||c.name||'—')}</div></td>
-        <td style="font-size:12px">${esc(c._autoNombre||c.autoInteres||'—')}</td>
+      return`<tr style="cursor:pointer" onclick="abrirDetalleLead('${esc(c._id||'')}')">
+        <td><div style="font-weight:600">${esc(c.nombre||c.name||'—')}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||'')}</div></td>
+        <td style="font-size:12px">${esc(c._autoNombre||c.autoInteres||'—')}
+          ${c._esConsigna?'<span class="chip chip-orange" style="font-size:10px;margin-left:4px">Consigna</span>':''}</td>
         <td style="font-size:12px">${esc(v?.nombre||v?.name||'—')}</td>
         <td class="num">${M(u.precio)}</td>
-        <td class="num">${M(u.costo)}</td>
         <td class="num" style="color:${u.util>=0?'var(--wc-ok)':'var(--wc-danger)'}">${M(u.util)}</td>
         <td><span class="chip ${u.margen>=20?'chip-green':u.margen>=10?'chip-warn':'chip-danger'}">${u.margen}%</span></td>
         <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(fechaVenta(c))}</td>
@@ -874,58 +874,112 @@ function renderPipeline(){
       </tr>`;}).join('')}</tbody></table></div>`;
 }
 
-/* ══ DETALLE LEAD ══ */
+/* ══ DETALLE LEAD / VENTA ══ */
 function abrirDetalleLead(id){
   const c=CLIENTES.find(x=>x._id===id);if(!c)return;
   const v=findVend(c.vendedorId||c.vendedorAsignado);
   const etapa=c.etapa||c.estatus||'Nuevo';
   const ETAPA_BADGE={Nuevo:'chip-info',Contactado:'chip-info',Interesado:'chip-warn',
     Negociando:'chip-orange',Ganado:'chip-green',Vendido:'chip-green',Entregado:'chip-green',Perdido:'chip-gray'};
+  const car=c._car||null;
+
+  // ── Financiero ──
   const precio=parseFloat(c._precioVenta||c.cierrePrecio||c.precioVenta||0);
-  const costo=parseFloat(c._costoAdquisicion||c.costoAdquisicion||0);
+  const costoBase=parseFloat(c._costoAdquisicion||c.costoAdquisicion||(car?.costoAdquisicion)||0);
+  const gastosRep=parseFloat((car?.gastoReparacion)||c.gastoReparacion||0);
+  const gastosLeg=parseFloat((car?.gastoLegalAduanas)||c.gastoLegalAduanas||0);
+  const gastosExtra=parseFloat((car?.gastosExtras)||c.gastosExtras||0);
   const comision=parseFloat(c._comisionVendedor||c.cierreComision||c.comisionVendedor||0);
-  const utilidad=precio-costo-comision;
-  const margen=precio>0?Math.round(utilidad/precio*100):0;
-  const enganche=parseFloat(c.enganche||c.cierreEnganche||0);
+  // egresos de la colección Egresos vinculados a este lead
+  const egrsLead=EGRESOS.filter(e=>(e.leadId||e.clienteId||e.referenciaId||e.ventaId)===id);
+  const totalEgrsCol=egrsLead.reduce((s,e)=>s+parseFloat(e.monto||e.amount||0),0);
+  const totalInvertido=costoBase+gastosRep+gastosLeg+gastosExtra+totalEgrsCol;
+
+  // Consigna: cuánto hay que liquidar al dueño
+  const esConsigna=c._esConsigna||false;
+  const precioConvenido=parseFloat(c._precioConsignado||(car?.precioConvenido)||0);
+  // Liquidación = precio convenido con dueño (o costo base si es consigna sin campo específico)
+  const liquidacionDueno=esConsigna?precioConvenido:0;
+
+  const utilidadBruta=precio-totalInvertido;
+  const utilidadNeta=precio-totalInvertido-comision;
+  const margen=precio>0?Math.round(utilidadNeta/precio*100):0;
+
+  // Forma de pago / financiamiento
+  const enganche=parseFloat(c.enganche||c.cierreEnganche||c.enganch||0);
   const financiado=parseFloat(c.montoFinanciado||c.cierreFinanciado||0);
-  const banco=c.banco||c.bancoFinanciador||c.cierre_banco||'—';
+  const banco=c.banco||c.bancoFinanciador||c.cierre_banco||c.cierreBanco||'—';
+  const formaPago=c.formaPago||c.tipoPago||(financiado?'Financiado':'Contado');
   const folio=c.folio||c.folioVenta||c.cierreFolio||'—';
   const fechaV=fechaCorta(c.fechaVenta||c.cierreFecha||c.fechaCierre||c._createdDate);
-  // egresos relacionados al lead
-  const egrsLead=EGRESOS.filter(e=>(e.leadId||e.clienteId||e.referenciaId)===id);
-  const totalEgrs=egrsLead.reduce((s,e)=>s+parseFloat(e.monto||e.amount||0),0);
+
+  // ── Render del overlay ──
   const o=document.getElementById('ge-det-overlay');
+
+  // Header
   o.querySelector('#ge-det-nombre').textContent=c.nombre||c.name||'Sin nombre';
-  o.querySelector('#ge-det-etapa').className='chip '+( ETAPA_BADGE[etapa]||'chip-gray');
-  o.querySelector('#ge-det-etapa').textContent=etapa;
-  o.querySelector('#ge-det-auto').textContent=c._autoNombre||c.autoInteres||'—';
-  o.querySelector('#ge-det-vendedor').textContent=v?.nombre||v?.name||'Sin asignar';
+  const etapaEl=o.querySelector('#ge-det-etapa');
+  etapaEl.className='chip '+(ETAPA_BADGE[etapa]||'chip-gray');
+  etapaEl.textContent=etapa;
+  o.querySelector('#ge-det-consigna-badge').style.display=esConsigna?'inline':'none';
+
+  // Datos cliente
   o.querySelector('#ge-det-tel').textContent=c.telefono||'—';
   o.querySelector('#ge-det-email').textContent=c.email||'—';
+  o.querySelector('#ge-det-auto').textContent=c._autoNombre||c.autoInteres||'—';
+  o.querySelector('#ge-det-vin').textContent=(car?.vin)||'—';
+  o.querySelector('#ge-det-vendedor').textContent=v?.nombre||v?.name||'Sin asignar';
   o.querySelector('#ge-det-folio').textContent=folio;
   o.querySelector('#ge-det-fecha').textContent=fechaV;
-  o.querySelector('#ge-det-precio').textContent=M(precio);
-  o.querySelector('#ge-det-costo').textContent=M(costo);
-  o.querySelector('#ge-det-comision').textContent=M(comision);
-  o.querySelector('#ge-det-egresos').textContent=M(totalEgrs);
-  o.querySelector('#ge-det-utilidad').textContent=M(utilidad);
-  o.querySelector('#ge-det-utilidad').style.color=utilidad>=0?'var(--wc-ok)':'var(--wc-danger)';
-  o.querySelector('#ge-det-margen').textContent=margen+'%';
+
+  // Forma de pago
+  o.querySelector('#ge-det-forma-pago').textContent=formaPago;
   o.querySelector('#ge-det-enganche').textContent=enganche?M(enganche):'—';
   o.querySelector('#ge-det-financiado').textContent=financiado?M(financiado):'—';
   o.querySelector('#ge-det-banco').textContent=banco;
-  // lista egresos
-  const egrsEl=o.querySelector('#ge-det-egrs-list');
-  if(egrsLead.length){
-    egrsEl.innerHTML=`<table class="data-table" style="margin-top:8px"><thead><tr><th>Concepto</th><th>Fecha</th><th class="num">Monto</th></tr></thead><tbody>${
-      egrsLead.map(e=>`<tr><td>${esc(e.concepto||e.descripcion||e.tipo||'Egreso')}</td><td style="font-size:11px">${fechaCorta(e.fecha)}</td><td class="num">${M(e.monto||e.amount)}</td></tr>`).join('')
-    }</tbody></table>`;
-  } else {
-    egrsEl.innerHTML='<div style="font-size:12px;color:var(--wc-ink3);padding:8px 0">Sin egresos registrados para este lead</div>';
+
+  // Costos / Inversión
+  o.querySelector('#ge-det-precio').textContent=M(precio);
+  o.querySelector('#ge-det-costo-base').textContent=M(costoBase);
+  o.querySelector('#ge-det-gastos-rep').textContent=gastosRep?M(gastosRep):'—';
+  o.querySelector('#ge-det-gastos-leg').textContent=gastosLeg?M(gastosLeg):'—';
+  o.querySelector('#ge-det-gastos-extra').textContent=gastosExtra?M(gastosExtra):'—';
+  o.querySelector('#ge-det-egresos-col').textContent=totalEgrsCol?M(totalEgrsCol):'—';
+  o.querySelector('#ge-det-total-inv').textContent=M(totalInvertido);
+  o.querySelector('#ge-det-comision').textContent=comision?M(comision):'—';
+
+  // Consigna: sección liquidación
+  const consignaSection=o.querySelector('#ge-det-consigna-section');
+  consignaSection.style.display=esConsigna?'block':'none';
+  if(esConsigna){
+    o.querySelector('#ge-det-precio-convenido').textContent=precioConvenido?M(precioConvenido):'—';
+    const saldoConsigna=precio-precioConvenido;
+    o.querySelector('#ge-det-saldo-consigna').textContent=M(saldoConsigna);
+    o.querySelector('#ge-det-saldo-consigna').style.color=saldoConsigna>=0?'var(--wc-ok)':'var(--wc-danger)';
+    o.querySelector('#ge-det-dueno').textContent=(car?.duenioNombre)||'—';
+    o.querySelector('#ge-det-dueno-tel').textContent=(car?.duenioTel)||'—';
   }
-  // notas / historial
-  const notas=c.notas||c.comentarios||c.historial||'';
+
+  // Resultado
+  const utilEl=o.querySelector('#ge-det-utilidad');
+  utilEl.textContent=M(utilidadNeta);
+  utilEl.style.color=utilidadNeta>=0?'var(--wc-ok)':'var(--wc-danger)';
+  o.querySelector('#ge-det-margen').textContent=margen+'%';
+  o.querySelector('#ge-det-margen').className='ge-det-val '+(margen>=20?'':'')+(margen<0?'text-danger':'');
+  o.querySelector('#ge-det-utilidad-bruta').textContent=M(utilidadBruta);
+
+  // Egresos detallados
+  const egrsEl=o.querySelector('#ge-det-egrs-list');
+  egrsEl.innerHTML=egrsLead.length
+    ?`<table class="data-table" style="margin-top:6px"><thead><tr><th>Concepto</th><th>Fecha</th><th class="num">Monto</th></tr></thead><tbody>${
+        egrsLead.map(e=>`<tr><td>${esc(e.concepto||e.descripcion||e.tipo||'Egreso')}</td><td style="font-size:11px">${fechaCorta(e.fecha)}</td><td class="num">${M(e.monto||e.amount)}</td></tr>`).join('')
+      }</tbody></table>`
+    :'<div style="font-size:12px;color:var(--wc-ink3);padding:6px 0">Sin egresos registrados en el sistema para esta venta</div>';
+
+  // Notas
+  const notas=c.notas||c.comentarios||c.historial||c.cierreNotas||'';
   o.querySelector('#ge-det-notas').textContent=notas||'Sin notas';
+
   o.classList.add('open');
 }
 function cerrarDetalleLead(){document.getElementById('ge-det-overlay').classList.remove('open');}
@@ -1146,64 +1200,92 @@ document.getElementById('ge-det-overlay')?.addEventListener('click',e=>{if(e.tar
 try{new ResizeObserver(()=>{const h=document.body.scrollHeight;window.parent.postMessage({type:'wecars-height',height:h},'*');}).observe(document.body);}catch(_){}
 </script>
 
-<!-- ══ DETALLE LEAD OVERLAY ══ -->
+<!-- ══ DETALLE LEAD / VENTA OVERLAY ══ -->
 <div id="ge-det-overlay">
   <div class="ge-det-panel">
     <div class="ge-det-handle"></div>
     <div class="ge-det-header">
-      <div>
+      <div style="flex:1;min-width:0">
         <div class="ge-det-title" id="ge-det-nombre">—</div>
-        <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+        <div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span class="chip chip-info" id="ge-det-etapa">Nuevo</span>
+          <span class="chip chip-orange" id="ge-det-consigna-badge" style="display:none">Consigna</span>
         </div>
       </div>
       <button class="ge-det-close" onclick="cerrarDetalleLead()"><i class="ti ti-x" style="font-size:14px"></i></button>
     </div>
     <div class="ge-det-body">
 
-      <!-- Info general -->
+      <!-- 1. Datos del cliente y la operación -->
       <div class="ge-det-section">
-        <div class="ge-det-section-title">Información del cliente</div>
+        <div class="ge-det-section-title">Cliente y operación</div>
         <div class="ge-det-grid">
           <div class="ge-det-item"><div class="ge-det-label">Teléfono</div><div class="ge-det-val" id="ge-det-tel">—</div></div>
           <div class="ge-det-item"><div class="ge-det-label">Email</div><div class="ge-det-val" id="ge-det-email">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Auto de interés</div><div class="ge-det-val" id="ge-det-auto">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Vendedor asignado</div><div class="ge-det-val" id="ge-det-vendedor">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Folio / ID</div><div class="ge-det-val" id="ge-det-folio">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Fecha</div><div class="ge-det-val" id="ge-det-fecha">—</div></div>
+          <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Auto vendido</div><div class="ge-det-val" id="ge-det-auto">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">VIN</div><div class="ge-det-val" style="font-size:12px;font-family:monospace" id="ge-det-vin">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Vendedor</div><div class="ge-det-val" id="ge-det-vendedor">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Folio</div><div class="ge-det-val" id="ge-det-folio">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Fecha de venta</div><div class="ge-det-val" id="ge-det-fecha">—</div></div>
         </div>
       </div>
 
-      <!-- Finanzas de la venta -->
+      <!-- 2. Forma de pago -->
       <div class="ge-det-section">
-        <div class="ge-det-section-title">Finanzas de la venta</div>
+        <div class="ge-det-section-title">Forma de pago</div>
         <div class="ge-det-grid">
-          <div class="ge-det-item"><div class="ge-det-label">Precio de venta</div><div class="ge-det-val" id="ge-det-precio">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Costo adquisición</div><div class="ge-det-val" id="ge-det-costo">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Comisión vendedor</div><div class="ge-det-val" id="ge-det-comision">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Egresos adicionales</div><div class="ge-det-val" id="ge-det-egresos">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Utilidad neta</div><div class="ge-det-val" id="ge-det-utilidad">—</div></div>
-          <div class="ge-det-item"><div class="ge-det-label">Margen</div><div class="ge-det-val" id="ge-det-margen">—</div></div>
-        </div>
-      </div>
-
-      <!-- Financiamiento -->
-      <div class="ge-det-section">
-        <div class="ge-det-section-title">Financiamiento</div>
-        <div class="ge-det-grid">
+          <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Tipo</div><div class="ge-det-val" id="ge-det-forma-pago">—</div></div>
           <div class="ge-det-item"><div class="ge-det-label">Enganche</div><div class="ge-det-val" id="ge-det-enganche">—</div></div>
           <div class="ge-det-item"><div class="ge-det-label">Monto financiado</div><div class="ge-det-val" id="ge-det-financiado">—</div></div>
           <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Banco / Financiera</div><div class="ge-det-val" id="ge-det-banco">—</div></div>
         </div>
       </div>
 
-      <!-- Egresos del lead -->
+      <!-- 3. Costos e inversión total -->
       <div class="ge-det-section">
-        <div class="ge-det-section-title">Egresos asociados</div>
+        <div class="ge-det-section-title">Costos e inversión</div>
+        <div class="ge-det-grid">
+          <div class="ge-det-item"><div class="ge-det-label">Precio de venta</div><div class="ge-det-val" style="color:var(--wc-ok)" id="ge-det-precio">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Costo adquisición</div><div class="ge-det-val" id="ge-det-costo-base">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Reparaciones</div><div class="ge-det-val" id="ge-det-gastos-rep">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Gastos legales / aduanas</div><div class="ge-det-val" id="ge-det-gastos-leg">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Gastos extras</div><div class="ge-det-val" id="ge-det-gastos-extra">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Egresos en sistema</div><div class="ge-det-val" id="ge-det-egresos-col">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Comisión vendedor</div><div class="ge-det-val" id="ge-det-comision">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label" style="font-weight:700">Total invertido</div><div class="ge-det-val" style="font-weight:700" id="ge-det-total-inv">—</div></div>
+        </div>
+      </div>
+
+      <!-- 4. Consigna: liquidación al dueño -->
+      <div class="ge-det-section" id="ge-det-consigna-section" style="display:none">
+        <div class="ge-det-section-title" style="color:var(--wc-orange)">Consigna — Liquidación al dueño</div>
+        <div class="ge-det-grid">
+          <div class="ge-det-item"><div class="ge-det-label">Dueño del auto</div><div class="ge-det-val" id="ge-det-dueno">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Teléfono dueño</div><div class="ge-det-val" id="ge-det-dueno-tel">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Precio convenido con dueño</div><div class="ge-det-val" id="ge-det-precio-convenido">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label">Saldo a liquidar / ganancia weCars</div>
+            <div class="ge-det-val" id="ge-det-saldo-consigna">—</div></div>
+        </div>
+      </div>
+
+      <!-- 5. Resultado final -->
+      <div class="ge-det-section" style="background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:14px">
+        <div class="ge-det-section-title">Resultado de la operación</div>
+        <div class="ge-det-grid">
+          <div class="ge-det-item"><div class="ge-det-label">Utilidad bruta (antes comisión)</div><div class="ge-det-val" id="ge-det-utilidad-bruta">—</div></div>
+          <div class="ge-det-item"><div class="ge-det-label" style="font-weight:700">Utilidad neta</div>
+            <div class="ge-det-val" style="font-size:20px;font-weight:800" id="ge-det-utilidad">—</div></div>
+          <div class="ge-det-item" style="grid-column:span 2"><div class="ge-det-label">Margen</div><div class="ge-det-val" id="ge-det-margen">—</div></div>
+        </div>
+      </div>
+
+      <!-- 6. Egresos detallados -->
+      <div class="ge-det-section">
+        <div class="ge-det-section-title">Egresos registrados en sistema</div>
         <div id="ge-det-egrs-list"></div>
       </div>
 
-      <!-- Notas -->
+      <!-- 7. Notas -->
       <div class="ge-det-section">
         <div class="ge-det-section-title">Notas / Historial</div>
         <div class="ge-det-notas-box" id="ge-det-notas">Sin notas</div>
