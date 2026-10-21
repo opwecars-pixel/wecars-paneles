@@ -245,6 +245,26 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.ok{background:var(--wc-ok)}.toast.error{background:var(--wc-danger)}.toast.warn{background:var(--wc-warn)}
 
+/* ══ EDIT FORM ══ */
+.ge-edit-form{display:none;flex-direction:column;gap:14px}
+.ge-edit-form.open{display:flex}
+.ge-edit-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ge-edit-row.full{grid-template-columns:1fr}
+.ge-edit-field{display:flex;flex-direction:column;gap:4px}
+.ge-edit-field label{font-size:11px;font-weight:700;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px}
+.ge-edit-field input,.ge-edit-field select{border:1.5px solid var(--wc-border);border-radius:var(--wc-r-sm);
+  padding:9px 11px;font-size:14px;background:var(--wc-surface);color:var(--wc-ink);width:100%;
+  transition:border-color .15s}
+.ge-edit-field input:focus,.ge-edit-field select:focus{outline:none;border-color:var(--wc-green)}
+.ge-edit-actions{display:flex;gap:10px;padding-top:4px}
+.ge-edit-actions .btn-save{flex:1;background:var(--wc-green);color:#fff;border:none;
+  border-radius:var(--wc-r-md);padding:11px;font-size:14px;font-weight:700;cursor:pointer}
+.ge-edit-actions .btn-cancel{padding:11px 16px;border:1.5px solid var(--wc-border);background:none;
+  border-radius:var(--wc-r-md);font-size:14px;cursor:pointer;color:var(--wc-ink2)}
+.ge-det-edit-btn{padding:7px 14px;border:1.5px solid var(--wc-green);color:var(--wc-green);
+  background:none;border-radius:var(--wc-r-md);font-size:13px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:6px}
+
 /* ══ DETALLE LEAD OVERLAY ══ */
 #ge-det-overlay{position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;
   background:rgba(13,26,13,.45);opacity:0;pointer-events:none;transition:opacity .25s}
@@ -553,18 +573,21 @@ const WC = {
   OUT:{
     DATOS_SOLICITAR: 'wecars-gerencia-solicitar',
     META_GUARDAR:    'wecars-gerencia-meta-guardar',
+    LEAD_ACTUALIZAR: 'wecars-gerencia-lead-actualizar',
   },
   IN:{
-    DATOS:           'wecars-gerencia-datos',
-    META_RESULTADO:  'wecars-gerencia-meta-resultado',
+    DATOS:              'wecars-gerencia-datos',
+    META_RESULTADO:     'wecars-gerencia-meta-resultado',
+    LEAD_ACTUALIZADO:   'wecars-gerencia-lead-actualizado',
   },
   send(tipo,datos){try{window.parent.postMessage({type:tipo,...datos},'*');}catch(_){}}
 };
 window.addEventListener('message',e=>{
   const msg=e.data;if(!msg||!msg.type)return;
   switch(msg.type){
-    case WC.IN.DATOS:          recibirDatos(msg);break;
-    case WC.IN.META_RESULTADO: if(msg.ok)toast('✓ Meta guardada');break;
+    case WC.IN.DATOS:            recibirDatos(msg);break;
+    case WC.IN.META_RESULTADO:   if(msg.ok)toast('✓ Meta guardada');break;
+    case WC.IN.LEAD_ACTUALIZADO: recibirLeadActualizado(msg);break;
   }
 });
 WC.send(WC.OUT.DATOS_SOLICITAR,{});
@@ -573,12 +596,14 @@ WC.send(WC.OUT.DATOS_SOLICITAR,{});
 let CLIENTES=[],CREDITOS=[],VENDEDORES=[],CARS=[],EGRESOS=[],COMISIONES=[];
 let CTX={emailActual:'',rolActual:'',nombreActual:''};
 let _filtroMes='',_filtroVend='',_filtroPipe='todos',_filtroInv='todos';
+let _ROL='';
 
 /* ══ Recibir datos ══ */
 function recibirDatos(msg){
   CLIENTES=msg.clientes||[];CREDITOS=msg.creditos||[];VENDEDORES=msg.vendedores||[];
   CARS=msg.cars||[];EGRESOS=msg.egresos||[];COMISIONES=msg.comisiones||[];
   CTX={emailActual:msg.emailActual||'',rolActual:msg.rolActual||'',nombreActual:msg.nombreActual||''};
+  _ROL=(CTX.rolActual||'').toLowerCase();
   const ini=(CTX.nombreActual||'GR').slice(0,2).toUpperCase();
   document.getElementById('sb-avatar').textContent=ini;
   document.getElementById('sb-nombre').textContent=CTX.nombreActual||'Gerente';
@@ -875,8 +900,31 @@ function renderPipeline(){
 }
 
 /* ══ DETALLE LEAD / VENTA ══ */
+function recibirLeadActualizado(msg){
+  const btn=document.querySelector('#ge-edit-form .btn-save');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy"></i> Guardar cambios';}
+  if(msg.ok){
+    // Actualizar en memoria para que re-render sea inmediato
+    if(msg.lead&&_editLeadId){
+      const idx=CLIENTES.findIndex(c=>c._id===_editLeadId);
+      if(idx>=0)CLIENTES[idx]={...CLIENTES[idx],...msg.lead};
+    }
+    toast('✓ Operación actualizada');
+    // cerrar form, reabrir detalle con datos nuevos
+    document.getElementById('ge-edit-form').classList.remove('open');
+    document.getElementById('ge-det-overlay').querySelector('.ge-det-body').style.display='';
+    document.getElementById('ge-det-edit-label').textContent='Editar';
+    abrirDetalleLead(_editLeadId);
+    // refrescar tablas
+    renderVentas();renderDashboard();
+  } else {
+    toast('Error al guardar: '+(msg.error||'inténtalo de nuevo'),'error');
+  }
+}
+
 function abrirDetalleLead(id){
   const c=CLIENTES.find(x=>x._id===id);if(!c)return;
+  _editLeadId=id;
   const v=findVend(c.vendedorId||c.vendedorAsignado);
   const etapa=c.etapa||c.estatus||'Nuevo';
   const ETAPA_BADGE={Nuevo:'chip-info',Contactado:'chip-info',Interesado:'chip-warn',
@@ -980,9 +1028,89 @@ function abrirDetalleLead(id){
   const notas=c.notas||c.comentarios||c.historial||c.cierreNotas||'';
   o.querySelector('#ge-det-notas').textContent=notas||'Sin notas';
 
+  // Mostrar/ocultar botón editar según rol
+  const editBtn=document.getElementById('ge-det-edit-btn');
+  if(editBtn) editBtn.style.display=ROLES_EDIT.some(r=>_ROL.includes(r))?'flex':'none';
+
   o.classList.add('open');
 }
-function cerrarDetalleLead(){document.getElementById('ge-det-overlay').classList.remove('open');}
+function cerrarDetalleLead(){
+  document.getElementById('ge-det-overlay').classList.remove('open');
+  // cerrar form si estaba abierto
+  document.getElementById('ge-edit-form').classList.remove('open');
+  document.getElementById('ge-det-edit-label').textContent='Editar';
+}
+
+let _editLeadId=null;
+const ROLES_EDIT=['gerencia','administracion','operaciones'];
+function toggleEditLead(){
+  // Verificar rol
+  if(!ROLES_EDIT.some(r=>(_ROL||'').toLowerCase().includes(r))){
+    toast('Solo Gerencia u Operaciones pueden editar','error');return;
+  }
+  const form=document.getElementById('ge-edit-form');
+  const panel=document.getElementById('ge-det-overlay').querySelector('.ge-det-body');
+  const label=document.getElementById('ge-det-edit-label');
+  const isOpen=form.classList.contains('open');
+  if(isOpen){
+    form.classList.remove('open');
+    panel.style.display='';
+    label.textContent='Editar';
+  } else {
+    // Pre-cargar valores actuales
+    const c=CLIENTES.find(x=>x._id===_editLeadId);
+    if(!c)return;
+    const precio=parseFloat(c._precioVenta||c.cierrePrecio||c.precioVenta||0);
+    const comision=parseFloat(c._comisionVendedor||c.cierreComision||0);
+    const enganche=parseFloat(c.enganche||c.cierreEnganche||0);
+    const financiado=parseFloat(c.montoFinanciado||c.cierreFinanciado||0);
+    const banco=c.banco||c.bancoFinanciador||c.cierreBanco||c.cierre_banco||'';
+    const formaPago=c.formaPago||c.tipoPago||(financiado?'Financiado':'Contado');
+    const folio=c.folio||c.folioVenta||c.cierreFolio||'';
+    const notas=c.notas||c.cierreNotas||c.comentarios||'';
+    document.getElementById('ef-precio').value=precio||'';
+    document.getElementById('ef-comision').value=comision||'';
+    document.getElementById('ef-enganche').value=enganche||'';
+    document.getElementById('ef-financiado').value=financiado||'';
+    document.getElementById('ef-folio').value=folio;
+    document.getElementById('ef-notas').value=notas;
+    // set select values
+    const selPago=document.getElementById('ef-forma-pago');
+    [...selPago.options].forEach(o=>o.selected=o.value===formaPago);
+    const selBanco=document.getElementById('ef-banco');
+    const bancoOpt=[...selBanco.options].find(o=>o.value===banco||o.textContent===banco);
+    if(bancoOpt)bancoOpt.selected=true;else selBanco.value='';
+    panel.style.display='none';
+    form.classList.add('open');
+    label.textContent='Ver detalle';
+  }
+}
+function guardarEdicionLead(){
+  if(!_editLeadId){toast('Sin lead seleccionado','error');return;}
+  const precio=parseFloat(document.getElementById('ef-precio').value)||0;
+  const comision=parseFloat(document.getElementById('ef-comision').value)||0;
+  const enganche=parseFloat(document.getElementById('ef-enganche').value)||0;
+  const financiado=parseFloat(document.getElementById('ef-financiado').value)||0;
+  const banco=document.getElementById('ef-banco').value;
+  const formaPago=document.getElementById('ef-forma-pago').value;
+  const folio=document.getElementById('ef-folio').value.trim();
+  const notas=document.getElementById('ef-notas').value.trim();
+  const btn=document.querySelector('#ge-edit-form .btn-save');
+  btn.disabled=true;btn.textContent='Guardando...';
+  WC.send('wecars-gerencia-lead-actualizar',{
+    leadId:_editLeadId,
+    campos:{
+      precioVenta:precio, cierrePrecio:precio,
+      cierreComision:comision, comisionVendedor:comision,
+      enganche, cierreEnganche:enganche,
+      montoFinanciado:financiado, cierreFinanciado:financiado,
+      banco, cierreBanco:banco, bancoFinanciador:banco,
+      formaPago, tipoPago:formaPago,
+      folio, folioVenta:folio, cierreFolio:folio,
+      notas, cierreNotas:notas,
+    }
+  });
+}
 
 /* ══ INVENTARIO ══ */
 let _invView='grid';
@@ -1212,7 +1340,12 @@ try{new ResizeObserver(()=>{const h=document.body.scrollHeight;window.parent.pos
           <span class="chip chip-orange" id="ge-det-consigna-badge" style="display:none">Consigna</span>
         </div>
       </div>
-      <button class="ge-det-close" onclick="cerrarDetalleLead()"><i class="ti ti-x" style="font-size:14px"></i></button>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="ge-det-edit-btn" id="ge-det-edit-btn" onclick="toggleEditLead()">
+          <i class="ti ti-edit" style="font-size:14px"></i><span id="ge-det-edit-label">Editar</span>
+        </button>
+        <button class="ge-det-close" onclick="cerrarDetalleLead()"><i class="ti ti-x" style="font-size:14px"></i></button>
+      </div>
     </div>
     <div class="ge-det-body">
 
@@ -1292,6 +1425,90 @@ try{new ResizeObserver(()=>{const h=document.body.scrollHeight;window.parent.pos
       </div>
 
     </div>
+
+    <!-- ══ FORM EDICIÓN (solo Gerencia / Operaciones) ══ -->
+    <div class="ge-edit-form" id="ge-edit-form">
+      <div style="padding:0 20px">
+        <div style="font-size:13px;font-weight:700;color:var(--wc-ink2);margin-bottom:14px;
+          padding-bottom:10px;border-bottom:1px solid var(--wc-border)">
+          Editar operación
+        </div>
+
+        <div class="ge-edit-row">
+          <div class="ge-edit-field">
+            <label>Precio de venta</label>
+            <input type="number" id="ef-precio" placeholder="0" min="0" step="1000">
+          </div>
+          <div class="ge-edit-field">
+            <label>Comisión vendedor</label>
+            <input type="number" id="ef-comision" placeholder="0" min="0" step="100">
+          </div>
+        </div>
+
+        <div class="ge-edit-row">
+          <div class="ge-edit-field">
+            <label>Forma de pago</label>
+            <select id="ef-forma-pago">
+              <option value="Contado">Contado</option>
+              <option value="Financiado">Financiado (banco)</option>
+              <option value="Crédito weCars">Crédito weCars</option>
+              <option value="Arrendamiento">Arrendamiento</option>
+              <option value="Parte de pago">Parte de pago</option>
+            </select>
+          </div>
+          <div class="ge-edit-field">
+            <label>Enganche</label>
+            <input type="number" id="ef-enganche" placeholder="0" min="0" step="1000">
+          </div>
+        </div>
+
+        <div class="ge-edit-row">
+          <div class="ge-edit-field">
+            <label>Monto financiado</label>
+            <input type="number" id="ef-financiado" placeholder="0" min="0" step="1000">
+          </div>
+          <div class="ge-edit-field">
+            <label>Banco / Financiera</label>
+            <select id="ef-banco">
+              <option value="">— Sin banco —</option>
+              <option value="BBVA">BBVA</option>
+              <option value="Santander">Santander</option>
+              <option value="Banorte">Banorte</option>
+              <option value="HSBC">HSBC</option>
+              <option value="Banamex">Banamex / Citibanamex</option>
+              <option value="Scotiabank">Scotiabank</option>
+              <option value="Inbursa">Inbursa</option>
+              <option value="Credito Bajio">Crédito Bajío</option>
+              <option value="CrediToGo">CrediToGo</option>
+              <option value="Financiera weCars">Financiera weCars</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ge-edit-row full">
+          <div class="ge-edit-field">
+            <label>Folio de venta</label>
+            <input type="text" id="ef-folio" placeholder="Ej. VTA-2026-001">
+          </div>
+        </div>
+
+        <div class="ge-edit-row full">
+          <div class="ge-edit-field">
+            <label>Notas de la operación</label>
+            <input type="text" id="ef-notas" placeholder="Observaciones, condiciones especiales...">
+          </div>
+        </div>
+
+        <div class="ge-edit-actions">
+          <button class="btn-cancel" onclick="toggleEditLead()">Cancelar</button>
+          <button class="btn-save" onclick="guardarEdicionLead()">
+            <i class="ti ti-device-floppy"></i> Guardar cambios
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 </body>

@@ -4,18 +4,21 @@ import wixUsers from 'wix-users';
 import {
   obtenerDatosGerencia,
   actualizarMetas,
+  actualizarDatosLead,
 } from 'backend/gerencia-data.jsw';
 
 const ROLES_PERMITIDOS = ['gerencia', 'administracion'];
 
 const OUT = {
-  DATOS_SOLICITAR: 'wecars-gerencia-solicitar',
-  META_GUARDAR:    'wecars-gerencia-meta-guardar',
+  DATOS_SOLICITAR:  'wecars-gerencia-solicitar',
+  META_GUARDAR:     'wecars-gerencia-meta-guardar',
+  LEAD_ACTUALIZAR:  'wecars-gerencia-lead-actualizar',
 };
 
 const IN = {
-  DATOS:          'wecars-gerencia-datos',
-  META_RESULTADO: 'wecars-gerencia-meta-resultado',
+  DATOS:             'wecars-gerencia-datos',
+  META_RESULTADO:    'wecars-gerencia-meta-resultado',
+  LEAD_ACTUALIZADO:  'wecars-gerencia-lead-actualizado',
 };
 
 let _email = '';
@@ -35,8 +38,9 @@ $w.onReady(async () => {
     const msg = event.data;
     if (!msg || !msg.type) return;
     switch (msg.type) {
-      case OUT.DATOS_SOLICITAR: await enviarDatos(); break;
-      case OUT.META_GUARDAR:    await manejarMetaGuardar(msg); break;
+      case OUT.DATOS_SOLICITAR:  await enviarDatos(); break;
+      case OUT.META_GUARDAR:     await manejarMetaGuardar(msg); break;
+      case OUT.LEAD_ACTUALIZAR:  await manejarLeadActualizar(msg); break;
     }
   });
 
@@ -58,6 +62,16 @@ async function enviarDatos() {
       clientes: [], creditos: [], vendedores: [], cars: [], egresos: [], comisiones: [],
       emailActual: _email, nombreActual: _email.split('@')[0] || 'Gerente', rolActual: _rol,
     });
+  }
+}
+
+async function manejarLeadActualizar(msg) {
+  if (!msg.leadId) return;
+  try {
+    const res = await actualizarDatosLead(msg.leadId, msg.campos || {});
+    enviar(IN.LEAD_ACTUALIZADO, res);
+  } catch (err) {
+    enviar(IN.LEAD_ACTUALIZADO, { ok: false, error: String(err) });
   }
 }
 

@@ -112,7 +112,37 @@ export async function obtenerDatosGerencia() {
   return { clientes: clientesEnriquecidos, creditos, vendedores, cars: carsRaw, egresos, comisiones };
 }
 
-// ── Actualizar metas de vendedores ────────────────────────────────────────
+// ── Actualizar datos de un lead/cierre ───────────────────────────────────
+export async function actualizarDatosLead(leadId, campos) {
+  await verificarAcceso();
+  try {
+    const lead = await wixData.get('ALeads', leadId, OPTS);
+    if (!lead) throw new Error('Lead no encontrado');
+    const actualizado = await wixData.update('ALeads', { ...lead, ...campos, _id: leadId }, OPTS);
+    // Si hay autoId y cambia el precio, actualizar también en Cierres si existe
+    if (campos.precioVenta || campos.cierrePrecio) {
+      try {
+        const cierres = await wixData.query('Cierres').eq('leadId', leadId).find(OPTS);
+        if (cierres.items.length > 0) {
+          const c = cierres.items[0];
+          await wixData.update('Cierres', {
+            ...c,
+            precioVenta: campos.precioVenta || campos.cierrePrecio || c.precioVenta,
+            formaPago:   campos.formaPago   || c.formaPago,
+            banco:       campos.banco       || c.banco,
+            engancheMonto: campos.enganche  || c.engancheMonto,
+            notas:       campos.notas       || c.notas,
+          }, OPTS);
+        }
+      } catch (_) {}
+    }
+    return { ok: true, lead: actualizado };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Actualizar metas de vendedores ───────────────────────────────────────
 export async function actualizarMetas(vendedoresConMeta) {
   await verificarAcceso();
   try {
