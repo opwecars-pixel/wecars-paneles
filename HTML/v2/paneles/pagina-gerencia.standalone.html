@@ -205,6 +205,27 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 .fin-res-val{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}
 .fin-res-sub{font-size:12px;color:var(--wc-ink3);margin-top:4px}
 
+/* ── Inventario cards ── */
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:4px}
+@media(max-width:600px){.inv-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
+@media(max-width:360px){.inv-grid{grid-template-columns:1fr}}
+.inv-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
+  overflow:hidden;cursor:pointer;transition:box-shadow .2s,border-color .2s;display:flex;flex-direction:column}
+.inv-card:hover{border-color:var(--wc-green);box-shadow:var(--wc-shadow-md)}
+.inv-card-foto{width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--wc-surface2);display:block;flex-shrink:0}
+.inv-card-foto-placeholder{width:100%;aspect-ratio:4/3;background:var(--wc-surface2);display:flex;
+  align-items:center;justify-content:center;color:var(--wc-ink3)}
+.inv-card-body{padding:10px 12px;flex:1;display:flex;flex-direction:column;gap:4px}
+.inv-card-nombre{font-size:13px;font-weight:700;color:var(--wc-ink);line-height:1.2;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.inv-card-anio{font-size:11px;color:var(--wc-ink3)}
+.inv-card-precio{font-size:14px;font-weight:800;color:var(--wc-ok);font-variant-numeric:tabular-nums;margin-top:2px}
+.inv-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.inv-view-toggle{display:flex;gap:4px;margin-left:auto}
+.inv-view-btn{padding:5px 10px;border:1.5px solid var(--wc-border);background:var(--wc-surface);
+  border-radius:var(--wc-r-sm);cursor:pointer;color:var(--wc-ink3);font-size:14px;line-height:1;transition:all .15s}
+.inv-view-btn.active{background:var(--wc-green);color:#fff;border-color:var(--wc-green)}
+
 /* ── Metas ── */
 .meta-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
   padding:18px 20px;margin-bottom:12px}
@@ -390,6 +411,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
         <div class="search-wrap">
           <i class="ti ti-search"></i>
           <input type="search" id="inv-q" placeholder="Buscar por marca, modelo, año..." oninput="renderInventario()">
+        </div>
+        <div class="inv-view-toggle">
+          <button class="inv-view-btn active" id="inv-btn-grid" onclick="setInvView('grid')" title="Cards"><i class="ti ti-layout-grid"></i></button>
+          <button class="inv-view-btn" id="inv-btn-tabla" onclick="setInvView('tabla')" title="Tabla"><i class="ti ti-list"></i></button>
         </div>
       </div>
       <div class="filter-bar">
@@ -609,10 +634,17 @@ function renderDashboard(){
   const promMargen=ventas.length>0?Math.round(utilidades.reduce((s,u)=>s+u.margen,0)/ventas.length):0;
   // Inventario
   const dispCars=CARS.filter(c=>(c.estatus||c.status||'Disponible')==='Disponible'||(c.estado||'')==='Disponible').length;
-  // Auto más solicitado
+  // Auto más solicitado — agrupar por ID del auto primero, luego por texto
   const autoCount={};
-  CLIENTES.forEach(c=>{const a=c.autoInteres||c._autoNombre||'';if(a)autoCount[a]=(autoCount[a]||0)+1;});
-  const autoTop=Object.entries(autoCount).sort((a,b)=>b[1]-a[1])[0];
+  CLIENTES.forEach(c=>{
+    const key=c.autoInteresId||c.cierreAutoId||c.autoInventarioId||'';
+    const nombre=c._autoNombre||c.autoInteres||'';
+    if(!nombre)return;
+    const grupo=key||nombre;
+    if(!autoCount[grupo])autoCount[grupo]={nombre,n:0};
+    autoCount[grupo].n++;
+  });
+  const autoTop=Object.values(autoCount).sort((a,b)=>b.n-a.n)[0];
   // Mejor vendedor del mes
   const vendCount={};
   ventas.forEach(c=>{const id=c.vendedorId||c.vendedorAsignado||'sin-asignar';vendCount[id]=(vendCount[id]||0)+1;});
@@ -630,10 +662,10 @@ function renderDashboard(){
   document.getElementById('kpi-inv-sub').textContent=CARS.length+' autos en lote';
   document.getElementById('kpi-prom-util').textContent=M(promUtil);
   document.getElementById('kpi-prom-pct').textContent=promMargen+'% margen prom.';
-  document.getElementById('kpi-auto-top').textContent=autoTop?autoTop[0].split(' ').slice(0,2).join(' '):'—';
-  document.getElementById('kpi-auto-top-n').textContent=autoTop?autoTop[1]+' solicitudes':'';
-  document.getElementById('kpi-top-vendedor').textContent=topVend?(topVend.nombre||topVend.name||'—'):(topVendId?topVendId[0]:'—');
-  document.getElementById('kpi-top-vend-n').textContent=topVendId?topVendId[1][1]+' ventas':'';
+  document.getElementById('kpi-auto-top').textContent=autoTop?autoTop.nombre.split(' ').slice(0,3).join(' '):'—';
+  document.getElementById('kpi-auto-top-n').textContent=autoTop?autoTop.n+' solicitudes':'';
+  document.getElementById('kpi-top-vendedor').textContent=topVend?(topVend.nombre||topVend.name||topVend.email||'—'):(topVendId?'—':'—');
+  document.getElementById('kpi-top-vend-n').textContent=topVendId?topVendId[1]+' ventas':'';
 
   // Badge leads activos
   const bEl=document.getElementById('sb-badge-leads');
@@ -807,6 +839,13 @@ function renderPipeline(){
 }
 
 /* ══ INVENTARIO ══ */
+let _invView='grid';
+function setInvView(v){
+  _invView=v;
+  document.getElementById('inv-btn-grid').classList.toggle('active',v==='grid');
+  document.getElementById('inv-btn-tabla').classList.toggle('active',v==='tabla');
+  renderInventario();
+}
 function setFiltroInv(f,btn){
   _filtroInv=f;
   document.querySelectorAll('#view-inventario .filter-chip').forEach(b=>b.classList.remove('active'));
@@ -838,24 +877,51 @@ function renderInventario(){
   const el=document.getElementById('inv-list');
   if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-car"></i><h3>Sin autos</h3><p>No hay autos con ese filtro</p></div>';return;}
   const EST_BADGE={Disponible:'chip-green',Apartado:'chip-warn',Vendido:'chip-gray',Entregado:'chip-gray'};
-  el.innerHTML=`<div class="table-wrap"><table class="data-table">
-    <thead><tr>
-      <th>Auto</th><th>VIN</th><th>Estatus</th><th>Tipo</th>
-      <th class="num">Costo</th><th class="num">Precio lista</th>
-    </tr></thead>
-    <tbody>${rows.map(c=>{
-      const marca=c.marca||c.brand||'—';const modelo=c.modelo||c.model||'—';const anio=c.anio||c.year||'';
+
+  if(_invView==='grid'){
+    el.innerHTML=`<div class="inv-grid">${rows.map(c=>{
+      const marca=c.marca||c.brand||'';const modelo=c.modelo||c.model||'';const anio=c.anio||c.year||'';
+      const nombre=[marca,modelo].filter(Boolean).join(' ')||'Sin nombre';
       const est=c.estatus||c.status||c.estado||'Disponible';
-      const tipo=(c.tipoAdquisicion||c.tipoOrigen||'compra').toLowerCase();
-      return`<tr>
-        <td><div style="font-weight:600">${esc(marca+' '+modelo)}</div>
-          <div style="font-size:11px;color:var(--wc-ink3)">${anio}</div></td>
-        <td style="font-size:11px;color:var(--wc-ink3)">${esc(c.vin||c.VIN||'—')}</td>
-        <td><span class="chip ${EST_BADGE[est]||'chip-gray'}">${esc(est)}</span></td>
-        <td>${tipo==='consigna'?'<span class="chip chip-orange">Consigna</span>':'<span style="font-size:12px;color:var(--wc-ink3)">Compra</span>'}</td>
-        <td class="num">${M(c.costoAdquisicion||c.costoCompra||c.costo)}</td>
-        <td class="num">${M(c.priceNew||c.precioVenta||c.precio)}</td>
-      </tr>`;}).join('')}</tbody></table></div>`;
+      const tipo=(c.tipoAdquisicion||c.tipoOrigen||'').toLowerCase();
+      const precio=c.priceNew||c.precioVenta||c.precio||0;
+      // Foto: campo fotos (array), foto (string), image (string)
+      const fotos=c.fotos||c.images||[];
+      const fotoUrl=typeof fotos==='string'?fotos:(Array.isArray(fotos)&&fotos.length?fotos[0]:null)||c.foto||c.image||null;
+      const fotoSrc=fotoUrl?`<img class="inv-card-foto" src="${esc(fotoUrl)}" alt="${esc(nombre)}" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`:'';
+      return`<div class="inv-card">
+        ${fotoSrc}
+        <div class="inv-card-foto-placeholder" style="${fotoUrl?'display:none':''}"><i class="ti ti-car" style="font-size:32px;opacity:.25"></i></div>
+        <div class="inv-card-body">
+          <div class="inv-card-nombre" title="${esc(nombre)}">${esc(nombre)}</div>
+          <div class="inv-card-anio">${anio}</div>
+          <div class="inv-card-footer">
+            <span class="chip ${EST_BADGE[est]||'chip-gray'}" style="font-size:10px">${esc(est)}</span>
+            ${tipo==='consigna'?'<span class="chip chip-orange" style="font-size:10px">Consigna</span>':''}
+          </div>
+          <div class="inv-card-precio">${precio?M(precio):'Precio por definir'}</div>
+        </div>
+      </div>`;}).join('')}</div>`;
+  } else {
+    el.innerHTML=`<div class="table-wrap"><table class="data-table">
+      <thead><tr>
+        <th>Auto</th><th>VIN</th><th>Estatus</th><th>Tipo</th>
+        <th class="num">Costo</th><th class="num">Precio lista</th>
+      </tr></thead>
+      <tbody>${rows.map(c=>{
+        const marca=c.marca||c.brand||'—';const modelo=c.modelo||c.model||'—';const anio=c.anio||c.year||'';
+        const est=c.estatus||c.status||c.estado||'Disponible';
+        const tipo=(c.tipoAdquisicion||c.tipoOrigen||'compra').toLowerCase();
+        return`<tr>
+          <td><div style="font-weight:600">${esc(marca+' '+modelo)}</div>
+            <div style="font-size:11px;color:var(--wc-ink3)">${anio}</div></td>
+          <td style="font-size:11px;color:var(--wc-ink3)">${esc(c.vin||c.VIN||'—')}</td>
+          <td><span class="chip ${EST_BADGE[est]||'chip-gray'}">${esc(est)}</span></td>
+          <td>${tipo==='consigna'?'<span class="chip chip-orange">Consigna</span>':'<span style="font-size:12px;color:var(--wc-ink3)">Compra</span>'}</td>
+          <td class="num">${M(c.costoAdquisicion||c.costoCompra||c.costo)}</td>
+          <td class="num">${M(c.priceNew||c.precioVenta||c.precio)}</td>
+        </tr>`;}).join('')}</tbody></table></div>`;
+  }
 }
 
 /* ══ FINANZAS RESUMEN ══ */

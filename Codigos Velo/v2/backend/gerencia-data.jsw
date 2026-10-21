@@ -28,14 +28,33 @@ async function safeQuery(coleccion, limite = 500) {
 // ── Carga maestra ────────────────────────────────────────────────────────
 export async function obtenerDatosGerencia() {
   await verificarAcceso();
-  const [clientes, creditos, vendedores, carsRaw, egresos, comisiones] = await Promise.all([
+  const [clientes, creditos, vendedoresCol, usuariosCol, carsRaw, egresos, comisiones] = await Promise.all([
     safeQuery('ALeads', 1000),
     safeQuery('Creditos', 500),
     safeQuery('Vendedores', 200),
+    safeQuery('Usuarios',   200),
     safeQuery('Cars', 500),
     safeQuery('Egresos', 500),
     safeQuery('Comisiones', 500),
   ]);
+
+  // Merge: Usuarios es la fuente principal de nombres; Vendedores aporta metaMensual/bonoMeta
+  const vendedores = [...usuariosCol];
+  const vendedoresMap = {};
+  usuariosCol.forEach(u => {
+    vendedoresMap[u._id] = u;
+    if (u.email) vendedoresMap[u.email] = u;
+  });
+  vendedoresCol.forEach(v => {
+    const existing = vendedoresMap[v._id] || (v.email ? vendedoresMap[v.email] : null);
+    if (existing) {
+      // Copiar campos de meta que no existen en Usuarios
+      if (v.metaMensual) existing.metaMensual = v.metaMensual;
+      if (v.bonoMeta)    existing.bonoMeta    = v.bonoMeta;
+    } else {
+      vendedores.push(v);
+    }
+  });
 
   const carMap = {};
   carsRaw.forEach(car => { carMap[car._id] = car; });
@@ -75,9 +94,15 @@ export async function actualizarMetas(vendedoresConMeta) {
     const updates = await Promise.all(
       vendedoresConMeta.map(async ({ id, metaMensual, metaEquipo, bonoMeta }) => {
         try {
-          const existente = await wixData.get('Vendedores', id, OPTS);
-          if (!existente) return { id, ok: false };
-          const actualizado = await wixData.update('Vendedores', { ...existente, metaMensual, metaEquipo, bonoMeta, _id: id }, OPTS);
+          // Intentar en Vendedores primero; si no existe, usar Usuarios
+          let existente = null;
+          try { existente = await wixData.get('Vendedores', id, OPTS); } catch (_) {}
+          if (existente) {
+            await wixData.update('Vendedores', { ...existente, metaMensual, metaEquipo, bonoMeta, _id: id }, OPTS);
+          } else {
+            const usuario = await wixData.get('Usuarios', id, OPTS);
+            if (usuario) await wixData.update('Usuarios', { ...usuario, metaMensual, metaEquipo, bonoMeta, _id: id }, OPTS);
+          }
           return { id, ok: true };
         } catch (e) { return { id, ok: false, error: e.message }; }
       })
