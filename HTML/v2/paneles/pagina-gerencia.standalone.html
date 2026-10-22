@@ -1161,6 +1161,9 @@ const WC = {
     CREDITO_EDITAR:    'wecars-gerencia-credito-editar',
     COMISION_EDITAR:   'wecars-gerencia-comision-editar',
     EGRESO_REGISTRAR:  'wecars-gerencia-egreso-registrar',
+    PAGO_REGISTRAR:    'wecars-gerencia-pago-registrar',
+    TAREA_CREAR:       'wecars-gerencia-tarea-crear',
+    TAREA_ACTUALIZAR:  'wecars-gerencia-tarea-actualizar',
   },
   IN:{
     DATOS:              'wecars-gerencia-datos',
@@ -1169,6 +1172,8 @@ const WC = {
     CREDITO_RESULTADO:  'wecars-gerencia-credito-resultado',
     COMISION_RESULTADO: 'wecars-gerencia-comision-resultado',
     EGRESO_RESULTADO:   'wecars-gerencia-egreso-resultado',
+    PAGO_RESULTADO:     'wecars-gerencia-pago-resultado',
+    TAREA_RESULTADO:    'wecars-gerencia-tarea-resultado',
   },
   send(tipo,datos){try{window.parent.postMessage({type:tipo,...datos},'*');}catch(_){}}
 };
@@ -1178,15 +1183,23 @@ window.addEventListener('message',e=>{
     case WC.IN.DATOS:              recibirDatos(msg);break;
     case WC.IN.META_RESULTADO:     if(msg.ok)toast('✓ Meta guardada');break;
     case WC.IN.LEAD_ACTUALIZADO:   recibirLeadActualizado(msg);break;
-    case WC.IN.CREDITO_RESULTADO:  if(msg.ok)toast('Crédito actualizado ✓');else toast('Error al actualizar crédito','error');break;
-    case WC.IN.COMISION_RESULTADO: if(msg.ok)toast('Comisión actualizada ✓');else toast('Error','error');break;
+    case WC.IN.CREDITO_RESULTADO:
+      if(msg.ok&&msg.credito){const i=CREDITOS.findIndex(c=>c._id===msg.credito._id);if(i>=0)CREDITOS[i]={...CREDITOS[i],...msg.credito};renderCreditos();}
+      else if(!msg.ok){toast('Error al actualizar crédito','error');renderCreditos();}
+      break;
+    case WC.IN.COMISION_RESULTADO:
+      if(msg.ok&&msg.comision){const i=COMISIONES.findIndex(c=>c._id===msg.comision._id);if(i>=0)COMISIONES[i]={...COMISIONES[i],...msg.comision};renderComisionesGer();}
+      else if(!msg.ok){toast('Error al actualizar comisión','error');renderComisionesGer();}
+      break;
     case WC.IN.EGRESO_RESULTADO:   recibirEgresoResultado(msg);break;
+    case WC.IN.PAGO_RESULTADO:     recibirPagoResultado(msg);break;
+    case WC.IN.TAREA_RESULTADO:    recibirTareaResultado(msg);break;
   }
 });
 WC.send(WC.OUT.DATOS_SOLICITAR,{});
 
 /* ══ Estado global ══ */
-let CLIENTES=[],CREDITOS=[],VENDEDORES=[],CARS=[],EGRESOS=[],COMISIONES=[];
+let CLIENTES=[],CREDITOS=[],VENDEDORES=[],CARS=[],EGRESOS=[],COMISIONES=[],PAGOS=[],TAREAS=[];
 let CTX={emailActual:'',rolActual:'',nombreActual:''};
 let _filtroMes='',_filtroVend='',_filtroPipe='todos',_filtroInv='todos';
 let _ROL='';
@@ -1195,6 +1208,7 @@ let _ROL='';
 function recibirDatos(msg){
   CLIENTES=msg.clientes||[];CREDITOS=msg.creditos||[];VENDEDORES=msg.vendedores||[];
   CARS=msg.cars||[];EGRESOS=msg.egresos||[];COMISIONES=msg.comisiones||[];
+  PAGOS=msg.pagos||[];TAREAS=msg.tareas||[];
   CTX={emailActual:msg.emailActual||'',rolActual:msg.rolActual||'',nombreActual:msg.nombreActual||''};
   _ROL=(CTX.rolActual||'').toLowerCase();
   const ini=(CTX.nombreActual||'GR').slice(0,2).toUpperCase();
@@ -2284,9 +2298,10 @@ function guardarEgresoGer(){
   const categoria=document.getElementById('ov-egr-categoria').value;
   const ref=document.getElementById('ov-egr-ref').value.trim();
   const notas=document.getElementById('ov-egr-notas').value.trim();
-  const e={concepto,categoria,monto,ref,notas,fecha:new Date().toISOString(),registradoPor:CTX.emailActual};
+  const _tmp='tmp_'+Date.now();
+  const e={_tmp,concepto,categoria,monto,ref,notas,fecha:new Date().toISOString(),registradoPor:CTX.emailActual};
   WC.send(WC.OUT.EGRESO_REGISTRAR,e);
-  EGRESOS.unshift({...e,_id:'tmp_'+Date.now(),_createdDate:new Date()});
+  EGRESOS.unshift({...e,_id:_tmp,_createdDate:new Date()});
   cerrarOverlay('ov-egreso');
   document.getElementById('ov-egr-concepto').value='';
   document.getElementById('ov-egr-monto').value='';
@@ -2295,7 +2310,18 @@ function guardarEgresoGer(){
   toast('Egreso registrado ✓');renderEgresosGer();renderFinanzas();
 }
 function recibirEgresoResultado(msg){
-  if(!msg.ok)toast('Error al guardar egreso: '+(msg.error||'inténtalo de nuevo'),'error');
+  if(msg.ok&&msg.egreso){
+    const idx=EGRESOS.findIndex(e=>e._tmp===msg.egreso._tmp||e._id===msg.egreso._id);
+    if(idx>=0)EGRESOS[idx]={...EGRESOS[idx],...msg.egreso};
+    else EGRESOS.unshift(msg.egreso);
+    toast('Egreso registrado ✓');renderEgresosGer();renderFinanzas();
+  }else{
+    // Revertir el egreso temporal
+    const tmpId=msg._tmp||'';
+    if(tmpId){const idx=EGRESOS.findIndex(e=>e._tmp===tmpId||e._id===tmpId);if(idx>=0)EGRESOS.splice(idx,1);}
+    toast('Error al guardar egreso: '+(msg.error||'inténtalo de nuevo'),'error');
+    renderEgresosGer();renderFinanzas();
+  }
 }
 
 /* ══ HOY / URGENTES ══ */
@@ -2485,7 +2511,6 @@ function renderRentabilidad(){
 }
 
 /* ══ PENDIENTES / TAREAS ══ */
-let TAREAS=[];
 function renderPendientes(){
   const COLS=[
     {id:'pendiente',label:'Pendiente',color:'var(--wc-warn)'},
@@ -2546,14 +2571,32 @@ function guardarTarea(){
     estado:'pendiente',creadoPor:CTX.emailActual,
   };
   TAREAS.unshift(t);
+  WC.send(WC.OUT.TAREA_CREAR,{datos:t});
   cerrarOverlay('ov-tarea');
-  document.getElementById('ov-tarea-titulo').value='';
-  toast('Tarea creada ✓');renderPendientes();
+  ['ov-tarea-titulo','ov-tarea-prioridad','ov-tarea-resp','ov-tarea-fecha','ov-tarea-cat','ov-tarea-notas'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  toast('Guardando tarea…');renderPendientes();
+}
+function recibirTareaResultado(msg){
+  if(msg.ok&&msg.tarea){
+    const idx=TAREAS.findIndex(t=>t._tmp===msg.tarea._tmp||t._id===msg.tarea._id);
+    if(idx>=0)TAREAS[idx]={...TAREAS[idx],...msg.tarea};
+    else TAREAS.unshift(msg.tarea);
+    toast('Tarea creada ✓');renderPendientes();
+  }else{
+    toast(msg.error||'Error al guardar tarea','error');
+    TAREAS.shift();renderPendientes();
+  }
 }
 function moverTarea(id,nuevoEstado){
   const idx=TAREAS.findIndex(t=>(t._id||t._tmp)===id);
   if(idx<0)return;
+  const prev=TAREAS[idx].estado;
   TAREAS[idx].estado=nuevoEstado;
+  if(TAREAS[idx]._id){
+    WC.send(WC.OUT.TAREA_ACTUALIZAR,{id:TAREAS[idx]._id,datos:{estado:nuevoEstado}});
+  }
   toast(nuevoEstado==='completado'?'Tarea completada ✓':nuevoEstado==='proceso'?'En proceso':'Tarea reabierta');
   renderPendientes();
 }
@@ -2566,7 +2609,6 @@ function editarTarea(id){
 }
 
 /* ══ PAGOS / APARTADOS ══ */
-let PAGOS=[];
 function renderPagos(){
   const q=(document.getElementById('pagos-q')?.value||'').toLowerCase();
   const fTipo=document.getElementById('pagos-f-tipo')?.value||'';
@@ -2609,12 +2651,23 @@ function guardarPagoGer(){
     fecha:new Date().toISOString(),registradoPor:CTX.emailActual,
   };
   PAGOS.unshift(p);
+  WC.send(WC.OUT.PAGO_REGISTRAR,{datos:p});
   cerrarOverlay('ov-pago');
-  document.getElementById('ov-pago-cliente').value='';
-  document.getElementById('ov-pago-monto').value='';
-  document.getElementById('ov-pago-auto').value='';
-  document.getElementById('ov-pago-notas').value='';
-  toast('Pago registrado ✓');renderPagos();
+  ['ov-pago-cliente','ov-pago-monto','ov-pago-auto','ov-pago-notas'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  toast('Guardando pago…');renderPagos();
+}
+function recibirPagoResultado(msg){
+  if(msg.ok&&msg.pago){
+    const idx=PAGOS.findIndex(p=>p._tmp===msg.pago._tmp||p._id===msg.pago._id);
+    if(idx>=0)PAGOS[idx]={...PAGOS[idx],...msg.pago};
+    else PAGOS.unshift(msg.pago);
+    toast('Pago registrado ✓');renderPagos();
+  }else{
+    toast(msg.error||'Error al registrar pago','error');
+    PAGOS.shift();renderPagos();
+  }
 }
 
 /* ══ REPORTES GERENCIALES ══ */
@@ -2728,7 +2781,7 @@ function renderReportes(){
   </div>`:''}`;
 }
 
-/* ══ CLIENTES ══
+// ══ CLIENTES ══
 const CLI_ESTATUS=['Nuevo','Contactado','Interesado','Negociando','Ganado','Perdido'];
 let _cliView='tabla';
 let _cliAbierto=null;
@@ -2762,7 +2815,7 @@ function geCliBadgeClass(e){
 }
 function diasSinActCli(c){
   const ua=c.ultimaActividad||c._updatedDate||c._createdDate;
-  if(!ua)return0;
+  if(!ua||isNaN(new Date(ua).getTime()))return 0;
   return Math.floor((Date.now()-new Date(ua).getTime())/86400000);
 }
 function filteredClientes(){

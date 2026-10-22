@@ -8,6 +8,9 @@ import {
   registrarEgreso,
   actualizarComision,
   actualizarCredito,
+  registrarPago,
+  crearTarea,
+  actualizarTarea,
 } from 'backend/gerencia-data.jsw';
 
 const ROLES_PERMITIDOS = ['gerencia', 'administracion'];
@@ -19,6 +22,9 @@ const OUT = {
   CREDITO_EDITAR:   'wecars-gerencia-credito-editar',
   COMISION_EDITAR:  'wecars-gerencia-comision-editar',
   EGRESO_REGISTRAR: 'wecars-gerencia-egreso-registrar',
+  PAGO_REGISTRAR:   'wecars-gerencia-pago-registrar',
+  TAREA_CREAR:      'wecars-gerencia-tarea-crear',
+  TAREA_ACTUALIZAR: 'wecars-gerencia-tarea-actualizar',
 };
 
 const IN = {
@@ -28,6 +34,8 @@ const IN = {
   CREDITO_RESULTADO:  'wecars-gerencia-credito-resultado',
   COMISION_RESULTADO: 'wecars-gerencia-comision-resultado',
   EGRESO_RESULTADO:   'wecars-gerencia-egreso-resultado',
+  PAGO_RESULTADO:     'wecars-gerencia-pago-resultado',
+  TAREA_RESULTADO:    'wecars-gerencia-tarea-resultado',
 };
 
 let _email = '';
@@ -53,6 +61,9 @@ $w.onReady(async () => {
       case OUT.CREDITO_EDITAR:   await manejarCreditoEditar(msg); break;
       case OUT.COMISION_EDITAR:  await manejarComisionEditar(msg); break;
       case OUT.EGRESO_REGISTRAR: await manejarEgresoRegistrar(msg); break;
+      case OUT.PAGO_REGISTRAR:   await manejarPagoRegistrar(msg); break;
+      case OUT.TAREA_CREAR:      await manejarTareaCrear(msg); break;
+      case OUT.TAREA_ACTUALIZAR: await manejarTareaActualizar(msg); break;
     }
   });
 
@@ -122,7 +133,35 @@ async function manejarEgresoRegistrar(msg) {
     const res = await registrarEgreso(msg);
     enviar(IN.EGRESO_RESULTADO, res);
   } catch (err) {
-    enviar(IN.EGRESO_RESULTADO, { ok: false, error: String(err) });
+    enviar(IN.EGRESO_RESULTADO, { ok: false, error: String(err), _tmp: msg._tmp });
+  }
+}
+
+async function manejarPagoRegistrar(msg) {
+  try {
+    const res = await registrarPago(msg.datos || {});
+    enviar(IN.PAGO_RESULTADO, res);
+  } catch (err) {
+    enviar(IN.PAGO_RESULTADO, { ok: false, error: String(err) });
+  }
+}
+
+async function manejarTareaCrear(msg) {
+  try {
+    const res = await crearTarea(msg.datos || {});
+    enviar(IN.TAREA_RESULTADO, res);
+  } catch (err) {
+    enviar(IN.TAREA_RESULTADO, { ok: false, error: String(err) });
+  }
+}
+
+async function manejarTareaActualizar(msg) {
+  if (!msg.id) return;
+  try {
+    const res = await actualizarTarea(msg.id, msg.datos || {});
+    enviar(IN.TAREA_RESULTADO, res);
+  } catch (err) {
+    enviar(IN.TAREA_RESULTADO, { ok: false, error: String(err) });
   }
 }
 
