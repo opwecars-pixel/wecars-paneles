@@ -320,6 +320,39 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 .ge-cli-origen-otro{background:var(--wc-surface2);color:var(--wc-ink3)}
 
 /* Kanban clientes */
+/* ── Stats row (igual Operaciones) ────────────── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:700px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-md);padding:14px;text-align:center}
+.stat-card.accent{border-color:var(--wc-green);background:var(--wc-green-light)}
+.stat-num{font-size:22px;font-weight:800;line-height:1;color:var(--wc-ink)}
+.stat-card.accent .stat-num{color:var(--wc-green-dark)}
+.stat-lbl{font-size:11px;color:var(--wc-ink3);margin-top:3px}
+/* ── Pipeline funnel ──────────────────────────── */
+.pipeline-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.pipeline-chip{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
+  padding:10px 14px;min-width:80px;text-align:center;cursor:pointer;transition:box-shadow .15s}
+.pipeline-chip:hover{box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.pipeline-chip-n{font-size:20px;font-weight:800;line-height:1}
+.pipeline-chip-l{font-size:10px;color:var(--wc-ink3);margin-top:3px}
+.pipeline-chip-v{font-size:10px;color:var(--wc-ink3);margin-top:2px}
+.pipe-col-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;max-height:340px;overflow-y:auto}
+.pipe-col-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-md);
+  padding:10px 12px;cursor:pointer;transition:border-color .15s}
+.pipe-col-card:hover{border-color:var(--wc-green)}
+.pipe-bar{height:8px;background:var(--wc-border);border-radius:8px;overflow:hidden;display:flex;margin-top:12px}
+.pipe-bar-seg{min-width:2px;transition:width .4s}
+/* ── Funnel columns grid ─────────────────────── */
+.pipe-funnel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px}
+.pipe-funnel-col{background:var(--wc-surface2);border-radius:var(--wc-r-lg);overflow:hidden}
+.pipe-funnel-head{padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--wc-border)}
+.pipe-funnel-head-title{font-weight:700;font-size:12px;flex:1}
+.pipe-funnel-head-count{background:var(--wc-green);color:#fff;font-size:10px;font-weight:800;
+  border-radius:999px;padding:1px 7px;min-width:20px;text-align:center}
+.pipe-funnel-body{padding:8px;display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto}
+.pipe-funnel-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-md);
+  padding:8px 10px;cursor:pointer}
+.pipe-funnel-card:hover{border-color:var(--wc-green)}
 .ge-cli-kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;min-height:300px}
 .ge-cli-kanban-col{flex:0 0 220px;background:var(--wc-surface2);border-radius:var(--wc-r-lg);
   display:flex;flex-direction:column;overflow:hidden}
@@ -570,22 +603,21 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
       <div class="search-bar">
         <div class="search-wrap">
           <i class="ti ti-search"></i>
-          <input type="search" id="pipe-q" placeholder="Buscar por cliente, auto, vendedor..." oninput="renderPipeline()">
+          <input type="search" id="pipe-q" placeholder="Buscar cliente, auto, vendedor..." oninput="renderPipeline()">
         </div>
         <select class="field-input" id="pipe-f-vend" onchange="renderPipeline()" style="width:auto;padding:7px 12px">
           <option value="">Todos los vendedores</option>
         </select>
+        <div class="inv-view-toggle">
+          <button class="inv-view-btn active" id="pipe-btn-funnel" onclick="setPipeView('funnel')" title="Funnel"><i class="ti ti-filter"></i></button>
+          <button class="inv-view-btn" id="pipe-btn-lista" onclick="setPipeView('lista')" title="Lista"><i class="ti ti-list"></i></button>
+        </div>
       </div>
-      <div class="filter-bar">
-        <button class="filter-chip active" onclick="setFiltroPipe('todos',this)">Todos</button>
-        <button class="filter-chip" onclick="setFiltroPipe('Nuevo',this)">Nuevos</button>
-        <button class="filter-chip" onclick="setFiltroPipe('Contactado',this)">Contactados</button>
-        <button class="filter-chip" onclick="setFiltroPipe('Interesado',this)">Interesados</button>
-        <button class="filter-chip" onclick="setFiltroPipe('Negociando',this)">Negociando</button>
-        <button class="filter-chip" onclick="setFiltroPipe('Ganado',this)">Ganados</button>
-        <button class="filter-chip" onclick="setFiltroPipe('Perdido',this)">Perdidos</button>
-      </div>
-      <div id="pipe-list"></div>
+      <!-- KPIs del pipeline -->
+      <div id="pipe-kpis" style="margin-bottom:16px"></div>
+      <!-- Funnel / Lista -->
+      <div id="pipe-funnel"></div>
+      <div id="pipe-list" style="display:none"></div>
     </div>
 
     <!-- ══════════════ CLIENTES ══════════════ -->
@@ -611,6 +643,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
           <button class="inv-view-btn active" id="cli-btn-tabla" onclick="setCliView('tabla')" title="Tabla"><i class="ti ti-list"></i></button>
           <button class="inv-view-btn" id="cli-btn-kanban" onclick="setCliView('kanban')" title="Kanban"><i class="ti ti-layout-columns"></i></button>
         </div>
+      </div>
+      <!-- Stats row igual que Operaciones -->
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px" id="cli-stats-row">
+        <div class="stat-card accent"><div class="stat-num" id="cli-st-total">—</div><div class="stat-lbl">Total leads</div></div>
+        <div class="stat-card"><div class="stat-num" id="cli-st-activos">—</div><div class="stat-lbl">Activos</div></div>
+        <div class="stat-card"><div class="stat-num" id="cli-st-urgentes" style="color:var(--wc-warn)">—</div><div class="stat-lbl">Sin seguimiento 3d+</div></div>
+        <div class="stat-card"><div class="stat-num" id="cli-st-ganados" style="color:var(--wc-ok)">—</div><div class="stat-lbl">Ganados</div></div>
       </div>
       <div id="cli-stats" style="margin-bottom:12px"></div>
       <div id="cli-list"></div>
@@ -1194,31 +1233,117 @@ function wixImg(raw){
   return url;
 }
 
+let _pipeView='funnel';
+function setPipeView(v){
+  _pipeView=v;
+  document.getElementById('pipe-btn-funnel')?.classList.toggle('active',v==='funnel');
+  document.getElementById('pipe-btn-lista')?.classList.toggle('active',v==='lista');
+  document.getElementById('pipe-funnel').style.display=v==='funnel'?'':'none';
+  document.getElementById('pipe-list').style.display=v==='lista'?'':'none';
+  renderPipeline();
+}
 function renderPipeline(){
   const q=(document.getElementById('pipe-q')?.value||'').toLowerCase();
   const fVend=document.getElementById('pipe-f-vend')?.value||'';
+  const ETAPAS=['Nuevo','Contactado','Interesado','Negociando','Ganado','Perdido'];
+  const ETAPA_COLOR={Nuevo:'var(--wc-info)',Contactado:'#8b5cf6',Interesado:'var(--wc-warn)',
+    Negociando:'var(--wc-orange)',Ganado:'var(--wc-ok)',Perdido:'var(--wc-danger)'};
   const ETAPA_BADGE={Nuevo:'chip-info',Contactado:'chip-info',Interesado:'chip-warn',
-    Negociando:'chip-orange',Ganado:'chip-green',Vendido:'chip-green',Entregado:'chip-green',Perdido:'chip-gray'};
+    Negociando:'chip-orange',Ganado:'chip-green',Perdido:'chip-gray'};
+
   let rows=[...CLIENTES];
-  if(_filtroPipe!=='todos')rows=rows.filter(c=>(c.etapa||c.estatus||'')==_filtroPipe);
   if(fVend)rows=rows.filter(c=>(c.vendedorId||c.vendedorAsignado)===fVend);
-  if(q)rows=rows.filter(c=>[c.nombre,c.name,c.autoInteres,c._autoNombre].some(v=>String(v||'').toLowerCase().includes(q)));
-  rows.sort((a,b)=>new Date(b._createdDate||0)-new Date(a._createdDate||0));
-  const el=document.getElementById('pipe-list');
-  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-list-check"></i><h3>Sin leads</h3><p>No hay leads con ese filtro</p></div>';return;}
-  el.innerHTML=`<div class="table-wrap"><table class="data-table">
-    <thead><tr><th>Cliente</th><th>Auto de interés</th><th>Vendedor</th><th>Etapa</th><th>Fecha</th></tr></thead>
-    <tbody>${rows.map(c=>{
-      const v=findVend(c.vendedorId||c.vendedorAsignado);
-      const etapa=c.etapa||c.estatus||'Nuevo';
-      return`<tr style="cursor:pointer" onclick="abrirDetalleLead('${esc(c._id||'')}')">
-        <td><div style="font-weight:600">${esc(c.nombre||c.name||'Sin nombre')}</div>
-          <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||c.email||'')}</div></td>
-        <td style="font-size:12px">${esc(c.autoInteres||c._autoNombre||'—')}</td>
-        <td style="font-size:12px">${esc(v?.nombre||v?.name||'Sin asignar')}</td>
-        <td><span class="chip ${ETAPA_BADGE[etapa]||'chip-gray'}">${esc(etapa)}</span></td>
-        <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(c._createdDate)}</td>
-      </tr>`;}).join('')}</tbody></table></div>`;
+  if(q)rows=rows.filter(c=>[c.nombre,c.name,c.autoInteres,c._autoNombre,c.telefono].some(v=>String(v||'').toLowerCase().includes(q)));
+
+  // ── KPIs ──
+  const activos=rows.filter(c=>!['Ganado','Vendido','Entregado','Perdido'].includes(c.etapa||c.estatus||''));
+  const ganados=rows.filter(c=>isVenta(c));
+  const perdidos=rows.filter(c=>(c.etapa||c.estatus||'')==='Perdido');
+  const tasa=rows.length?Math.round(ganados.length/rows.length*100):0;
+  document.getElementById('pipe-kpis').innerHTML=`
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px">
+      <div class="stat-card accent"><div class="stat-num">${rows.length}</div><div class="stat-lbl">Total leads</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--wc-info)">${activos.length}</div><div class="stat-lbl">En proceso</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--wc-ok)">${ganados.length}</div><div class="stat-lbl">Cerrados</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:${tasa>=20?'var(--wc-ok)':tasa>=10?'var(--wc-warn)':'var(--wc-danger)'}">${tasa}%</div><div class="stat-lbl">Tasa de cierre</div></div>
+    </div>`;
+
+  // ── Chips por etapa + barra ──
+  const porEtapa={};ETAPAS.forEach(e=>{porEtapa[e]=[];});
+  rows.forEach(c=>{
+    const e=ETAPAS.includes(c.etapa||c.estatus||'')?c.etapa||c.estatus:'Nuevo';
+    porEtapa[e].push(c);
+  });
+
+  if(_pipeView==='funnel'){
+    const fEl=document.getElementById('pipe-funnel');
+    // Barra visual
+    const barSegs=ETAPAS.filter(e=>porEtapa[e].length>0)
+      .map(e=>`<div class="pipe-bar-seg" style="flex:${porEtapa[e].length};background:${ETAPA_COLOR[e]}" title="${e}: ${porEtapa[e].length}"></div>`).join('');
+    // Chips resumen
+    const chips=ETAPAS.map(e=>`
+      <div class="pipeline-chip" style="border-top:3px solid ${ETAPA_COLOR[e]}">
+        <div class="pipeline-chip-n" style="color:${ETAPA_COLOR[e]}">${porEtapa[e].length}</div>
+        <div class="pipeline-chip-l">${e}</div>
+      </div>`).join('');
+    // Columnas kanban (solo etapas con leads, excluye Ganado/Perdido en columnas)
+    const ETAPAS_ACTIVAS=['Nuevo','Contactado','Interesado','Negociando'];
+    const cols=ETAPAS_ACTIVAS.map(e=>{
+      const lista=porEtapa[e];
+      if(!lista.length)return`<div class="pipe-funnel-col">
+        <div class="pipe-funnel-head" style="border-top:3px solid ${ETAPA_COLOR[e]}">
+          <div class="pipe-funnel-head-title">${e}</div>
+          <span class="pipe-funnel-head-count" style="background:var(--wc-border);color:var(--wc-ink3)">0</span>
+        </div>
+        <div class="pipe-funnel-body" style="padding:16px;text-align:center;color:var(--wc-ink3);font-size:12px">Sin leads</div>
+      </div>`;
+      return`<div class="pipe-funnel-col">
+        <div class="pipe-funnel-head" style="border-top:3px solid ${ETAPA_COLOR[e]}">
+          <div class="pipe-funnel-head-title">${e}</div>
+          <span class="pipe-funnel-head-count" style="background:${ETAPA_COLOR[e]}">${lista.length}</span>
+        </div>
+        <div class="pipe-funnel-body">
+          ${lista.sort((a,b)=>new Date(b._createdDate||0)-new Date(a._createdDate||0)).map(c=>{
+            const v=findVend(c.vendedorId||c.vendedorAsignado);
+            const dias=diasSinActCli(c);const urgente=dias>=3;
+            return`<div class="pipe-funnel-card" onclick="abrirDetalleLead('${esc(c._id||'')}')">
+              <div style="font-weight:600;font-size:13px">${esc(c.nombre||c.name||'Sin nombre')}${urgente?'<span style="color:var(--wc-warn);margin-left:4px;font-size:11px">⚠${dias}d</span>':''}</div>
+              <div style="font-size:11px;color:var(--wc-ink3);margin-top:2px">${esc(c.autoInteres||c._autoNombre||'—')}</div>
+              <div style="font-size:11px;color:var(--wc-ink3)">${esc(v?.nombre||v?.name||'Sin asignar')}</div>
+            </div>`;}).join('')}
+        </div>
+      </div>`;
+    }).join('');
+    fEl.innerHTML=`
+      <div class="pipeline-row">${chips}</div>
+      <div class="pipe-bar">${barSegs}</div>
+      <div class="pipe-funnel-grid" style="margin-top:16px">${cols}</div>
+      ${(porEtapa['Ganado'].length||porEtapa['Perdido'].length)?`
+      <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+        ${porEtapa['Ganado'].length?`<span class="chip chip-green"><i class="ti ti-check"></i>${porEtapa['Ganado'].length} ganados</span>`:''}
+        ${porEtapa['Perdido'].length?`<span class="chip chip-gray"><i class="ti ti-x"></i>${porEtapa['Perdido'].length} perdidos</span>`:''}
+      </div>`:''}`;
+  } else {
+    // Vista lista simple
+    const ETAPA_BADGE2={Nuevo:'chip-info',Contactado:'chip-info',Interesado:'chip-warn',
+      Negociando:'chip-orange',Ganado:'chip-green',Perdido:'chip-gray'};
+    const sorted=[...rows].sort((a,b)=>new Date(b._createdDate||0)-new Date(a._createdDate||0));
+    const el=document.getElementById('pipe-list');
+    if(!sorted.length){el.innerHTML='<div class="empty-state"><i class="ti ti-list-check"></i><h3>Sin leads</h3><p>No hay leads con ese filtro</p></div>';return;}
+    el.innerHTML=`<div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Cliente</th><th>Auto de interés</th><th>Vendedor</th><th>Etapa</th><th>Fecha</th></tr></thead>
+      <tbody>${sorted.map(c=>{
+        const v=findVend(c.vendedorId||c.vendedorAsignado);
+        const etapa=c.etapa||c.estatus||'Nuevo';
+        return`<tr style="cursor:pointer" onclick="abrirDetalleLead('${esc(c._id||'')}')">
+          <td><div style="font-weight:600">${esc(c.nombre||c.name||'Sin nombre')}</div>
+            <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||c.email||'')}</div></td>
+          <td style="font-size:12px">${esc(c.autoInteres||c._autoNombre||'—')}</td>
+          <td style="font-size:12px">${esc(v?.nombre||v?.name||'Sin asignar')}</td>
+          <td><span class="chip ${ETAPA_BADGE2[etapa]||'chip-gray'}">${esc(etapa)}</span></td>
+          <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(c._createdDate)}</td>
+        </tr>`;}).join('')}</tbody></table></div>`;
+  }
 }
 
 /* ══ DETALLE LEAD / VENTA ══ */
@@ -1976,11 +2101,25 @@ function filteredClientes(){
 }
 function renderClientes(){
   const shown=filteredClientes();
-  // badge
+  // badge sidebar
   const bdg=document.getElementById('sb-badge-clientes');
-  const activos=CLIENTES.filter(c=>!['Ganado','Vendido','Perdido'].includes(c.estatus||c.etapa||'')).length;
+  const activos=CLIENTES.filter(c=>!['Ganado','Vendido','Entregado','Perdido'].includes(c.estatus||c.etapa||'')).length;
   if(bdg){bdg.textContent=activos;bdg.style.display=activos?'':'none';}
-  // stats bar
+  // stats cards
+  const ganados=CLIENTES.filter(c=>isVenta(c)).length;
+  const urgentes=CLIENTES.filter(c=>{
+    const e=c.estatus||c.etapa||'';
+    return!['Ganado','Vendido','Entregado','Perdido'].includes(e)&&diasSinActCli(c)>=3;
+  }).length;
+  const stTotal=document.getElementById('cli-st-total');
+  const stActivos=document.getElementById('cli-st-activos');
+  const stUrgentes=document.getElementById('cli-st-urgentes');
+  const stGanados=document.getElementById('cli-st-ganados');
+  if(stTotal)stTotal.textContent=CLIENTES.length;
+  if(stActivos)stActivos.textContent=activos;
+  if(stUrgentes)stUrgentes.textContent=urgentes;
+  if(stGanados)stGanados.textContent=ganados;
+  // chips mini por estatus
   const byEst={};CLI_ESTATUS.forEach(e=>{byEst[e]=0;});
   CLIENTES.forEach(c=>{const e=c.estatus||c.etapa||'Nuevo';if(byEst[e]!==undefined)byEst[e]++;});
   document.getElementById('cli-stats').innerHTML=`
