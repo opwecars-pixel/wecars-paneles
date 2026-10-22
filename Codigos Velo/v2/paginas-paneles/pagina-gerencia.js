@@ -5,6 +5,9 @@ import {
   obtenerDatosGerencia,
   actualizarMetas,
   actualizarDatosLead,
+  registrarEgreso,
+  actualizarComision,
+  actualizarCredito,
 } from 'backend/gerencia-data.jsw';
 
 const ROLES_PERMITIDOS = ['gerencia', 'administracion'];
@@ -13,12 +16,18 @@ const OUT = {
   DATOS_SOLICITAR:  'wecars-gerencia-solicitar',
   META_GUARDAR:     'wecars-gerencia-meta-guardar',
   LEAD_ACTUALIZAR:  'wecars-gerencia-lead-actualizar',
+  CREDITO_EDITAR:   'wecars-gerencia-credito-editar',
+  COMISION_EDITAR:  'wecars-gerencia-comision-editar',
+  EGRESO_REGISTRAR: 'wecars-gerencia-egreso-registrar',
 };
 
 const IN = {
-  DATOS:             'wecars-gerencia-datos',
-  META_RESULTADO:    'wecars-gerencia-meta-resultado',
-  LEAD_ACTUALIZADO:  'wecars-gerencia-lead-actualizado',
+  DATOS:              'wecars-gerencia-datos',
+  META_RESULTADO:     'wecars-gerencia-meta-resultado',
+  LEAD_ACTUALIZADO:   'wecars-gerencia-lead-actualizado',
+  CREDITO_RESULTADO:  'wecars-gerencia-credito-resultado',
+  COMISION_RESULTADO: 'wecars-gerencia-comision-resultado',
+  EGRESO_RESULTADO:   'wecars-gerencia-egreso-resultado',
 };
 
 let _email = '';
@@ -41,6 +50,9 @@ $w.onReady(async () => {
       case OUT.DATOS_SOLICITAR:  await enviarDatos(); break;
       case OUT.META_GUARDAR:     await manejarMetaGuardar(msg); break;
       case OUT.LEAD_ACTUALIZAR:  await manejarLeadActualizar(msg); break;
+      case OUT.CREDITO_EDITAR:   await manejarCreditoEditar(msg); break;
+      case OUT.COMISION_EDITAR:  await manejarComisionEditar(msg); break;
+      case OUT.EGRESO_REGISTRAR: await manejarEgresoRegistrar(msg); break;
     }
   });
 
@@ -82,6 +94,35 @@ async function manejarMetaGuardar(msg) {
     enviar(IN.META_RESULTADO, res);
   } catch (err) {
     enviar(IN.META_RESULTADO, { ok: false, error: String(err) });
+  }
+}
+
+async function manejarCreditoEditar(msg) {
+  if (!msg.id) return;
+  try {
+    const res = await actualizarCredito(msg.id, msg.datos || {});
+    enviar(IN.CREDITO_RESULTADO, res);
+  } catch (err) {
+    enviar(IN.CREDITO_RESULTADO, { ok: false, error: String(err) });
+  }
+}
+
+async function manejarComisionEditar(msg) {
+  if (!msg.id) return;
+  try {
+    const res = await actualizarComision(msg.id, msg.datos || {});
+    enviar(IN.COMISION_RESULTADO, res);
+  } catch (err) {
+    enviar(IN.COMISION_RESULTADO, { ok: false, error: String(err) });
+  }
+}
+
+async function manejarEgresoRegistrar(msg) {
+  try {
+    const res = await registrarEgreso(msg);
+    enviar(IN.EGRESO_RESULTADO, res);
+  } catch (err) {
+    enviar(IN.EGRESO_RESULTADO, { ok: false, error: String(err) });
   }
 }
 

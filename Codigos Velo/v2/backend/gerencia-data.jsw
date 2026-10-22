@@ -120,23 +120,83 @@ export async function actualizarDatosLead(leadId, campos) {
     if (!lead) throw new Error('Lead no encontrado');
     const actualizado = await wixData.update('ALeads', { ...lead, ...campos, _id: leadId }, OPTS);
     // Si hay autoId y cambia el precio, actualizar también en Cierres si existe
-    if (campos.precioVenta || campos.cierrePrecio) {
+    const hasCamposCierre = campos.precioVenta || campos.cierrePrecio ||
+      campos.cierreComision !== undefined || campos.comisionVendedor !== undefined ||
+      campos.formaPago || campos.banco || campos.enganche !== undefined || campos.notas;
+    if (hasCamposCierre) {
       try {
         const cierres = await wixData.query('Cierres').eq('leadId', leadId).find(OPTS);
         if (cierres.items.length > 0) {
           const c = cierres.items[0];
-          await wixData.update('Cierres', {
-            ...c,
-            precioVenta: campos.precioVenta || campos.cierrePrecio || c.precioVenta,
-            formaPago:   campos.formaPago   || c.formaPago,
-            banco:       campos.banco       || c.banco,
-            engancheMonto: campos.enganche  || c.engancheMonto,
-            notas:       campos.notas       || c.notas,
-          }, OPTS);
+          const updates = { ...c };
+          if (campos.precioVenta || campos.cierrePrecio) updates.precioVenta = campos.precioVenta || campos.cierrePrecio;
+          if (campos.cierreComision !== undefined) updates.comision = campos.cierreComision;
+          if (campos.comisionVendedor !== undefined) updates.comisionVendedor = campos.comisionVendedor;
+          if (campos.formaPago)  updates.formaPago    = campos.formaPago;
+          if (campos.banco)      updates.banco        = campos.banco;
+          if (campos.enganche !== undefined) updates.engancheMonto = campos.enganche;
+          if (campos.notas)      updates.notas        = campos.notas;
+          await wixData.update('Cierres', updates, OPTS);
         }
       } catch (_) {}
     }
     return { ok: true, lead: actualizado };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Registrar egreso ────────────────────────────────────────────────────
+export async function registrarEgreso(datos) {
+  await verificarAcceso();
+  try {
+    const item = {
+      concepto:       datos.concepto || '',
+      categoria:      datos.categoria || 'Otro',
+      monto:          parseFloat(datos.monto) || 0,
+      ref:            datos.ref || '',
+      notas:          datos.notas || '',
+      fecha:          datos.fecha ? new Date(datos.fecha) : new Date(),
+      registradoPor:  datos.registradoPor || '',
+    };
+    const inserted = await wixData.insert('Egresos', item, OPTS);
+    return { ok: true, egreso: inserted };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Actualizar comisión ──────────────────────────────────────────────────
+export async function actualizarComision(id, datos) {
+  await verificarAcceso();
+  try {
+    const existente = await wixData.get('Comisiones', id, OPTS);
+    if (!existente) throw new Error('Comisión no encontrada');
+    const actualizado = await wixData.update('Comisiones', { ...existente, ...datos, _id: id }, OPTS);
+    return { ok: true, comision: actualizado };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Actualizar crédito ───────────────────────────────────────────────────
+export async function actualizarCredito(id, datos) {
+  await verificarAcceso();
+  try {
+    const existente = await wixData.get('Creditos', id, OPTS);
+    if (!existente) throw new Error('Crédito no encontrado');
+    const actualizado = await wixData.update('Creditos', { ...existente, ...datos, _id: id }, OPTS);
+    // Sincronizar estatus en Cierres si aplica
+    if (datos.estatus) {
+      try {
+        const cierres = await wixData.query('Cierres').eq('creditoId', id).find(OPTS);
+        if (cierres.items.length > 0) {
+          const c = cierres.items[0];
+          await wixData.update('Cierres', { ...c, estatusCredito: datos.estatus }, OPTS);
+        }
+      } catch (_) {}
+    }
+    return { ok: true, credito: actualizado };
   } catch (e) {
     return { ok: false, error: e.message };
   }

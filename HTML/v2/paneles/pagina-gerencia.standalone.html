@@ -81,11 +81,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 /* ── Bottom nav ── */
 .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:var(--bottom-nav-h);
   background:var(--wc-nav-bg);border-top:1px solid rgba(255,255,255,.1);z-index:100;
-  padding-bottom:env(safe-area-inset-bottom,0)}
+  padding-bottom:env(safe-area-inset-bottom,0);overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;-ms-overflow-style:none}
+.bottom-nav::-webkit-scrollbar{display:none}
 @media(min-width:769px){.bottom-nav{display:none}}
-.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+.bn-item{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:3px;font-size:10px;color:rgba(255,255,255,.55);cursor:pointer;border:none;background:none;
-  padding:6px 2px;min-height:44px;transition:color .15s}
+  padding:6px 10px;min-height:44px;min-width:64px;transition:color .15s}
 .bn-item.active{color:var(--wc-green-mid)}
 .bn-item i{font-size:20px}
 
@@ -457,6 +459,21 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
       <button class="sb-item" onclick="mostrarVista('metas',this)">
         <i class="ti ti-target"></i>Metas y bonos
       </button>
+      <div class="sb-section-label">Gestión</div>
+      <button class="sb-item" onclick="mostrarVista('expedientes',this)">
+        <i class="ti ti-folder-check"></i>Expedientes
+      </button>
+      <button class="sb-item" onclick="mostrarVista('creditos',this)">
+        <i class="ti ti-building-bank"></i>Créditos
+        <span class="sb-badge" id="sb-badge-cred" style="display:none">0</span>
+      </button>
+      <button class="sb-item" onclick="mostrarVista('comisiones',this)">
+        <i class="ti ti-percentage"></i>Comisiones
+        <span class="sb-badge" id="sb-badge-com" style="display:none">0</span>
+      </button>
+      <button class="sb-item" onclick="mostrarVista('egresos',this)">
+        <i class="ti ti-arrow-down-circle"></i>Egresos
+      </button>
     </nav>
   </aside>
 
@@ -664,6 +681,82 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
       <div id="metas-list"></div>
     </div>
 
+    <!-- ══════════════ EXPEDIENTES ══════════════ -->
+    <div class="view view-wrap" id="view-expedientes">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:16px;font-weight:700">Expedientes de venta</div>
+          <div style="font-size:12px;color:var(--wc-ink3)">Todas las ventas cerradas con su información completa</div>
+        </div>
+      </div>
+      <div id="exp-kpis"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <input class="field-input" type="search" id="exp-q" placeholder="Buscar cliente, auto, folio, vendedor..." style="flex:1;min-width:180px" oninput="renderExpedientes()">
+        <select class="field-input" id="exp-f-pago" onchange="renderExpedientes()" style="width:auto">
+          <option value="">Todas las formas de pago</option>
+          <option>Contado</option><option>Financiado</option><option>Crédito weCars</option><option>Arrendamiento</option>
+        </select>
+      </div>
+      <div id="exp-list"></div>
+    </div>
+
+    <!-- ══════════════ CRÉDITOS ══════════════ -->
+    <div class="view view-wrap" id="view-creditos">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:16px;font-weight:700">Créditos en trámite</div>
+      </div>
+      <div id="cred-kpis" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <input class="field-input" type="search" id="cred-q" placeholder="Buscar cliente, banco, auto..." style="flex:1;min-width:180px" oninput="renderCreditos()">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="filter-chip active" onclick="setFiltroCredGer('todos',this)">Todos</button>
+          <button class="filter-chip" onclick="setFiltroCredGer('Pendiente',this)">Pendiente</button>
+          <button class="filter-chip" onclick="setFiltroCredGer('Enviado',this)">Enviado</button>
+          <button class="filter-chip" onclick="setFiltroCredGer('Aprobado',this)">Aprobado</button>
+          <button class="filter-chip" onclick="setFiltroCredGer('Rechazado',this)">Rechazado</button>
+        </div>
+      </div>
+      <div id="cred-list"></div>
+    </div>
+
+    <!-- ══════════════ COMISIONES ══════════════ -->
+    <div class="view view-wrap" id="view-comisiones">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:16px;font-weight:700">Comisiones del equipo</div>
+      </div>
+      <div id="com-kpis" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <input class="field-input" type="search" id="com-q" placeholder="Buscar vendedor, cliente..." style="flex:1;min-width:180px" oninput="renderComisionesGer()">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="filter-chip active" onclick="setFiltroComGer('todos',this)">Todas</button>
+          <button class="filter-chip" onclick="setFiltroComGer('Pendiente',this)">Pendiente</button>
+          <button class="filter-chip" onclick="setFiltroComGer('Liberada',this)">Liberada</button>
+          <button class="filter-chip" onclick="setFiltroComGer('Pagada',this)">Pagada</button>
+        </div>
+      </div>
+      <div id="com-list"></div>
+    </div>
+
+    <!-- ══════════════ EGRESOS ══════════════ -->
+    <div class="view view-wrap" id="view-egresos">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:16px;font-weight:700">Egresos del negocio</div>
+        <button class="btn btn-primary" onclick="abrirOverlay('ov-egreso')">
+          <i class="ti ti-plus"></i>Registrar egreso
+        </button>
+      </div>
+      <div id="egr-kpis" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <input class="field-input" type="search" id="egr-q" placeholder="Buscar concepto, categoría..." style="flex:1;min-width:180px" oninput="renderEgresosGer()">
+        <select class="field-input" id="egr-f-cat" onchange="renderEgresosGer()" style="width:auto">
+          <option value="">Todas las categorías</option>
+          <option>Publicidad</option><option>Reparaciones</option><option>Gastos fijos</option>
+          <option>Comisiones</option><option>Legal</option><option>Otro</option>
+        </select>
+      </div>
+      <div id="egr-list"></div>
+    </div>
+
   </main>
 </div>
 
@@ -686,6 +779,18 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
   </button>
   <button class="bn-item" onclick="mostrarVista('finanzas',this,'bn')">
     <i class="ti ti-chart-bar"></i>Finanzas
+  </button>
+  <button class="bn-item" onclick="mostrarVista('expedientes',this,'bn')">
+    <i class="ti ti-folder-check"></i>Expedientes
+  </button>
+  <button class="bn-item" onclick="mostrarVista('creditos',this,'bn')">
+    <i class="ti ti-building-bank"></i>Créditos
+  </button>
+  <button class="bn-item" onclick="mostrarVista('comisiones',this,'bn')">
+    <i class="ti ti-percentage"></i>Comisiones
+  </button>
+  <button class="bn-item" onclick="mostrarVista('egresos',this,'bn')">
+    <i class="ti ti-arrow-down-circle"></i>Egresos
   </button>
 </nav>
 
@@ -717,29 +822,80 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
   </div>
 </div>
 
+<!-- OVERLAY: Registrar egreso -->
+<div class="overlay" id="ov-egreso">
+  <div class="overlay-panel">
+    <div class="overlay-hdr">
+      <i class="ti ti-arrow-down-circle" style="font-size:18px;color:var(--wc-orange)"></i>
+      <div class="overlay-title">Registrar egreso</div>
+      <button class="overlay-close" onclick="cerrarOverlay('ov-egreso')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="overlay-body">
+      <div class="field-grid" style="grid-template-columns:1fr 1fr">
+        <div class="field-group" style="grid-column:span 2">
+          <div class="field-label">Concepto *</div>
+          <input class="field-input" id="ov-egr-concepto" placeholder="Ej: Publicidad Facebook, Reparación Motor...">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Categoría</div>
+          <select class="field-input" id="ov-egr-categoria">
+            <option>Publicidad</option><option>Reparaciones</option><option>Gastos fijos</option>
+            <option>Comisiones</option><option>Legal</option><option>Otro</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Monto *</div>
+          <input class="field-input" id="ov-egr-monto" type="number" placeholder="0.00" min="0">
+        </div>
+        <div class="field-group" style="grid-column:span 2">
+          <div class="field-label">Referencia / Lead ID (opcional)</div>
+          <input class="field-input" id="ov-egr-ref" placeholder="Nombre del cliente o referencia">
+        </div>
+        <div class="field-group" style="grid-column:span 2">
+          <div class="field-label">Notas</div>
+          <textarea class="field-input" id="ov-egr-notas" rows="2" placeholder="Notas adicionales..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="overlay-footer">
+      <button class="btn" onclick="cerrarOverlay('ov-egreso')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEgresoGer()"><i class="ti ti-device-floppy"></i>Guardar egreso</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ══════════════════════════════════════════════════════
    WC PROTOCOL — GERENCIA
 ══════════════════════════════════════════════════════ */
 const WC = {
   OUT:{
-    DATOS_SOLICITAR: 'wecars-gerencia-solicitar',
-    META_GUARDAR:    'wecars-gerencia-meta-guardar',
-    LEAD_ACTUALIZAR: 'wecars-gerencia-lead-actualizar',
+    DATOS_SOLICITAR:   'wecars-gerencia-solicitar',
+    META_GUARDAR:      'wecars-gerencia-meta-guardar',
+    LEAD_ACTUALIZAR:   'wecars-gerencia-lead-actualizar',
+    CREDITO_EDITAR:    'wecars-gerencia-credito-editar',
+    COMISION_EDITAR:   'wecars-gerencia-comision-editar',
+    EGRESO_REGISTRAR:  'wecars-gerencia-egreso-registrar',
   },
   IN:{
     DATOS:              'wecars-gerencia-datos',
     META_RESULTADO:     'wecars-gerencia-meta-resultado',
     LEAD_ACTUALIZADO:   'wecars-gerencia-lead-actualizado',
+    CREDITO_RESULTADO:  'wecars-gerencia-credito-resultado',
+    COMISION_RESULTADO: 'wecars-gerencia-comision-resultado',
+    EGRESO_RESULTADO:   'wecars-gerencia-egreso-resultado',
   },
   send(tipo,datos){try{window.parent.postMessage({type:tipo,...datos},'*');}catch(_){}}
 };
 window.addEventListener('message',e=>{
   const msg=e.data;if(!msg||!msg.type)return;
   switch(msg.type){
-    case WC.IN.DATOS:            recibirDatos(msg);break;
-    case WC.IN.META_RESULTADO:   if(msg.ok)toast('✓ Meta guardada');break;
-    case WC.IN.LEAD_ACTUALIZADO: recibirLeadActualizado(msg);break;
+    case WC.IN.DATOS:              recibirDatos(msg);break;
+    case WC.IN.META_RESULTADO:     if(msg.ok)toast('✓ Meta guardada');break;
+    case WC.IN.LEAD_ACTUALIZADO:   recibirLeadActualizado(msg);break;
+    case WC.IN.CREDITO_RESULTADO:  if(msg.ok)toast('Crédito actualizado ✓');else toast('Error al actualizar crédito','error');break;
+    case WC.IN.COMISION_RESULTADO: if(msg.ok)toast('Comisión actualizada ✓');else toast('Error','error');break;
+    case WC.IN.EGRESO_RESULTADO:   recibirEgresoResultado(msg);break;
   }
 });
 WC.send(WC.OUT.DATOS_SOLICITAR,{});
@@ -762,6 +918,7 @@ function recibirDatos(msg){
   document.getElementById('sb-rol').textContent=CTX.rolActual||'Gerencia';
   _poblarFiltroMes();_poblarFiltroVendedores();_poblarFiltroCliVend();
   renderDashboard();renderVentas();renderEquipo();renderPipeline();renderInventario();renderFinanzas();renderMetas();renderClientes();
+  renderExpedientes();renderCreditos();renderComisionesGer();renderEgresosGer();
 }
 
 /* ══ Utilidades ══ */
@@ -1554,6 +1711,221 @@ function guardarMetas(){
   cerrarOverlay('ov-meta');renderMetas();toast('✓ Metas actualizadas');
 }
 
+/* ══ EXPEDIENTES ══ */
+function renderExpedientes(){
+  const q=(document.getElementById('exp-q')?.value||'').toLowerCase();
+  const fPago=document.getElementById('exp-f-pago')?.value||'';
+  let rows=CLIENTES.filter(c=>isVenta(c));
+  if(q)rows=rows.filter(c=>[c.nombre,c.name,c._autoNombre,c.autoInteres,c.folio,c.folioVenta].some(v=>String(v||'').toLowerCase().includes(q)));
+  if(fPago)rows=rows.filter(c=>(c.formaPago||c.tipoPago||'Contado')===fPago);
+  rows.sort((a,b)=>new Date(fechaVenta(b)||0)-new Date(fechaVenta(a)||0));
+  // KPIs
+  const totalIng=rows.reduce((s,c)=>s+parseFloat(c._precioVenta||c.cierrePrecio||0),0);
+  document.getElementById('exp-kpis').innerHTML=`<div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:12px">
+    <div class="kpi-card"><div class="kpi-label">Ventas cerradas</div><div class="kpi-value" style="color:var(--wc-ok)">${rows.length}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ingresos totales</div><div class="kpi-value" style="font-size:20px">${M(totalIng)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Este mes</div><div class="kpi-value">${ventasDelMes().length}</div></div>
+  </div>`;
+  const el=document.getElementById('exp-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-folder-check"></i><h3>Sin expedientes</h3><p>No hay ventas cerradas con ese filtro</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Folio</th><th>Cliente</th><th>Auto</th><th>Vendedor</th><th>Forma pago</th><th>Banco</th><th class="num">Precio</th><th>Fecha</th></tr></thead>
+    <tbody>${rows.map(c=>{
+      const v=findVend(c.vendedorId||c.vendedorAsignado);
+      const folio=c.folio||c.folioVenta||c.cierreFolio||'—';
+      const forma=c.formaPago||c.tipoPago||(parseFloat(c.montoFinanciado||0)>0?'Financiado':'Contado');
+      const banco=c.banco||c.bancoFinanciador||c.cierreBanco||'—';
+      return`<tr style="cursor:pointer" onclick="abrirDetalleLead('${esc(c._id||'')}')">
+        <td style="font-size:12px;color:var(--wc-ink3)">${esc(folio)}</td>
+        <td><div style="font-weight:600">${esc(c.nombre||c.name||'—')}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||'')}</div></td>
+        <td style="font-size:12px">${esc(c._autoNombre||c.autoInteres||'—')}
+          ${c._esConsigna?'<span class="chip chip-orange" style="font-size:10px;margin-left:4px">Consigna</span>':''}</td>
+        <td style="font-size:12px">${esc(v?.nombre||v?.name||'—')}</td>
+        <td><span class="chip ${forma==='Contado'?'chip-green':forma==='Financiado'?'chip-info':'chip-warn'}" style="font-size:10px">${esc(forma)}</span></td>
+        <td style="font-size:12px;color:var(--wc-ink3)">${banco!=='—'?esc(banco):'—'}</td>
+        <td class="num">${M(c._precioVenta||c.cierrePrecio||c.precioVenta)}</td>
+        <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(fechaVenta(c))}</td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+}
+
+/* ══ CRÉDITOS ══ */
+let _filtroCredGer='todos';
+function credEstGer(c){
+  const s=(c.estatus||c.estatusCredito||'').toLowerCase();
+  if(['aprobado','approved','autorizado'].includes(s))return'Aprobado';
+  if(['rechazado','rejected','negado'].includes(s))return'Rechazado';
+  if(['enviado','sent'].includes(s))return'Enviado';
+  return'Pendiente';
+}
+function renderCreditos(){
+  const q=(document.getElementById('cred-q')?.value||'').toLowerCase();
+  let rows=CREDITOS.map(c=>{
+    const lead=CLIENTES.find(l=>l._id===(c.leadId||c.clienteId));
+    return{...c,
+      _clienteNombre:c.clienteNombre||c.nombre||lead?.nombre||lead?.name||'—',
+      _autoNombre:c.autoInteres||lead?._autoNombre||lead?.autoInteres||'—',
+      _vendedorId:c.vendedorId||lead?.vendedorId||lead?.vendedorAsignado||''};
+  });
+  if(_filtroCredGer!=='todos')rows=rows.filter(c=>credEstGer(c)===_filtroCredGer);
+  if(q)rows=rows.filter(c=>[c._clienteNombre,c.banco,c.financiera,c._autoNombre].some(v=>String(v||'').toLowerCase().includes(q)));
+  const pend=CREDITOS.filter(c=>credEstGer(c)==='Pendiente').length;
+  const aprobados=CREDITOS.filter(c=>credEstGer(c)==='Aprobado').length;
+  const totalMonto=CREDITOS.reduce((s,c)=>s+parseFloat(c.monto||c.montoSolicitado||0),0);
+  const bEl=document.getElementById('sb-badge-cred');if(bEl){bEl.textContent=pend;bEl.style.display=pend?'inline':'none';}
+  document.getElementById('cred-kpis').innerHTML=`<div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:0">
+    <div class="kpi-card"><div class="kpi-label">En trámite</div><div class="kpi-value" style="color:var(--wc-warn)">${pend}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Aprobados</div><div class="kpi-value" style="color:var(--wc-ok)">${aprobados}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Monto total</div><div class="kpi-value" style="font-size:18px">${M(totalMonto)}</div></div>
+  </div>`;
+  const BADGE={Pendiente:'chip-warn',Enviado:'chip-info',Aprobado:'chip-green',Rechazado:'chip-gray'};
+  const el=document.getElementById('cred-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-building-bank"></i><h3>Sin créditos</h3><p>No hay créditos con ese filtro</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Cliente</th><th>Auto</th><th>Banco / Financiera</th><th>Vendedor</th><th class="num">Monto</th><th>Estatus</th><th>Cambiar</th></tr></thead>
+    <tbody>${rows.map(c=>{
+      const est=credEstGer(c);const vend=findVend(c._vendedorId||c.vendedorId);
+      return`<tr>
+        <td><div style="font-weight:600">${esc(c._clienteNombre)}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${fechaCorta(c._createdDate||c.fechaSolicitud)}</div></td>
+        <td style="font-size:12px">${esc(c._autoNombre)}</td>
+        <td style="font-size:12px">${esc(c.banco||c.financiera||'—')}${c.plazo||c.plazoMeses?' · '+(c.plazo||c.plazoMeses)+'m':''}</td>
+        <td style="font-size:12px">${esc(vend?.nombre||c.vendedorNombre||'—')}</td>
+        <td class="num">${M(c.monto||c.montoSolicitado)}</td>
+        <td><span class="chip ${BADGE[est]||'chip-warn'}">${esc(est)}</span></td>
+        <td><select class="field-input" style="font-size:11px;padding:4px 8px;height:auto;width:auto"
+              onchange="cambiarEstatusCred('${esc(c._id)}',this.value)">
+          ${['Pendiente','Enviado','Aprobado','Rechazado'].map(o=>`<option${o===est?' selected':''}>${o}</option>`).join('')}
+        </select></td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+}
+function setFiltroCredGer(f,btn){
+  _filtroCredGer=f;
+  document.querySelectorAll('#view-creditos .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderCreditos();
+}
+function cambiarEstatusCred(id,est){
+  const idx=CREDITOS.findIndex(c=>c._id===id);if(idx>=0)CREDITOS[idx].estatus=est;
+  WC.send(WC.OUT.CREDITO_EDITAR,{id,datos:{estatus:est}});
+  toast('Crédito → '+est);renderCreditos();
+}
+
+/* ══ COMISIONES ══ */
+let _filtroComGer='todos';
+function renderComisionesGer(){
+  const q=(document.getElementById('com-q')?.value||'').toLowerCase();
+  let rows=[...COMISIONES];
+  if(_filtroComGer!=='todos')rows=rows.filter(c=>(c.estatus||'Pendiente')===_filtroComGer);
+  if(q)rows=rows.filter(c=>(c.vendedor||c.vendedorNombre||''+(c.clienteNombre||'')).toLowerCase().includes(q));
+  const pendCount=COMISIONES.filter(c=>(c.estatusPago||'Pendiente')==='Pendiente').length;
+  const pendMonto=COMISIONES.filter(c=>(c.estatusPago||'Pendiente')==='Pendiente').reduce((s,c)=>s+parseFloat(c.monto||0),0);
+  const pagadoMonto=COMISIONES.filter(c=>(c.estatusPago||'')!=='Pendiente').reduce((s,c)=>s+parseFloat(c.monto||0),0);
+  const bEl=document.getElementById('sb-badge-com');if(bEl){bEl.textContent=pendCount;bEl.style.display=pendCount?'inline':'none';}
+  document.getElementById('com-kpis').innerHTML=`<div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:0">
+    <div class="kpi-card"><div class="kpi-label">Pendientes</div><div class="kpi-value" style="color:var(--wc-warn)">${pendCount}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Por pagar</div><div class="kpi-value" style="font-size:18px;color:var(--wc-warn)">${M(pendMonto)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pagado (total)</div><div class="kpi-value" style="font-size:18px;color:var(--wc-ok)">${M(pagadoMonto)}</div></div>
+  </div>`;
+  const BADGE_EST={Pendiente:'chip-warn',Liberada:'chip-info',Pagada:'chip-green'};
+  const BADGE_PAGO={Pendiente:'chip-warn',Pagado:'chip-green'};
+  const el=document.getElementById('com-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-percentage"></i><h3>Sin comisiones</h3><p>No hay comisiones con ese filtro</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Vendedor</th><th>Cliente / Concepto</th><th>Auto</th><th class="num">Monto</th><th>Flujo</th><th>Pago</th><th>Acciones</th></tr></thead>
+    <tbody>${rows.map(c=>{
+      const est=c.estatus||'Pendiente';const pago=c.estatusPago||'Pendiente';
+      return`<tr>
+        <td style="font-weight:600">${esc(c.vendedor||c.vendedorNombre||'—')}</td>
+        <td style="font-size:12px">${esc(c.clienteNombre||c.concepto||'—')}</td>
+        <td style="font-size:11px;color:var(--wc-ink3)">${esc(c.vehiculo||c.autoVendido||'—')}</td>
+        <td class="num">${M(c.monto)}</td>
+        <td><span class="chip ${BADGE_EST[est]||'chip-gray'}">${esc(est)}</span></td>
+        <td><span class="chip ${BADGE_PAGO[pago]||'chip-warn'}">${esc(pago)}</span></td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          ${est==='Pendiente'?`<button class="btn btn-sm" onclick="liberarComisionGer('${esc(c._id)}')"><i class="ti ti-lock-open"></i>Liberar</button>`:''}
+          ${est==='Liberada'?`<button class="btn btn-sm btn-primary" onclick="pagarComisionGer('${esc(c._id)}')"><i class="ti ti-check"></i>Marcar pagada</button>`:''}
+          ${pago==='Pendiente'&&est!=='Rechazada'?`<button class="btn btn-sm" style="background:var(--wc-green-mid);color:#fff" onclick="marcarPagoComGer('${esc(c._id)}','Pagado')"><i class="ti ti-cash"></i>Pagado</button>`:''}
+          ${pago==='Pagado'?`<button class="btn btn-sm" style="opacity:.6" onclick="marcarPagoComGer('${esc(c._id)}','Pendiente')"><i class="ti ti-refresh"></i>Deshacer</button>`:''}
+        </td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+}
+function setFiltroComGer(f,btn){
+  _filtroComGer=f;
+  document.querySelectorAll('#view-comisiones .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderComisionesGer();
+}
+function liberarComisionGer(id){
+  const idx=COMISIONES.findIndex(c=>c._id===id);if(idx<0)return;
+  COMISIONES[idx].estatus='Liberada';
+  WC.send(WC.OUT.COMISION_EDITAR,{id,datos:{estatus:'Liberada'}});
+  toast('Comisión liberada ✓');renderComisionesGer();
+}
+function pagarComisionGer(id){
+  const idx=COMISIONES.findIndex(c=>c._id===id);if(idx<0)return;
+  COMISIONES[idx].estatus='Pagada';COMISIONES[idx].estatusPago='Pagado';
+  WC.send(WC.OUT.COMISION_EDITAR,{id,datos:{estatus:'Pagada',estatusPago:'Pagado'}});
+  toast('Comisión pagada ✓');renderComisionesGer();renderFinanzas();
+}
+function marcarPagoComGer(id,nuevoPago){
+  const idx=COMISIONES.findIndex(c=>c._id===id);if(idx<0)return;
+  COMISIONES[idx].estatusPago=nuevoPago;
+  WC.send(WC.OUT.COMISION_EDITAR,{id,datos:{estatusPago:nuevoPago}});
+  toast(nuevoPago==='Pagado'?'Pago registrado ✓':'Pago deshecho');renderComisionesGer();renderFinanzas();
+}
+
+/* ══ EGRESOS ══ */
+function renderEgresosGer(){
+  const q=(document.getElementById('egr-q')?.value||'').toLowerCase();
+  const fCat=document.getElementById('egr-f-cat')?.value||'';
+  let rows=[...EGRESOS].sort((a,b)=>new Date(b._createdDate||b.fecha||0)-new Date(a._createdDate||a.fecha||0));
+  if(fCat)rows=rows.filter(e=>(e.categoria||e.tipo||'')===fCat);
+  if(q)rows=rows.filter(e=>(e.concepto||e.categoria||e.ref||'').toLowerCase().includes(q));
+  const totalMes=EGRESOS.filter(e=>{
+    if(!e.fecha&&!e._createdDate)return false;
+    const f=new Date(e.fecha||e._createdDate);if(isNaN(f))return false;
+    const m=f.getFullYear()+'-'+(f.getMonth()+1).toString().padStart(2,'0');
+    return m===(_filtroMes||(new Date().getFullYear()+'-'+(new Date().getMonth()+1).toString().padStart(2,'0')));
+  }).reduce((s,e)=>s+parseFloat(e.monto||0),0);
+  const totalAll=EGRESOS.reduce((s,e)=>s+parseFloat(e.monto||0),0);
+  document.getElementById('egr-kpis').innerHTML=`<div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:0">
+    <div class="kpi-card"><div class="kpi-label">Total registrados</div><div class="kpi-value">${EGRESOS.length}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Egresos este mes</div><div class="kpi-value" style="color:var(--wc-danger)">${M(totalMes)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total histórico</div><div class="kpi-value" style="color:var(--wc-danger)">${M(totalAll)}</div></div>
+  </div>`;
+  const el=document.getElementById('egr-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-arrow-down-circle"></i><h3>Sin egresos</h3><p>Registra el primer egreso</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Concepto</th><th>Categoría</th><th>Referencia</th><th class="num">Monto</th><th>Fecha</th></tr></thead>
+    <tbody>${rows.map(e=>`<tr>
+      <td style="font-weight:600">${esc(e.concepto||'—')}</td>
+      <td><span class="chip chip-orange">${esc(e.categoria||e.tipo||'—')}</span></td>
+      <td style="font-size:12px;color:var(--wc-ink3)">${esc(e.ref||e.clienteNombre||e.leadId||'—')}</td>
+      <td class="num" style="color:var(--wc-danger)">${M(e.monto)}</td>
+      <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(e._createdDate||e.fecha)}</td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+function guardarEgresoGer(){
+  const concepto=document.getElementById('ov-egr-concepto').value.trim();
+  const monto=parseFloat(document.getElementById('ov-egr-monto').value)||0;
+  if(!concepto){toast('Escribe un concepto','warn');return;}
+  if(!monto||monto<=0){toast('Ingresa un monto válido','warn');return;}
+  const categoria=document.getElementById('ov-egr-categoria').value;
+  const ref=document.getElementById('ov-egr-ref').value.trim();
+  const notas=document.getElementById('ov-egr-notas').value.trim();
+  const e={concepto,categoria,monto,ref,notas,fecha:new Date().toISOString(),registradoPor:CTX.emailActual};
+  WC.send(WC.OUT.EGRESO_REGISTRAR,e);
+  EGRESOS.unshift({...e,_id:'tmp_'+Date.now(),_createdDate:new Date()});
+  cerrarOverlay('ov-egreso');
+  document.getElementById('ov-egr-concepto').value='';
+  document.getElementById('ov-egr-monto').value='';
+  document.getElementById('ov-egr-ref').value='';
+  document.getElementById('ov-egr-notas').value='';
+  toast('Egreso registrado ✓');renderEgresosGer();renderFinanzas();
+}
+function recibirEgresoResultado(msg){
+  if(!msg.ok)toast('Error al guardar egreso: '+(msg.error||'inténtalo de nuevo'),'error');
+}
+
 /* ══ CLIENTES ══ */
 const CLI_ESTATUS=['Nuevo','Contactado','Interesado','Negociando','Ganado','Perdido'];
 let _cliView='tabla';
@@ -1813,6 +2185,10 @@ const TOPBAR_LABELS={
   clientes:{title:'Todos los clientes',sub:''},
   inventario:{title:'Inventario',sub:''},finanzas:{title:'Resumen financiero',sub:''},
   metas:{title:'Metas y bonos',sub:''},
+  expedientes:{title:'Expedientes de venta',sub:''},
+  creditos:{title:'Créditos en trámite',sub:''},
+  comisiones:{title:'Comisiones del equipo',sub:''},
+  egresos:{title:'Egresos del negocio',sub:''},
 };
 function mostrarVista(id,btn,nav){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
