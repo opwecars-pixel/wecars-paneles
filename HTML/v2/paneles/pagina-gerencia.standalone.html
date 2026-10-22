@@ -328,6 +328,48 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 .stat-num{font-size:22px;font-weight:800;line-height:1;color:var(--wc-ink)}
 .stat-card.accent .stat-num{color:var(--wc-green-dark)}
 .stat-lbl{font-size:11px;color:var(--wc-ink3);margin-top:3px}
+/* ── Vendedor cards ──────────────────────────── */
+.vend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.vend-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);padding:16px}
+.vend-card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.vend-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
+.vend-meta{flex:1;min-width:0}
+.vend-nombre{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vend-sub{font-size:11px;color:var(--wc-ink3)}
+.vend-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.vend-stat{text-align:center;background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:8px 4px}
+.vend-stat-n{font-size:18px;font-weight:800;line-height:1}
+.vend-stat-l{font-size:10px;color:var(--wc-ink3);margin-top:2px}
+.vend-bar-wrap{margin-bottom:6px}
+.vend-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--wc-ink3);margin-bottom:3px}
+.vend-bar{height:6px;background:var(--wc-border);border-radius:6px;overflow:hidden}
+.vend-bar-fill{height:6px;border-radius:6px;transition:width .4s}
+/* ── Rentabilidad ────────────────────────────── */
+.rent-row{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-md);
+  padding:12px 14px;margin-bottom:8px}
+.rent-row.alerta{border-left:3px solid var(--wc-danger)}
+.rent-row.warn{border-left:3px solid var(--wc-warn)}
+.rent-row-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rent-nombre{font-weight:700;font-size:13px;flex:1;min-width:0}
+.rent-dias{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--wc-surface2);color:var(--wc-ink3);white-space:nowrap}
+.rent-margen-bar{height:6px;background:var(--wc-border);border-radius:6px;overflow:hidden;margin-top:8px}
+.rent-margen-fill{height:6px;border-radius:6px}
+/* ── Pendientes kanban ─────────────────────── */
+.pend-col{background:var(--wc-surface2);border-radius:var(--wc-r-lg);overflow:hidden}
+.pend-col-head{padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--wc-border)}
+.pend-col-title{font-weight:700;font-size:12px;flex:1}
+.pend-col-count{background:var(--wc-border);color:var(--wc-ink3);font-size:10px;font-weight:800;
+  border-radius:999px;padding:1px 7px}
+.pend-col-body{padding:8px;display:flex;flex-direction:column;gap:6px;min-height:80px}
+.pend-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-md);
+  padding:10px 12px;cursor:pointer}
+.pend-card:hover{border-color:var(--wc-green)}
+.pend-card-title{font-weight:600;font-size:13px;margin-bottom:4px}
+.pend-card-meta{font-size:11px;color:var(--wc-ink3);display:flex;gap:8px;flex-wrap:wrap}
+.pend-prio-urgente{color:var(--wc-danger);font-weight:700}
+.pend-prio-alta{color:var(--wc-warn);font-weight:700}
+@media(max-width:700px){#pend-board{grid-template-columns:1fr!important}}
 /* ── Pipeline funnel ──────────────────────────── */
 .pipeline-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .pipeline-chip{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);
@@ -474,6 +516,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
         <i class="ti ti-users"></i>Equipo / Ranking
       </button>
       <div class="sb-section-label">Operaciones</div>
+      <button class="sb-item" onclick="mostrarVista('hoy',this)">
+        <i class="ti ti-sun"></i>Hoy / Urgentes
+        <span class="sb-badge" id="sb-badge-hoy" style="display:none">0</span>
+      </button>
       <button class="sb-item" onclick="mostrarVista('clientes',this)">
         <i class="ti ti-users"></i>Todos los clientes
         <span class="sb-badge" id="sb-badge-clientes" style="display:none">0</span>
@@ -482,12 +528,25 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
         <i class="ti ti-list-check"></i>Pipeline completo
         <span class="sb-badge" id="sb-badge-leads" style="display:none">0</span>
       </button>
+      <button class="sb-item" onclick="mostrarVista('vendedores',this)">
+        <i class="ti ti-id-badge"></i>Vendedores
+      </button>
       <button class="sb-item" onclick="mostrarVista('inventario',this)">
         <i class="ti ti-car"></i>Inventario
+      </button>
+      <button class="sb-item" onclick="mostrarVista('rentabilidad',this)">
+        <i class="ti ti-trending-up"></i>Rentabilidad
+      </button>
+      <button class="sb-item" onclick="mostrarVista('pendientes',this)">
+        <i class="ti ti-checkbox"></i>Pendientes
+        <span class="sb-badge" id="sb-badge-pend" style="display:none">0</span>
       </button>
       <div class="sb-section-label">Finanzas y metas</div>
       <button class="sb-item" onclick="mostrarVista('finanzas',this)">
         <i class="ti ti-chart-bar"></i>Resumen financiero
+      </button>
+      <button class="sb-item" onclick="mostrarVista('pagos',this)">
+        <i class="ti ti-cash"></i>Pagos / Apartados
       </button>
       <button class="sb-item" onclick="mostrarVista('metas',this)">
         <i class="ti ti-target"></i>Metas y bonos
@@ -506,6 +565,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
       </button>
       <button class="sb-item" onclick="mostrarVista('egresos',this)">
         <i class="ti ti-arrow-down-circle"></i>Egresos
+      </button>
+      <button class="sb-item" onclick="mostrarVista('reportes',this)">
+        <i class="ti ti-report-analytics"></i>Reportes
       </button>
     </nav>
   </aside>
@@ -796,6 +858,75 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
       <div id="egr-list"></div>
     </div>
 
+    <!-- ══════════════ HOY / URGENTES ══════════════ -->
+    <div class="view view-wrap" id="view-hoy">
+      <div id="hoy-urgentes"></div>
+      <div id="hoy-sin-seguimiento"></div>
+      <div id="hoy-ganados-recientes"></div>
+    </div>
+
+    <!-- ══════════════ VENDEDORES (cards) ══════════════ -->
+    <div class="view view-wrap" id="view-vendedores">
+      <div id="vend-list"></div>
+    </div>
+
+    <!-- ══════════════ RENTABILIDAD ══════════════ -->
+    <div class="view view-wrap" id="view-rentabilidad">
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="search" id="rent-q" placeholder="Buscar auto..." oninput="renderRentabilidad()">
+        </div>
+        <select class="field-input" id="rent-f-est" onchange="renderRentabilidad()" style="width:auto;padding:7px 12px">
+          <option value="">Todos los estatus</option>
+          <option>Disponible</option><option>Apartado</option><option>Vendido</option><option>Entregado</option>
+        </select>
+        <select class="field-input" id="rent-sort" onchange="renderRentabilidad()" style="width:auto;padding:7px 12px">
+          <option value="dias">Más días en lote</option>
+          <option value="margen-asc">Menor margen</option>
+          <option value="margen-desc">Mayor margen</option>
+          <option value="precio">Mayor precio</option>
+        </select>
+      </div>
+      <div id="rent-kpis" style="margin-bottom:14px"></div>
+      <div id="rent-list"></div>
+    </div>
+
+    <!-- ══════════════ PENDIENTES ══════════════ -->
+    <div class="view view-wrap" id="view-pendientes">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:16px;font-weight:700">Pendientes del equipo</div>
+        <button class="btn btn-primary" onclick="abrirOverlay('ov-tarea')">
+          <i class="ti ti-plus"></i>Nueva tarea
+        </button>
+      </div>
+      <div id="pend-board" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div>
+    </div>
+
+    <!-- ══════════════ PAGOS / APARTADOS ══════════════ -->
+    <div class="view view-wrap" id="view-pagos">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:16px;font-weight:700">Pagos y apartados</div>
+        <button class="btn btn-primary" onclick="abrirOverlay('ov-pago')">
+          <i class="ti ti-plus"></i>Registrar pago
+        </button>
+      </div>
+      <div id="pagos-kpis" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <input class="field-input" type="search" id="pagos-q" placeholder="Buscar cliente, concepto..." style="flex:1;min-width:180px" oninput="renderPagos()">
+        <select class="field-input" id="pagos-f-tipo" onchange="renderPagos()" style="width:auto">
+          <option value="">Todos los tipos</option>
+          <option>Apartado</option><option>Anticipo</option><option>Contado</option><option>Financiamiento</option>
+        </select>
+      </div>
+      <div id="pagos-list"></div>
+    </div>
+
+    <!-- ══════════════ REPORTES ══════════════ -->
+    <div class="view view-wrap" id="view-reportes">
+      <div id="rep-content"></div>
+    </div>
+
   </main>
 </div>
 
@@ -803,6 +934,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 <nav class="bottom-nav">
   <button class="bn-item active" onclick="mostrarVista('dashboard',this,'bn')">
     <i class="ti ti-layout-dashboard"></i>Dashboard
+  </button>
+  <button class="bn-item" onclick="mostrarVista('hoy',this,'bn')">
+    <i class="ti ti-sun"></i>Hoy
   </button>
   <button class="bn-item" onclick="mostrarVista('ventas',this,'bn')">
     <i class="ti ti-receipt"></i>Ventas
@@ -816,8 +950,20 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
   <button class="bn-item" onclick="mostrarVista('equipo',this,'bn')">
     <i class="ti ti-trophy"></i>Equipo
   </button>
+  <button class="bn-item" onclick="mostrarVista('vendedores',this,'bn')">
+    <i class="ti ti-id-badge"></i>Vendedores
+  </button>
+  <button class="bn-item" onclick="mostrarVista('rentabilidad',this,'bn')">
+    <i class="ti ti-trending-up"></i>Rentab.
+  </button>
+  <button class="bn-item" onclick="mostrarVista('pendientes',this,'bn')">
+    <i class="ti ti-checkbox"></i>Pendientes
+  </button>
   <button class="bn-item" onclick="mostrarVista('finanzas',this,'bn')">
     <i class="ti ti-chart-bar"></i>Finanzas
+  </button>
+  <button class="bn-item" onclick="mostrarVista('pagos',this,'bn')">
+    <i class="ti ti-cash"></i>Pagos
   </button>
   <button class="bn-item" onclick="mostrarVista('expedientes',this,'bn')">
     <i class="ti ti-folder-check"></i>Expedientes
@@ -830,6 +976,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
   </button>
   <button class="bn-item" onclick="mostrarVista('egresos',this,'bn')">
     <i class="ti ti-arrow-down-circle"></i>Egresos
+  </button>
+  <button class="bn-item" onclick="mostrarVista('reportes',this,'bn')">
+    <i class="ti ti-report-analytics"></i>Reportes
   </button>
 </nav>
 
@@ -903,6 +1052,103 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
   </div>
 </div>
 
+<!-- OVERLAY: Nueva tarea -->
+<div class="overlay" id="ov-tarea">
+  <div class="overlay-panel">
+    <div class="overlay-hdr">
+      <i class="ti ti-checkbox" style="font-size:18px;color:var(--wc-info)"></i>
+      <div class="overlay-title">Nueva tarea</div>
+      <button class="overlay-close" onclick="cerrarOverlay('ov-tarea')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="overlay-body">
+      <div class="field-grid" style="grid-template-columns:1fr 1fr">
+        <div class="field-group" style="grid-column:span 2">
+          <div class="field-label">Tarea *</div>
+          <input class="field-input" id="ov-tarea-titulo" placeholder="Descripción de la tarea...">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Prioridad</div>
+          <select class="field-input" id="ov-tarea-prioridad">
+            <option value="normal">Normal</option>
+            <option value="alta">Alta</option>
+            <option value="urgente">Urgente</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Responsable</div>
+          <select class="field-input" id="ov-tarea-resp"></select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Fecha límite</div>
+          <input class="field-input" id="ov-tarea-fecha" type="date">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Categoría</div>
+          <select class="field-input" id="ov-tarea-cat">
+            <option value="general">General</option>
+            <option value="seguimiento">Seguimiento</option>
+            <option value="documentos">Documentos</option>
+            <option value="tramite">Trámite</option>
+            <option value="reparacion">Reparación</option>
+          </select>
+        </div>
+        <div class="field-group" style="grid-column:span 2">
+          <div class="field-label">Notas</div>
+          <textarea class="field-input" id="ov-tarea-notas" rows="2" placeholder="Contexto adicional..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="overlay-footer">
+      <button class="btn" onclick="cerrarOverlay('ov-tarea')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarTarea()"><i class="ti ti-device-floppy"></i>Crear tarea</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: Registrar pago -->
+<div class="overlay" id="ov-pago">
+  <div class="overlay-panel">
+    <div class="overlay-hdr">
+      <i class="ti ti-cash" style="font-size:18px;color:var(--wc-ok)"></i>
+      <div class="overlay-title">Registrar pago / apartado</div>
+      <button class="overlay-close" onclick="cerrarOverlay('ov-pago')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="overlay-body">
+      <div class="field-grid" style="grid-template-columns:1fr 1fr">
+        <div class="field-group" style="grid-column:span 2">
+          <div class="field-label">Cliente *</div>
+          <input class="field-input" id="ov-pago-cliente" placeholder="Nombre del cliente...">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Tipo de pago *</div>
+          <select class="field-input" id="ov-pago-tipo">
+            <option>Apartado</option>
+            <option>Anticipo</option>
+            <option>Contado</option>
+            <option>Financiamiento</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Monto *</div>
+          <input class="field-input" id="ov-pago-monto" type="number" placeholder="0.00" min="0">
+        </div>
+        <div class="field-group" style="grid-column:span 2">
+          <div class="field-label">Auto (referencia)</div>
+          <input class="field-input" id="ov-pago-auto" placeholder="Marca, modelo, año...">
+        </div>
+        <div class="field-group" style="grid-column:span 2">
+          <div class="field-label">Notas / Referencia</div>
+          <textarea class="field-input" id="ov-pago-notas" rows="2" placeholder="Número de recibo, folio, banco..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="overlay-footer">
+      <button class="btn" onclick="cerrarOverlay('ov-pago')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarPagoGer()"><i class="ti ti-device-floppy"></i>Registrar pago</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ══════════════════════════════════════════════════════
    WC PROTOCOL — GERENCIA
@@ -958,6 +1204,7 @@ function recibirDatos(msg){
   _poblarFiltroMes();_poblarFiltroVendedores();_poblarFiltroCliVend();
   renderDashboard();renderVentas();renderEquipo();renderPipeline();renderInventario();renderFinanzas();renderMetas();renderClientes();
   renderExpedientes();renderCreditos();renderComisionesGer();renderEgresosGer();
+  renderHoy();renderVendedores();renderRentabilidad();renderPendientes();renderPagos();renderReportes();
 }
 
 /* ══ Utilidades ══ */
@@ -2051,7 +2298,437 @@ function recibirEgresoResultado(msg){
   if(!msg.ok)toast('Error al guardar egreso: '+(msg.error||'inténtalo de nuevo'),'error');
 }
 
-/* ══ CLIENTES ══ */
+/* ══ HOY / URGENTES ══ */
+function renderHoy(){
+  const ACTIVOS_EST=['Nuevo','Contactado','Interesado','Negociando'];
+  const urgentes=CLIENTES.filter(c=>ACTIVOS_EST.includes(c.etapa||c.estatus||'Nuevo')&&diasSinActCli(c)>=3)
+    .sort((a,b)=>diasSinActCli(b)-diasSinActCli(a));
+  const ganados=CLIENTES.filter(c=>isVanta(c)||isVenta(c))
+    .sort((a,b)=>new Date(b._updatedDate||b._createdDate||0)-new Date(a._updatedDate||a._createdDate||0))
+    .slice(0,5);
+  const nuevosHoy=CLIENTES.filter(c=>{
+    if(!c._createdDate)return false;
+    const d=new Date(c._createdDate);
+    const hoy=new Date();
+    return d.getFullYear()===hoy.getFullYear()&&d.getMonth()===hoy.getMonth()&&d.getDate()===hoy.getDate();
+  });
+  // badge
+  const bHoy=document.getElementById('sb-badge-hoy');
+  if(bHoy){bHoy.textContent=urgentes.length;bHoy.style.display=urgentes.length?'inline':'none';}
+  // Urgentes
+  const uEl=document.getElementById('hoy-urgentes');
+  uEl.innerHTML=`<div style="font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+    <i class="ti ti-alert-triangle" style="color:var(--wc-warn)"></i>Sin seguimiento hace 3+ días
+    <span class="chip chip-warn">${urgentes.length}</span>
+  </div>`+(urgentes.length?`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Cliente</th><th>Vendedor</th><th>Etapa</th><th>Días</th><th></th></tr></thead>
+    <tbody>${urgentes.map(c=>{
+      const v=findVend(c.vendedorId||c.vendedorAsignado);
+      const dias=diasSinActCli(c);
+      const wa=c.telefono?`<a href="https://wa.me/52${c.telefono.replace(/\D/g,'')}" target="_blank" class="btn btn-sm" style="background:var(--wc-green);color:#fff;padding:4px 8px" onclick="event.stopPropagation()"><i class="ti ti-brand-whatsapp"></i></a>`:'';
+      return`<tr style="cursor:pointer" onclick="abrirDetalleCli('${esc(c._id||'')}')">
+        <td><div style="font-weight:600">${esc(c.nombre||c.name||'—')}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||'')}</div></td>
+        <td style="font-size:12px">${esc(v?.nombre||v?.name||'Sin asignar')}</td>
+        <td><span class="chip chip-warn">${esc(c.etapa||c.estatus||'Nuevo')}</span></td>
+        <td style="font-weight:700;color:var(--wc-danger)">${dias}d</td>
+        <td onclick="event.stopPropagation()">${wa}</td>
+      </tr>`;}).join('')}</tbody></table></div>`
+    :'<div class="empty-state" style="padding:20px"><i class="ti ti-check"></i><h3>¡Todo al día!</h3><p>Ningún lead lleva 3+ días sin seguimiento</p></div>');
+  // Nuevos hoy
+  const nEl=document.getElementById('hoy-sin-seguimiento');
+  nEl.innerHTML=`<div style="font-size:14px;font-weight:700;margin:20px 0 10px;display:flex;align-items:center;gap:8px">
+    <i class="ti ti-user-plus" style="color:var(--wc-info)"></i>Nuevos leads hoy
+    <span class="chip chip-info">${nuevosHoy.length}</span>
+  </div>`+(nuevosHoy.length?`<div style="display:flex;flex-direction:column;gap:6px">
+    ${nuevosHoy.map(c=>{
+      const v=findVend(c.vendedorId||c.vendedorAsignado);
+      return`<div class="pend-card" onclick="abrirDetalleCli('${esc(c._id||'')}')">
+        <div class="pend-card-title">${esc(c.nombre||c.name||'Sin nombre')}</div>
+        <div class="pend-card-meta">
+          <span>${esc(c.autoInteres||c._autoNombre||'—')}</span>
+          <span>${esc(v?.nombre||v?.name||'Sin asignar')}</span>
+          <span>${esc(c.origen||'—')}</span>
+        </div>
+      </div>`;}).join('')}</div>`
+    :'<div style="color:var(--wc-ink3);font-size:13px;padding:8px 0">No hay leads nuevos hoy</div>');
+  // Ventas recientes
+  const gEl=document.getElementById('hoy-ganados-recientes');
+  gEl.innerHTML=`<div style="font-size:14px;font-weight:700;margin:20px 0 10px;display:flex;align-items:center;gap:8px">
+    <i class="ti ti-trophy" style="color:var(--wc-ok)"></i>Ventas recientes
+  </div>`+(ganados.length?`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Cliente</th><th>Auto</th><th>Vendedor</th><th class="num">Precio</th><th>Fecha</th></tr></thead>
+    <tbody>${ganados.map(c=>{
+      const v=findVend(c.vendedorId||c.vendedorAsignado);
+      return`<tr style="cursor:pointer" onclick="abrirDetalleLead('${esc(c._id||'')}')">
+        <td style="font-weight:600">${esc(c.nombre||c.name||'—')}</td>
+        <td style="font-size:12px">${esc(c._autoNombre||c.autoInteres||'—')}</td>
+        <td style="font-size:12px">${esc(v?.nombre||v?.name||'—')}</td>
+        <td class="num">${M(c._precioVenta||c.cierrePrecio||0)}</td>
+        <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(c._updatedDate||c._createdDate)}</td>
+      </tr>`;}).join('')}</tbody></table></div>`
+    :'<div style="color:var(--wc-ink3);font-size:13px;padding:8px 0">Sin ventas recientes</div>');
+}
+function isVanta(c){return isVenta(c);}
+
+/* ══ VENDEDORES (cards detalladas) ══ */
+function renderVendedores(){
+  const AVCOLORS=['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#10b981','#ef4444','#f97316'];
+  const vendActivos=VENDEDORES.filter(v=>v.rol&&!['perdido','inactivo'].includes((v.rol||'').toLowerCase()));
+  const mesStr=_filtroMes||(new Date().getFullYear()+'-'+(new Date().getMonth()+1).toString().padStart(2,'0'));
+  const el=document.getElementById('vend-list');
+  if(!VENDEDORES.length){el.innerHTML='<div class="empty-state"><i class="ti ti-id-badge"></i><h3>Sin vendedores</h3><p>No hay vendedores registrados</p></div>';return;}
+  const cards=VENDEDORES.map((v,i)=>{
+    const id=v._id;
+    const leads=CLIENTES.filter(c=>(c.vendedorId||c.vendedorAsignado)===id);
+    const activos=leads.filter(c=>!['Ganado','Vendido','Entregado','Perdido'].includes(c.etapa||c.estatus||'')).length;
+    const cerrados=leads.filter(c=>isVenta(c)).length;
+    const esMes=leads.filter(c=>isVenta(c)&&_enMes(c));
+    const unidades=esMes.length;
+    const utilMes=esMes.reduce((s,c)=>s+calcUtil(c).util,0);
+    const meta=parseFloat(v.metaMensual||v.meta||0);
+    const pctVentas=meta>0?Math.min(100,Math.round(unidades/meta*100)):0;
+    const color=AVCOLORS[i%AVCOLORS.length];
+    const ini=(v.nombre||v.name||'?').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
+    const waHref=v.telefono?`https://wa.me/52${v.telefono.replace(/\D/g,'')}`:'';
+    return`<div class="vend-card">
+      <div class="vend-card-head">
+        <div class="vend-avatar" style="background:${color}">${esc(ini)}</div>
+        <div class="vend-meta">
+          <div class="vend-nombre">${esc(v.nombre||v.name||'—')}</div>
+          <div class="vend-sub">${esc(v.email||v.sucursal||v.rol||'—')}</div>
+        </div>
+        ${waHref?`<a href="${waHref}" target="_blank" class="btn btn-sm" style="background:var(--wc-green);color:#fff;padding:5px 8px"><i class="ti ti-brand-whatsapp"></i></a>`:''}
+      </div>
+      <div class="vend-stats">
+        <div class="vend-stat"><div class="vend-stat-n" style="color:var(--wc-info)">${activos}</div><div class="vend-stat-l">Activos</div></div>
+        <div class="vend-stat"><div class="vend-stat-n" style="color:var(--wc-ok)">${unidades}</div><div class="vend-stat-l">Este mes</div></div>
+        <div class="vend-stat"><div class="vend-stat-n">${cerrados}</div><div class="vend-stat-l">Total cierres</div></div>
+      </div>
+      ${meta>0?`<div class="vend-bar-wrap">
+        <div class="vend-bar-label"><span>Meta mensual: ${meta} ventas</span><span style="font-weight:700;color:${pctVentas>=100?'var(--wc-ok)':'var(--wc-ink2)'}">${pctVentas}%</span></div>
+        <div class="vend-bar"><div class="vend-bar-fill" style="width:${pctVentas}%;background:${pctVentas>=100?'var(--wc-ok)':'var(--wc-warn)'}"></div></div>
+      </div>`:''}
+      <div style="font-size:11px;color:var(--wc-ink3);margin-top:8px">Utilidad este mes: <strong style="color:var(--wc-ok)">${M(utilMes)}</strong></div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn btn-sm" style="flex:1" onclick="filtrarCliPorVendedor('${esc(id)}')"><i class="ti ti-users"></i>Ver leads</button>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div class="vend-grid">${cards}</div>`;
+}
+function filtrarCliPorVendedor(id){
+  mostrarVista('clientes',document.querySelector('.sb-item[onclick*="clientes"]'));
+  const sel=document.getElementById('cli-f-vend');
+  if(sel){sel.value=id;renderClientes();}
+}
+
+/* ══ RENTABILIDAD ══ */
+function renderRentabilidad(){
+  const q=(document.getElementById('rent-q')?.value||'').toLowerCase();
+  const fEst=document.getElementById('rent-f-est')?.value||'';
+  const sort=document.getElementById('rent-sort')?.value||'dias';
+  let rows=[...CARS].map(car=>{
+    const nombre=[car.marca||car.brand||'',car.modelo||car.model||'',car.anio||car.year||''].filter(Boolean).join(' ');
+    const precio=parseFloat(car.precioVenta||car.priceNew||car.precio||0);
+    const costo=parseFloat(car.costoAdquisicion||car.costoCompra||car.costo||0);
+    const gastos=parseFloat(car.gastoReparacion||car.gastosReparacion||0)+parseFloat(car.gastoLegalAduanas||0)+parseFloat(car.gastosExtras||0);
+    const costoTotal=costo+gastos;
+    const margen=precio-costoTotal;
+    const margenPct=precio>0?Math.round(margen/precio*100):0;
+    const fechaIn=car._createdDate||car.fechaIngreso||car.fechaCompra;
+    const dias=fechaIn?Math.round((Date.now()-new Date(fechaIn).getTime())/(1000*60*60*24)):0;
+    const interesados=CLIENTES.filter(c=>(c.cierreAutoId||c.autoInventarioId||c.autoInteresId||c.vehiculoId)===car._id).length;
+    const estatus=car.estatusVenta||car.estatus||'Disponible';
+    return{...car,_nombre:nombre,_precio:precio,_costo:costoTotal,_margen:margen,_margenPct:margenPct,_dias:dias,_interesados:interesados,_estatus:estatus};
+  });
+  if(q)rows=rows.filter(c=>c._nombre.toLowerCase().includes(q)||(c.vin||'').toLowerCase().includes(q));
+  if(fEst)rows=rows.filter(c=>c._estatus===fEst);
+  if(sort==='dias')rows.sort((a,b)=>b._dias-a._dias);
+  else if(sort==='margen-asc')rows.sort((a,b)=>a._margenPct-b._margenPct);
+  else if(sort==='margen-desc')rows.sort((a,b)=>b._margenPct-a._margenPct);
+  else if(sort==='precio')rows.sort((a,b)=>b._precio-a._precio);
+  // KPIs
+  const sinCosto=rows.filter(c=>c._costo===0).length;
+  const margenProm=rows.length?Math.round(rows.reduce((s,c)=>s+c._margenPct,0)/rows.length):0;
+  const diasProm=rows.length?Math.round(rows.reduce((s,c)=>s+c._dias,0)/rows.length):0;
+  const alertas=rows.filter(c=>c._dias>=60&&!['Vendido','Entregado'].includes(c._estatus)).length;
+  document.getElementById('rent-kpis').innerHTML=`<div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat-card accent"><div class="stat-num">${rows.length}</div><div class="stat-lbl">Autos</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:${margenProm>=15?'var(--wc-ok)':margenProm>=5?'var(--wc-warn)':'var(--wc-danger)'}">${margenProm}%</div><div class="stat-lbl">Margen promedio</div></div>
+    <div class="stat-card"><div class="stat-num">${diasProm}d</div><div class="stat-lbl">Días prom en lote</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:${alertas?'var(--wc-danger)':'var(--wc-ok)'}">${alertas}</div><div class="stat-lbl">Alerta +60 días</div></div>
+  </div>${sinCosto?`<div style="background:var(--wc-warn-bg);border:1px solid var(--wc-warn);border-radius:var(--wc-r-md);padding:10px 14px;font-size:12px;margin-bottom:12px;color:var(--wc-warn)"><i class="ti ti-alert-triangle"></i> ${sinCosto} autos sin costo registrado — el margen puede estar sobreestimado</div>`:''}`;
+  const el=document.getElementById('rent-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-car"></i><h3>Sin autos</h3><p>No hay autos con ese filtro</p></div>';return;}
+  const ESTBADGE={Disponible:'chip-green',Apartado:'chip-warn',Vendido:'chip-info',Entregado:'chip-gray'};
+  el.innerHTML=rows.map(c=>{
+    const alerta=c._dias>=60&&!['Vendido','Entregado'].includes(c._estatus);
+    const warn=c._dias>=30&&c._dias<60&&!['Vendido','Entregado'].includes(c._estatus);
+    const margenColor=c._margenPct>=15?'var(--wc-ok)':c._margenPct>=5?'var(--wc-warn)':'var(--wc-danger)';
+    const barW=Math.min(100,Math.max(0,c._margenPct));
+    return`<div class="rent-row ${alerta?'alerta':warn?'warn':''}">
+      <div class="rent-row-head">
+        <div class="rent-nombre">${esc(c._nombre||'—')}</div>
+        ${c._estatus?`<span class="chip ${ESTBADGE[c._estatus]||'chip-gray'}">${esc(c._estatus)}</span>`:''}
+        <span class="rent-dias ${alerta?'pend-prio-urgente':warn?'pend-prio-alta':''}">${c._dias}d${alerta?' ⚠':''}</span>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:12px">
+        <span>Precio: <strong>${M(c._precio)}</strong></span>
+        <span>Costo+gastos: <strong>${c._costo>0?M(c._costo):'<span style="color:var(--wc-warn)">Sin registro</span>'}</strong></span>
+        <span>Margen: <strong style="color:${margenColor}">${M(c._margen)} (${c._margenPct}%)</strong></span>
+        ${c._interesados?`<span><i class="ti ti-eye" style="font-size:11px"></i> ${c._interesados} interesados</span>`:''}
+      </div>
+      <div class="rent-margen-bar"><div class="rent-margen-fill" style="width:${barW}%;background:${margenColor}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ══ PENDIENTES / TAREAS ══ */
+let TAREAS=[];
+function renderPendientes(){
+  const COLS=[
+    {id:'pendiente',label:'Pendiente',color:'var(--wc-warn)'},
+    {id:'proceso',label:'En proceso',color:'var(--wc-info)'},
+    {id:'completado',label:'Completado',color:'var(--wc-ok)'},
+  ];
+  const bdg=document.getElementById('sb-badge-pend');
+  const pend=TAREAS.filter(t=>t.estado==='pendiente').length;
+  if(bdg){bdg.textContent=pend;bdg.style.display=pend?'inline':'none';}
+  // Llenar selector de responsable en overlay
+  const respSel=document.getElementById('ov-tarea-resp');
+  if(respSel&&!respSel.dataset.loaded){
+    VENDEDORES.forEach(v=>{const o=document.createElement('option');o.value=v._id;o.textContent=v.nombre||v.name||v.email||'—';respSel.appendChild(o);});
+    respSel.dataset.loaded='1';
+  }
+  const board=document.getElementById('pend-board');
+  board.innerHTML=COLS.map(col=>{
+    const items=TAREAS.filter(t=>(t.estado||'pendiente')===col.id);
+    const cards=items.map(t=>{
+      const resp=findVend(t.responsableId)||{nombre:t.responsableNombre||'—'};
+      const vencido=t.fechaLimite&&new Date(t.fechaLimite)<new Date();
+      const prioClass=t.prioridad==='urgente'?'pend-prio-urgente':t.prioridad==='alta'?'pend-prio-alta':'';
+      return`<div class="pend-card" onclick="editarTarea('${esc(t._id||t._tmp||'')}')">
+        <div class="pend-card-title">${esc(t.titulo||'Sin título')}</div>
+        <div class="pend-card-meta">
+          ${t.prioridad&&t.prioridad!=='normal'?`<span class="${prioClass}">${t.prioridad.toUpperCase()}</span>`:''}
+          <span>${esc(resp.nombre||resp.name||'—')}</span>
+          ${t.fechaLimite?`<span style="${vencido?'color:var(--wc-danger);font-weight:700':''}"><i class="ti ti-calendar" style="font-size:10px"></i>${fechaCorta(t.fechaLimite)}</span>`:''}
+          ${t.categoria?`<span class="chip chip-gray" style="font-size:9px;padding:1px 5px">${esc(t.categoria)}</span>`:''}
+        </div>
+        <div style="margin-top:8px;display:flex;gap:6px">
+          ${col.id!=='completado'?`<button class="btn btn-sm" style="font-size:10px;padding:3px 8px" onclick="event.stopPropagation();moverTarea('${esc(t._id||t._tmp||'')}','${col.id==='pendiente'?'proceso':'completado'}')">
+            ${col.id==='pendiente'?'▶ Iniciar':'✓ Completar'}
+          </button>`:''}
+          ${col.id!=='pendiente'?`<button class="btn btn-sm" style="font-size:10px;padding:3px 8px;opacity:.6" onclick="event.stopPropagation();moverTarea('${esc(t._id||t._tmp||'')}','pendiente')">↩ Deshacer</button>`:''}
+        </div>
+      </div>`;
+    }).join('')||`<div style="color:var(--wc-ink3);font-size:12px;text-align:center;padding:16px">Sin tareas</div>`;
+    return`<div class="pend-col">
+      <div class="pend-col-head" style="border-top:3px solid ${col.color}">
+        <div class="pend-col-title">${col.label}</div>
+        <span class="pend-col-count" style="${items.length?'background:'+col.color+';color:#fff':''}">${items.length}</span>
+      </div>
+      <div class="pend-col-body">${cards}</div>
+    </div>`;
+  }).join('');
+}
+function guardarTarea(){
+  const titulo=document.getElementById('ov-tarea-titulo').value.trim();
+  if(!titulo){toast('Escribe el título de la tarea','warn');return;}
+  const t={
+    _tmp:'tmp_'+Date.now(),titulo,
+    prioridad:document.getElementById('ov-tarea-prioridad').value,
+    responsableId:document.getElementById('ov-tarea-resp').value,
+    fechaLimite:document.getElementById('ov-tarea-fecha').value||'',
+    categoria:document.getElementById('ov-tarea-cat').value,
+    notas:document.getElementById('ov-tarea-notas').value,
+    estado:'pendiente',creadoPor:CTX.emailActual,
+  };
+  TAREAS.unshift(t);
+  cerrarOverlay('ov-tarea');
+  document.getElementById('ov-tarea-titulo').value='';
+  toast('Tarea creada ✓');renderPendientes();
+}
+function moverTarea(id,nuevoEstado){
+  const idx=TAREAS.findIndex(t=>(t._id||t._tmp)===id);
+  if(idx<0)return;
+  TAREAS[idx].estado=nuevoEstado;
+  toast(nuevoEstado==='completado'?'Tarea completada ✓':nuevoEstado==='proceso'?'En proceso':'Tarea reabierta');
+  renderPendientes();
+}
+function editarTarea(id){
+  const t=TAREAS.find(t=>(t._id||t._tmp)===id);
+  if(!t)return;
+  // Simple toast con opciones de mover
+  const opciones=t.estado==='pendiente'?'proceso/completado':t.estado==='proceso'?'completado':null;
+  if(opciones)toast(`"${t.titulo.slice(0,30)}" — mover a: ${opciones}`);
+}
+
+/* ══ PAGOS / APARTADOS ══ */
+let PAGOS=[];
+function renderPagos(){
+  const q=(document.getElementById('pagos-q')?.value||'').toLowerCase();
+  const fTipo=document.getElementById('pagos-f-tipo')?.value||'';
+  let rows=[...PAGOS].sort((a,b)=>new Date(b._createdDate||b.fecha||0)-new Date(a._createdDate||a.fecha||0));
+  if(fTipo)rows=rows.filter(p=>(p.tipo||p.tipoPago||p.formaPago||'')===fTipo);
+  if(q)rows=rows.filter(p=>(p.cliente||p.clienteNombre||p.auto||p.notas||'').toLowerCase().includes(q));
+  const totalApart=PAGOS.filter(p=>(p.tipo||p.formaPago||'')===('Apartado')).reduce((s,p)=>s+parseFloat(p.monto||0),0);
+  const totalAntic=PAGOS.filter(p=>(p.tipo||p.formaPago||'')===('Anticipo')).reduce((s,p)=>s+parseFloat(p.monto||0),0);
+  const totalGen=PAGOS.reduce((s,p)=>s+parseFloat(p.monto||0),0);
+  document.getElementById('pagos-kpis').innerHTML=`<div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat-card accent"><div class="stat-num">${PAGOS.length}</div><div class="stat-lbl">Pagos registrados</div></div>
+    <div class="stat-card"><div class="stat-num" style="font-size:18px;color:var(--wc-warn)">${M(totalApart+totalAntic)}</div><div class="stat-lbl">Apartados + Anticipos</div></div>
+    <div class="stat-card"><div class="stat-num" style="font-size:18px;color:var(--wc-ok)">${M(totalGen)}</div><div class="stat-lbl">Total cobrado</div></div>
+  </div>`;
+  const el=document.getElementById('pagos-list');
+  if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-cash"></i><h3>Sin pagos</h3><p>Registra el primer pago o apartado</p></div>';return;}
+  const TBADGE={Apartado:'chip-warn',Anticipo:'chip-orange',Contado:'chip-green',Financiamiento:'chip-info'};
+  el.innerHTML=`<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Cliente</th><th>Auto</th><th>Tipo</th><th class="num">Monto</th><th>Fecha</th><th>Notas</th></tr></thead>
+    <tbody>${rows.map(p=>`<tr>
+      <td style="font-weight:600">${esc(p.cliente||p.clienteNombre||'—')}</td>
+      <td style="font-size:12px">${esc(p.auto||p.vehiculo||'—')}</td>
+      <td><span class="chip ${TBADGE[p.tipo||p.formaPago||'']||'chip-gray'}">${esc(p.tipo||p.formaPago||'—')}</span></td>
+      <td class="num" style="color:var(--wc-ok)">${M(p.monto)}</td>
+      <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(p._createdDate||p.fecha)}</td>
+      <td style="font-size:11px;color:var(--wc-ink3)">${esc(p.notas||'—')}</td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+function guardarPagoGer(){
+  const cliente=document.getElementById('ov-pago-cliente').value.trim();
+  const monto=parseFloat(document.getElementById('ov-pago-monto').value)||0;
+  if(!cliente){toast('Escribe el nombre del cliente','warn');return;}
+  if(!monto||monto<=0){toast('Ingresa un monto válido','warn');return;}
+  const p={
+    _tmp:'tmp_'+Date.now(),
+    cliente,monto,
+    tipo:document.getElementById('ov-pago-tipo').value,
+    auto:document.getElementById('ov-pago-auto').value.trim(),
+    notas:document.getElementById('ov-pago-notas').value.trim(),
+    fecha:new Date().toISOString(),registradoPor:CTX.emailActual,
+  };
+  PAGOS.unshift(p);
+  cerrarOverlay('ov-pago');
+  document.getElementById('ov-pago-cliente').value='';
+  document.getElementById('ov-pago-monto').value='';
+  document.getElementById('ov-pago-auto').value='';
+  document.getElementById('ov-pago-notas').value='';
+  toast('Pago registrado ✓');renderPagos();
+}
+
+/* ══ REPORTES GERENCIALES ══ */
+function renderReportes(){
+  const el=document.getElementById('rep-content');
+  if(!el)return;
+  const ahora=new Date();
+  const mesLabel=ahora.toLocaleString('es-MX',{month:'long',year:'numeric'});
+  const ventas=ventasDelMes();
+  const leadsTotal=CLIENTES.length;
+  const leadsActivos=CLIENTES.filter(c=>!['Ganado','Vendido','Entregado','Perdido'].includes(c.etapa||c.estatus||'')).length;
+  const leadsGanados=CLIENTES.filter(c=>isVenta(c)).length;
+  const leadsPerdidos=CLIENTES.filter(c=>(c.etapa||c.estatus||'')==='Perdido').length;
+  const leadsMes=CLIENTES.filter(c=>_enMes(c)).length;
+  const tasaCierre=leadsTotal>0?Math.round(leadsGanados/leadsTotal*100):0;
+  // Pipeline por etapa
+  const ETAPAS=['Nuevo','Contactado','Interesado','Negociando','Ganado','Perdido'];
+  const ETAPA_COLOR={Nuevo:'var(--wc-info)',Contactado:'#8b5cf6',Interesado:'var(--wc-warn)',
+    Negociando:'var(--wc-orange)',Ganado:'var(--wc-ok)',Perdido:'var(--wc-danger)'};
+  const pipeData=ETAPAS.map(e=>({etapa:e,count:CLIENTES.filter(c=>(c.etapa||c.estatus||'Nuevo')===e).length}));
+  // Ranking vendedores
+  const rankVend=VENDEDORES.map(v=>{
+    const mis=CLIENTES.filter(c=>(c.vendedorId||c.vendedorAsignado)===v._id);
+    const leadsM=mis.filter(c=>_enMes(c)).length;
+    const gan=mis.filter(c=>isVenta(c)&&_enMes(c)).length;
+    const util=mis.filter(c=>isVenta(c)&&_enMes(c)).reduce((s,c)=>s+calcUtil(c).util,0);
+    const meta=parseFloat(v.metaMensual||0);
+    return{...v,leads:mis.length,leadsMes:leadsM,ganados:gan,util,meta,pct:meta>0?Math.round(gan/meta*100):0};
+  }).filter(v=>v.leads>0||v.leadsMes>0).sort((a,b)=>b.ganados-a.ganados||b.leads-a.leads);
+  // Top autos solicitados
+  const autoCount={};
+  CLIENTES.forEach(c=>{
+    const id=c.cierreAutoId||c.autoInventarioId||c.autoInteresId||c.vehiculoId;
+    if(id)autoCount[id]=(autoCount[id]||0)+1;
+  });
+  const topAutos=Object.entries(autoCount).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([id,cnt])=>{
+    const car=CARS.find(c=>c._id===id);
+    if(!car)return null;
+    const nombre=[car.marca||car.brand||'',car.modelo||car.model||'',car.anio||car.year||''].filter(Boolean).join(' ');
+    return{car,nombre,cnt,precio:parseFloat(car.precioVenta||car.priceNew||car.precio||0),estatus:car.estatusVenta||car.estatus||'Disponible'};
+  }).filter(Boolean);
+  const AVCOLORS=['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#10b981'];
+  el.innerHTML=`
+  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+    <div><h2 style="font-size:20px;font-weight:800;margin:0">Reportes gerenciales</h2>
+    <div style="font-size:12px;color:var(--wc-ink3);margin-top:2px">${mesLabel} · ${leadsTotal} leads · ${CARS.length} vehículos</div></div>
+  </div>
+  <!-- KPIs CRM -->
+  <div class="kpi-section-label"><i class="ti ti-address-book"></i>CRM · Leads</div>
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-label">Leads totales</div><div class="kpi-value">${leadsTotal}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Nuevos este mes</div><div class="kpi-value">${leadsMes}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Activos</div><div class="kpi-value">${leadsActivos}</div><div class="kpi-sub">${leadsPerdidos} perdidos</div></div>
+    <div class="kpi-card"><div class="kpi-label">Tasa de cierre</div>
+      <div class="kpi-value" style="color:${tasaCierre>=20?'var(--wc-ok)':tasaCierre>=10?'var(--wc-warn)':'var(--wc-danger)'}">${tasaCierre}%</div>
+      <div class="kpi-sub">meta ≥ 20% · ${leadsGanados} cerrados</div></div>
+  </div>
+  <!-- Pipeline por etapa -->
+  <div class="card-box" style="background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);padding:16px;margin-bottom:16px">
+    <div style="font-weight:700;font-size:13px;margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="ti ti-filter"></i>Pipeline de ventas</div>
+    <div class="pipeline-row">${pipeData.map(p=>`
+      <div class="pipeline-chip" style="border-top:3px solid ${ETAPA_COLOR[p.etapa]||'var(--wc-border)'}">
+        <div class="pipeline-chip-n" style="color:${ETAPA_COLOR[p.etapa]||'var(--wc-ink)'}">${p.count}</div>
+        <div class="pipeline-chip-l">${p.etapa}</div>
+      </div>`).join('')}</div>
+    ${leadsTotal>0?`<div class="pipe-bar">${pipeData.filter(p=>p.count>0).map(p=>`<div class="pipe-bar-seg" style="flex:${p.count};background:${ETAPA_COLOR[p.etapa]||'var(--wc-border)'}"></div>`).join('')}</div>`:''}
+  </div>
+  <!-- Ranking vendedores -->
+  ${rankVend.length?`<div class="card-box" style="background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);padding:16px;margin-bottom:16px">
+    <div style="font-weight:700;font-size:13px;margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="ti ti-trophy"></i>Ranking vendedores — ${mesLabel}</div>
+    ${rankVend.map((v,i)=>{
+      const color=AVCOLORS[i%AVCOLORS.length];
+      const ini=(v.nombre||v.name||'?').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
+      const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+      return`<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--wc-border)">
+        <span style="font-size:16px;width:24px;text-align:center">${medal||i+1}</span>
+        <div style="width:36px;height:36px;border-radius:50%;background:${color};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0">${esc(ini)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13px">${esc(v.nombre||v.name||'—')}</div>
+          <div style="font-size:11px;color:var(--wc-ink3)">${v.leads} leads · ${v.leadsMes} este mes · ${v.ganados} cerrados · ${M(v.util)} util</div>
+          ${v.meta>0?`<div style="margin-top:4px;height:4px;background:var(--wc-border);border-radius:4px;overflow:hidden"><div style="height:4px;width:${Math.min(100,v.pct)}%;background:${v.pct>=100?'var(--wc-ok)':'var(--wc-warn)'};border-radius:4px"></div></div>`:''}
+        </div>
+        ${v.meta>0?`<span style="font-size:11px;font-weight:700;color:${v.pct>=100?'var(--wc-ok)':'var(--wc-ink3)'}">${v.pct}%</span>`:''}
+      </div>`;
+    }).join('')}
+  </div>`:''}
+  <!-- Top autos más solicitados -->
+  ${topAutos.length?`<div class="card-box" style="background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-lg);padding:16px;margin-bottom:16px">
+    <div style="font-weight:700;font-size:13px;margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="ti ti-heart"></i>Autos más solicitados</div>
+    ${topAutos.map((entry,i)=>{
+      const {car,nombre,cnt,precio,estatus}=entry;
+      const ESTBADGE={Disponible:'chip-green',Apartado:'chip-warn',Vendido:'chip-info',Entregado:'chip-gray'};
+      const interesados=CLIENTES.filter(c=>(c.cierreAutoId||c.autoInventarioId||c.autoInteresId||c.vehiculoId)===car._id);
+      return`<div style="padding:10px 0;border-bottom:1px solid var(--wc-border)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:16px;font-weight:900;color:var(--wc-ink3);width:20px">${i+1}</span>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:13px">${esc(nombre)}</div>
+            <div style="font-size:11px;color:var(--wc-ink3);margin-top:2px">${M(precio)} · <span class="chip ${ESTBADGE[estatus]||'chip-gray'}" style="font-size:10px">${esc(estatus)}</span></div>
+          </div>
+          <span class="chip chip-info"><i class="ti ti-eye" style="font-size:11px"></i>${cnt} interesados</span>
+        </div>
+        ${interesados.length?`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+          ${interesados.slice(0,4).map(c=>`<span style="font-size:11px;background:var(--wc-surface2);border-radius:999px;padding:2px 8px;cursor:pointer" onclick="abrirDetalleCli('${esc(c._id||'')}')">
+            ${esc(c.nombre||c.name||'—')}
+          </span>`).join('')}
+          ${interesados.length>4?`<span style="font-size:11px;color:var(--wc-ink3)">+${interesados.length-4} más</span>`:''}
+        </div>`:''}
+      </div>`;
+    }).join('')}
+  </div>`:''}`;
+}
+
+/* ══ CLIENTES ══
 const CLI_ESTATUS=['Nuevo','Contactado','Interesado','Negociando','Ganado','Perdido'];
 let _cliView='tabla';
 let _cliAbierto=null;
@@ -2319,15 +2996,24 @@ function guardarEdicionCli(){
 
 /* ══ Nav ══ */
 const TOPBAR_LABELS={
-  dashboard:{title:'Dashboard Ejecutivo',sub:''},ventas:{title:'Ventas del mes',sub:''},
-  equipo:{title:'Equipo / Ranking',sub:''},pipeline:{title:'Pipeline completo',sub:''},
+  dashboard:{title:'Dashboard Ejecutivo',sub:''},
+  hoy:{title:'Hoy / Urgentes',sub:'leads sin seguimiento · nuevos hoy · ventas recientes'},
+  ventas:{title:'Ventas del mes',sub:''},
+  equipo:{title:'Equipo / Ranking',sub:''},
+  pipeline:{title:'Pipeline completo',sub:''},
   clientes:{title:'Todos los clientes',sub:''},
-  inventario:{title:'Inventario',sub:''},finanzas:{title:'Resumen financiero',sub:''},
+  vendedores:{title:'Vendedores',sub:'ficha por vendedor'},
+  inventario:{title:'Inventario',sub:''},
+  rentabilidad:{title:'Rentabilidad',sub:'precio · costo · margen · días en lote'},
+  pendientes:{title:'Pendientes del equipo',sub:''},
+  finanzas:{title:'Resumen financiero',sub:''},
+  pagos:{title:'Pagos y apartados',sub:''},
   metas:{title:'Metas y bonos',sub:''},
   expedientes:{title:'Expedientes de venta',sub:''},
   creditos:{title:'Créditos en trámite',sub:''},
   comisiones:{title:'Comisiones del equipo',sub:''},
   egresos:{title:'Egresos del negocio',sub:''},
+  reportes:{title:'Reportes gerenciales',sub:'pipeline · ranking · autos más solicitados'},
 };
 function mostrarVista(id,btn,nav){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
