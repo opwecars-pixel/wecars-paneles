@@ -316,10 +316,14 @@ export async function crearSolicitudAprobacion(datos) {
   await verificarAcceso();
   try {
     const item = {
+      tipo:             datos.tipo || 'consigna',   // 'consigna' | 'descuento'
       autoId:           datos.autoId || '',
       autoNombre:       datos.autoNombre || '',
+      leadId:           datos.leadId || '',
+      clienteNombre:    datos.clienteNombre || '',
       precioSolicitado: parseFloat(datos.precioSolicitado) || 0,
       precioAnterior:   parseFloat(datos.precioAnterior) || 0,
+      montoDescuento:   parseFloat(datos.montoDescuento) || 0,
       notas:            datos.notas || '',
       solicitadoPor:    datos.solicitadoPor || '',
       fechaSolicitud:   new Date(),
@@ -359,15 +363,31 @@ export async function firmarAprobacion(id, tipoFirma, usuarioNombre, usuarioEmai
     if (ambasFirmas) {
       update.estatus = 'aprobado';
       update.fechaAprobacion = ahora;
-      if (existente.autoId) {
+      const tipo = existente.tipo || 'consigna';
+      if (tipo === 'consigna' && existente.autoId) {
+        // Actualizar precio convenido en el auto
         try {
           const car = await wixData.get('Cars', existente.autoId, OPTS);
           if (car) {
             await wixData.update('Cars', {
               ...car,
-              precioConvenido:    parseFloat(existente.precioSolicitado),
-              precioConsignaMin:  parseFloat(existente.precioSolicitado),
+              precioConvenido:   parseFloat(existente.precioSolicitado),
+              precioConsignaMin: parseFloat(existente.precioSolicitado),
               _id: car._id,
+            }, OPTS);
+          }
+        } catch (_) {}
+      } else if (tipo === 'descuento' && existente.leadId) {
+        // Registrar precio aprobado con descuento en el lead
+        try {
+          const lead = await wixData.get('ALeads', existente.leadId, OPTS);
+          if (lead) {
+            await wixData.update('ALeads', {
+              ...lead,
+              precioConDescuento:    parseFloat(existente.precioSolicitado),
+              descuentoAprobado:     parseFloat(existente.montoDescuento),
+              descuentoAprobadoPor:  `${existente.firmaContraloriaUser} + ${existente.firmaGerenciaVentasUser}`,
+              _id: lead._id,
             }, OPTS);
           }
         } catch (_) {}

@@ -3234,7 +3234,7 @@ const FIRMA_CONTRALORIA    = 'contraloria';
 const FIRMA_GERENCIA_VTA   = 'gerenciaVentas';
 // Emails de los firmantes (se comparan con CTX.emailActual)
 const EMAIL_CONTRALORIA    = 'rodrigocastillo.9718@gmail.com';
-const EMAIL_GERENCIA_VTA   = 'fernando@wecars.mx'; // ajustar al email real de Fernando
+const EMAIL_GERENCIA_VTA   = 'parrazada@gmail.com';
 
 function setFiltroApro(f,btn){
   _filtroApro=f;
@@ -3261,6 +3261,8 @@ function renderAprobaciones(){
     const estadoBadge={pendiente:'chip-warn',aprobado:'chip-green',rechazado:'chip-danger'};
     const estadoLabel={pendiente:'Pendiente',aprobado:'Aprobado',rechazado:'Rechazado'};
     const fotoUrl=car?(car.fotos?.[0]||car.foto||car.fotoPrincipal||''):'';
+    const tipoLabel=a.tipo==='descuento'?'Descuento':'Consigna';
+    const tipoColor=a.tipo==='descuento'?'chip-info':'chip-orange';
     // Firmas
     const fc=a.firmaContraloria;
     const fg=a.firmaGerenciaVentas;
@@ -3285,14 +3287,18 @@ function renderAprobaciones(){
         ${fotoUrl?`<img src="${esc(fotoUrl)}" style="width:72px;height:54px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none'">`:''}
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-            <span style="font-size:15px;font-weight:800">${esc(a.autoNombre||'Auto sin nombre')}</span>
+            <span style="font-size:15px;font-weight:800">${esc(a.tipo==='descuento'?(a.clienteNombre||'Cliente'):(a.autoNombre||'Auto'))}</span>
+            <span class="chip ${tipoColor}">${tipoLabel}</span>
             <span class="chip ${estadoBadge[a.estatus]||'chip-warn'}">${estadoLabel[a.estatus]||a.estatus}</span>
           </div>
+          ${a.tipo==='descuento'?`<div style="font-size:12px;color:var(--wc-ink3);margin-bottom:8px">Auto: ${esc(a.autoNombre||'—')}</div>`:''}
           <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:10px">
-            <div><div style="font-size:10px;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px">Precio propuesto</div>
+            <div><div style="font-size:10px;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px">${a.tipo==='descuento'?'Precio con descuento':'Precio propuesto'}</div>
               <div style="font-size:18px;font-weight:800;color:var(--wc-green)">${precio}</div></div>
-            <div><div style="font-size:10px;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px">Precio anterior</div>
+            <div><div style="font-size:10px;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px">${a.tipo==='descuento'?'Precio lista':'Precio anterior'}</div>
               <div style="font-size:18px;font-weight:800;color:var(--wc-ink2)">${anterior}</div></div>
+            ${a.montoDescuento?`<div><div style="font-size:10px;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px">Descuento</div>
+              <div style="font-size:18px;font-weight:800;color:var(--wc-danger)">-${M(a.montoDescuento)}</div></div>`:''}
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:${botonesHtml?10:0}px">
             ${firmaContrHtml}${firmaGerHtml}
@@ -3344,6 +3350,30 @@ function solicitarAprobacionPrecio(autoId,autoNombre,precioAnterior){
     solicitadoPor:CTX.nombreActual||CTX.emailActual||'',
   }});
   toast('Solicitud de aprobación creada — se notificará a ambos firmantes');
+}
+
+function solicitarAprobacionDescuento(leadId,clienteNombre,precioLista){
+  const precioDesc=prompt(`Precio con descuento para "${clienteNombre}" (número sin $):\nPrecio lista: $${precioLista?precioLista.toLocaleString('es-MX'):0}`);
+  if(!precioDesc||isNaN(parseFloat(precioDesc)))return;
+  const pdNum=parseFloat(precioDesc);
+  const plNum=parseFloat(precioLista)||0;
+  if(plNum>0&&pdNum>=plNum){toast('El precio con descuento debe ser menor al precio lista','error');return;}
+  const notas=prompt('Motivo del descuento (obligatorio):')||'';
+  if(!notas.trim()){toast('Escribe el motivo del descuento','error');return;}
+  const c=CLIENTES.find(x=>x._id===leadId);
+  const autoNombre=c?c._autoNombre||c.autoInteres||'Auto sin nombre':'Auto sin nombre';
+  WC.send(WC.OUT.APROBACION_CREAR,{datos:{
+    tipo:'descuento',
+    leadId,
+    clienteNombre,
+    autoNombre,
+    precioSolicitado:pdNum,
+    precioAnterior:plNum,
+    montoDescuento:plNum>0?(plNum-pdNum):0,
+    notas,
+    solicitadoPor:CTX.nombreActual||CTX.emailActual||'',
+  }});
+  toast('Solicitud de descuento creada — se notificará a ambos firmantes');
 }
 
 function recibirAprobacionResultado(msg){
@@ -3670,6 +3700,13 @@ function recibirAprobacionResultado(msg){
       <div>
         <div class="ge-cli-sec-title">Notas</div>
         <div class="ge-cli-notas-box" id="ge-cli-notas-val">—</div>
+      </div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--wc-border)">
+        <div class="ge-cli-sec-title" style="margin-bottom:8px">Aprobaciones</div>
+        <button class="btn btn-sm" style="color:var(--wc-warn);border-color:var(--wc-warn);width:100%;justify-content:center"
+          onclick="(()=>{const id=_cliAbierto;const c=CLIENTES.find(x=>x._id===id);if(!c)return;const nombre=c.nombre||c.name||'Cliente';const precio=c._precioVenta||c.cierrePrecio||c.precioVenta||0;solicitarAprobacionDescuento(id,nombre,precio)})()">
+          <i class="ti ti-tag-off"></i> Solicitar aprobación de descuento
+        </button>
       </div>
     </div>
 
