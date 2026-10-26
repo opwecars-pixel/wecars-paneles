@@ -41,10 +41,15 @@ export async function obtenerDatosFI() {
   const clientesEnriquecidos = clientes.map(lead => {
     const autoId = lead.cierreAutoId || lead.autoInventarioId || lead.autoInteresId || lead.vehiculoId || '';
     const car = autoId ? carMap[autoId] : null;
+    const etapaRaw = lead.etapa || lead.estatus || lead.status || lead.estado || 'Nuevo';
+    const etapaMap = { nuevo:'Nuevo', contactado:'Contactado', interesado:'Interesado',
+                       negociando:'Negociando', ganado:'Ganado', perdido:'Perdido',
+                       vendido:'Ganado', entregado:'Ganado' };
     return {
       ...lead,
-      _precioVenta: lead.cierrePrecio || lead.precioVenta || (car ? (car.precioVenta || car.priceNew || car.precio) : 0) || 0,
-      _autoNombre: car ? [car.marca||car.brand||'', car.modelo||car.model||'', car.anio||car.year||''].filter(Boolean).join(' ') : (lead.autoInteres || ''),
+      _etapa: etapaMap[etapaRaw.toLowerCase()] || etapaRaw,
+      _precioVenta: parseFloat(lead.cierrePrecio || lead.precioVenta || (car ? (car.precioVenta || car.priceNew || car.precio) : 0) || 0),
+      _autoNombre: car ? [car.marca||car.brand||'', car.modelo||car.model||'', car.año||car.anio||car.year||''].filter(Boolean).join(' ') : (lead.autoInteres || ''),
     };
   });
 

@@ -520,6 +520,7 @@ window.addEventListener('message', e => {
   }
 });
 WC.send(WC.OUT.DATOS_SOLICITAR, {});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')WC.send(WC.OUT.DATOS_SOLICITAR,{});});
 
 /* ══ Estado global ══ */
 let CLIENTES=[],CREDITOS=[];
@@ -661,7 +662,7 @@ function renderCreditos(){
     const cl=CLIENTES.find(l=>l._id===(c.leadId||c.clienteId));
     return{...c,_clienteNombre:c.clienteNombre||cl?.nombre||cl?.name||'—',
       _autoNombre:c.autoInteres||cl?.autoInteres||cl?.autoVendido||cl?._autoNombre||'—',
-      _precio:cl?.cierrePrecio||cl?.precioVenta||cl?._precioVenta||0};
+      _precio:cl?._precioVenta||cl?.cierrePrecio||cl?.precioVenta||0};
   });
   if(_filtroCredFin!=='todos')rows=rows.filter(c=>credEst(c)===_filtroCredFin);
   if(q)rows=rows.filter(c=>[c._clienteNombre,c.banco,c.financiera,c._autoNombre].some(v=>String(v||'').toLowerCase().includes(q)));
@@ -808,7 +809,7 @@ function setFiltroDoc(f,btn){
 }
 function renderDocumentos(){
   const q=(document.getElementById('doc-q')?.value||'').toLowerCase();
-  let rows=CLIENTES.filter(c=>(c.etapa||c.estatus||'')!=='Perdido'&&(c.etapa||c.estatus||'')!=='Perdido');
+  let rows=CLIENTES.filter(c=>(c._etapa||c.etapa||c.estatus||'')!=='Perdido');
   if(q)rows=rows.filter(c=>String(c.nombre||c.name||'').toLowerCase().includes(q));
   rows=rows.map(c=>{
     const docs=c.documentosFI||c.documentos||{};
