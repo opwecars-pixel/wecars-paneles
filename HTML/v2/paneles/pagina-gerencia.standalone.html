@@ -1057,7 +1057,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
   <div class="overlay-panel">
     <div class="overlay-hdr">
       <i class="ti ti-checkbox" style="font-size:18px;color:var(--wc-info)"></i>
-      <div class="overlay-title">Nueva tarea</div>
+      <div class="overlay-title" id="ov-tarea-titulo-hdr">Nueva tarea</div>
       <button class="overlay-close" onclick="cerrarOverlay('ov-tarea')"><i class="ti ti-x"></i></button>
     </div>
     <div class="overlay-body">
@@ -1100,7 +1100,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
     </div>
     <div class="overlay-footer">
       <button class="btn" onclick="cerrarOverlay('ov-tarea')">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardarTarea()"><i class="ti ti-device-floppy"></i>Crear tarea</button>
+      <button class="btn btn-primary" id="ov-tarea-btn-guardar" onclick="guardarTarea()"><i class="ti ti-device-floppy"></i>Crear tarea</button>
     </div>
   </div>
 </div>
@@ -1208,7 +1208,9 @@ let _ROL='';
 function recibirDatos(msg){
   CLIENTES=msg.clientes||[];CREDITOS=msg.creditos||[];VENDEDORES=msg.vendedores||[];
   CARS=msg.cars||[];EGRESOS=msg.egresos||[];COMISIONES=msg.comisiones||[];
-  PAGOS=msg.pagos||[];TAREAS=msg.tareas||[];
+  PAGOS=msg.pagos||[];
+  // Si Tareas CMS aún no existe en Wix, usar las guardadas localmente
+  TAREAS=msg.tareas&&msg.tareas.length?msg.tareas:_cargarTareasLocal();
   CTX={emailActual:msg.emailActual||'',rolActual:msg.rolActual||'',nombreActual:msg.nombreActual||''};
   _ROL=(CTX.rolActual||'').toLowerCase();
   const ini=(CTX.nombreActual||'GR').slice(0,2).toUpperCase();
@@ -2102,6 +2104,13 @@ function guardarMetas(){
 }
 
 /* ══ EXPEDIENTES ══ */
+const EXP_DOCS=['Contrato','Factura','Placas','Llaves','INE','Comprobante pago'];
+function expGetCheck(leadId){try{return JSON.parse(localStorage.getItem('wc_exp_'+leadId)||'{}');}catch(_){return{};}}
+function expSetCheck(leadId,key,val){
+  const d=expGetCheck(leadId);d[key]=val;
+  try{localStorage.setItem('wc_exp_'+leadId,JSON.stringify(d));}catch(_){}
+  renderExpedientes();
+}
 function renderExpedientes(){
   const q=(document.getElementById('exp-q')?.value||'').toLowerCase();
   const fPago=document.getElementById('exp-f-pago')?.value||'';
@@ -2119,12 +2128,18 @@ function renderExpedientes(){
   const el=document.getElementById('exp-list');
   if(!rows.length){el.innerHTML='<div class="empty-state"><i class="ti ti-folder-check"></i><h3>Sin expedientes</h3><p>No hay ventas cerradas con ese filtro</p></div>';return;}
   el.innerHTML=`<div class="table-wrap"><table class="data-table">
-    <thead><tr><th>Folio</th><th>Cliente</th><th>Auto</th><th>Vendedor</th><th>Forma pago</th><th>Banco</th><th class="num">Precio</th><th>Fecha</th></tr></thead>
+    <thead><tr><th>Folio</th><th>Cliente</th><th>Auto</th><th>Vendedor</th><th>Forma pago</th><th class="num">Precio</th><th>Documentos</th><th>Fecha</th></tr></thead>
     <tbody>${rows.map(c=>{
       const v=findVend(vendId(c));
       const folio=c.folio||c.folioVenta||c.cierreFolio||'—';
       const forma=c.formaPago||c.tipoPago||(parseFloat(c.montoFinanciado||0)>0?'Financiado':'Contado');
-      const banco=c.banco||c.bancoFinanciador||c.cierreBanco||'—';
+      const chk=expGetCheck(c._id||'');
+      const done=EXP_DOCS.filter(d=>chk[d]).length;
+      const docsHtml=EXP_DOCS.map(d=>`<label style="display:inline-flex;align-items:center;gap:3px;font-size:10px;cursor:pointer;white-space:nowrap;margin-right:4px">
+        <input type="checkbox" ${chk[d]?'checked':''} onchange="expSetCheck('${esc(c._id||'')}','${d}',this.checked)" onclick="event.stopPropagation()" style="accent-color:var(--wc-ok);width:12px;height:12px">
+        ${d}</label>`).join('');
+      const pct=Math.round(done/EXP_DOCS.length*100);
+      const barColor=pct===100?'var(--wc-ok)':pct>=50?'var(--wc-warn)':'var(--wc-err)';
       return`<tr style="cursor:pointer" onclick="abrirDetalleLead('${esc(c._id||'')}')">
         <td style="font-size:12px;color:var(--wc-ink3)">${esc(folio)}</td>
         <td><div style="font-weight:600">${esc(c.nombre||c.name||'—')}</div>
@@ -2133,8 +2148,16 @@ function renderExpedientes(){
           ${c._esConsigna?'<span class="chip chip-orange" style="font-size:10px;margin-left:4px">Consigna</span>':''}</td>
         <td style="font-size:12px">${esc(v?.nombre||v?.name||'—')}</td>
         <td><span class="chip ${forma==='Contado'?'chip-green':forma==='Financiado'?'chip-info':'chip-warn'}" style="font-size:10px">${esc(forma)}</span></td>
-        <td style="font-size:12px;color:var(--wc-ink3)">${banco!=='—'?esc(banco):'—'}</td>
         <td class="num">${M(c._precioVenta||c.cierrePrecio||c.precioVenta)}</td>
+        <td style="min-width:220px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <div style="flex:1;height:4px;background:var(--wc-line);border-radius:2px">
+              <div style="width:${pct}%;height:100%;background:${barColor};border-radius:2px;transition:width .3s"></div>
+            </div>
+            <span style="font-size:10px;color:var(--wc-ink3);white-space:nowrap">${done}/${EXP_DOCS.length}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:2px">${docsHtml}</div>
+        </td>
         <td style="font-size:12px;color:var(--wc-ink3)">${fechaCorta(fechaVenta(c))}</td>
       </tr>`;}).join('')}</tbody></table></div>`;
 }
@@ -2575,35 +2598,61 @@ function renderPendientes(){
     </div>`;
   }).join('');
 }
+let _tareaEditandoId=null;
+function _resetOverlayTarea(){
+  _tareaEditandoId=null;
+  document.getElementById('ov-tarea-titulo-hdr').textContent='Nueva tarea';
+  document.getElementById('ov-tarea-btn-guardar').innerHTML='<i class="ti ti-device-floppy"></i> Crear tarea';
+  ['ov-tarea-titulo','ov-tarea-fecha','ov-tarea-notas'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const pr=document.getElementById('ov-tarea-prioridad');if(pr)pr.value='normal';
+  const ca=document.getElementById('ov-tarea-cat');if(ca)ca.value='general';
+  const re=document.getElementById('ov-tarea-resp');if(re)re.value='';
+}
+function _guardarTareasLocal(){
+  try{localStorage.setItem('wc_tareas',JSON.stringify(TAREAS));}catch(_){}
+}
+function _cargarTareasLocal(){
+  try{const r=localStorage.getItem('wc_tareas');return r?JSON.parse(r):[];}catch(_){return[];}
+}
 function guardarTarea(){
   const titulo=document.getElementById('ov-tarea-titulo').value.trim();
   if(!titulo){toast('Escribe el título de la tarea','warn');return;}
-  const t={
-    _tmp:'tmp_'+Date.now(),titulo,
+  const datos={
+    titulo,
     prioridad:document.getElementById('ov-tarea-prioridad').value,
     responsableId:document.getElementById('ov-tarea-resp').value,
+    responsableNombre:VENDEDORES.find(v=>v._id===document.getElementById('ov-tarea-resp').value)?.nombre||'',
     fechaLimite:document.getElementById('ov-tarea-fecha').value||'',
     categoria:document.getElementById('ov-tarea-cat').value,
     notas:document.getElementById('ov-tarea-notas').value,
-    estado:'pendiente',creadoPor:CTX.emailActual,
   };
-  TAREAS.unshift(t);
-  WC.send(WC.OUT.TAREA_CREAR,{datos:t});
+  const editId=_tareaEditandoId;
   cerrarOverlay('ov-tarea');
-  ['ov-tarea-titulo','ov-tarea-prioridad','ov-tarea-resp','ov-tarea-fecha','ov-tarea-cat','ov-tarea-notas'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.value='';
-  });
-  toast('Guardando tarea…');renderPendientes();
+  _resetOverlayTarea();
+  if(editId){
+    const idx=TAREAS.findIndex(t=>(t._id||t._tmp)===editId);
+    if(idx>=0){TAREAS[idx]={...TAREAS[idx],...datos};_guardarTareasLocal();}
+    toast('Guardando cambios…');renderPendientes();
+    const real=TAREAS[idx];
+    if(real?._id)WC.send(WC.OUT.TAREA_ACTUALIZAR,{id:real._id,datos});
+  }else{
+    const t={...datos,_tmp:'tmp_'+Date.now(),estado:'pendiente',creadoPor:CTX.emailActual,_createdDate:new Date().toISOString()};
+    TAREAS.unshift(t);_guardarTareasLocal();
+    WC.send(WC.OUT.TAREA_CREAR,{datos:t});
+    toast('Guardando tarea…');renderPendientes();
+  }
 }
 function recibirTareaResultado(msg){
   if(msg.ok&&msg.tarea){
     const idx=TAREAS.findIndex(t=>t._tmp===msg.tarea._tmp||t._id===msg.tarea._id);
     if(idx>=0)TAREAS[idx]={...TAREAS[idx],...msg.tarea};
     else TAREAS.unshift(msg.tarea);
-    toast('Tarea creada ✓');renderPendientes();
+    _guardarTareasLocal();
+    toast(msg.tarea._tmp?'Tarea creada ✓':'Tarea actualizada ✓');renderPendientes();
   }else{
     toast(msg.error||'Error al guardar tarea','error');
-    TAREAS.shift();renderPendientes();
+    if(msg.tarea?._tmp)TAREAS.shift();
+    renderPendientes();
   }
 }
 function moverTarea(id,nuevoEstado){
@@ -2620,9 +2669,17 @@ function moverTarea(id,nuevoEstado){
 function editarTarea(id){
   const t=TAREAS.find(t=>(t._id||t._tmp)===id);
   if(!t)return;
-  // Simple toast con opciones de mover
-  const opciones=t.estado==='pendiente'?'proceso/completado':t.estado==='proceso'?'completado':null;
-  if(opciones)toast(`"${t.titulo.slice(0,30)}" — mover a: ${opciones}`);
+  _tareaEditandoId=id;
+  document.getElementById('ov-tarea-titulo-hdr').textContent='Editar tarea';
+  document.getElementById('ov-tarea-btn-guardar').innerHTML='<i class="ti ti-device-floppy"></i>Guardar cambios';
+  document.getElementById('ov-tarea-titulo').value=t.titulo||'';
+  document.getElementById('ov-tarea-prioridad').value=t.prioridad||'normal';
+  document.getElementById('ov-tarea-resp').value=t.responsableId||'';
+  document.getElementById('ov-tarea-fecha').value=t.fechaLimite
+    ?(new Date(t.fechaLimite).toISOString().split('T')[0]):'';
+  document.getElementById('ov-tarea-cat').value=t.categoria||'general';
+  document.getElementById('ov-tarea-notas').value=t.notas||'';
+  abrirOverlay('ov-tarea');
 }
 
 /* ══ PAGOS / APARTADOS ══ */
