@@ -1,7 +1,6 @@
 // paginas-paneles/pagina-finanzas.js
 // Panel Finanzas v2 — Velo page code
 import wixUsers from 'wix-users';
-import wixData  from 'wix-data';
 import {
   obtenerDatosFinanzas,
   actualizarClienteFinanzas,
@@ -53,11 +52,8 @@ $w.onReady(async () => {
     if (!tieneAcceso) console.warn('[Finanzas] Rol sin acceso configurado:', _rol);
   } catch (_) { /* continuar sin verificar rol */ }
 
-  // Cargar lista de vendedores
-  try {
-    const res = await wixData.query('Vendedores').limit(200).find({ suppressAuth: true });
-    _vendedores = res.items || [];
-  } catch (_) { _vendedores = []; }
+  // vendedores viene de obtenerDatosFinanzas() (Usuarios); _vendedores queda como fallback vacío
+  _vendedores = [];
 
   // Escuchar mensajes del iframe
   $w('#htmlFinanzas').onMessage(async (event) => {
@@ -84,7 +80,7 @@ async function enviarDatos() {
     const datos = await obtenerDatosFinanzas();
     enviar(IN.DATOS, {
       ...datos,
-      vendedores:   _vendedores,
+      vendedores:   datos.vendedores?.length ? datos.vendedores : _vendedores,
       emailActual:  _email,
       nombreActual: _email.split('@')[0] || 'Usuario',
       rolActual:    _rol,

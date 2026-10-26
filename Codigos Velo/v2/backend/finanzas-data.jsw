@@ -42,57 +42,84 @@ export async function obtenerDatosFinanzas() {
   const carMap = {};
   carsRaw.forEach(car => { carMap[car._id] = car; });
 
+  // Índice email→_id para resolver vendedorAsignado
+  const usuariosCol = await safeQuery('Usuarios', 200);
+  const emailToId = {};
+  usuariosCol.forEach(u => { if (u.email) emailToId[u.email.toLowerCase()] = u._id; });
+
+  // Índice leadId→comisión
+  const comisionMap = {};
+  comisiones.forEach(com => { if (com.leadId && !comisionMap[com.leadId]) comisionMap[com.leadId] = com; });
+
   // Enriquecer cada lead con datos financieros del auto vinculado
   const clientesEnriquecidos = clientes.map(lead => {
     const autoId = lead.cierreAutoId || lead.autoInventarioId || lead.autoInteresId || lead.vehiculoId || '';
     const car = autoId ? carMap[autoId] : null;
 
-    // Precio de venta: cierre registrado > expediente del auto > estimado del lead
-    const precioVenta = lead.cierrePrecio || lead.precioVenta
-      || (car ? (car.precioVenta || car.priceNew || car.precio) : null)
-      || 0;
+    // ── Precio canónico (mismo orden que gerencia-data) ──────────────────
+    const precioVenta = parseFloat(
+      lead.cierrePrecio || lead.precioVenta
+      || (car ? (car.precioVenta || car.priceNew || car.precio) : 0) || 0
+    );
 
-    // Costo de adquisición: siempre viene del auto
+    // ── Costo y lógica consigna ──────────────────────────────────────────
     const costoAdquisicion = (car ? (car.costoAdquisicion || car.costoCompra || car.costPrice || car.costo) : null)
       || lead.costoAdquisicion || 0;
-
-    // Comisión del vendedor: cierre (3%) > expediente del auto
-    const comisionVendedor = lead.cierreComision || lead.comisionVendedor
-      || (car ? car.comisionVendedor : null)
-      || 0;
-
-    // Gastos de preparación y traslado: vienen del auto
-    const gastosPreparacion = (car ? (car.gastosPreparacion || car.gastosPrep || car.costoPreparacion) : null)
-      || lead.gastosPreparacion || 0;
-    const gastosTraslado = (car ? (car.gastosTraslado || car.costoTraslado || car.precioTraslado) : null)
-      || lead.gastosTraslado || 0;
-
-    // Consigna: el costo es el precio mínimo pactado con el dueño
-    const tipoAdq = car ? (car.tipoAdquisicion||car.tipoOrigen||'compra').toLowerCase() : 'compra';
+    const tipoAdq = car ? (car.tipoAdquisicion || car.tipoOrigen || 'compra').toLowerCase() : 'compra';
     const esConsigna = tipoAdq === 'consigna' || car?.esConsigna === true;
     const costoFinal = esConsigna
-      ? parseFloat(car?.precioConsignaMin || car?.costoConsigna || costoAdquisicion || 0)
-      : costoAdquisicion;
+      ? parseFloat(car?.precioConvenido || car?.precioConsignaMin || car?.costoConsigna || costoAdquisicion || 0)
+      : parseFloat(costoAdquisicion || 0);
+
+    // ── Gastos (nombres canónicos alineados con gerencia-data) ───────────
+    const gastoReparacion = parseFloat((car?.gastoReparacion || car?.gastosReparacion || car?.gastosPreparacion || car?.gastosPrep || car?.reparacion) || 0);
+    const gastoLegal      = parseFloat((car?.gastoLegalAduanas || car?.gastoLegal || car?.gastosTraslado) || 0);
+    const gastosExtras    = parseFloat((car?.gastosExtras || car?.gastoAdicional) || 0);
+    const gastoTotal      = gastoReparacion + gastoLegal + gastosExtras;
+    const costoTotal      = costoFinal + gastoTotal;
+
+    // ── Comisión: fuente oficial es colección Comisiones ─────────────────
+    const comisionObj = comisionMap[lead._id];
+    const comisionVendedor = parseFloat(
+      (comisionObj?.monto) || lead.cierreComision || lead.comisionVendedor
+      || (car?.comisionVendedor) || 0
+    );
+
+    // ── Etapa canónica ───────────────────────────────────────────────────
+    const etapaRaw = lead.etapa || lead.estatus || lead.status || lead.estado || 'Nuevo';
+    const etapaMap = { nuevo:'Nuevo', contactado:'Contactado', interesado:'Interesado',
+                       negociando:'Negociando', ganado:'Ganado', perdido:'Perdido',
+                       vendido:'Ganado', entregado:'Ganado' };
+    const _etapa = etapaMap[etapaRaw.toLowerCase()] || etapaRaw;
+
+    // ── VendedorId: resolver email→_id ───────────────────────────────────
+    const _vendedorId = lead.vendedorId
+      || emailToId[(lead.vendedorAsignado || '').toLowerCase()]
+      || lead.vendedorAsignado || '';
 
     return {
       ...lead,
-      // Campos financieros normalizados — prefijo _ para no colisionar con campos del lead
+      // Campos canónicos (igual que gerencia-data)
+      _etapa,
+      _vendedorId,
       _precioVenta:       precioVenta,
       _costoAdquisicion:  costoFinal,
+      _gastoTotal:        gastoTotal,
+      _costoTotal:        costoTotal,
       _comisionVendedor:  comisionVendedor,
-      _gastosPreparacion: gastosPreparacion,
-      _gastosTraslado:    gastosTraslado,
+      _margenBruto:       precioVenta > 0
+                            ? Math.round((precioVenta - costoTotal - comisionVendedor) / precioVenta * 100)
+                            : 0,
+      _esConsigna:        esConsigna,
+      _tipoAdquisicion:   tipoAdq,
       // Info del auto
-      _autoNombre: car ? [car.marca||car.brand||'', car.modelo||car.model||'', car.anio||car.year||''].filter(Boolean).join(' ') : (lead.autoInteres || ''),
+      _autoNombre: car ? [car.marca||car.brand||'', car.modelo||car.model||'', car.año||car.anio||car.year||''].filter(Boolean).join(' ') : (lead.autoInteres || ''),
       _autoVin:    car ? (car.vin || car.VIN || '') : '',
-      _autoCosto:  costoFinal,
-      _esConsigna: esConsigna,
-      _tipoAdquisicion: tipoAdq,
-      _precioLista: car ? parseFloat(car.priceNew||car.precioVenta||car.precio||0) : 0,
+      _precioLista: car ? parseFloat(car.priceNew || car.precioVenta || car.precio || 0) : 0,
     };
   });
 
-  return { clientes: clientesEnriquecidos, creditos, pagos, comisiones, egresos };
+  return { clientes: clientesEnriquecidos, creditos, pagos, comisiones, egresos, vendedores: usuariosCol };
 }
 
 // ── Actualizar campos financieros de un cliente ────────────────────────
