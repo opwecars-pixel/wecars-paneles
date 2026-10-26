@@ -1180,6 +1180,7 @@ window.addEventListener('message',e=>{
   }
 });
 WC.send(WC.OUT.DATOS_SOLICITAR,{});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')WC.send(WC.OUT.DATOS_SOLICITAR,{});});
 
 /* ══ Estado global ══ */
 let CLIENTES=[],CREDITOS=[],VENDEDORES=[],CARS=[],EGRESOS=[],COMISIONES=[],PAGOS=[],TAREAS=[];

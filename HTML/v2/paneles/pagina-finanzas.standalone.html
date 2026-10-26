@@ -1284,6 +1284,7 @@ window.addEventListener('message',e=>{
 });
 
 WC.send(WC.OUT.DATOS_SOLICITAR,{});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')WC.send(WC.OUT.DATOS_SOLICITAR,{});});
 
 // Reportar altura al contenedor Wix (evita scrollbar dentro del iframe)
 function enviarAltura(){WC.send('wecars-resize',{height:document.body.scrollHeight});}

@@ -2601,6 +2601,7 @@ window.addEventListener('load', () => {
   enviarAltura();
   WC.send(WC.OUT.READY);
 });
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')WC.send(WC.OUT.READY);});
 
 WC.onMany({
   [WC.IN.CONTEXTO]: (d) => {
