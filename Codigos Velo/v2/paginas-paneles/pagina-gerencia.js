@@ -11,31 +11,38 @@ import {
   registrarPago,
   crearTarea,
   actualizarTarea,
+  crearSolicitudAprobacion,
+  firmarAprobacion,
+  rechazarAprobacion,
 } from 'backend/gerencia-data.jsw';
 
 const ROLES_PERMITIDOS = ['gerencia', 'administracion'];
 
 const OUT = {
-  DATOS_SOLICITAR:  'wecars-gerencia-solicitar',
-  META_GUARDAR:     'wecars-gerencia-meta-guardar',
-  LEAD_ACTUALIZAR:  'wecars-gerencia-lead-actualizar',
-  CREDITO_EDITAR:   'wecars-gerencia-credito-editar',
-  COMISION_EDITAR:  'wecars-gerencia-comision-editar',
-  EGRESO_REGISTRAR: 'wecars-gerencia-egreso-registrar',
-  PAGO_REGISTRAR:   'wecars-gerencia-pago-registrar',
-  TAREA_CREAR:      'wecars-gerencia-tarea-crear',
-  TAREA_ACTUALIZAR: 'wecars-gerencia-tarea-actualizar',
+  DATOS_SOLICITAR:    'wecars-gerencia-solicitar',
+  META_GUARDAR:       'wecars-gerencia-meta-guardar',
+  LEAD_ACTUALIZAR:    'wecars-gerencia-lead-actualizar',
+  CREDITO_EDITAR:     'wecars-gerencia-credito-editar',
+  COMISION_EDITAR:    'wecars-gerencia-comision-editar',
+  EGRESO_REGISTRAR:   'wecars-gerencia-egreso-registrar',
+  PAGO_REGISTRAR:     'wecars-gerencia-pago-registrar',
+  TAREA_CREAR:        'wecars-gerencia-tarea-crear',
+  TAREA_ACTUALIZAR:   'wecars-gerencia-tarea-actualizar',
+  APROBACION_CREAR:   'wecars-gerencia-aprobacion-crear',
+  APROBACION_FIRMAR:  'wecars-gerencia-aprobacion-firmar',
+  APROBACION_RECHAZAR:'wecars-gerencia-aprobacion-rechazar',
 };
 
 const IN = {
-  DATOS:              'wecars-gerencia-datos',
-  META_RESULTADO:     'wecars-gerencia-meta-resultado',
-  LEAD_ACTUALIZADO:   'wecars-gerencia-lead-actualizado',
-  CREDITO_RESULTADO:  'wecars-gerencia-credito-resultado',
-  COMISION_RESULTADO: 'wecars-gerencia-comision-resultado',
-  EGRESO_RESULTADO:   'wecars-gerencia-egreso-resultado',
-  PAGO_RESULTADO:     'wecars-gerencia-pago-resultado',
-  TAREA_RESULTADO:    'wecars-gerencia-tarea-resultado',
+  DATOS:               'wecars-gerencia-datos',
+  META_RESULTADO:      'wecars-gerencia-meta-resultado',
+  LEAD_ACTUALIZADO:    'wecars-gerencia-lead-actualizado',
+  CREDITO_RESULTADO:   'wecars-gerencia-credito-resultado',
+  COMISION_RESULTADO:  'wecars-gerencia-comision-resultado',
+  EGRESO_RESULTADO:    'wecars-gerencia-egreso-resultado',
+  PAGO_RESULTADO:      'wecars-gerencia-pago-resultado',
+  TAREA_RESULTADO:     'wecars-gerencia-tarea-resultado',
+  APROBACION_RESULTADO:'wecars-gerencia-aprobacion-resultado',
 };
 
 let _email = '';
@@ -62,8 +69,11 @@ $w.onReady(async () => {
       case OUT.COMISION_EDITAR:  await manejarComisionEditar(msg); break;
       case OUT.EGRESO_REGISTRAR: await manejarEgresoRegistrar(msg); break;
       case OUT.PAGO_REGISTRAR:   await manejarPagoRegistrar(msg); break;
-      case OUT.TAREA_CREAR:      await manejarTareaCrear(msg); break;
-      case OUT.TAREA_ACTUALIZAR: await manejarTareaActualizar(msg); break;
+      case OUT.TAREA_CREAR:         await manejarTareaCrear(msg); break;
+      case OUT.TAREA_ACTUALIZAR:    await manejarTareaActualizar(msg); break;
+      case OUT.APROBACION_CREAR:    await manejarAprobacionCrear(msg); break;
+      case OUT.APROBACION_FIRMAR:   await manejarAprobacionFirmar(msg); break;
+      case OUT.APROBACION_RECHAZAR: await manejarAprobacionRechazar(msg); break;
     }
   });
 
@@ -162,6 +172,35 @@ async function manejarTareaActualizar(msg) {
     enviar(IN.TAREA_RESULTADO, res);
   } catch (err) {
     enviar(IN.TAREA_RESULTADO, { ok: false, error: String(err) });
+  }
+}
+
+async function manejarAprobacionCrear(msg) {
+  try {
+    const res = await crearSolicitudAprobacion(msg.datos || {});
+    enviar(IN.APROBACION_RESULTADO, res);
+  } catch (err) {
+    enviar(IN.APROBACION_RESULTADO, { ok: false, error: String(err) });
+  }
+}
+
+async function manejarAprobacionFirmar(msg) {
+  if (!msg.id) return;
+  try {
+    const res = await firmarAprobacion(msg.id, msg.tipoFirma, msg.usuarioNombre, msg.usuarioEmail);
+    enviar(IN.APROBACION_RESULTADO, res);
+  } catch (err) {
+    enviar(IN.APROBACION_RESULTADO, { ok: false, error: String(err) });
+  }
+}
+
+async function manejarAprobacionRechazar(msg) {
+  if (!msg.id) return;
+  try {
+    const res = await rechazarAprobacion(msg.id, msg.usuarioNombre, msg.notas);
+    enviar(IN.APROBACION_RESULTADO, res);
+  } catch (err) {
+    enviar(IN.APROBACION_RESULTADO, { ok: false, error: String(err) });
   }
 }
 

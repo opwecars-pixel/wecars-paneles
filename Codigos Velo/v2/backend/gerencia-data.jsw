@@ -34,7 +34,7 @@ async function safeQuery(coleccion, limite = 500) {
 // ── Carga maestra ────────────────────────────────────────────────────────
 export async function obtenerDatosGerencia() {
   await verificarAcceso();
-  const [clientes, creditos, usuariosCol, carsRaw, egresos, comisiones, pagos, tareas] = await Promise.all([
+  const [clientes, creditos, usuariosCol, carsRaw, egresos, comisiones, pagos, tareas, aprobaciones] = await Promise.all([
     safeQuery('ALeads', 1000),
     safeQuery('Creditos', 500),
     safeQuery('Usuarios',   200),
@@ -43,6 +43,7 @@ export async function obtenerDatosGerencia() {
     safeQuery('Comisiones', 500),
     safeQuery('Pagos', 500),
     safeQuery('Tareas', 500),
+    safeQuery('AprobacionesConsigna', 200),
   ]);
 
   // Usuarios es la única fuente de vendedores
@@ -156,7 +157,7 @@ export async function obtenerDatosGerencia() {
     };
   });
 
-  return { clientes: clientesEnriquecidos, creditos, vendedores, cars: carsRaw, egresos, comisiones, pagos, tareas };
+  return { clientes: clientesEnriquecidos, creditos, vendedores, cars: carsRaw, egresos, comisiones, pagos, tareas, aprobaciones };
 }
 
 // ── Actualizar datos de un lead/cierre ───────────────────────────────────
@@ -305,6 +306,93 @@ export async function actualizarTarea(id, datos) {
     if (!existente) throw new Error('Tarea no encontrada');
     const actualizada = await wixData.update('Tareas', { ...existente, ...datos, _id: id }, OPTS);
     return { ok: true, tarea: actualizada };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Aprobaciones de precio consigna ──────────────────────────────────────
+export async function crearSolicitudAprobacion(datos) {
+  await verificarAcceso();
+  try {
+    const item = {
+      autoId:           datos.autoId || '',
+      autoNombre:       datos.autoNombre || '',
+      precioSolicitado: parseFloat(datos.precioSolicitado) || 0,
+      precioAnterior:   parseFloat(datos.precioAnterior) || 0,
+      notas:            datos.notas || '',
+      solicitadoPor:    datos.solicitadoPor || '',
+      fechaSolicitud:   new Date(),
+      firmaContraloria:       false,
+      firmaContraloriaFecha:  null,
+      firmaContraloriaUser:   '',
+      firmaGerenciaVentas:    false,
+      firmaGerenciaVentasFecha: null,
+      firmaGerenciaVentasUser:  '',
+      estatus: 'pendiente',
+    };
+    const inserted = await wixData.insert('AprobacionesConsigna', item, OPTS);
+    return { ok: true, aprobacion: inserted };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+export async function firmarAprobacion(id, tipoFirma, usuarioNombre, usuarioEmail) {
+  await verificarAcceso();
+  try {
+    const existente = await wixData.get('AprobacionesConsigna', id, OPTS);
+    if (!existente) throw new Error('Aprobación no encontrada');
+    const ahora = new Date();
+    const update = { ...existente, _id: id };
+    if (tipoFirma === 'contraloria') {
+      update.firmaContraloria      = true;
+      update.firmaContraloriaFecha = ahora;
+      update.firmaContraloriaUser  = usuarioNombre || usuarioEmail || '';
+    } else if (tipoFirma === 'gerenciaVentas') {
+      update.firmaGerenciaVentas       = true;
+      update.firmaGerenciaVentasFecha  = ahora;
+      update.firmaGerenciaVentasUser   = usuarioNombre || usuarioEmail || '';
+    }
+    // Si ambas firmas están presentes → aprobar y actualizar precio en Cars
+    const ambasFirmas = update.firmaContraloria && update.firmaGerenciaVentas;
+    if (ambasFirmas) {
+      update.estatus = 'aprobado';
+      update.fechaAprobacion = ahora;
+      if (existente.autoId) {
+        try {
+          const car = await wixData.get('Cars', existente.autoId, OPTS);
+          if (car) {
+            await wixData.update('Cars', {
+              ...car,
+              precioConvenido:    parseFloat(existente.precioSolicitado),
+              precioConsignaMin:  parseFloat(existente.precioSolicitado),
+              _id: car._id,
+            }, OPTS);
+          }
+        } catch (_) {}
+      }
+    }
+    const actualizada = await wixData.update('AprobacionesConsigna', update, OPTS);
+    return { ok: true, aprobacion: actualizada, aprobado: ambasFirmas };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+export async function rechazarAprobacion(id, usuarioNombre, notas) {
+  await verificarAcceso();
+  try {
+    const existente = await wixData.get('AprobacionesConsigna', id, OPTS);
+    if (!existente) throw new Error('Aprobación no encontrada');
+    const actualizada = await wixData.update('AprobacionesConsigna', {
+      ...existente, _id: id,
+      estatus: 'rechazado',
+      notasRechazo: notas || '',
+      rechazadoPor: usuarioNombre || '',
+      fechaRechazo: new Date(),
+    }, OPTS);
+    return { ok: true, aprobacion: actualizada };
   } catch (e) {
     return { ok: false, error: e.message };
   }

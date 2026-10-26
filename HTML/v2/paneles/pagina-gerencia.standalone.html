@@ -554,6 +554,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
         <i class="ti ti-building-bank"></i>Créditos
         <span class="sb-badge" id="sb-badge-leads" style="display:none">0</span>
       </button>
+      <button class="sb-item" onclick="mostrarVista('aprobaciones',this)" style="position:relative">
+        <i class="ti ti-writing-sign"></i>Aprobaciones
+        <span id="sb-badge-apro" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--wc-danger);color:#fff;font-size:10px;font-weight:700;border-radius:9999px;padding:1px 6px;min-width:18px;text-align:center"></span>
+      </button>
     </nav>
   </aside>
 
@@ -928,6 +932,24 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
       </div>
     </div>
 
+    <!-- ══════════════ APROBACIONES DE PRECIO CONSIGNA ══════════════ -->
+    <div class="view view-wrap" id="view-aprobaciones">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-size:17px;font-weight:800;margin-bottom:4px">Aprobaciones de precio — Consigna</div>
+          <div style="font-size:13px;color:var(--wc-ink3)">Doble firma requerida: Contraloría <b>Rodrigo Castillo</b> + Gerencia de Ventas <b>Fernando Parrazal</b></div>
+        </div>
+      </div>
+      <!-- Filtro -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="chip chip-green active" onclick="setFiltroApro('pendiente',this)">Pendientes</button>
+        <button class="chip" onclick="setFiltroApro('aprobado',this)">Aprobadas</button>
+        <button class="chip" onclick="setFiltroApro('rechazado',this)">Rechazadas</button>
+        <button class="chip" onclick="setFiltroApro('todos',this)">Todas</button>
+      </div>
+      <div id="apro-list"></div>
+    </div>
+
   </main>
 </div>
 
@@ -962,6 +984,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
   </button>
   <button class="bn-item" onclick="mostrarVista('reportes',this,'bn')">
     <i class="ti ti-report-analytics"></i>Reportes
+  </button>
+  <button class="bn-item" onclick="mostrarVista('aprobaciones',this,'bn')" style="position:relative">
+    <i class="ti ti-writing-sign"></i>Aprobac.
+    <span id="bn-badge-apro" style="display:none;position:absolute;top:4px;right:8px;background:var(--wc-danger);color:#fff;font-size:9px;font-weight:700;border-radius:9999px;padding:0 5px;min-width:16px;text-align:center"></span>
   </button>
 </nav>
 
@@ -1146,7 +1172,10 @@ const WC = {
     EGRESO_REGISTRAR:  'wecars-gerencia-egreso-registrar',
     PAGO_REGISTRAR:    'wecars-gerencia-pago-registrar',
     TAREA_CREAR:       'wecars-gerencia-tarea-crear',
-    TAREA_ACTUALIZAR:  'wecars-gerencia-tarea-actualizar',
+    TAREA_ACTUALIZAR:   'wecars-gerencia-tarea-actualizar',
+    APROBACION_CREAR:   'wecars-gerencia-aprobacion-crear',
+    APROBACION_FIRMAR:  'wecars-gerencia-aprobacion-firmar',
+    APROBACION_RECHAZAR:'wecars-gerencia-aprobacion-rechazar',
   },
   IN:{
     DATOS:              'wecars-gerencia-datos',
@@ -1156,7 +1185,8 @@ const WC = {
     COMISION_RESULTADO: 'wecars-gerencia-comision-resultado',
     EGRESO_RESULTADO:   'wecars-gerencia-egreso-resultado',
     PAGO_RESULTADO:     'wecars-gerencia-pago-resultado',
-    TAREA_RESULTADO:    'wecars-gerencia-tarea-resultado',
+    TAREA_RESULTADO:     'wecars-gerencia-tarea-resultado',
+    APROBACION_RESULTADO:'wecars-gerencia-aprobacion-resultado',
   },
   send(tipo,datos){try{window.parent.postMessage({type:tipo,...datos},'*');}catch(_){}}
 };
@@ -1176,14 +1206,15 @@ window.addEventListener('message',e=>{
       break;
     case WC.IN.EGRESO_RESULTADO:   recibirEgresoResultado(msg);break;
     case WC.IN.PAGO_RESULTADO:     recibirPagoResultado(msg);break;
-    case WC.IN.TAREA_RESULTADO:    recibirTareaResultado(msg);break;
+    case WC.IN.TAREA_RESULTADO:      recibirTareaResultado(msg);break;
+    case WC.IN.APROBACION_RESULTADO: recibirAprobacionResultado(msg);break;
   }
 });
 WC.send(WC.OUT.DATOS_SOLICITAR,{});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')WC.send(WC.OUT.DATOS_SOLICITAR,{});});
 
 /* ══ Estado global ══ */
-let CLIENTES=[],CREDITOS=[],VENDEDORES=[],CARS=[],EGRESOS=[],COMISIONES=[],PAGOS=[],TAREAS=[];
+let CLIENTES=[],CREDITOS=[],VENDEDORES=[],CARS=[],EGRESOS=[],COMISIONES=[],PAGOS=[],TAREAS=[],APROBACIONES=[];
 let CTX={emailActual:'',rolActual:'',nombreActual:''};
 let _filtroMes='',_filtroVend='',_filtroPipe='todos',_filtroInv='todos';
 let _ROL='';
@@ -1195,6 +1226,7 @@ function recibirDatos(msg){
   PAGOS=msg.pagos||[];
   // Si Tareas CMS aún no existe en Wix, usar las guardadas localmente
   TAREAS=msg.tareas&&msg.tareas.length?msg.tareas:_cargarTareasLocal();
+  APROBACIONES=msg.aprobaciones||[];
   CTX={emailActual:msg.emailActual||'',rolActual:msg.rolActual||'',nombreActual:msg.nombreActual||''};
   _ROL=(CTX.rolActual||'').toLowerCase();
   const ini=(CTX.nombreActual||'GR').slice(0,2).toUpperCase();
@@ -1205,6 +1237,10 @@ function recibirDatos(msg){
   renderDashboard();renderVentas();renderEquipo();renderPipeline();renderInventario();renderFinanzas();renderMetas();renderClientes();
   renderExpedientes();renderCreditos();renderComisionesGer();renderEgresosGer();
   renderHoy();renderVendedores();renderRentabilidad();renderPendientes();renderPagos();renderReportes();
+  // Badge aprobaciones pendientes
+  const aproPend=APROBACIONES.filter(a=>a.estatus==='pendiente').length;
+  const badgeEl=document.getElementById('sb-badge-apro');
+  if(badgeEl){badgeEl.textContent=aproPend;badgeEl.style.display=aproPend?'inline':'none';}
 }
 
 /* ══ Utilidades ══ */
@@ -3136,6 +3172,7 @@ const TOPBAR_LABELS={
   reportes:{title:'Reportes / Metas',sub:'pipeline · ranking · bonos'},
   expedientes:{title:'Expedientes de venta',sub:''},
   creditos:{title:'Créditos en trámite',sub:''},
+  aprobaciones:{title:'Aprobaciones de precio',sub:'doble firma — Contraloría + Gerencia de Ventas'},
   // stubs — por si alguien navega directamente
   hoy:{title:'Inicio',sub:''},pipeline:{title:'Clientes / Pipeline',sub:''},
   vendedores:{title:'Equipo',sub:''},rentabilidad:{title:'Ventas / Rentabilidad',sub:''},
@@ -3173,6 +3210,10 @@ function mostrarVista(id,btn,nav){
   if(realId==='finanzas'&&document.getElementById('vtp-finanzas-pagos')?.classList.contains('active'))renderPagos();
   if(realId==='comisiones'&&document.getElementById('vtp-cuadre-egr')?.classList.contains('active'))renderEgresosGer();
   if(realId==='reportes'&&document.getElementById('vtp-reportes-metas')?.classList.contains('active'))renderMetas();
+  if(realId==='aprobaciones')renderAprobaciones();
+  // badge bottom nav
+  const bnBadge=document.getElementById('bn-badge-apro');
+  if(bnBadge){const p=APROBACIONES.filter(a=>a.estatus==='pendiente').length;bnBadge.textContent=p;bnBadge.style.display=p?'inline':'none';}
 }
 function cerrarOverlay(id){document.getElementById(id)?.classList.remove('open');}
 function abrirOverlay(id){document.getElementById(id)?.classList.add('open');}
@@ -3183,6 +3224,148 @@ document.getElementById('ge-cli-overlay')?.addEventListener('click',e=>{if(e.tar
 
 // Resize observer para Wix
 try{new ResizeObserver(()=>{const h=document.body.scrollHeight;window.parent.postMessage({type:'wecars-height',height:h},'*');}).observe(document.body);}catch(_){}
+
+/* ══════════════════════════════════════════════════════
+   APROBACIONES DE PRECIO CONSIGNA
+   Doble firma: Contraloría (Rodrigo) + Gerencia Ventas (Fernando)
+══════════════════════════════════════════════════════ */
+let _filtroApro='pendiente';
+const FIRMA_CONTRALORIA    = 'contraloria';
+const FIRMA_GERENCIA_VTA   = 'gerenciaVentas';
+// Emails de los firmantes (se comparan con CTX.emailActual)
+const EMAIL_CONTRALORIA    = 'rodrigocastillo.9718@gmail.com';
+const EMAIL_GERENCIA_VTA   = 'fernando@wecars.mx'; // ajustar al email real de Fernando
+
+function setFiltroApro(f,btn){
+  _filtroApro=f;
+  document.querySelectorAll('#view-aprobaciones .chip').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderAprobaciones();
+}
+
+function renderAprobaciones(){
+  let rows=APROBACIONES;
+  if(_filtroApro!=='todos')rows=rows.filter(a=>a.estatus===_filtroApro);
+  rows=[...rows].sort((a,b)=>new Date(b._createdDate||0)-new Date(a._createdDate||0));
+  const el=document.getElementById('apro-list');if(!el)return;
+  if(!rows.length){
+    el.innerHTML='<div class="empty-state"><i class="ti ti-writing-sign"></i><h3>Sin solicitudes</h3><p>No hay aprobaciones con ese filtro</p></div>';
+    return;
+  }
+  const esContraloria   = CTX.emailActual===EMAIL_CONTRALORIA || _ROL.includes('contralor') || _ROL.includes('administracion');
+  const esGerenciaVta   = CTX.emailActual===EMAIL_GERENCIA_VTA || _ROL.includes('gerencia');
+  el.innerHTML=rows.map(a=>{
+    const car=CARS.find(c=>c._id===a.autoId)||null;
+    const precio=M(a.precioSolicitado);
+    const anterior=a.precioAnterior?M(a.precioAnterior):'—';
+    const estadoBadge={pendiente:'chip-warn',aprobado:'chip-green',rechazado:'chip-danger'};
+    const estadoLabel={pendiente:'Pendiente',aprobado:'Aprobado',rechazado:'Rechazado'};
+    const fotoUrl=car?(car.fotos?.[0]||car.foto||car.fotoPrincipal||''):'';
+    // Firmas
+    const fc=a.firmaContraloria;
+    const fg=a.firmaGerenciaVentas;
+    const firmaContrHtml=fc
+      ?`<div style="display:flex;align-items:center;gap:6px;color:var(--wc-ok)"><i class="ti ti-circle-check-filled"></i><span style="font-size:12px"><b>Contraloría</b> — ${esc(a.firmaContraloriaUser||'Rodrigo')} · ${fechaCorta(a.firmaContraloriaFecha)}</span></div>`
+      :`<div style="display:flex;align-items:center;gap:6px;color:var(--wc-warn)"><i class="ti ti-clock"></i><span style="font-size:12px"><b>Contraloría</b> — pendiente de firma</span></div>`;
+    const firmaGerHtml=fg
+      ?`<div style="display:flex;align-items:center;gap:6px;color:var(--wc-ok)"><i class="ti ti-circle-check-filled"></i><span style="font-size:12px"><b>Gerencia Ventas</b> — ${esc(a.firmaGerenciaVentasUser||'Fernando')} · ${fechaCorta(a.firmaGerenciaVentasFecha)}</span></div>`
+      :`<div style="display:flex;align-items:center;gap:6px;color:var(--wc-warn)"><i class="ti ti-clock"></i><span style="font-size:12px"><b>Gerencia Ventas</b> — pendiente de firma</span></div>`;
+    // Botones de acción según rol y estado de firma
+    let botonesHtml='';
+    if(a.estatus==='pendiente'){
+      if(esContraloria&&!fc)
+        botonesHtml+=`<button class="btn btn-primary btn-sm" onclick="accionFirmar('${esc(a._id)}','${FIRMA_CONTRALORIA}')"><i class="ti ti-signature"></i>Firmar como Contraloría</button>`;
+      if(esGerenciaVta&&!fg)
+        botonesHtml+=`<button class="btn btn-primary btn-sm" onclick="accionFirmar('${esc(a._id)}','${FIRMA_GERENCIA_VTA}')"><i class="ti ti-signature"></i>Firmar como Gte. Ventas</button>`;
+      if(esContraloria||esGerenciaVta)
+        botonesHtml+=`<button class="btn btn-sm" style="color:var(--wc-danger);border-color:var(--wc-danger)" onclick="accionRechazar('${esc(a._id)}')"><i class="ti ti-x"></i>Rechazar</button>`;
+    }
+    return`<div style="background:var(--wc-surface);border:1.5px solid ${a.estatus==='pendiente'?'var(--wc-warn)':a.estatus==='aprobado'?'var(--wc-ok)':'var(--wc-border)'};border-radius:var(--wc-r-lg);padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        ${fotoUrl?`<img src="${esc(fotoUrl)}" style="width:72px;height:54px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none'">`:''}
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="font-size:15px;font-weight:800">${esc(a.autoNombre||'Auto sin nombre')}</span>
+            <span class="chip ${estadoBadge[a.estatus]||'chip-warn'}">${estadoLabel[a.estatus]||a.estatus}</span>
+          </div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:10px">
+            <div><div style="font-size:10px;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px">Precio propuesto</div>
+              <div style="font-size:18px;font-weight:800;color:var(--wc-green)">${precio}</div></div>
+            <div><div style="font-size:10px;color:var(--wc-ink3);text-transform:uppercase;letter-spacing:.5px">Precio anterior</div>
+              <div style="font-size:18px;font-weight:800;color:var(--wc-ink2)">${anterior}</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:${botonesHtml?10:0}px">
+            ${firmaContrHtml}${firmaGerHtml}
+          </div>
+          ${a.notas?`<div style="font-size:12px;color:var(--wc-ink3);margin-bottom:8px"><i class="ti ti-notes" style="font-size:11px"></i> ${esc(a.notas)}</div>`:''}
+          ${a.notasRechazo?`<div style="font-size:12px;color:var(--wc-danger);margin-bottom:8px"><i class="ti ti-alert-circle" style="font-size:11px"></i> Rechazado por ${esc(a.rechazadoPor||'')}: ${esc(a.notasRechazo)}</div>`:''}
+          <div style="font-size:11px;color:var(--wc-ink3)">Solicitado por ${esc(a.solicitadoPor||'—')} · ${fechaCorta(a.fechaSolicitud||a._createdDate)}</div>
+          ${botonesHtml?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">${botonesHtml}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function accionFirmar(id,tipoFirma){
+  const etiq=tipoFirma===FIRMA_CONTRALORIA?'Contraloría':'Gerencia de Ventas';
+  const a=APROBACIONES.find(x=>x._id===id);if(!a)return;
+  WCConfirm.show({
+    titulo:'Confirmar firma',
+    mensaje:`¿Firmas como ${etiq} el precio de <b>${M(a.precioSolicitado)}</b> para "${a.autoNombre}"?`,
+    tipo:'ok',labelOk:'Sí, firmar',
+    onOk:()=>{
+      WC.send(WC.OUT.APROBACION_FIRMAR,{
+        id,tipoFirma,
+        usuarioNombre:CTX.nombreActual||'',
+        usuarioEmail:CTX.emailActual||'',
+      });
+      toast('Firma enviada…');
+    }
+  });
+}
+
+function accionRechazar(id){
+  const a=APROBACIONES.find(x=>x._id===id);if(!a)return;
+  const notas=prompt(`Motivo del rechazo para "${a.autoNombre}" (opcional):`)||'';
+  WC.send(WC.OUT.APROBACION_RECHAZAR,{id,usuarioNombre:CTX.nombreActual||'',notas});
+  toast('Rechazo enviado…');
+}
+
+function solicitarAprobacionPrecio(autoId,autoNombre,precioAnterior){
+  const precio=prompt(`Precio de consigna propuesto para "${autoNombre}" (número sin $):`);
+  if(!precio||isNaN(parseFloat(precio)))return;
+  const notas=prompt('Notas adicionales (opcional):')||'';
+  WC.send(WC.OUT.APROBACION_CREAR,{datos:{
+    autoId,autoNombre,
+    precioSolicitado:parseFloat(precio),
+    precioAnterior:parseFloat(precioAnterior)||0,
+    notas,
+    solicitadoPor:CTX.nombreActual||CTX.emailActual||'',
+  }});
+  toast('Solicitud de aprobación creada — se notificará a ambos firmantes');
+}
+
+function recibirAprobacionResultado(msg){
+  if(!msg.ok){toast('Error: '+(msg.error||''),'error');return;}
+  const a=msg.aprobacion;
+  if(!a)return;
+  const idx=APROBACIONES.findIndex(x=>x._id===a._id);
+  if(idx>=0)APROBACIONES[idx]={...APROBACIONES[idx],...a};
+  else APROBACIONES.unshift(a);
+  // Actualizar badges
+  const pend=APROBACIONES.filter(x=>x.estatus==='pendiente').length;
+  const sb=document.getElementById('sb-badge-apro');
+  if(sb){sb.textContent=pend;sb.style.display=pend?'inline':'none';}
+  const bn=document.getElementById('bn-badge-apro');
+  if(bn){bn.textContent=pend;bn.style.display=pend?'inline':'none';}
+  if(msg.aprobado){
+    toast('✅ Precio aprobado por ambas partes — se actualizó en el inventario','ok');
+  } else {
+    toast(a.estatus==='rechazado'?'Solicitud rechazada':'✓ Firma registrada','ok');
+  }
+  renderAprobaciones();
+}
 </script>
 
 <!-- ══ DETALLE LEAD / VENTA OVERLAY ══ -->
@@ -3414,6 +3597,13 @@ try{new ResizeObserver(()=>{const h=document.body.scrollHeight;window.parent.pos
           <div class="ge-edit-field" id="ef-row-consigna" style="display:none">
             <label>Precio consigna (convenido dueño)</label>
             <input type="number" id="ef-precio-consigna" placeholder="0" min="0" step="1000">
+            <div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="font-size:11px;color:var(--wc-warn)"><i class="ti ti-alert-triangle" style="font-size:11px"></i> Requiere doble aprobación para confirmar</span>
+              <button type="button" class="btn btn-sm" style="color:var(--wc-warn);border-color:var(--wc-warn);font-size:11px"
+                onclick="(()=>{const c=_editLeadId?CLIENTES.find(x=>x._id===_editLeadId):null;const car=c&&c._car?c._car:null;const autoId=car?car._id:'';const autoNombre=c?c._autoNombre||'Auto':'Auto';const precioAnt=car?(car.precioConvenido||car.precioConsignaMin||0):0;solicitarAprobacionPrecio(autoId,autoNombre,precioAnt)})()">
+                <i class="ti ti-writing-sign"></i>Solicitar aprobación
+              </button>
+            </div>
           </div>
         </div>
 
