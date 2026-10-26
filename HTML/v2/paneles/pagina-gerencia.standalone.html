@@ -483,6 +483,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 .ge-det-val{font-size:14px;font-weight:600;color:var(--wc-ink)}
 .ge-det-notas-box{background:var(--wc-surface2);border-radius:var(--wc-r-md);padding:12px;
   font-size:13px;color:var(--wc-ink2);white-space:pre-wrap;line-height:1.5}
+/* ── Tabs de vista ── */
+.view-tab-bar{display:flex;gap:2px;margin-bottom:18px;border-bottom:2px solid var(--wc-line)}
+.view-tab{padding:7px 18px;font-size:13px;font-weight:500;color:var(--wc-ink3);background:none;border:none;
+  border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;transition:color .15s,border-color .15s}
+.view-tab:hover{color:var(--wc-ink)}
+.view-tab.active{color:var(--wc-green);border-bottom-color:var(--wc-green)}
+.view-tab-panel{display:none}.view-tab-panel.active{display:block}
 </style>
 </head>
 <body>
@@ -506,50 +513,38 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
     <nav class="sb-nav">
       <div class="sb-section-label">Resumen</div>
       <button class="sb-item active" onclick="mostrarVista('dashboard',this)">
-        <i class="ti ti-layout-dashboard"></i>Dashboard ejecutivo
+        <i class="ti ti-layout-dashboard"></i>Inicio
+        <span class="sb-badge" id="sb-badge-hoy" style="display:none">0</span>
       </button>
       <div class="sb-section-label">Ventas y equipo</div>
       <button class="sb-item" onclick="mostrarVista('ventas',this)">
-        <i class="ti ti-receipt"></i>Ventas del mes
+        <i class="ti ti-receipt"></i>Ventas / Rentabilidad
       </button>
       <button class="sb-item" onclick="mostrarVista('equipo',this)">
-        <i class="ti ti-users"></i>Equipo / Ranking
+        <i class="ti ti-users"></i>Equipo
       </button>
       <div class="sb-section-label">Operaciones</div>
-      <button class="sb-item" onclick="mostrarVista('hoy',this)">
-        <i class="ti ti-sun"></i>Hoy / Urgentes
-        <span class="sb-badge" id="sb-badge-hoy" style="display:none">0</span>
-      </button>
       <button class="sb-item" id="sb-btn-clientes" onclick="mostrarVista('clientes',this)">
-        <i class="ti ti-users"></i>Todos los clientes
+        <i class="ti ti-users"></i>Clientes / Pipeline
         <span class="sb-badge" id="sb-badge-clientes" style="display:none">0</span>
-      </button>
-      <button class="sb-item" onclick="mostrarVista('pipeline',this)">
-        <i class="ti ti-list-check"></i>Pipeline completo
-        <span class="sb-badge" id="sb-badge-leads" style="display:none">0</span>
-      </button>
-      <button class="sb-item" onclick="mostrarVista('vendedores',this)">
-        <i class="ti ti-id-badge"></i>Vendedores
       </button>
       <button class="sb-item" onclick="mostrarVista('inventario',this)">
         <i class="ti ti-car"></i>Inventario
-      </button>
-      <button class="sb-item" onclick="mostrarVista('rentabilidad',this)">
-        <i class="ti ti-trending-up"></i>Rentabilidad
       </button>
       <button class="sb-item" onclick="mostrarVista('pendientes',this)">
         <i class="ti ti-checkbox"></i>Pendientes
         <span class="sb-badge" id="sb-badge-pend" style="display:none">0</span>
       </button>
-      <div class="sb-section-label">Finanzas y metas</div>
+      <div class="sb-section-label">Finanzas</div>
       <button class="sb-item" onclick="mostrarVista('finanzas',this)">
-        <i class="ti ti-chart-bar"></i>Resumen financiero
+        <i class="ti ti-chart-bar"></i>Finanzas / Pagos
       </button>
-      <button class="sb-item" onclick="mostrarVista('pagos',this)">
-        <i class="ti ti-cash"></i>Pagos / Apartados
+      <button class="sb-item" onclick="mostrarVista('comisiones',this)">
+        <i class="ti ti-percentage"></i>Cuadre
+        <span class="sb-badge" id="sb-badge-cred" style="display:none">0</span>
       </button>
-      <button class="sb-item" onclick="mostrarVista('metas',this)">
-        <i class="ti ti-target"></i>Metas y bonos
+      <button class="sb-item" onclick="mostrarVista('reportes',this)">
+        <i class="ti ti-report-analytics"></i>Reportes / Metas
       </button>
       <div class="sb-section-label">Gestión</div>
       <button class="sb-item" onclick="mostrarVista('expedientes',this)">
@@ -557,17 +552,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
       </button>
       <button class="sb-item" onclick="mostrarVista('creditos',this)">
         <i class="ti ti-building-bank"></i>Créditos
-        <span class="sb-badge" id="sb-badge-cred" style="display:none">0</span>
-      </button>
-      <button class="sb-item" onclick="mostrarVista('comisiones',this)">
-        <i class="ti ti-percentage"></i>Comisiones
-        <span class="sb-badge" id="sb-badge-com" style="display:none">0</span>
-      </button>
-      <button class="sb-item" onclick="mostrarVista('egresos',this)">
-        <i class="ti ti-arrow-down-circle"></i>Egresos
-      </button>
-      <button class="sb-item" onclick="mostrarVista('reportes',this)">
-        <i class="ti ti-report-analytics"></i>Reportes
+        <span class="sb-badge" id="sb-badge-leads" style="display:none">0</span>
       </button>
     </nav>
   </aside>
@@ -638,49 +623,68 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
           <div id="dash-ventas-recientes"></div>
         </div>
       </div>
+      <div style="margin-top:24px;border-top:1px solid var(--wc-line);padding-top:20px">
+        <div id="hoy-urgentes"></div>
+        <div id="hoy-sin-seguimiento"></div>
+        <div id="hoy-ganados-recientes"></div>
+      </div>
     </div>
 
     <!-- ══════════════ VENTAS ══════════════ -->
     <div class="view view-wrap" id="view-ventas">
-      <div class="search-bar">
-        <div class="search-wrap">
-          <i class="ti ti-search"></i>
-          <input type="search" id="ventas-q" placeholder="Buscar cliente, auto, vendedor..." oninput="renderVentas()">
-        </div>
-        <select class="field-input" id="ventas-f-vend" onchange="renderVentas()" style="width:auto;padding:7px 12px">
-          <option value="">Todos los vendedores</option>
-        </select>
+      <div class="view-tab-bar">
+        <button class="view-tab active" onclick="setViewTab('ventas','ventas')">Ventas del mes</button>
+        <button class="view-tab" onclick="setViewTab('ventas','rent')">Rentabilidad</button>
       </div>
-      <div id="ventas-kpis" style="margin-bottom:16px"></div>
-      <div id="ventas-list"></div>
+      <div class="view-tab-panel active" id="vtp-ventas-ventas">
+        <div class="search-bar">
+          <div class="search-wrap"><i class="ti ti-search"></i>
+            <input type="search" id="ventas-q" placeholder="Buscar cliente, auto, vendedor..." oninput="renderVentas()">
+          </div>
+          <select class="field-input" id="ventas-f-vend" onchange="renderVentas()" style="width:auto;padding:7px 12px">
+            <option value="">Todos los vendedores</option>
+          </select>
+        </div>
+        <div id="ventas-kpis" style="margin-bottom:16px"></div>
+        <div id="ventas-list"></div>
+      </div>
+      <div class="view-tab-panel" id="vtp-ventas-rent">
+        <div class="search-bar">
+          <div class="search-wrap"><i class="ti ti-search"></i>
+            <input type="search" id="rent-q" placeholder="Buscar auto..." oninput="renderRentabilidad()">
+          </div>
+          <select class="field-input" id="rent-f-est" onchange="renderRentabilidad()" style="width:auto;padding:7px 12px">
+            <option value="">Todos los estatus</option>
+            <option>Disponible</option><option>Apartado</option><option>Vendido</option><option>Entregado</option>
+          </select>
+          <select class="field-input" id="rent-sort" onchange="renderRentabilidad()" style="width:auto;padding:7px 12px">
+            <option value="dias">Más días en lote</option>
+            <option value="margen-asc">Menor margen</option>
+            <option value="margen-desc">Mayor margen</option>
+            <option value="precio">Mayor precio</option>
+          </select>
+        </div>
+        <div id="rent-kpis" style="margin-bottom:14px"></div>
+        <div id="rent-list"></div>
+      </div>
     </div>
 
     <!-- ══════════════ EQUIPO ══════════════ -->
     <div class="view view-wrap" id="view-equipo">
-      <div id="equipo-list"></div>
+      <div class="view-tab-bar">
+        <button class="view-tab active" onclick="setViewTab('equipo','ranking')">Ranking</button>
+        <button class="view-tab" onclick="setViewTab('equipo','cards')">Fichas vendedores</button>
+      </div>
+      <div class="view-tab-panel active" id="vtp-equipo-ranking">
+        <div id="equipo-list"></div>
+      </div>
+      <div class="view-tab-panel" id="vtp-equipo-cards">
+        <div id="vend-list"></div>
+      </div>
     </div>
 
-    <!-- ══════════════ PIPELINE ══════════════ -->
-    <div class="view view-wrap" id="view-pipeline">
-      <div class="search-bar">
-        <div class="search-wrap">
-          <i class="ti ti-search"></i>
-          <input type="search" id="pipe-q" placeholder="Buscar cliente, auto, vendedor..." oninput="renderPipeline()">
-        </div>
-        <select class="field-input" id="pipe-f-vend" onchange="renderPipeline()" style="width:auto;padding:7px 12px">
-          <option value="">Todos los vendedores</option>
-        </select>
-        <div class="inv-view-toggle">
-          <button class="inv-view-btn active" id="pipe-btn-funnel" onclick="setPipeView('funnel')" title="Funnel"><i class="ti ti-filter"></i></button>
-          <button class="inv-view-btn" id="pipe-btn-lista" onclick="setPipeView('lista')" title="Lista"><i class="ti ti-list"></i></button>
-        </div>
-      </div>
-      <!-- KPIs del pipeline -->
-      <div id="pipe-kpis" style="margin-bottom:16px"></div>
-      <!-- Funnel / Lista -->
-      <div id="pipe-funnel"></div>
-      <div id="pipe-list" style="display:none"></div>
-    </div>
+    <!-- stub pipeline fusionado con Clientes -->
+    <div style="display:none" id="view-pipeline"></div>
 
     <!-- ══════════════ CLIENTES ══════════════ -->
     <div class="view view-wrap" id="view-clientes">
@@ -704,6 +708,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
         <div class="inv-view-toggle">
           <button class="inv-view-btn active" id="cli-btn-tabla" onclick="setCliView('tabla')" title="Tabla"><i class="ti ti-list"></i></button>
           <button class="inv-view-btn" id="cli-btn-kanban" onclick="setCliView('kanban')" title="Kanban"><i class="ti ti-layout-columns"></i></button>
+          <button class="inv-view-btn" id="cli-btn-pipeline" onclick="setCliView('pipeline')" title="Pipeline"><i class="ti ti-filter"></i></button>
         </div>
       </div>
       <!-- Stats row igual que Operaciones -->
@@ -714,7 +719,26 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
         <div class="stat-card"><div class="stat-num" id="cli-st-ganados" style="color:var(--wc-ok)">—</div><div class="stat-lbl">Ganados</div></div>
       </div>
       <div id="cli-stats" style="margin-bottom:12px"></div>
+      <!-- Lista / kanban -->
       <div id="cli-list"></div>
+      <!-- Pipeline (visible cuando setCliView('pipeline')) -->
+      <div id="cli-pipeline-wrap" style="display:none">
+        <div class="search-bar" style="margin-bottom:12px">
+          <div class="search-wrap"><i class="ti ti-search"></i>
+            <input type="search" id="pipe-q" placeholder="Buscar cliente, auto, vendedor..." oninput="renderPipeline()">
+          </div>
+          <select class="field-input" id="pipe-f-vend" onchange="renderPipeline()" style="width:auto;padding:7px 12px">
+            <option value="">Todos los vendedores</option>
+          </select>
+          <div class="inv-view-toggle">
+            <button class="inv-view-btn active" id="pipe-btn-funnel" onclick="setPipeView('funnel')" title="Funnel"><i class="ti ti-filter"></i></button>
+            <button class="inv-view-btn" id="pipe-btn-lista" onclick="setPipeView('lista')" title="Lista"><i class="ti ti-list"></i></button>
+          </div>
+        </div>
+        <div id="pipe-kpis" style="margin-bottom:16px"></div>
+        <div id="pipe-funnel"></div>
+        <div id="pipe-list" style="display:none"></div>
+      </div>
     </div>
 
     <!-- ══════════════ INVENTARIO ══════════════ -->
@@ -742,45 +766,55 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 
     <!-- ══════════════ FINANZAS RESUMEN ══════════════ -->
     <div class="view view-wrap" id="view-finanzas">
-      <div class="fin-res-grid">
-        <div class="fin-res-card ok">
-          <div class="fin-res-title">Ingresos totales</div>
-          <div class="fin-res-val" id="fin-ingresos" style="color:var(--wc-ok)">—</div>
-          <div class="fin-res-sub" id="fin-ventas-n">— ventas cerradas</div>
-        </div>
-        <div class="fin-res-card danger">
-          <div class="fin-res-title">Costos + egresos</div>
-          <div class="fin-res-val" id="fin-costos" style="color:var(--wc-danger)">—</div>
-          <div class="fin-res-sub" id="fin-egresos-n">— egresos registrados</div>
-        </div>
-        <div class="fin-res-card ok">
-          <div class="fin-res-title">Utilidad neta del mes</div>
-          <div class="fin-res-val" id="fin-utilidad">—</div>
-          <div class="fin-res-sub" id="fin-margen">margen —%</div>
-        </div>
-        <div class="fin-res-card">
-          <div class="fin-res-title">Comisiones a pagar</div>
-          <div class="fin-res-val" id="fin-comisiones" style="color:var(--wc-warn)">—</div>
-          <div class="fin-res-sub" id="fin-com-n">— comisiones pendientes</div>
-        </div>
+      <div class="view-tab-bar">
+        <button class="view-tab active" onclick="setViewTab('finanzas','resumen')">Resumen</button>
+        <button class="view-tab" onclick="setViewTab('finanzas','pagos',renderPagos)">Pagos / Apartados</button>
       </div>
-      <div class="kpi-section-label"><i class="ti ti-table" style="font-size:14px"></i>Desglose por venta</div>
-      <div id="fin-tabla"></div>
+      <div class="view-tab-panel active" id="vtp-finanzas-resumen">
+        <div class="fin-res-grid">
+          <div class="fin-res-card ok">
+            <div class="fin-res-title">Ingresos totales</div>
+            <div class="fin-res-val" id="fin-ingresos" style="color:var(--wc-ok)">—</div>
+            <div class="fin-res-sub" id="fin-ventas-n">— ventas cerradas</div>
+          </div>
+          <div class="fin-res-card danger">
+            <div class="fin-res-title">Costos + egresos</div>
+            <div class="fin-res-val" id="fin-costos" style="color:var(--wc-danger)">—</div>
+            <div class="fin-res-sub" id="fin-egresos-n">— egresos registrados</div>
+          </div>
+          <div class="fin-res-card ok">
+            <div class="fin-res-title">Utilidad neta del mes</div>
+            <div class="fin-res-val" id="fin-utilidad">—</div>
+            <div class="fin-res-sub" id="fin-margen">margen —%</div>
+          </div>
+          <div class="fin-res-card">
+            <div class="fin-res-title">Comisiones a pagar</div>
+            <div class="fin-res-val" id="fin-comisiones" style="color:var(--wc-warn)">—</div>
+            <div class="fin-res-sub" id="fin-com-n">— comisiones pendientes</div>
+          </div>
+        </div>
+        <div class="kpi-section-label"><i class="ti ti-table" style="font-size:14px"></i>Desglose por venta</div>
+        <div id="fin-tabla"></div>
+      </div>
+      <div class="view-tab-panel" id="vtp-finanzas-pagos">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+          <button class="btn btn-primary" onclick="abrirOverlay('ov-pago')"><i class="ti ti-plus"></i>Registrar pago</button>
+        </div>
+        <div id="pagos-kpis" style="margin-bottom:14px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <input class="field-input" type="search" id="pagos-q" placeholder="Buscar cliente, concepto..." style="flex:1;min-width:180px" oninput="renderPagos()">
+          <select class="field-input" id="pagos-f-tipo" onchange="renderPagos()" style="width:auto">
+            <option value="">Todos los tipos</option>
+            <option>Apartado</option><option>Anticipo</option><option>Contado</option><option>Financiamiento</option>
+          </select>
+        </div>
+        <div id="pagos-list"></div>
+      </div>
     </div>
 
     <!-- ══════════════ METAS ══════════════ -->
-    <div class="view view-wrap" id="view-metas">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-        <div>
-          <div style="font-size:16px;font-weight:700">Metas del mes</div>
-          <div style="font-size:12px;color:var(--wc-ink3)" id="metas-periodo">—</div>
-        </div>
-        <button class="btn btn-primary" onclick="abrirOverlay('ov-meta')">
-          <i class="ti ti-settings"></i>Configurar metas
-        </button>
-      </div>
-      <div id="metas-list"></div>
-    </div>
+    <!-- stub metas fusionado con Reportes -->
+    <div style="display:none" id="view-metas"></div>
 
     <!-- ══════════════ EXPEDIENTES ══════════════ -->
     <div class="view view-wrap" id="view-expedientes">
@@ -820,77 +854,47 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
       <div id="cred-list"></div>
     </div>
 
-    <!-- ══════════════ COMISIONES ══════════════ -->
+    <!-- ══════════════ CUADRE (Comisiones + Egresos) ══════════════ -->
     <div class="view view-wrap" id="view-comisiones">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-        <div style="font-size:16px;font-weight:700">Comisiones del equipo</div>
+      <div class="view-tab-bar">
+        <button class="view-tab active" onclick="setViewTab('cuadre','com')">Comisiones<span class="sb-badge" id="sb-badge-com" style="display:none;margin-left:6px">0</span></button>
+        <button class="view-tab" onclick="setViewTab('cuadre','egr',renderEgresosGer)">Egresos</button>
       </div>
-      <div id="com-kpis" style="margin-bottom:14px"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        <input class="field-input" type="search" id="com-q" placeholder="Buscar vendedor, cliente..." style="flex:1;min-width:180px" oninput="renderComisionesGer()">
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="filter-chip active" onclick="setFiltroComGer('todos',this)">Todas</button>
-          <button class="filter-chip" onclick="setFiltroComGer('Pendiente',this)">Pendiente</button>
-          <button class="filter-chip" onclick="setFiltroComGer('Liberada',this)">Liberada</button>
-          <button class="filter-chip" onclick="setFiltroComGer('Pagada',this)">Pagada</button>
+      <div class="view-tab-panel active" id="vtp-cuadre-com">
+        <div id="com-kpis" style="margin-bottom:14px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <input class="field-input" type="search" id="com-q" placeholder="Buscar vendedor, cliente..." style="flex:1;min-width:180px" oninput="renderComisionesGer()">
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="filter-chip active" onclick="setFiltroComGer('todos',this)">Todas</button>
+            <button class="filter-chip" onclick="setFiltroComGer('Pendiente',this)">Pendiente</button>
+            <button class="filter-chip" onclick="setFiltroComGer('Liberada',this)">Liberada</button>
+            <button class="filter-chip" onclick="setFiltroComGer('Pagada',this)">Pagada</button>
+          </div>
         </div>
+        <div id="com-list"></div>
       </div>
-      <div id="com-list"></div>
-    </div>
-
-    <!-- ══════════════ EGRESOS ══════════════ -->
-    <div class="view view-wrap" id="view-egresos">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-        <div style="font-size:16px;font-weight:700">Egresos del negocio</div>
-        <button class="btn btn-primary" onclick="abrirOverlay('ov-egreso')">
-          <i class="ti ti-plus"></i>Registrar egreso
-        </button>
+      <div class="view-tab-panel" id="vtp-cuadre-egr">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+          <button class="btn btn-primary" onclick="abrirOverlay('ov-egreso')"><i class="ti ti-plus"></i>Registrar egreso</button>
+        </div>
+        <div id="egr-kpis" style="margin-bottom:14px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <input class="field-input" type="search" id="egr-q" placeholder="Buscar concepto, categoría..." style="flex:1;min-width:180px" oninput="renderEgresosGer()">
+          <select class="field-input" id="egr-f-cat" onchange="renderEgresosGer()" style="width:auto">
+            <option value="">Todas las categorías</option>
+            <option>Publicidad</option><option>Reparaciones</option><option>Gastos fijos</option>
+            <option>Comisiones</option><option>Legal</option><option>Otro</option>
+          </select>
+        </div>
+        <div id="egr-list"></div>
       </div>
-      <div id="egr-kpis" style="margin-bottom:14px"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        <input class="field-input" type="search" id="egr-q" placeholder="Buscar concepto, categoría..." style="flex:1;min-width:180px" oninput="renderEgresosGer()">
-        <select class="field-input" id="egr-f-cat" onchange="renderEgresosGer()" style="width:auto">
-          <option value="">Todas las categorías</option>
-          <option>Publicidad</option><option>Reparaciones</option><option>Gastos fijos</option>
-          <option>Comisiones</option><option>Legal</option><option>Otro</option>
-        </select>
-      </div>
-      <div id="egr-list"></div>
     </div>
 
     <!-- ══════════════ HOY / URGENTES ══════════════ -->
-    <div class="view view-wrap" id="view-hoy">
-      <div id="hoy-urgentes"></div>
-      <div id="hoy-sin-seguimiento"></div>
-      <div id="hoy-ganados-recientes"></div>
-    </div>
-
-    <!-- ══════════════ VENDEDORES (cards) ══════════════ -->
-    <div class="view view-wrap" id="view-vendedores">
-      <div id="vend-list"></div>
-    </div>
-
-    <!-- ══════════════ RENTABILIDAD ══════════════ -->
-    <div class="view view-wrap" id="view-rentabilidad">
-      <div class="search-bar">
-        <div class="search-wrap">
-          <i class="ti ti-search"></i>
-          <input type="search" id="rent-q" placeholder="Buscar auto..." oninput="renderRentabilidad()">
-        </div>
-        <select class="field-input" id="rent-f-est" onchange="renderRentabilidad()" style="width:auto;padding:7px 12px">
-          <option value="">Todos los estatus</option>
-          <option>Disponible</option><option>Apartado</option><option>Vendido</option><option>Entregado</option>
-        </select>
-        <select class="field-input" id="rent-sort" onchange="renderRentabilidad()" style="width:auto;padding:7px 12px">
-          <option value="dias">Más días en lote</option>
-          <option value="margen-asc">Menor margen</option>
-          <option value="margen-desc">Mayor margen</option>
-          <option value="precio">Mayor precio</option>
-        </select>
-      </div>
-      <div id="rent-kpis" style="margin-bottom:14px"></div>
-      <div id="rent-list"></div>
-    </div>
+    <!-- stubs para vistas fusionadas — no borrar, mostrarVista las necesita -->
+    <div style="display:none" id="view-hoy"></div>
+    <div style="display:none" id="view-vendedores"></div>
+    <div style="display:none" id="view-rentabilidad"></div>
 
     <!-- ══════════════ PENDIENTES ══════════════ -->
     <div class="view view-wrap" id="view-pendientes">
@@ -903,28 +907,25 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
       <div id="pend-board" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div>
     </div>
 
-    <!-- ══════════════ PAGOS / APARTADOS ══════════════ -->
-    <div class="view view-wrap" id="view-pagos">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-        <div style="font-size:16px;font-weight:700">Pagos y apartados</div>
-        <button class="btn btn-primary" onclick="abrirOverlay('ov-pago')">
-          <i class="ti ti-plus"></i>Registrar pago
-        </button>
-      </div>
-      <div id="pagos-kpis" style="margin-bottom:14px"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        <input class="field-input" type="search" id="pagos-q" placeholder="Buscar cliente, concepto..." style="flex:1;min-width:180px" oninput="renderPagos()">
-        <select class="field-input" id="pagos-f-tipo" onchange="renderPagos()" style="width:auto">
-          <option value="">Todos los tipos</option>
-          <option>Apartado</option><option>Anticipo</option><option>Contado</option><option>Financiamiento</option>
-        </select>
-      </div>
-      <div id="pagos-list"></div>
-    </div>
+    <!-- stub pagos fusionado con Finanzas -->
+    <div style="display:none" id="view-pagos"></div>
 
     <!-- ══════════════ REPORTES ══════════════ -->
     <div class="view view-wrap" id="view-reportes">
-      <div id="rep-content"></div>
+      <div class="view-tab-bar">
+        <button class="view-tab active" onclick="setViewTab('reportes','rep')">Reportes</button>
+        <button class="view-tab" onclick="setViewTab('reportes','metas',renderMetas)">Metas y bonos</button>
+      </div>
+      <div class="view-tab-panel active" id="vtp-reportes-rep">
+        <div id="rep-content"></div>
+      </div>
+      <div class="view-tab-panel" id="vtp-reportes-metas">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+          <button class="btn btn-primary" onclick="abrirOverlay('ov-meta')"><i class="ti ti-settings"></i>Configurar metas</button>
+        </div>
+        <div style="font-size:12px;color:var(--wc-ink3);margin-bottom:12px" id="metas-periodo">—</div>
+        <div id="metas-list"></div>
+      </div>
     </div>
 
   </main>
@@ -933,28 +934,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 <!-- BOTTOM NAV MÓVIL -->
 <nav class="bottom-nav">
   <button class="bn-item active" onclick="mostrarVista('dashboard',this,'bn')">
-    <i class="ti ti-layout-dashboard"></i>Dashboard
-  </button>
-  <button class="bn-item" onclick="mostrarVista('hoy',this,'bn')">
-    <i class="ti ti-sun"></i>Hoy
-  </button>
-  <button class="bn-item" onclick="mostrarVista('ventas',this,'bn')">
-    <i class="ti ti-receipt"></i>Ventas
+    <i class="ti ti-layout-dashboard"></i>Inicio
   </button>
   <button class="bn-item" onclick="mostrarVista('clientes',this,'bn')">
     <i class="ti ti-users"></i>Clientes
   </button>
-  <button class="bn-item" onclick="mostrarVista('pipeline',this,'bn')">
-    <i class="ti ti-list-check"></i>Pipeline
+  <button class="bn-item" onclick="mostrarVista('ventas',this,'bn')">
+    <i class="ti ti-receipt"></i>Ventas
   </button>
   <button class="bn-item" onclick="mostrarVista('equipo',this,'bn')">
     <i class="ti ti-trophy"></i>Equipo
-  </button>
-  <button class="bn-item" onclick="mostrarVista('vendedores',this,'bn')">
-    <i class="ti ti-id-badge"></i>Vendedores
-  </button>
-  <button class="bn-item" onclick="mostrarVista('rentabilidad',this,'bn')">
-    <i class="ti ti-trending-up"></i>Rentab.
   </button>
   <button class="bn-item" onclick="mostrarVista('pendientes',this,'bn')">
     <i class="ti ti-checkbox"></i>Pendientes
@@ -962,20 +951,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
   <button class="bn-item" onclick="mostrarVista('finanzas',this,'bn')">
     <i class="ti ti-chart-bar"></i>Finanzas
   </button>
-  <button class="bn-item" onclick="mostrarVista('pagos',this,'bn')">
-    <i class="ti ti-cash"></i>Pagos
+  <button class="bn-item" onclick="mostrarVista('comisiones',this,'bn')">
+    <i class="ti ti-percentage"></i>Cuadre
   </button>
   <button class="bn-item" onclick="mostrarVista('expedientes',this,'bn')">
     <i class="ti ti-folder-check"></i>Expedientes
   </button>
   <button class="bn-item" onclick="mostrarVista('creditos',this,'bn')">
     <i class="ti ti-building-bank"></i>Créditos
-  </button>
-  <button class="bn-item" onclick="mostrarVista('comisiones',this,'bn')">
-    <i class="ti ti-percentage"></i>Comisiones
-  </button>
-  <button class="bn-item" onclick="mostrarVista('egresos',this,'bn')">
-    <i class="ti ti-arrow-down-circle"></i>Egresos
   </button>
   <button class="bn-item" onclick="mostrarVista('reportes',this,'bn')">
     <i class="ti ti-report-analytics"></i>Reportes
@@ -2865,7 +2848,25 @@ function setCliView(v){
   _cliView=v;
   document.getElementById('cli-btn-tabla').classList.toggle('active',v==='tabla');
   document.getElementById('cli-btn-kanban').classList.toggle('active',v==='kanban');
-  renderClientes();
+  document.getElementById('cli-btn-pipeline')?.classList.toggle('active',v==='pipeline');
+  const pipeWrap=document.getElementById('cli-pipeline-wrap');
+  const statsRow=document.getElementById('cli-stats-row');
+  const cliStats=document.getElementById('cli-stats');
+  const cliList=document.getElementById('cli-list');
+  const cliQ=document.getElementById('cli-q')?.closest('.search-bar');
+  if(v==='pipeline'){
+    if(pipeWrap)pipeWrap.style.display='';
+    if(cliList)cliList.style.display='none';
+    if(statsRow)statsRow.style.display='none';
+    if(cliStats)cliStats.style.display='none';
+    renderPipeline();
+  } else {
+    if(pipeWrap)pipeWrap.style.display='none';
+    if(cliList)cliList.style.display='';
+    if(statsRow)statsRow.style.display='';
+    if(cliStats)cliStats.style.display='';
+    renderClientes();
+  }
 }
 
 function geCliOrigenClass(o){
@@ -3123,32 +3124,54 @@ function guardarEdicionCli(){
 
 /* ══ Nav ══ */
 const TOPBAR_LABELS={
-  dashboard:{title:'Dashboard Ejecutivo',sub:''},
-  hoy:{title:'Hoy / Urgentes',sub:'leads sin seguimiento · nuevos hoy · ventas recientes'},
-  ventas:{title:'Ventas del mes',sub:''},
-  equipo:{title:'Equipo / Ranking',sub:''},
-  pipeline:{title:'Pipeline completo',sub:''},
-  clientes:{title:'Todos los clientes',sub:''},
-  vendedores:{title:'Vendedores',sub:'ficha por vendedor'},
+  dashboard:{title:'Inicio',sub:'resumen ejecutivo · urgentes · actividad del día'},
+  ventas:{title:'Ventas / Rentabilidad',sub:''},
+  equipo:{title:'Equipo',sub:'ranking · fichas por vendedor'},
+  clientes:{title:'Clientes / Pipeline',sub:''},
   inventario:{title:'Inventario',sub:''},
-  rentabilidad:{title:'Rentabilidad',sub:'precio · costo · margen · días en lote'},
   pendientes:{title:'Pendientes del equipo',sub:''},
-  finanzas:{title:'Resumen financiero',sub:''},
-  pagos:{title:'Pagos y apartados',sub:''},
-  metas:{title:'Metas y bonos',sub:''},
+  finanzas:{title:'Finanzas / Pagos',sub:''},
+  comisiones:{title:'Cuadre',sub:'comisiones · egresos'},
+  reportes:{title:'Reportes / Metas',sub:'pipeline · ranking · bonos'},
   expedientes:{title:'Expedientes de venta',sub:''},
   creditos:{title:'Créditos en trámite',sub:''},
-  comisiones:{title:'Comisiones del equipo',sub:''},
-  egresos:{title:'Egresos del negocio',sub:''},
-  reportes:{title:'Reportes gerenciales',sub:'pipeline · ranking · autos más solicitados'},
+  // stubs — por si alguien navega directamente
+  hoy:{title:'Inicio',sub:''},pipeline:{title:'Clientes / Pipeline',sub:''},
+  vendedores:{title:'Equipo',sub:''},rentabilidad:{title:'Ventas / Rentabilidad',sub:''},
+  pagos:{title:'Finanzas / Pagos',sub:''},metas:{title:'Reportes / Metas',sub:''},
+  egresos:{title:'Cuadre',sub:''},
 };
+// setViewTab(grupo, tab, [fnRender])
+function setViewTab(grupo,tab,fnRender){
+  const prefix='vtp-'+grupo+'-';
+  document.querySelectorAll(`[id^="${prefix}"]`).forEach(p=>{
+    p.classList.toggle('active',p.id===prefix+tab);
+  });
+  // sync tab bar buttons
+  const viewEl=document.querySelector(`#view-${grupo==='cuadre'?'comisiones':grupo}`);
+  if(viewEl)viewEl.querySelectorAll('.view-tab').forEach(b=>{
+    const fn=b.getAttribute('onclick')||'';
+    b.classList.toggle('active',fn.includes(`'${tab}'`)||fn.includes(`"${tab}"`));
+  });
+  if(typeof fnRender==='function')fnRender();
+}
 function mostrarVista(id,btn,nav){
+  // Redirige stubs a su vista fusionada
+  const redirect={hoy:'dashboard',pipeline:'clientes',vendedores:'equipo',rentabilidad:'ventas',pagos:'finanzas',metas:'reportes',egresos:'comisiones'};
+  const realId=redirect[id]||id;
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-'+id)?.classList.add('active');
+  document.getElementById('view-'+realId)?.classList.add('active');
   if(nav==='bn'){document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');}
   else{document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');}
-  const t=TOPBAR_LABELS[id]||{title:id,sub:''};
+  const t=TOPBAR_LABELS[realId]||{title:realId,sub:''};
   document.getElementById('topbar-title').innerHTML=t.title+(t.sub?`<span class="topbar-sub">${t.sub}</span>`:'');
+  // Disparar renders de vistas fusionadas al navegar
+  if(realId==='dashboard')renderHoy();
+  if(realId==='equipo'&&document.getElementById('vtp-equipo-cards')?.classList.contains('active'))renderVendedores();
+  if(realId==='ventas'&&document.getElementById('vtp-ventas-rent')?.classList.contains('active'))renderRentabilidad();
+  if(realId==='finanzas'&&document.getElementById('vtp-finanzas-pagos')?.classList.contains('active'))renderPagos();
+  if(realId==='comisiones'&&document.getElementById('vtp-cuadre-egr')?.classList.contains('active'))renderEgresosGer();
+  if(realId==='reportes'&&document.getElementById('vtp-reportes-metas')?.classList.contains('active'))renderMetas();
 }
 function cerrarOverlay(id){document.getElementById(id)?.classList.remove('open');}
 function abrirOverlay(id){document.getElementById(id)?.classList.add('open');}
