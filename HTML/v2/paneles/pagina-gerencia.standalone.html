@@ -520,7 +520,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
         <i class="ti ti-sun"></i>Hoy / Urgentes
         <span class="sb-badge" id="sb-badge-hoy" style="display:none">0</span>
       </button>
-      <button class="sb-item" onclick="mostrarVista('clientes',this)">
+      <button class="sb-item" id="sb-btn-clientes" onclick="mostrarVista('clientes',this)">
         <i class="ti ti-users"></i>Todos los clientes
         <span class="sb-badge" id="sb-badge-clientes" style="display:none">0</span>
       </button>
@@ -1226,12 +1226,15 @@ function M(v){if(!v&&v!==0)return'—';const n=parseFloat(v)||0;return'$'+n.toLo
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fechaCorta(d){if(!d)return'—';const f=new Date(d);return isNaN(f)?'—':f.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'});}
 function initials(s){return String(s||'').split(' ').map(w=>w[0]||'').slice(0,2).join('').toUpperCase()||'?';}
-function isVenta(c){return['Ganado','Vendido','Entregado'].includes(c.etapa||c.estatus||'');}
+// ── Funciones canónicas — usan siempre campos enriquecidos del backend ──
+function etapa(c){return c._etapa||etapa(c)||c.status||'Nuevo';}
+function isVenta(c){return['Ganado','Vendido','Entregado'].includes(etapa(c));}
+function vendId(c){return c._vendedorId||vendId(c)||'';}
 function fechaVenta(c){return c.cierreFecha||c.fechaCierre||c.fechaVenta||c._updatedDate||c._createdDate||null;}
-function findVend(id){return VENDEDORES.find(v=>v._id===id||v.email===id)||null;}
+function findVend(id){if(!id)return null;return VENDEDORES.find(v=>v._id===id||v.email===id)||null;}
 function calcUtil(c){
   const precio=parseFloat(c._precioVenta||c.cierrePrecio||c.precioVenta||0);
-  const costo=parseFloat(c._costoAdquisicion||c.costoAdquisicion||0);
+  const costo=parseFloat(c._costoTotal||c._costoAdquisicion||c.costoAdquisicion||0);
   const com=parseFloat(c._comisionVendedor||c.cierreComision||0);
   const egrs=EGRESOS.filter(e=>e.leadId===c._id||e.clienteId===c._id).reduce((s,e)=>s+parseFloat(e.monto||0),0);
   return{precio,costo,com,egrs,util:precio-costo-com-egrs,margen:precio>0?Math.round((precio-costo-com-egrs)/precio*100):0};
@@ -1275,6 +1278,7 @@ function aplicarFiltroMes(){
   const sel=document.getElementById('filtro-mes');
   const ahora=new Date();_filtroMes=sel.value||(ahora.getFullYear()+'-'+(ahora.getMonth()+1).toString().padStart(2,'0'));
   renderDashboard();renderVentas();renderFinanzas();
+  renderVendedores();renderReportes();renderEgresosGer();renderHoy();renderMetas();
 }
 function _enMes(c){
   if(!_filtroMes)return true;
@@ -1287,7 +1291,7 @@ function ventasDelMes(){return CLIENTES.filter(c=>isVenta(c)&&_enMes(c));}
 /* ══ DASHBOARD ══ */
 function renderDashboard(){
   const ventas=ventasDelMes();
-  const leads=CLIENTES.filter(c=>!isVenta(c)&&(c.etapa||c.estatus||'')!=='Perdido').length;
+  const leads=CLIENTES.filter(c=>!isVenta(c)&&(etapa(c))!=='Perdido').length;
   const totalLeads=CLIENTES.length;
   const tasaCierre=totalLeads>0?Math.round(ventas.length/totalLeads*100):0;
   const ingresos=ventas.reduce((s,c)=>s+parseFloat(c._precioVenta||c.cierrePrecio||0),0);
@@ -1311,7 +1315,7 @@ function renderDashboard(){
   const autoTop=Object.values(autoCount).sort((a,b)=>b.n-a.n)[0];
   // Mejor vendedor del mes
   const vendCount={};
-  ventas.forEach(c=>{const id=c.vendedorId||c.vendedorAsignado||'sin-asignar';vendCount[id]=(vendCount[id]||0)+1;});
+  ventas.forEach(c=>{const id=vendId(c)||'sin-asignar';vendCount[id]=(vendCount[id]||0)+1;});
   const topVendId=Object.entries(vendCount).sort((a,b)=>b[1]-a[1])[0];
   const topVend=topVendId?findVend(topVendId[0]):null;
 
@@ -1345,7 +1349,7 @@ function renderDashboard(){
   // Ranking
   const rankMap={};
   ventas.forEach(c=>{
-    const id=c.vendedorId||c.vendedorAsignado||'sin-asignar';
+    const id=vendId(c)||'sin-asignar';
     if(!rankMap[id])rankMap[id]={id,ventas:0,util:0};
     rankMap[id].ventas++;rankMap[id].util+=calcUtil(c).util;
   });
@@ -1374,7 +1378,7 @@ function renderDashboard(){
   const rec=[...ventas].sort((a,b)=>new Date(fechaVenta(b)||0)-new Date(fechaVenta(a)||0)).slice(0,5);
   document.getElementById('dash-ventas-recientes').innerHTML=rec.length
     ?rec.map(c=>{
-      const u=calcUtil(c);const v=findVend(c.vendedorId||c.vendedorAsignado);
+      const u=calcUtil(c);const v=findVend(vendId(c));
       return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--wc-border)">
         <div>
           <div style="font-weight:600;font-size:13px">${esc(c.nombre||c.name||'Sin nombre')}</div>
@@ -1393,7 +1397,7 @@ function renderVentas(){
   const q=(document.getElementById('ventas-q')?.value||'').toLowerCase();
   const fVend=document.getElementById('ventas-f-vend')?.value||'';
   let rows=ventasDelMes();
-  if(fVend)rows=rows.filter(c=>(c.vendedorId||c.vendedorAsignado)===fVend);
+  if(fVend)rows=rows.filter(c=>(vendId(c))===fVend);
   if(q)rows=rows.filter(c=>[c.nombre,c.name,c._autoNombre,c.autoInteres].some(v=>String(v||'').toLowerCase().includes(q)));
   const total=rows.reduce((s,c)=>s+parseFloat(c._precioVenta||c.cierrePrecio||0),0);
   const util=rows.reduce((s,c)=>s+calcUtil(c).util,0);
@@ -1415,7 +1419,7 @@ function renderVentas(){
       <th class="num">Precio</th><th class="num">Utilidad</th><th>Margen</th><th>Fecha</th>
     </tr></thead>
     <tbody>${rows.map(c=>{
-      const u=calcUtil(c);const v=findVend(c.vendedorId||c.vendedorAsignado);
+      const u=calcUtil(c);const v=findVend(vendId(c));
       return`<tr style="cursor:pointer" onclick="abrirDetalleLead('${esc(c._id||'')}')">
         <td><div style="font-weight:600">${esc(c.nombre||c.name||'—')}</div>
           <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||'')}</div></td>
@@ -1436,7 +1440,7 @@ function renderEquipo(){
   VENDEDORES.forEach(v=>{vendMap[v._id]={vend:v,leads:0,ventas:0,util:0,com:0};});
   // Por si hay leads sin vendedor en mapa
   allLeads.forEach(c=>{
-    const id=c.vendedorId||c.vendedorAsignado||'';
+    const id=vendId(c)||'';
     if(id&&!vendMap[id])vendMap[id]={vend:null,leads:0,ventas:0,util:0,com:0};
     if(id&&vendMap[id]){
       vendMap[id].leads++;
@@ -1513,13 +1517,13 @@ function renderPipeline(){
     Negociando:'chip-orange',Ganado:'chip-green',Perdido:'chip-gray'};
 
   let rows=[...CLIENTES];
-  if(fVend)rows=rows.filter(c=>(c.vendedorId||c.vendedorAsignado)===fVend);
+  if(fVend)rows=rows.filter(c=>(vendId(c))===fVend);
   if(q)rows=rows.filter(c=>[c.nombre,c.name,c.autoInteres,c._autoNombre,c.telefono].some(v=>String(v||'').toLowerCase().includes(q)));
 
   // ── KPIs ──
-  const activos=rows.filter(c=>!['Ganado','Vendido','Entregado','Perdido'].includes(c.etapa||c.estatus||''));
+  const activos=rows.filter(c=>!['Ganado','Vendido','Entregado','Perdido'].includes(etapa(c)));
   const ganados=rows.filter(c=>isVenta(c));
-  const perdidos=rows.filter(c=>(c.etapa||c.estatus||'')==='Perdido');
+  const perdidos=rows.filter(c=>(etapa(c))==='Perdido');
   const tasa=rows.length?Math.round(ganados.length/rows.length*100):0;
   document.getElementById('pipe-kpis').innerHTML=`
     <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px">
@@ -1532,7 +1536,7 @@ function renderPipeline(){
   // ── Chips por etapa + barra ──
   const porEtapa={};ETAPAS.forEach(e=>{porEtapa[e]=[];});
   rows.forEach(c=>{
-    const e=ETAPAS.includes(c.etapa||c.estatus||'')?c.etapa||c.estatus:'Nuevo';
+    const e=ETAPAS.includes(etapa(c))?etapa(c):'Nuevo';
     porEtapa[e].push(c);
   });
 
@@ -1565,7 +1569,7 @@ function renderPipeline(){
         </div>
         <div class="pipe-funnel-body">
           ${lista.sort((a,b)=>new Date(b._createdDate||0)-new Date(a._createdDate||0)).map(c=>{
-            const v=findVend(c.vendedorId||c.vendedorAsignado);
+            const v=findVend(vendId(c));
             const dias=diasSinActCli(c);const urgente=dias>=3;
             return`<div class="pipe-funnel-card" onclick="abrirDetalleLead('${esc(c._id||'')}')">
               <div style="font-weight:600;font-size:13px">${esc(c.nombre||c.name||'Sin nombre')}${urgente?'<span style="color:var(--wc-warn);margin-left:4px;font-size:11px">⚠${dias}d</span>':''}</div>
@@ -1594,8 +1598,8 @@ function renderPipeline(){
     el.innerHTML=`<div class="table-wrap"><table class="data-table">
       <thead><tr><th>Cliente</th><th>Auto de interés</th><th>Vendedor</th><th>Etapa</th><th>Fecha</th></tr></thead>
       <tbody>${sorted.map(c=>{
-        const v=findVend(c.vendedorId||c.vendedorAsignado);
-        const etapa=c.etapa||c.estatus||'Nuevo';
+        const v=findVend(vendId(c));
+        const etapa=etapa(c);
         return`<tr style="cursor:pointer" onclick="abrirDetalleLead('${esc(c._id||'')}')">
           <td><div style="font-weight:600">${esc(c.nombre||c.name||'Sin nombre')}</div>
             <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||c.email||'')}</div></td>
@@ -1656,8 +1660,8 @@ function recibirLeadActualizado(msg){
 function abrirDetalleLead(id){
   const c=CLIENTES.find(x=>x._id===id);if(!c)return;
   _editLeadId=id;
-  const v=findVend(c.vendedorId||c.vendedorAsignado);
-  const etapa=c.etapa||c.estatus||'Nuevo';
+  const v=findVend(vendId(c));
+  const etapa=etapa(c);
   const ETAPA_BADGE={Nuevo:'chip-info',Contactado:'chip-info',Interesado:'chip-warn',
     Negociando:'chip-orange',Ganado:'chip-green',Vendido:'chip-green',Entregado:'chip-green',Perdido:'chip-gray'};
   const car=c._car||null;
@@ -2023,7 +2027,7 @@ function renderFinanzas(){
   // Advertencia cuando todos los costos son $0 (Cars CMS sin datos)
   const sinCostos=costos===0&&ventas.length>0;
   const warnHtml=sinCostos?`<div style="background:var(--wc-warn-bg,#fffbe6);border:1px solid var(--wc-warn);border-radius:var(--wc-r-md);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--wc-ink2);display:flex;align-items:center;gap:8px"><i class="ti ti-alert-triangle" style="color:var(--wc-warn);font-size:16px;flex-shrink:0"></i><span>Los costos de adquisición no están registrados en el CMS (Cars). La utilidad puede estar sobreestimada — registra los costos en cada auto para ver números reales.</span></div>`:'';
-  const rows=ventas.map(c=>({...c,...calcUtil(c),_vend:findVend(c.vendedorId||c.vendedorAsignado)}));
+  const rows=ventas.map(c=>({...c,...calcUtil(c),_vend:findVend(vendId(c))}));
   rows.sort((a,b)=>new Date(fechaVenta(b)||0)-new Date(fechaVenta(a)||0));
   el.innerHTML=warnHtml+`<div class="table-wrap"><table class="data-table">
     <thead><tr>
@@ -2053,7 +2057,7 @@ function renderMetas(){
   if(!VENDEDORES.length){el.innerHTML='<div class="empty-state"><i class="ti ti-target"></i><h3>Sin vendedores configurados</h3></div>';return;}
   el.innerHTML=VENDEDORES.map(v=>{
     const meta=parseFloat(v.metaMensual||10);
-    const ventas=CLIENTES.filter(c=>isVenta(c)&&ventasMes(c)&&(c.vendedorId||c.vendedorAsignado)===v._id).length;
+    const ventas=CLIENTES.filter(c=>isVenta(c)&&ventasMes(c)&&(vendId(c))===v._id).length;
     const pct=Math.min(100,Math.round(ventas/meta*100));
     const colorClass=pct>=100?'':pct>=70?'warn':'danger';
     const bono=parseFloat(v.bonoMeta||0);
@@ -2117,7 +2121,7 @@ function renderExpedientes(){
   el.innerHTML=`<div class="table-wrap"><table class="data-table">
     <thead><tr><th>Folio</th><th>Cliente</th><th>Auto</th><th>Vendedor</th><th>Forma pago</th><th>Banco</th><th class="num">Precio</th><th>Fecha</th></tr></thead>
     <tbody>${rows.map(c=>{
-      const v=findVend(c.vendedorId||c.vendedorAsignado);
+      const v=findVend(vendId(c));
       const folio=c.folio||c.folioVenta||c.cierreFolio||'—';
       const forma=c.formaPago||c.tipoPago||(parseFloat(c.montoFinanciado||0)>0?'Financiado':'Contado');
       const banco=c.banco||c.bancoFinanciador||c.cierreBanco||'—';
@@ -2157,7 +2161,7 @@ function renderCreditos(){
   if(q)rows=rows.filter(c=>[c._clienteNombre,c.banco,c.financiera,c._autoNombre].some(v=>String(v||'').toLowerCase().includes(q)));
   const pend=CREDITOS.filter(c=>credEstGer(c)==='Pendiente').length;
   const aprobados=CREDITOS.filter(c=>credEstGer(c)==='Aprobado').length;
-  const totalMonto=CREDITOS.reduce((s,c)=>s+parseFloat(c.monto||c.montoSolicitado||0),0);
+  const totalMonto=CREDITOS.reduce((s,c)=>s+parseFloat(c.monto||c.montoSolicitado||(parseFloat(c.precioVehiculo||0)-parseFloat(c.engancheMonto||0))||0),0);
   const bEl=document.getElementById('sb-badge-cred');if(bEl){bEl.textContent=pend;bEl.style.display=pend?'inline':'none';}
   document.getElementById('cred-kpis').innerHTML=`<div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:0">
     <div class="kpi-card"><div class="kpi-label">En trámite</div><div class="kpi-value" style="color:var(--wc-warn)">${pend}</div></div>
@@ -2177,7 +2181,7 @@ function renderCreditos(){
         <td style="font-size:12px">${esc(c._autoNombre)}</td>
         <td style="font-size:12px">${esc(c.banco||c.financiera||'—')}${c.plazo||c.plazoMeses?' · '+(c.plazo||c.plazoMeses)+'m':''}</td>
         <td style="font-size:12px">${esc(vend?.nombre||c.vendedorNombre||'—')}</td>
-        <td class="num">${M(c.monto||c.montoSolicitado)}</td>
+        <td class="num">${M(c.monto||c.montoSolicitado||(parseFloat(c.precioVehiculo||0)-parseFloat(c.engancheMonto||0))||0)}</td>
         <td><span class="chip ${BADGE[est]||'chip-warn'}">${esc(est)}</span></td>
         <td><select class="field-input" style="font-size:11px;padding:4px 8px;height:auto;width:auto"
               onchange="cambiarEstatusCred('${esc(c._id)}',this.value)">
@@ -2203,9 +2207,10 @@ function renderComisionesGer(){
   let rows=[...COMISIONES];
   if(_filtroComGer!=='todos')rows=rows.filter(c=>(c.estatus||'Pendiente')===_filtroComGer);
   if(q)rows=rows.filter(c=>(c.vendedor||c.vendedorNombre||''+(c.clienteNombre||'')).toLowerCase().includes(q));
-  const pendCount=COMISIONES.filter(c=>(c.estatusPago||'Pendiente')==='Pendiente').length;
-  const pendMonto=COMISIONES.filter(c=>(c.estatusPago||'Pendiente')==='Pendiente').reduce((s,c)=>s+parseFloat(c.monto||0),0);
-  const pagadoMonto=COMISIONES.filter(c=>(c.estatusPago||'')!=='Pendiente').reduce((s,c)=>s+parseFloat(c.monto||0),0);
+  const pagadaSet=new Set(['Pagado','Pagada','pagado','pagada']);
+  const pendCount=COMISIONES.filter(c=>!pagadaSet.has(c.estatusPago||'')).length;
+  const pendMonto=COMISIONES.filter(c=>!pagadaSet.has(c.estatusPago||'')).reduce((s,c)=>s+parseFloat(c.monto||0),0);
+  const pagadoMonto=COMISIONES.filter(c=>pagadaSet.has(c.estatusPago||'')).reduce((s,c)=>s+parseFloat(c.monto||0),0);
   const bEl=document.getElementById('sb-badge-com');if(bEl){bEl.textContent=pendCount;bEl.style.display=pendCount?'inline':'none';}
   document.getElementById('com-kpis').innerHTML=`<div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:0">
     <div class="kpi-card"><div class="kpi-label">Pendientes</div><div class="kpi-value" style="color:var(--wc-warn)">${pendCount}</div></div>
@@ -2327,10 +2332,10 @@ function recibirEgresoResultado(msg){
 /* ══ HOY / URGENTES ══ */
 function renderHoy(){
   const ACTIVOS_EST=['Nuevo','Contactado','Interesado','Negociando'];
-  const urgentes=CLIENTES.filter(c=>ACTIVOS_EST.includes(c.etapa||c.estatus||'Nuevo')&&diasSinActCli(c)>=3)
+  const urgentes=CLIENTES.filter(c=>ACTIVOS_EST.includes(etapa(c))&&diasSinActCli(c)>=3)
     .sort((a,b)=>diasSinActCli(b)-diasSinActCli(a));
-  const ganados=CLIENTES.filter(c=>isVanta(c)||isVenta(c))
-    .sort((a,b)=>new Date(b._updatedDate||b._createdDate||0)-new Date(a._updatedDate||a._createdDate||0))
+  const ganados=CLIENTES.filter(c=>isVenta(c))
+    .sort((a,b)=>new Date(fechaVenta(b)||0)-new Date(fechaVenta(a)||0))
     .slice(0,5);
   const nuevosHoy=CLIENTES.filter(c=>{
     if(!c._createdDate)return false;
@@ -2349,14 +2354,14 @@ function renderHoy(){
   </div>`+(urgentes.length?`<div class="table-wrap"><table class="data-table">
     <thead><tr><th>Cliente</th><th>Vendedor</th><th>Etapa</th><th>Días</th><th></th></tr></thead>
     <tbody>${urgentes.map(c=>{
-      const v=findVend(c.vendedorId||c.vendedorAsignado);
+      const v=findVend(vendId(c));
       const dias=diasSinActCli(c);
       const wa=c.telefono?`<a href="https://wa.me/52${c.telefono.replace(/\D/g,'')}" target="_blank" class="btn btn-sm" style="background:var(--wc-green);color:#fff;padding:4px 8px" onclick="event.stopPropagation()"><i class="ti ti-brand-whatsapp"></i></a>`:'';
       return`<tr style="cursor:pointer" onclick="abrirDetalleCli('${esc(c._id||'')}')">
         <td><div style="font-weight:600">${esc(c.nombre||c.name||'—')}</div>
           <div style="font-size:11px;color:var(--wc-ink3)">${esc(c.telefono||'')}</div></td>
         <td style="font-size:12px">${esc(v?.nombre||v?.name||'Sin asignar')}</td>
-        <td><span class="chip chip-warn">${esc(c.etapa||c.estatus||'Nuevo')}</span></td>
+        <td><span class="chip chip-warn">${esc(etapa(c))}</span></td>
         <td style="font-weight:700;color:var(--wc-danger)">${dias}d</td>
         <td onclick="event.stopPropagation()">${wa}</td>
       </tr>`;}).join('')}</tbody></table></div>`
@@ -2368,7 +2373,7 @@ function renderHoy(){
     <span class="chip chip-info">${nuevosHoy.length}</span>
   </div>`+(nuevosHoy.length?`<div style="display:flex;flex-direction:column;gap:6px">
     ${nuevosHoy.map(c=>{
-      const v=findVend(c.vendedorId||c.vendedorAsignado);
+      const v=findVend(vendId(c));
       return`<div class="pend-card" onclick="abrirDetalleCli('${esc(c._id||'')}')">
         <div class="pend-card-title">${esc(c.nombre||c.name||'Sin nombre')}</div>
         <div class="pend-card-meta">
@@ -2385,7 +2390,7 @@ function renderHoy(){
   </div>`+(ganados.length?`<div class="table-wrap"><table class="data-table">
     <thead><tr><th>Cliente</th><th>Auto</th><th>Vendedor</th><th class="num">Precio</th><th>Fecha</th></tr></thead>
     <tbody>${ganados.map(c=>{
-      const v=findVend(c.vendedorId||c.vendedorAsignado);
+      const v=findVend(vendId(c));
       return`<tr style="cursor:pointer" onclick="abrirDetalleLead('${esc(c._id||'')}')">
         <td style="font-weight:600">${esc(c.nombre||c.name||'—')}</td>
         <td style="font-size:12px">${esc(c._autoNombre||c.autoInteres||'—')}</td>
@@ -2406,8 +2411,8 @@ function renderVendedores(){
   if(!VENDEDORES.length){el.innerHTML='<div class="empty-state"><i class="ti ti-id-badge"></i><h3>Sin vendedores</h3><p>No hay vendedores registrados</p></div>';return;}
   const cards=VENDEDORES.map((v,i)=>{
     const id=v._id;
-    const leads=CLIENTES.filter(c=>(c.vendedorId||c.vendedorAsignado)===id);
-    const activos=leads.filter(c=>!['Ganado','Vendido','Entregado','Perdido'].includes(c.etapa||c.estatus||'')).length;
+    const leads=CLIENTES.filter(c=>(vendId(c))===id);
+    const activos=leads.filter(c=>!['Ganado','Vendido','Entregado','Perdido'].includes(etapa(c))).length;
     const cerrados=leads.filter(c=>isVenta(c)).length;
     const esMes=leads.filter(c=>isVenta(c)&&_enMes(c));
     const unidades=esMes.length;
@@ -2444,7 +2449,7 @@ function renderVendedores(){
   el.innerHTML=`<div class="vend-grid">${cards}</div>`;
 }
 function filtrarCliPorVendedor(id){
-  mostrarVista('clientes',document.querySelector('.sb-item[onclick*="clientes"]'));
+  mostrarVista('clientes',document.getElementById('sb-btn-clientes'));
   const sel=document.getElementById('cli-f-vend');
   if(sel){sel.value=id;renderClientes();}
 }
@@ -2455,18 +2460,30 @@ function renderRentabilidad(){
   const fEst=document.getElementById('rent-f-est')?.value||'';
   const sort=document.getElementById('rent-sort')?.value||'dias';
   let rows=[...CARS].map(car=>{
-    const nombre=[car.marca||car.brand||'',car.modelo||car.model||'',car.anio||car.year||''].filter(Boolean).join(' ');
+    // Usar campos canónicos enriquecidos si están disponibles (car viene del backend sin enriquecer)
+    const nombre=[car.marca||car.brand||'',car.modelo||car.model||'',car.año||car.anio||car.year||''].filter(Boolean).join(' ');
     const precio=parseFloat(car.precioVenta||car.priceNew||car.precio||0);
-    const costo=parseFloat(car.costoAdquisicion||car.costoCompra||car.costo||0);
-    const gastos=parseFloat(car.gastoReparacion||car.gastosReparacion||0)+parseFloat(car.gastoLegalAduanas||0)+parseFloat(car.gastosExtras||0);
-    const costoTotal=costo+gastos;
+    const tipoAdq=(car.tipoAdquisicion||car.tipoOrigen||'compra').toLowerCase();
+    const esConsigna=tipoAdq==='consigna'||car.esConsigna===true;
+    const costoBase=esConsigna
+      ? parseFloat(car.precioConvenido||car.precioConsignaMin||car.costoConsigna||car.costoAdquisicion||car.costoCompra||car.costo||0)
+      : parseFloat(car.costoAdquisicion||car.costoCompra||car.costo||0);
+    const gastos=parseFloat(car.gastoReparacion||car.gastosReparacion||car.reparacion||0)
+               +parseFloat(car.gastoLegalAduanas||car.gastoLegal||0)
+               +parseFloat(car.gastosExtras||car.gastoAdicional||0);
+    const costoTotal=costoBase+gastos;
     const margen=precio-costoTotal;
     const margenPct=precio>0?Math.round(margen/precio*100):0;
-    const fechaIn=car._createdDate||car.fechaIngreso||car.fechaCompra;
-    const dias=fechaIn?Math.round((Date.now()-new Date(fechaIn).getTime())/(1000*60*60*24)):0;
+    const fechaIn=car.fechaIngreso||car.fechaCompra||car._createdDate;
+    // Para autos vendidos, días en lote = desde ingreso hasta venta; para disponibles = hasta hoy
+    const lead=CLIENTES.find(c=>(c.cierreAutoId||c.autoInventarioId||c.autoInteresId||c.vehiculoId)===car._id&&isVenta(c));
+    const estatusCar=(car.estatusVenta||car.estatus||car.status||'disponible').toLowerCase();
+    const fSalida=lead?new Date(fechaVenta(lead)||Date.now()):new Date();
+    const dias=fechaIn&&!isNaN(new Date(fechaIn).getTime())
+      ?Math.round((fSalida-new Date(fechaIn))/(1000*60*60*24)):0;
     const interesados=CLIENTES.filter(c=>(c.cierreAutoId||c.autoInventarioId||c.autoInteresId||c.vehiculoId)===car._id).length;
-    const estatus=car.estatusVenta||car.estatus||'Disponible';
-    return{...car,_nombre:nombre,_precio:precio,_costo:costoTotal,_margen:margen,_margenPct:margenPct,_dias:dias,_interesados:interesados,_estatus:estatus};
+    const _estatus=estatusCar.charAt(0).toUpperCase()+estatusCar.slice(1);
+    return{...car,_nombre:nombre,_precio:precio,_costo:costoTotal,_margen:margen,_margenPct:margenPct,_dias:dias,_interesados:interesados,_estatus,_esConsigna:esConsigna};
   });
   if(q)rows=rows.filter(c=>c._nombre.toLowerCase().includes(q)||(c.vin||'').toLowerCase().includes(q));
   if(fEst)rows=rows.filter(c=>c._estatus===fEst);
@@ -2478,7 +2495,7 @@ function renderRentabilidad(){
   const sinCosto=rows.filter(c=>c._costo===0).length;
   const margenProm=rows.length?Math.round(rows.reduce((s,c)=>s+c._margenPct,0)/rows.length):0;
   const diasProm=rows.length?Math.round(rows.reduce((s,c)=>s+c._dias,0)/rows.length):0;
-  const alertas=rows.filter(c=>c._dias>=60&&!['Vendido','Entregado'].includes(c._estatus)).length;
+  const alertas=rows.filter(c=>c._dias>=60&&!['Vendido','Entregado','vendido','entregado'].includes(c._estatus)).length;
   document.getElementById('rent-kpis').innerHTML=`<div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
     <div class="stat-card accent"><div class="stat-num">${rows.length}</div><div class="stat-lbl">Autos</div></div>
     <div class="stat-card"><div class="stat-num" style="color:${margenProm>=15?'var(--wc-ok)':margenProm>=5?'var(--wc-warn)':'var(--wc-danger)'}">${margenProm}%</div><div class="stat-lbl">Margen promedio</div></div>
@@ -2678,19 +2695,19 @@ function renderReportes(){
   const mesLabel=ahora.toLocaleString('es-MX',{month:'long',year:'numeric'});
   const ventas=ventasDelMes();
   const leadsTotal=CLIENTES.length;
-  const leadsActivos=CLIENTES.filter(c=>!['Ganado','Vendido','Entregado','Perdido'].includes(c.etapa||c.estatus||'')).length;
+  const leadsActivos=CLIENTES.filter(c=>!['Ganado','Vendido','Entregado','Perdido'].includes(etapa(c))).length;
   const leadsGanados=CLIENTES.filter(c=>isVenta(c)).length;
-  const leadsPerdidos=CLIENTES.filter(c=>(c.etapa||c.estatus||'')==='Perdido').length;
+  const leadsPerdidos=CLIENTES.filter(c=>(etapa(c))==='Perdido').length;
   const leadsMes=CLIENTES.filter(c=>_enMes(c)).length;
   const tasaCierre=leadsTotal>0?Math.round(leadsGanados/leadsTotal*100):0;
   // Pipeline por etapa
   const ETAPAS=['Nuevo','Contactado','Interesado','Negociando','Ganado','Perdido'];
   const ETAPA_COLOR={Nuevo:'var(--wc-info)',Contactado:'#8b5cf6',Interesado:'var(--wc-warn)',
     Negociando:'var(--wc-orange)',Ganado:'var(--wc-ok)',Perdido:'var(--wc-danger)'};
-  const pipeData=ETAPAS.map(e=>({etapa:e,count:CLIENTES.filter(c=>(c.etapa||c.estatus||'Nuevo')===e).length}));
+  const pipeData=ETAPAS.map(e=>({etapa:e,count:CLIENTES.filter(c=>(etapa(c))===e).length}));
   // Ranking vendedores
   const rankVend=VENDEDORES.map(v=>{
-    const mis=CLIENTES.filter(c=>(c.vendedorId||c.vendedorAsignado)===v._id);
+    const mis=CLIENTES.filter(c=>(vendId(c))===v._id);
     const leadsM=mis.filter(c=>_enMes(c)).length;
     const gan=mis.filter(c=>isVenta(c)&&_enMes(c)).length;
     const util=mis.filter(c=>isVenta(c)&&_enMes(c)).reduce((s,c)=>s+calcUtil(c).util,0);
@@ -2825,7 +2842,7 @@ function filteredClientes(){
   return CLIENTES.filter(c=>{
     if(q&&![c.nombre,c.telefono,c.correo,c.autoInteres].some(v=>String(v||'').toLowerCase().includes(q)))return false;
     if(est&&(c.estatus||c.etapa||'')!==est)return false;
-    if(vend&&(c.vendedorId||c.vendedorAsignado||'')!==vend)return false;
+    if(vend&&(vendId(c)||'')!==vend)return false;
     return true;
   });
 }
@@ -2874,7 +2891,7 @@ function renderCliTabla(shown){
       const e=c.estatus||c.etapa||'Nuevo';
       const dias=diasSinActCli(c);
       const urgente=dias>=3&&!['Ganado','Vendido','Perdido'].includes(e);
-      const vend=findVend(c.vendedorId||c.vendedorAsignado);
+      const vend=findVend(vendId(c));
       const _avColors=['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#10b981'];
       const _avClr=_avColors[(c.nombre||'?').charCodeAt(0)%_avColors.length];
       const _ini=(c.nombre||'?').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
@@ -2985,7 +3002,7 @@ function abrirDetalleCli(id){
   const c=CLIENTES.find(x=>x._id===id);if(!c)return;
   _cliAbierto=id;
   const e=c.estatus||c.etapa||'Nuevo';
-  const vend=findVend(c.vendedorId||c.vendedorAsignado);
+  const vend=findVend(vendId(c));
   const dias=diasSinActCli(c);
   // Header
   document.getElementById('ge-cli-nombre').textContent=c.nombre||'Sin nombre';
@@ -3006,7 +3023,7 @@ function abrirDetalleCli(id){
   document.getElementById('ge-cli-ef-estatus').value=e;
   document.getElementById('ge-cli-ef-vend').innerHTML=
     `<option value="">Sin asignar</option>`+
-    VENDEDORES.map(v=>`<option value="${esc(v._id)}" ${(c.vendedorId||c.vendedorAsignado)===v._id?'selected':''}>
+    VENDEDORES.map(v=>`<option value="${esc(v._id)}" ${(vendId(c))===v._id?'selected':''}>
       ${esc(v.nombre||v.name||v.email||v._id)}</option>`).join('');
   document.getElementById('ge-cli-ef-notas').value=c.notas||c.comentarios||'';
   document.getElementById('ge-cli-ef-prox').value=c.proximoSeguimiento?c.proximoSeguimiento.split('T')[0]:'';

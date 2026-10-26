@@ -48,49 +48,110 @@ export async function obtenerDatosGerencia() {
   // Usuarios es la única fuente de vendedores
   const vendedores = [...usuariosCol];
 
+  // Índice email→_id para resolver vendedorAsignado (email) a _id de Usuarios
+  const emailToId = {};
+  usuariosCol.forEach(u => { if (u.email) emailToId[u.email.toLowerCase()] = u._id; });
+
   const carMap = {};
   carsRaw.forEach(car => { carMap[car._id] = car; });
+
+  // Índice leadId→comisión para usar Comisiones como fuente oficial
+  const comisionMap = {};
+  comisiones.forEach(com => {
+    if (com.leadId && !comisionMap[com.leadId]) comisionMap[com.leadId] = com;
+  });
 
   // Enriquecer leads con datos del auto vinculado
   const clientesEnriquecidos = clientes.map(lead => {
     const autoId = lead.cierreAutoId || lead.autoInventarioId || lead.autoInteresId || lead.vehiculoId || '';
     const car = autoId ? carMap[autoId] : null;
+
+    // ── 1.2 Precio canónico ──────────────────────────────────────────────
     const precioVenta = lead.cierrePrecio || lead.precioVenta
       || (car ? (car.precioVenta || car.priceNew || car.precio) : 0) || 0;
+
+    // ── 1.4 Costo canónico con lógica consigna ───────────────────────────
     const costoAdquisicion = (car ? (car.costoAdquisicion || car.costoCompra || car.costo) : null)
       || lead.costoAdquisicion || 0;
     const tipoAdq = car ? (car.tipoAdquisicion || car.tipoOrigen || 'compra').toLowerCase() : 'compra';
     const esConsigna = tipoAdq === 'consigna' || car?.esConsigna === true;
     const costoFinal = esConsigna
-      ? parseFloat(car?.precioConsignaMin || car?.costoConsigna || costoAdquisicion || 0)
-      : costoAdquisicion;
-    const precioConsignado = esConsigna
       ? parseFloat(car?.precioConvenido || car?.precioConsignaMin || car?.costoConsigna || costoAdquisicion || 0)
-      : 0;
+      : parseFloat(costoAdquisicion || 0);
+    const precioConsignado = esConsigna ? costoFinal : 0;
+    const gastoReparacion   = parseFloat((car?.gastoReparacion || car?.gastosReparacion || car?.reparacion) || 0);
+    const gastoLegal        = parseFloat((car?.gastoLegalAduanas || car?.gastoLegal) || 0);
+    const gastosExtras      = parseFloat((car?.gastosExtras || car?.gastoAdicional) || 0);
+    const gastoTotal        = gastoReparacion + gastoLegal + gastosExtras;
+    const costoTotal        = costoFinal + gastoTotal;
+
+    // ── 1.7 Comisión: fuente oficial es colección Comisiones ─────────────
+    const comisionObj      = comisionMap[lead._id];
+    const comisionVendedor = parseFloat(
+      (comisionObj?.monto) || lead.cierreComision || lead.comisionVendedor
+      || (car?.comisionVendedor) || 0
+    );
+
+    // ── 1.6 Etapa canónica (normalizada a mayúscula inicial) ─────────────
+    const etapaRaw  = lead.etapa || lead.estatus || lead.status || lead.estado || 'Nuevo';
+    const etapaMap  = { nuevo:'Nuevo', contactado:'Contactado', interesado:'Interesado',
+                        negociando:'Negociando', ganado:'Ganado', perdido:'Perdido',
+                        vendido:'Ganado', entregado:'Ganado' };
+    const _etapa    = etapaMap[etapaRaw.toLowerCase()] || etapaRaw;
+
+    // ── 1.3 Estatus del auto normalizado ─────────────────────────────────
+    const estatusCarRaw = car ? (car.estatusVenta || car.estatus || car.status || 'disponible') : 'disponible';
+    const estatusCarMap = { disponible:'disponible', apartado:'apartado', vendido:'vendido',
+                            entregado:'entregado', consigna:'consigna', 'en proceso':'apartado' };
+    const _estatusCar   = estatusCarMap[estatusCarRaw.toLowerCase()] || estatusCarRaw.toLowerCase();
+
+    // ── 1.8 vendedorId: resolver email→_id ───────────────────────────────
+    const _vendedorId = lead.vendedorId
+      || emailToId[(lead.vendedorAsignado || '').toLowerCase()]
+      || lead.vendedorAsignado || '';
+
     return {
       ...lead,
-      _precioVenta: precioVenta,
-      _costoAdquisicion: costoFinal,
-      _comisionVendedor: lead.cierreComision || lead.comisionVendedor || (car ? car.comisionVendedor : 0) || 0,
+      // Campos canónicos
+      _etapa,
+      _vendedorId,
+      _precioVenta:        parseFloat(precioVenta) || 0,
+      _costoAdquisicion:   costoFinal,
+      _gastoTotal:         gastoTotal,
+      _costoTotal:         costoTotal,
+      _comisionVendedor:   comisionVendedor,
+      _margenBruto:        parseFloat(precioVenta) > 0
+                             ? Math.round((parseFloat(precioVenta) - costoTotal - comisionVendedor)
+                               / parseFloat(precioVenta) * 100)
+                             : 0,
       _autoNombre: car
-        ? [car.marca||car.brand||'', car.modelo||car.model||'', car.anio||car.year||''].filter(Boolean).join(' ')
+        ? [car.marca||car.brand||'', car.modelo||car.model||'', car.año||car.anio||car.year||''].filter(Boolean).join(' ')
         : (lead.autoInteres || ''),
-      _esConsigna: esConsigna,
-      _precioConsignado: precioConsignado,
-      // Datos del carro para expediente
+      _esConsigna:         esConsigna,
+      _precioConsignado:   precioConsignado,
+      _estatusCar,
+      // Datos del carro para expediente y rentabilidad
       _car: car ? {
-        _id: car._id,
-        vin: car.vin || car.VIN || '',
-        fotos: car.fotos || car.images || [],
-        foto: car.foto || car.fotoPrincipal || car.imagenUrl || '',
-        tipoAdquisicion: car.tipoAdquisicion || car.tipoOrigen || 'compra',
-        duenioNombre: car.duenioNombre || car.propietario || car.nombreDueno || '',
-        duenioTel: car.duenioTelefono || car.telefonoDueno || '',
-        precioConvenido: car.precioConvenido || car.precioConsignaMin || car.costoConsigna || 0,
-        costoAdquisicion: car.costoAdquisicion || car.costoCompra || car.costo || 0,
-        gastoReparacion: car.gastoReparacion || car.gastosReparacion || car.reparacion || 0,
-        gastoLegalAduanas: car.gastoLegalAduanas || car.gastoLegal || 0,
-        gastosExtras: car.gastosExtras || car.gastoAdicional || 0,
+        _id:              car._id,
+        _estatusCar,
+        _km:              parseFloat(car.km || car.kilometraje || car.mileage || 0),
+        _color:           car.color || car.colour || car.colorExterior || '',
+        _version:         car.version || car.versión || car.trim || car.variant || '',
+        _anio:            car.año || car.anio || car.year || '',
+        vin:              car.vin || car.VIN || '',
+        fotos:            car.fotos || car.images || [],
+        foto:             car.foto || car.fotoPrincipal || car.imagenUrl || '',
+        tipoAdquisicion:  car.tipoAdquisicion || car.tipoOrigen || 'compra',
+        duenioNombre:     car.duenioNombre || car.propietario || car.nombreDueno || '',
+        duenioTel:        car.duenioTelefono || car.telefonoDueno || '',
+        precioVenta:      parseFloat(car.precioVenta || car.priceNew || car.precio || 0),
+        precioConvenido:  parseFloat(car.precioConvenido || car.precioConsignaMin || car.costoConsigna || 0),
+        costoAdquisicion: parseFloat(car.costoAdquisicion || car.costoCompra || car.costo || 0),
+        gastoReparacion,
+        gastoLegalAduanas: gastoLegal,
+        gastosExtras,
+        gastoTotal,
+        fechaIngreso:     car.fechaIngreso || car.fechaCompra || car._createdDate || null,
       } : null,
     };
   });
