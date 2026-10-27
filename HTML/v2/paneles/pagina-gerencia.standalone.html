@@ -75,21 +75,19 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 /* ── Views ── */
 .view-wrap{padding:28px 32px}
 @media(max-width:1024px){.view-wrap{padding:20px 24px}}
-@media(max-width:768px){.view-wrap{padding:16px 18px}}
+@media(max-width:768px){.view-wrap{padding:16px 14px;padding-bottom:80px}}
 .view{display:none}.view.active{display:block}
 
 /* ── Bottom nav ── */
 .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:var(--bottom-nav-h);
   background:var(--wc-nav-bg);border-top:1px solid rgba(255,255,255,.1);z-index:100;
-  padding-bottom:env(safe-area-inset-bottom,0);overflow-x:auto;overflow-y:hidden;
-  scrollbar-width:none;-ms-overflow-style:none}
-.bottom-nav::-webkit-scrollbar{display:none}
+  padding-bottom:env(safe-area-inset-bottom,0);overflow-x:hidden;overflow-y:hidden}
 @media(min-width:769px){.bottom-nav{display:none}}
-.bn-item{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;font-size:10px;color:rgba(255,255,255,.55);cursor:pointer;border:none;background:none;
+.bn-item{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;font-size:9px;color:rgba(255,255,255,.55);cursor:pointer;border:none;background:none;
   padding:6px 10px;min-height:44px;min-width:64px;transition:color .15s}
 .bn-item.active{color:var(--wc-green-mid)}
-.bn-item i{font-size:20px}
+.bn-item i{font-size:18px}
 
 /* ══ Componentes ══════════════════════════════════════ */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
@@ -321,8 +319,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
 
 /* Kanban clientes */
 /* ── Stats row (igual Operaciones) ────────────── */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-@media(max-width:700px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr) !important}}
+@media(max-width:400px){.stats-row{grid-template-columns:repeat(2,1fr) !important;gap:8px}}
 .stat-card{background:var(--wc-surface);border:1px solid var(--wc-border);border-radius:var(--wc-r-md);padding:14px;text-align:center}
 .stat-card.accent{border-color:var(--wc-green);background:var(--wc-green-light)}
 .stat-num{font-size:22px;font-weight:800;line-height:1;color:var(--wc-ink)}
@@ -716,7 +715,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}img{max-width:10
         </div>
       </div>
       <!-- Stats row igual que Operaciones -->
-      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px" id="cli-stats-row">
+      <div class="stats-row" style="margin-bottom:12px" id="cli-stats-row">
         <div class="stat-card accent"><div class="stat-num" id="cli-st-total">—</div><div class="stat-lbl">Total leads</div></div>
         <div class="stat-card"><div class="stat-num" id="cli-st-activos">—</div><div class="stat-lbl">Activos</div></div>
         <div class="stat-card"><div class="stat-num" id="cli-st-urgentes" style="color:var(--wc-warn)">—</div><div class="stat-lbl">Sin seguimiento 3d+</div></div>
@@ -1548,7 +1547,7 @@ function renderPipeline(){
   const perdidos=rows.filter(c=>(etapa(c))==='Perdido');
   const tasa=rows.length?Math.round(ganados.length/rows.length*100):0;
   document.getElementById('pipe-kpis').innerHTML=`
-    <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px">
+    <div class="stats-row" style="margin-bottom:12px">
       <div class="stat-card accent"><div class="stat-num">${rows.length}</div><div class="stat-lbl">Total leads</div></div>
       <div class="stat-card"><div class="stat-num" style="color:var(--wc-info)">${activos.length}</div><div class="stat-lbl">En proceso</div></div>
       <div class="stat-card"><div class="stat-num" style="color:var(--wc-ok)">${ganados.length}</div><div class="stat-lbl">Cerrados</div></div>
@@ -2539,7 +2538,7 @@ function renderRentabilidad(){
   const margenProm=rows.length?Math.round(rows.reduce((s,c)=>s+c._margenPct,0)/rows.length):0;
   const diasProm=rows.length?Math.round(rows.reduce((s,c)=>s+c._dias,0)/rows.length):0;
   const alertas=rows.filter(c=>c._dias>=60&&!['Vendido','Entregado','vendido','entregado'].includes(c._estatus)).length;
-  document.getElementById('rent-kpis').innerHTML=`<div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+  document.getElementById('rent-kpis').innerHTML=`<div class="stats-row">
     <div class="stat-card accent"><div class="stat-num">${rows.length}</div><div class="stat-lbl">Autos</div></div>
     <div class="stat-card"><div class="stat-num" style="color:${margenProm>=15?'var(--wc-ok)':margenProm>=5?'var(--wc-warn)':'var(--wc-danger)'}">${margenProm}%</div><div class="stat-lbl">Margen promedio</div></div>
     <div class="stat-card"><div class="stat-num">${diasProm}d</div><div class="stat-lbl">Días prom en lote</div></div>
